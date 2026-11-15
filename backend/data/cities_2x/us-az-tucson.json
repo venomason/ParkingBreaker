@@ -1,0 +1,83 @@
+{
+  "city_id": "us-az-tucson",
+  "name": "Tucson",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Phoenix",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.tucsonaz.gov/Departments/Transportation-Mobility/Park-Tucson/If-You-Get-A-Parking-Ticket",
+  "local_rules": "Tucson has a 45-day window from the date of issuance to either pay or request a hearing. To contest by mail, you must submit a written 'Request for Hearing' at least 14 days before the appearance date shown on your ticket. Tucson City Court handles the adjudication, while Park Tucson handles the enforcement. If you are a student at the University of Arizona, UofA tickets are a separate system — do not mail city court for campus citations.",
+  "appeal_deadline_days": 45,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Tucson City Court",
+    "attention": "Parking Hearing Office",
+    "address1": "P.O. Box 27210",
+    "address2": "103 E. Alameda Street",
+    "city": "Tucson",
+    "state": "AZ",
+    "zip": "85726-7210",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest (revised). Address: Tucson City Court, Parking Hearing Office, P.O. Box 27210 / 103 E. Alameda Street, Tucson, AZ 85726-7210. URL: tucsonaz.gov/Departments/Transportation-Mobility/Park-Tucson/If-You-Get-A-Parking-Ticket. 45-day window to pay or request hearing. Mail contest requires written 'Request for Hearing' at least 14 days before appearance date. UofA tickets are a separate system.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "tucson_parking_enforcement": {
+      "section_id": "tucson_parking_enforcement",
+      "name": "Tucson Parking Enforcement",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "45-day window. Written 'Request for Hearing' required at least 14 days before appearance date. UofA tickets are separate system."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Tucson has a generous 45-day window from the date of issuance to either pay or request a hearing. However, to contest by mail, you must submit a written 'Request for Hearing' at least 14 days before the appearance date shown on your ticket. Note: Tucson City Court handles the adjudication, while Park Tucson handles the enforcement. If you are a student at the University of Arizona, UofA tickets are a separate system — do not mail city court for campus citations.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.tucsonaz.gov/Departments/Transportation-Mobility/Park-Tucson/If-You-Get-A-Parking-Ticket",
+    "official_excerpt": "…to either pay or request a hearing. To contest by mail, you must submit a written 'Request for Hearing' at least 14 days before the appearance date shown on your ticket. Tucs…",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

@@ -1,0 +1,114 @@
+# REVIEW OVERLAY: compose.yaml + deploy/compose.production.yaml + this file, in order.
+# Compose >=2.24.4 (!override and !reset). `docker compose config` is read-only.
+# Keep ONE fenced VM owning the regional disk. PB_DATA_PATH remains its existing
+# mounted directory, never a named volume, NFS/FUSE mount or Cloud Run filesystem.
+# Existing validate.sh disk-owner checks, flock, stop-before-start, quarantine,
+# backup/restore and schema gates remain mandatory; replicas are not disk fencing.
+# lifecycle.sh currently selects only the production stack and expects local web.
+# It MUST be separately integrated/rehearsed with this overlay before activation;
+# do not bypass it with `compose up`. This file alone is not a deployment workflow.
+# VM MUST have no public ingress/IP. Firewall TCP 8443 to the frontend VPC tag/range.
+# PB_PRIVATE_VM_IP must be the VM's RFC1918 address (never 0.0.0.0/public/loopback).
+# PB_PRIVATE_API_HOST must resolve to it and match the provisioned trusted TLS cert.
+# Public LB deny policy is described in cloudrun-frontend.service.yaml; the same
+# paths are refused here as defense in depth. No worker path is proxied at all.
+services:
+  web: !reset null
+  api:
+    container_name: parkingbreaker-api
+    deploy: {replicas: 1}
+    ports: !reset []
+    networks: !override [customer, api_egress]
+    environment:
+      PB_API_ROLE: customer
+      PB_DATA_DIR: /data
+      PB_PUBLIC_ORIGIN: ${PB_PUBLIC_ORIGIN:?final HTTPS customer origin required}
+    volumes: !override
+      - type: bind
+        source: ${PB_DATA_PATH:?existing regional disk mount required}
+        target: /data
+        bind: {create_host_path: false}
+  worker:
+    container_name: parkingbreaker-worker
+    deploy: {replicas: 1}
+    ports: !reset []
+    networks: !override [worker_control, worker_egress]
+    environment:
+      PB_API_ROLE: worker
+      PB_DATA_DIR: /data
+      PB_PUBLIC_ORIGIN: ${PB_PUBLIC_ORIGIN:?final HTTPS customer origin required}
+    volumes: !override
+      - type: bind
+        source: ${PB_DATA_PATH:?existing regional disk mount required}
+        target: /data
+        bind: {create_host_path: false}
+  scheduler:
+    container_name: parkingbreaker-scheduler
+    deploy: {replicas: 1}
+    ports: !reset []
+    networks: !override [worker_control]
+    depends_on: !override [worker]
+    command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch']
+  monitor:
+    container_name: parkingbreaker-monitor
+    deploy: {replicas: 1}
+    ports: !reset []
+    networks: !override [monitor_egress]
+    # Production monitor uses SQLite mode=ro. WAL readers need its existing RW mount.
+    volumes: !override
+      - type: bind
+        source: ${PB_DATA_PATH:?existing regional disk mount required}
+        target: /data
+        bind: {create_host_path: false}
+      - pbmonitor:/monitor
+  caddy: !override
+    image: caddy:2.10.2-alpine
+    user: "10001:10001"
+    restart: unless-stopped
+    ports:
+      - target: 8443
+        published: "8443"
+        host_ip: ${PB_PRIVATE_VM_IP:?private RFC1918 VM address required}
+        protocol: tcp
+    networks: [customer]
+    depends_on: [api]
+    configs:
+      - source: private_customer_gateway
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - type: bind
+        source: ${PB_PRIVATE_TLS_PATH:?provisioned trusted TLS certificate directory required}
+        target: /tls
+        read_only: true
+        bind: {create_host_path: false}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    deploy: {replicas: 1}
+
+networks:
+  customer: {internal: true}
+  worker_control: {internal: true}
+  api_egress: {}
+  worker_egress: {}
+  monitor_egress: {}
+
+configs:
+  private_customer_gateway:
+    content: |
+      {
+          admin off
+          auto_https off
+          persist_config off
+      }
+      https://${PB_PRIVATE_API_HOST:?private TLS DNS name required}:8443 {
+          tls /tls/fullchain.pem /tls/privkey.pem
+          route {
+              @private path /internal /internal/* /api/internal /api/internal/* /dev-worker /dev-worker/* /api/dev-worker /api/dev-worker/*
+              respond @private 404
+              @customer path /health /auth /auth/* /workspaces /workspaces/* /cases /cases/* /webhooks /webhooks/*
+              reverse_proxy @customer api:8000
+              respond 404
+          }
+      }

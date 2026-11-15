@@ -1,0 +1,84 @@
+{
+  "city_id": "us-ky-louisville",
+  "name": "Louisville Metro",
+  "jurisdiction": "Louisville-Jefferson County, Kentucky",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Kentucky/Louisville",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://louisvilleky.gov/government/parking-authority-parc/how-appeal-citation",
+  "local_rules": "15-day window. Deposit required for 2nd-tier hearings. LLCs need lawyers at hearings.",
+  "appeal_deadline_days": 15,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "PARC OnStreet",
+    "attention": null,
+    "address1": "222 S. 1st St",
+    "address2": "Suite 106",
+    "city": "Louisville",
+    "state": "KY",
+    "zip": "40202",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Address updated per master registry manifest: PARC OnStreet, 222 S. 1st St, Suite 106, Louisville, KY 40202. URL updated to louisvilleky.gov/government/parking-authority-parc/how-appeal-citation. Deadline changed to 15 days. Deposit required for 2nd-tier hearings. LLCs need lawyers at hearings.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "louisville_parking": {
+      "section_id": "louisville_parking",
+      "name": "Louisville Metro Parking Violations Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "15-day window. Deposit required for 2nd-tier hearings. LLCs need lawyers at hearings."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Louisville Metro allows 15 days to contest. Mark your calendar — missing this window means you lose the right to appeal. Deposit required for 2nd-tier hearings. LLCs need lawyers at hearings. Louisville Metro offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://louisvilleky.gov/government/parking-authority-parc/how-appeal-citation",
+    "official_excerpt": "Official Louisville Metro Louisville-Jefferson County, Kentucky of Louisville Metro (PARC OnStreet) — address verified via https://louisvilleky.gov/government/parking-authority-parc/how-appeal-citation",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

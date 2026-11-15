@@ -1,0 +1,7 @@
+{
+  "mode": "edit",
+  "objective": "Fix slug.py so runs of whitespace (including tabs/newlines) become one hyphen and leading/trailing whitespace disappears. Preserve lowercase behavior and empty input. Only slug.py is writable; check_slug.py is a frozen trusted evaluator. Read both, make the minimal fix, run the named slug test and finish with exact changed path/hash/excerpt, tests and limitations. No new dependency or unrelated work.",
+  "context": ["slug.py", "check_slug.py"],
+  "writable": ["slug.py"],
+  "tests": {"slug": ["/usr/bin/python3", "-B", "check_slug.py"]}
+}

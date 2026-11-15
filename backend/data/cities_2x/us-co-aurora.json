@@ -1,0 +1,78 @@
+{
+  "city_id": "us-co-aurora",
+  "name": "Aurora",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Denver",
+  "online_appeal_available": null,
+  "online_appeal_url": "https://www.auroragov.org/residents/park_aurora/how_to_pay_a_parking_citation/parking_dispute_process",
+  "local_rules": "Aurora Police Department handles parking citation appeals; online and mail appeal options confirmed.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of Aurora Municipal Court",
+    "attention": "Parking Ticket Dispute",
+    "address1": "15000 E. Alameda Pkwy",
+    "address2": null,
+    "city": "Aurora",
+    "state": "CO",
+    "zip": "80012",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-04-08",
+    "source": "auroracourt.org parking ticket page",
+    "confidence_score": 0.78,
+    "notes": "URL confirmed on official .gov domain. Page exists and appears to be for parking citation management. Unable to definitively confirm it supports contesting/disputing vs. payment-only without page content inspection.",
+    "verified_by": "minimax_research",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "aurora_parking": {
+      "section_id": "aurora_parking",
+      "name": "Aurora Police Department",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": null
+      }
+    }
+  },
+  "citation_patterns": [],
+  "query": "Aurora CO parking ticket appeal online dispute official city government",
+  "recency_days": 1095,
+  "source": "news",
+  "top_n": 10,
+  "letter_format": "form_required",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "human_verified": true,
+  "confirmation_note": "Aurora gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": false
+  }
+}

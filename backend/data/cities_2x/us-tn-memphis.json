@@ -1,0 +1,83 @@
+{
+  "city_id": "us-tn-memphis",
+  "name": "Memphis",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://memphistn.gov/dispute/",
+  "local_rules": "Memphis requires a mandatory 'Not Guilty' plea for any parking ticket contest. The 201 Poplar Avenue address is the Criminal Justice Center; you must specify 'Room LL-80' on the envelope to ensure the appeal reaches the Traffic Violations Bureau. If you do not resolve the ticket within 30 days, the court treats silence as a default admission, which can trigger license holds under Tennessee state law. Always include a copy of the citation front and back. Private lots in the Beale Street area are managed by vendors like Premium Parking — the city clerk cannot dismiss those; verify the citation was issued by MPD or 'City of Memphis' before mailing.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Traffic Violations Bureau",
+    "attention": "Clerk of Court",
+    "address1": "201 Poplar Avenue",
+    "address2": "Room LL-80",
+    "city": "Memphis",
+    "state": "TN",
+    "zip": "38103",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: Traffic Violations Bureau, Clerk of Court, 201 Poplar Avenue, Room LL-80, Memphis, TN 38103 (Criminal Justice Center). URL: memphistn.gov/dispute/. Requires mandatory 'Not Guilty' plea. 30-day default admission triggers license holds under TN state law. Private lots in Beale Street area (Premium Parking) are not city-issuable.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "memphis_traffic_violations": {
+      "section_id": "memphis_traffic_violations",
+      "name": "Memphis Traffic Violations Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Mandatory 'Not Guilty' plea required. 30-day default = license holds. Private lots (Beale St / Premium Parking) not city-issuable."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Memphis requires a mandatory 'Not Guilty' plea for any parking ticket contest. Crucially, the 201 Poplar Avenue address is the Criminal Justice Center; you must specify 'Room LL-80' on the envelope to ensure the appeal reaches the Traffic Violations Bureau. If you do not resolve the ticket within 30 days, the court treats silence as a default admission, which can trigger license holds under Tennessee state law. Always include a copy of the citation front and back. Important: if you have a ticket from a private lot in the Beale Street area (e.g., Premium Parking), the city clerk cannot dismiss those — verify the citation was issued by MPD or 'City of Memphis' before mailing your contest to the courthouse.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://memphistn.gov/dispute/",
+    "official_excerpt": "…sued by MPD or 'City of Memphis' before mailing. Updated from master registry manifest. Address: Traffic Violations Bureau, Clerk of Court, 201 Poplar Avenue, Room LL…",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

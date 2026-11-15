@@ -1,0 +1,83 @@
+{
+  "city_id": "us-az-mesa",
+  "name": "Mesa",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Phoenix",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.mesaaz.gov/Public-Safety/Court/Tickets",
+  "local_rules": "Action must be taken before the 'Court Appearance Date'. Missing the date adds a $90 default judgment penalty to the fine.",
+  "appeal_deadline_days": 20,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Mesa Municipal Court",
+    "attention": "Citations Clerk",
+    "address1": "250 E. 1st Ave.",
+    "address2": "",
+    "city": "Mesa",
+    "state": "AZ",
+    "zip": "85210",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest (revised). Address: Mesa Municipal Court, Citations Clerk, 250 E. 1st Ave., Mesa, AZ 85210. URL: mesaaz.gov/Public-Safety/Court/Tickets. Action required before 'Court Appearance Date'. Missing date = $90 default judgment penalty.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "mesa_municipal_court": {
+      "section_id": "mesa_municipal_court",
+      "name": "Mesa Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Action before Court Appearance Date. $90 default judgment penalty if missed."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Action must be taken before the 'Court Appearance Date'. Missing the date adds a $90 default judgment penalty to the fine.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.mesaaz.gov/Public-Safety/Court/Tickets",
+    "official_excerpt": "Official Mesa city of Mesa (Mesa Municipal Court) — address verified via https://www.mesaaz.gov/Public-Safety/Court/Tickets",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

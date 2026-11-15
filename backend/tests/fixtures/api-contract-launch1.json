@@ -1,0 +1,837 @@
+[
+  {
+    "method": "GET",
+    "path": "/health",
+    "request": null,
+    "status": 200,
+    "response": {
+      "status": "ok",
+      "mode": "fake",
+      "customer_authored_mode": false,
+      "customer_authored_mode_version": null,
+      "build_commit": null,
+      "policy_hashes": {}
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces",
+    "request": {
+      "notes": "Saved notes"
+    },
+    "status": 201,
+    "response": {
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "notes": "Saved notes",
+      "intake": null,
+      "case_id": null,
+      "work_preserved": true
+    }
+  },
+  {
+    "method": "PUT",
+    "path": "/workspaces/ws_00000000000000000000000000000001/intake-form",
+    "request": {
+      "expected_revision": 1,
+      "form": {
+        "values": {
+          "story": "Saved partial input"
+        },
+        "step": 2
+      }
+    },
+    "status": 200,
+    "response": {
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "notes": "Saved notes",
+      "intake": null,
+      "case_id": null,
+      "draft_revision": 2,
+      "intake_form": {
+        "values": {
+          "story": "Saved partial input"
+        },
+        "ticket_photo_ref": null,
+        "evidence_photo_ref": null,
+        "step": 2
+      },
+      "work_preserved": true
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/photos",
+    "request": {
+      "content_type": "image/png",
+      "data_base64": "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAFElEQVR4nGP8//8/AwwwMSAB3BwAlm4DBfIlvvkAAAAASUVORK5CYII="
+    },
+    "status": 201,
+    "response": {
+      "photo_ref": "photo_6e5edb15b6bed556ae7e6c4e156378ddb721f066f5f0e523a61106080ef8be08"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/intake",
+    "request": {
+      "rental_company_paid": "NOT_RENTAL",
+      "ticket": {
+        "citation_number": "DEMO-12345",
+        "license_plate": "DEMO123",
+        "license_plate_state": "CA",
+        "issuer_hint": "Demo Municipal Parking Agency",
+        "issued_city": "Demo City",
+        "issued_state": "CA",
+        "violation_code": "DEMO-7",
+        "violation_description": "Meter expired",
+        "issue_date": "2026-10-14",
+        "stage": "first-level review"
+      },
+      "customer_position": {
+        "statement": "I paid for parking and have the receipt."
+      },
+      "contact": {
+        "name": "Alex Example",
+        "phone": "415-555-0100",
+        "email": "alex@example.test",
+        "mailing_address": {
+          "line1": "123 Example Street",
+          "city": "Demo City",
+          "state": "CA",
+          "zip_code": "90000"
+        }
+      },
+      "photo_refs": [
+        "fake://workspace/receipt"
+      ]
+    },
+    "status": 200,
+    "response": {
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "case_id": "case_00000000000000000000000000000001",
+      "state": "INTAKE",
+      "pre_hold_status": "ready"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/workspaces/ws_00000000000000000000000000000001",
+    "request": null,
+    "status": 200,
+    "response": {
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "notes": "Saved notes",
+      "intake": {
+        "ticket": {
+          "citation_number": "DEMO-12345",
+          "license_plate": "DEMO123",
+          "license_plate_state": "CA",
+          "issuer_hint": "Demo Municipal Parking Agency",
+          "issued_city": "Demo City",
+          "issued_state": "CA",
+          "issuer_kind": "GOVERNMENT",
+          "violation_code": "DEMO-7",
+          "violation_description": "Meter expired",
+          "issue_date": "2026-10-14",
+          "stage": "first-level review",
+          "notice_date": null,
+          "printed_deadline": null
+        },
+        "customer_position": {
+          "statement": "I paid for parking and have the receipt.",
+          "provision_selections": []
+        },
+        "contact": {
+          "name": "Alex Example",
+          "phone": "415-555-0100",
+          "email": "alex@example.test",
+          "mailing_address": {
+            "line1": "123 Example Street",
+            "line2": "",
+            "city": "Demo City",
+            "state": "CA",
+            "zip_code": "90000"
+          }
+        },
+        "rental_company_paid": "NOT_RENTAL",
+        "citation_photo_ref": null,
+        "photo_refs": [
+          "fake://workspace/receipt"
+        ]
+      },
+      "case_id": "case_00000000000000000000000000000001",
+      "draft_revision": 2,
+      "intake_form": {
+        "values": {
+          "story": "Saved partial input"
+        },
+        "ticket_photo_ref": null,
+        "evidence_photo_ref": null,
+        "step": 2
+      },
+      "work_preserved": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/auth/appeal",
+    "request": null,
+    "status": 200,
+    "response": {
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "notes": "Saved notes",
+      "intake": {
+        "ticket": {
+          "citation_number": "DEMO-12345",
+          "license_plate": "DEMO123",
+          "license_plate_state": "CA",
+          "issuer_hint": "Demo Municipal Parking Agency",
+          "issued_city": "Demo City",
+          "issued_state": "CA",
+          "issuer_kind": "GOVERNMENT",
+          "violation_code": "DEMO-7",
+          "violation_description": "Meter expired",
+          "issue_date": "2026-10-14",
+          "stage": "first-level review",
+          "notice_date": null,
+          "printed_deadline": null
+        },
+        "customer_position": {
+          "statement": "I paid for parking and have the receipt.",
+          "provision_selections": []
+        },
+        "contact": {
+          "name": "Alex Example",
+          "phone": "415-555-0100",
+          "email": "alex@example.test",
+          "mailing_address": {
+            "line1": "123 Example Street",
+            "line2": "",
+            "city": "Demo City",
+            "state": "CA",
+            "zip_code": "90000"
+          }
+        },
+        "rental_company_paid": "NOT_RENTAL",
+        "citation_photo_ref": null,
+        "photo_refs": [
+          "fake://workspace/receipt"
+        ]
+      },
+      "case_id": "case_00000000000000000000000000000001",
+      "draft_revision": 2,
+      "intake_form": {
+        "values": {
+          "story": "Saved partial input"
+        },
+        "ticket_photo_ref": null,
+        "evidence_photo_ref": null,
+        "step": 2
+      },
+      "work_preserved": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/pre-hold",
+    "request": null,
+    "status": 200,
+    "response": {
+      "kind": "offer",
+      "case_id": "case_00000000000000000000000000000001",
+      "issuer": {
+        "issuer_id": "demo-ca",
+        "issuer_name": "Demo Municipal Parking Agency",
+        "deciding_body": "Demo Parking Administrative Review",
+        "state": "CA",
+        "stage": "first-level review",
+        "service_basis": "FAKE_LOCAL_GOVERNMENT_FIXTURE",
+        "delegated_tenant": null,
+        "evidence_ref": "fake://pre-hold/demo-ca"
+      },
+      "tiers": [
+        {
+          "tier": "CERTIFIED",
+          "amount_cents": 2999,
+          "currency": "usd",
+          "description": "Certified mail with tracking; no promised arrival date."
+        }
+      ],
+      "selected_tier": null
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/beta-offer",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "beta_requires_durable_service"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/beta-acceptance",
+    "request": {
+      "terms_accepted": true,
+      "disclosure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "status": 409,
+    "response": {
+      "detail": "beta_requires_durable_service"
+    }
+  },
+  {
+    "method": "PUT",
+    "path": "/cases/case_00000000000000000000000000000001/tier",
+    "request": {
+      "tier": "CERTIFIED"
+    },
+    "status": 200,
+    "response": {
+      "kind": "offer",
+      "case_id": "case_00000000000000000000000000000001",
+      "issuer": {
+        "issuer_id": "demo-ca",
+        "issuer_name": "Demo Municipal Parking Agency",
+        "deciding_body": "Demo Parking Administrative Review",
+        "state": "CA",
+        "stage": "first-level review",
+        "service_basis": "FAKE_LOCAL_GOVERNMENT_FIXTURE",
+        "delegated_tenant": null,
+        "evidence_ref": "fake://pre-hold/demo-ca"
+      },
+      "tiers": [
+        {
+          "tier": "CERTIFIED",
+          "amount_cents": 2999,
+          "currency": "usd",
+          "description": "Certified mail with tracking; no promised arrival date."
+        }
+      ],
+      "selected_tier": "CERTIFIED"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/authorization",
+    "request": {
+      "terms_accepted": true,
+      "payment_method_id": "pm_card_visa"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "payment_intent_id": "pi_fake_case_00000000000000000000000000000001",
+      "client_secret": "pi_fake_case_00000000000000000000000000000001_secret_placeholder",
+      "amount_cents": 2999,
+      "currency": "usd",
+      "status": "requires_confirmation",
+      "window_started_at": null,
+      "window_expires_at": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/internal/cases/case_00000000000000000000000000000001/step",
+    "request": {
+      "step_id": "hold-confirmed"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "RESEARCHING",
+      "payment_state": "AUTHORIZED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": 7200,
+      "window_status": "ACTIVE",
+      "question": null,
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/internal/cases/case_00000000000000000000000000000001/step",
+    "request": {
+      "step_id": "research-question"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "NEEDS_CUSTOMER",
+      "payment_state": "AUTHORIZED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": 7200,
+      "window_status": "ACTIVE",
+      "question": {
+        "question_id": "VEHICLE_RELATIONSHIP",
+        "prompt": "What is your relationship to the vehicle?",
+        "choices": [
+          "REGISTERED_OWNER",
+          "DRIVER_NOT_OWNER",
+          "BUSINESS_OR_FLEET_VEHICLE",
+          "RENTAL_OR_LEASE_RENTER",
+          "AUTHORISED_REPRESENTATIVE",
+          "OTHER"
+        ]
+      },
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/status",
+    "request": null,
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "NEEDS_CUSTOMER",
+      "payment_state": "AUTHORIZED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": 7200,
+      "window_status": "ACTIVE",
+      "question": {
+        "question_id": "VEHICLE_RELATIONSHIP",
+        "prompt": "What is your relationship to the vehicle?",
+        "choices": [
+          "REGISTERED_OWNER",
+          "DRIVER_NOT_OWNER",
+          "BUSINESS_OR_FLEET_VEHICLE",
+          "RENTAL_OR_LEASE_RENTER",
+          "AUTHORISED_REPRESENTATIVE",
+          "OTHER"
+        ]
+      },
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "PUT",
+    "path": "/cases/case_00000000000000000000000000000001/required-copies",
+    "request": {
+      "research_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected_revision": 0,
+      "selections": []
+    },
+    "status": 409,
+    "response": {
+      "detail": "required_copies_not_available"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/required-copies/0000000000000000000000000000000000000000000000000000000000000000/pages/1",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "required_copy_page_not_found"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/answers",
+    "request": {
+      "question_id": "VEHICLE_RELATIONSHIP",
+      "answer": "REGISTERED_OWNER"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "RESEARCHING",
+      "payment_state": "AUTHORIZED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": 7200,
+      "window_status": "ACTIVE",
+      "question": null,
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/internal/cases/case_00000000000000000000000000000001/step",
+    "request": {
+      "step_id": "research-draft"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "AWAITING_ADOPTION",
+      "payment_state": "AUTHORIZED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": 7200,
+      "window_status": "ACTIVE",
+      "question": null,
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/draft",
+    "request": null,
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "revision": 1,
+      "text": "To Demo Parking Administrative Review:\n\nI request review of citation DEMO-12345.\n\nI paid for parking and have the receipt.\n\nSincerely,\nAlex Example",
+      "text_sha256": "f9bcfbd961eed3ebbd07a22e2e9e039a078eebd204c11eeac3528ef8f6d2a258",
+      "adopted_sha256": null,
+      "adoption_screen_text": "Here is your typed draft based on your notes. Read it, edit any details, and approve if you adopt it as your own statement."
+    }
+  },
+  {
+    "method": "PUT",
+    "path": "/cases/case_00000000000000000000000000000001/draft",
+    "request": {
+      "text": "To Demo Parking Administrative Review:\n\nI request review of citation DEMO-12345.\n\nI paid for parking and have the receipt.\n\nSincerely,\nAlex Example\nReceipt enclosed.",
+      "expected_sha256": "f9bcfbd961eed3ebbd07a22e2e9e039a078eebd204c11eeac3528ef8f6d2a258"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "revision": 2,
+      "text": "To Demo Parking Administrative Review:\n\nI request review of citation DEMO-12345.\n\nI paid for parking and have the receipt.\n\nSincerely,\nAlex Example\nReceipt enclosed.",
+      "text_sha256": "f44724c3b230ad01e60b665b79edfc44b61f3d5af8781b4e87212246cdcba808",
+      "adopted_sha256": null,
+      "adoption_screen_text": "Here is your typed draft based on your notes. Read it, edit any details, and approve if you adopt it as your own statement."
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/adoption",
+    "request": {
+      "text": "To Demo Parking Administrative Review:\n\nI request review of citation DEMO-12345.\n\nI paid for parking and have the receipt.\n\nSincerely,\nAlex Example\nReceipt enclosed.",
+      "text_sha256": "f44724c3b230ad01e60b665b79edfc44b61f3d5af8781b4e87212246cdcba808"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "adopted_sha256": "f44724c3b230ad01e60b665b79edfc44b61f3d5af8781b4e87212246cdcba808",
+      "adopted_at": "2026-10-14T12:00:00Z"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/packet-preview",
+    "request": {
+      "adopted_sha256": "f44724c3b230ad01e60b665b79edfc44b61f3d5af8781b4e87212246cdcba808"
+    },
+    "status": 409,
+    "response": {
+      "detail": "packet_preview_requires_durable_service"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/approval",
+    "request": {
+      "adopted_sha256": "f44724c3b230ad01e60b665b79edfc44b61f3d5af8781b4e87212246cdcba808",
+      "packet_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "envelope_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "FROZEN",
+      "payment_state": "AUTHORIZED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": 7200,
+      "window_status": "ACTIVE",
+      "question": null,
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/internal/cases/case_00000000000000000000000000000001/step",
+    "request": {
+      "step_id": "fake-mail-accepted"
+    },
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "IN_TRANSIT",
+      "payment_state": "CAPTURED",
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": "2026-10-14T12:00:00Z",
+      "window_expires_at": "2026-10-14T14:00:00Z",
+      "seconds_remaining": null,
+      "window_status": null,
+      "question": null,
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/tracking",
+    "request": null,
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "state": "IN_TRANSIT",
+      "tier": "CERTIFIED",
+      "tracking_number": "FAKE-NOT-A-USPS-NUMBER",
+      "events": [
+        {
+          "event": "accepted",
+          "occurred_at": "2026-10-14T12:00:00Z",
+          "description": "Fake mailing accepted; this is not delivery confirmation."
+        }
+      ],
+      "delivery_confirmation_title": "ParkingBreaker Delivery Confirmation",
+      "fake": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/mailing-record",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "mailing_record_requires_durable_service"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/internal/dispatch",
+    "request": null,
+    "status": 200,
+    "response": {
+      "processed": 0,
+      "failed": 0
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/webhooks/stripe",
+    "request": {},
+    "status": 400,
+    "response": {
+      "detail": "invalid_signature"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/webhooks/lob",
+    "request": {},
+    "status": 400,
+    "response": {
+      "detail": "invalid_signature"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/notices",
+    "request": {
+      "request_id": "contract-notice",
+      "pages": [
+        {
+          "role": "page",
+          "photo_ref": "photo_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ]
+    },
+    "status": 409,
+    "response": {
+      "detail": "beta_feedback_requires_durable_service"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/notices",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "beta_feedback_requires_durable_service"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/notices/00000000000000000000000000000000/pages/1",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "beta_feedback_requires_durable_service"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-reading",
+    "request": null,
+    "status": 200,
+    "response": {
+      "enabled": false,
+      "required": false,
+      "synthetic": false,
+      "extraction": {
+        "request_id": null,
+        "status": "missing",
+        "current": false,
+        "synthetic": false,
+        "fields": []
+      },
+      "review": {
+        "request_id": null,
+        "status": "missing",
+        "current": false,
+        "synthetic": false,
+        "basis": "model comparison only; not external verification",
+        "fields": []
+      },
+      "confirmation": {
+        "state": "missing",
+        "command_id": null,
+        "review_request_id": null,
+        "generation": 0,
+        "discrepancy_status": null,
+        "reason": null
+      },
+      "next_confirmation_generation": 0
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-reading",
+    "request": {
+      "request_id": "contract-ticket-reading",
+      "expected_revision": 2
+    },
+    "status": 409,
+    "response": {
+      "detail": "ticket_reading_disabled"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-review",
+    "request": {
+      "request_id": "contract-ticket-review",
+      "expected_revision": 2
+    },
+    "status": 409,
+    "response": {
+      "detail": "ticket_reading_disabled"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-confirmation",
+    "request": {
+      "command_id": "contract-ticket-confirmation",
+      "expected_revision": 2,
+      "review_request_id": "contract-ticket-review",
+      "expected_confirmation_generation": 0,
+      "resolved_fields": {}
+    },
+    "status": 409,
+    "response": {
+      "detail": "ticket_reading_disabled"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/pre-hold",
+    "request": null,
+    "status": 200,
+    "response": {
+      "kind": "stop",
+      "case_id": "case_00000000000000000000000000000001",
+      "family": "NOT_YET_VERIFIED",
+      "hard_stop": "S2",
+      "reason_key": "contest_destination_unverified",
+      "message": "We could not verify where this contest must be mailed. You were not charged.",
+      "no_charge": true,
+      "work_preserved": true,
+      "official_quote": null
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/destination/disclosure",
+    "request": null,
+    "status": 200,
+    "response": {
+      "version": "v1",
+      "sha256": "ea45973d5e3be79d914e043bec37817365c32de6b2cd17237d44e596fea9d186",
+      "text": "We could not confirm the official appeal mailing address from the agency's official sources.\n\nYou can enter the mailing address yourself, and we will mail your approved appeal to that exact address. Make sure you enter the agency's contest or appeal address, not the payment address.\n\nBecause we could not verify this address, we cannot confirm that it is the agency's current appeal office, that USPS can deliver to it, or that the agency will accept mail there.\n\nHow refunds work for an address you supply: if your letter is undeliverable, returned, or not accepted solely because the address you entered is wrong, our normal refund for an address error does not apply. Every other mistake of ours remains our responsibility, including mailing to any address other than the exact one you approved, leaving out required contents, charging you twice, or any failure of our service. Nothing here limits your rights under applicable law.\n\nPrefer not to take that risk? You can decline right now. Your card will not be charged, the hold will be released, and your work will stay saved."
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/destination/address",
+    "request": {
+      "recipient": "Parking Review Office",
+      "line1": "1 Example Plaza",
+      "city": "Demo City",
+      "state": "CA",
+      "zip_code": "90000"
+    },
+    "status": 409,
+    "response": {
+      "detail": "destination_choice_requires_durable_service"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/destination/consent",
+    "request": {
+      "address_revision": 1,
+      "address_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "disclosure_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "accepted": true
+    },
+    "status": 409,
+    "response": {
+      "detail": "destination_choice_requires_durable_service"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/destination/decline",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "destination_choice_requires_durable_service"
+    }
+  }
+]

@@ -1,0 +1,124 @@
+# REVIEW TEMPLATE ONLY. JSON is a YAML subset; placeholders deliberately prevent release.
+# Build web/Dockerfile with PB_API_ORIGIN=https://<private-gateway-name>:8443.
+# next.config.ts embeds that origin at BUILD time. A runtime variable cannot repair it.
+# Qualify certificate trust, private DNS, cookies/CSRF, signed webhook bytes, uploads
+# and the reviewed digest before using this manifest. No private CA bypass is allowed.
+# Frontend service account must have NO Secret Manager/provider/worker/overseer grants.
+# Direct VPC tags are firewall selectors, not sufficient access control by themselves:
+# allow ONLY this tagged frontend/range to the VM private address on TCP 8443.
+# External HTTPS LB + serverless NEG are separate resources. Cloud Run ingress Caddy
+# refuses internal/development routes before Next.js; the private VM repeats the gate.
+# Next.js keeps port 3000. The sole platform ingress container listens on 8080 because
+# Cloud Run containers share a network namespace. Include both containers in cost/load
+# qualification, and rehearse encoded/path-normalized variants before publication.
+# No IAM/LB/firewall is changed here.
+{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "name": "parkingbreaker-frontend",
+    "labels": {
+      "cloud.googleapis.com/location": "us-west1"
+    },
+    "annotations": {
+      "run.googleapis.com/ingress": "internal-and-cloud-load-balancing"
+    }
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "autoscaling.knative.dev/minScale": "0",
+          "autoscaling.knative.dev/maxScale": "2",
+          "run.googleapis.com/execution-environment": "gen2",
+          "run.googleapis.com/vpc-access-egress": "private-ranges-only",
+          "run.googleapis.com/network-interfaces": "[{\"network\":\"REPLACE_PRIVATE_VPC\",\"subnetwork\":\"REPLACE_US_WEST1_SUBNET\",\"tags\":[\"parkingbreaker-frontend\"]}]",
+          "run.googleapis.com/container-dependencies": "{\"ingress\":[\"web\"]}"
+        }
+      },
+      "spec": {
+        "serviceAccountName": "parkingbreaker-web@REPLACE_PROJECT.iam.gserviceaccount.com",
+        "containerConcurrency": 20,
+        "timeoutSeconds": 60,
+        "containers": [
+          {
+            "name": "ingress",
+            "image": "us-west1-docker.pkg.dev/REPLACE_PROJECT/parkingbreaker/caddy@sha256:REPLACE_WITH_64_HEX_REVIEWED_DIGEST",
+            "ports": [
+              {
+                "name": "http1",
+                "containerPort": 8080
+              }
+            ],
+            "command": [
+              "/bin/sh"
+            ],
+            "args": [
+              "-ec",
+              "cat > /tmp/Caddyfile <<'PB_GATEWAY'\n{\n    admin off\n    auto_https off\n    persist_config off\n}\n:8080 {\n    route {\n        @private path /internal /internal/* /api/internal /api/internal/* /dev-worker /dev-worker/* /api/dev-worker /api/dev-worker/*\n        respond @private 404\n        reverse_proxy 127.0.0.1:3000\n    }\n}\nPB_GATEWAY\nexec caddy run --config /tmp/Caddyfile --adapter caddyfile"
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "128Mi"
+              }
+            },
+            "startupProbe": {
+              "tcpSocket": {
+                "port": 8080
+              },
+              "periodSeconds": 5,
+              "timeoutSeconds": 2,
+              "failureThreshold": 24
+            }
+          },
+          {
+            "name": "web",
+            "image": "us-west1-docker.pkg.dev/REPLACE_PROJECT/parkingbreaker/web@sha256:REPLACE_WITH_64_HEX_REVIEWED_DIGEST",
+            "command": [
+              "node",
+              "node_modules/next/dist/bin/next"
+            ],
+            "args": [
+              "start",
+              "--hostname",
+              "0.0.0.0",
+              "--port",
+              "3000"
+            ],
+            "env": [
+              {
+                "name": "NODE_ENV",
+                "value": "production"
+              },
+              {
+                "name": "NEXT_TELEMETRY_DISABLED",
+                "value": "1"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "512Mi"
+              }
+            },
+            "startupProbe": {
+              "tcpSocket": {
+                "port": 3000
+              },
+              "periodSeconds": 5,
+              "timeoutSeconds": 2,
+              "failureThreshold": 24
+            }
+          }
+        ]
+      }
+    },
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100
+      }
+    ]
+  }
+}

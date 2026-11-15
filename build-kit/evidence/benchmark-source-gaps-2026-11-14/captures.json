@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "captures": [
+    {
+      "id": "la-authority",
+      "url": "https://ladot.lacity.gov/sites/default/files/press-releases/ladot-launches-new-parking-management-website.pdf",
+      "retrieved_at": "2026-11-15T00:16:11.742398+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 403,
+      "content_type": "text/html"
+    },
+    {
+      "id": "la-services",
+      "url": "https://ladot.lacity.gov/onlineservices",
+      "retrieved_at": "2026-11-15T00:16:11.742784+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 403,
+      "content_type": "text/html"
+    },
+    {
+      "id": "la-form",
+      "url": "https://ladotparking.org/wp-content/uploads/2018/04/Initial-Review-Request.pdf",
+      "retrieved_at": "2026-11-15T00:16:11.743636+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 403,
+      "content_type": "text/html"
+    },
+    {
+      "id": "seattle-hearings",
+      "url": "https://www.seattle.gov/courts/tickets-and-payments/dispute-my-ticket/hearings-by-mail",
+      "retrieved_at": "2026-11-15T00:16:11.743751+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "raw_file": "seattle-hearings.html",
+      "raw_sha256": "d6c88c1ed5cbe5fcf13da401321749070edf1cd374bbbe140889cace4afb4c3f",
+      "text_file": "seattle-hearings.txt",
+      "text_sha256": "7c4c7d32ff546a537763847a499ce6a393299eccb28376c879bb43f40592ec9d",
+      "usable_as_page_evidence": true
+    },
+    {
+      "id": "wa-response-rule",
+      "url": "https://www.courts.wa.gov/court_rules/pdf/IRLJ/CLJ_IRLJ_02_04_00.pdf",
+      "retrieved_at": "2026-11-15T00:16:11.854962+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "application/pdf",
+      "raw_file": "wa-response-rule.pdf",
+      "raw_sha256": "3319edf0355db5afa115b2c0bfb892a3270538d628357f488cf406156fff5dc3",
+      "text_file": "wa-response-rule.txt",
+      "text_sha256": "1802f266171b85f03facbfae374f28f910532b2357cbff5b3c41b5f49005e475",
+      "usable_as_page_evidence": true
+    },
+    {
+      "id": "austin-civil",
+      "url": "https://www.austintexas.gov/services/handle-civil-parking-citation",
+      "retrieved_at": "2026-11-15T00:16:11.860986+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "raw_file": "austin-civil.html",
+      "raw_sha256": "5230c2239d3b3aa4b3d0b735a91454bee6440175e5d44701a7b96e2c7a07d136",
+      "text_file": "austin-civil.txt",
+      "text_sha256": "7c74fa1cb3c827b534e79022d4a541ebcc46e7f2a25a71aea15469dd6437c056",
+      "usable_as_page_evidence": true
+    },
+    {
+      "id": "austin-faq",
+      "url": "https://www.austintexas.gov/municipal-court/civil-parking-faqs",
+      "retrieved_at": "2026-11-15T00:16:11.904918+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "raw_file": "austin-faq.html",
+      "raw_sha256": "05aa59a1454b1bd6fd03e0be095e8f8270d25ba407751cb810d3da3d0ba36e24",
+      "text_file": "austin-faq.txt",
+      "text_sha256": "38284c51ea7fcae144fb6e31d4cc493cfa3d218ff0fce7f1c00a698fe41864ae",
+      "usable_as_page_evidence": true
+    },
+    {
+      "id": "austin-ordinance",
+      "url": "https://services.austintexas.gov/edims/document.cfm?id=448754",
+      "retrieved_at": "2026-11-15T00:16:11.942209+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "application/pdf;charset=UTF-8",
+      "raw_file": "austin-ordinance.pdf.partial",
+      "raw_sha256": "4c764d0d457e2f671682b30ab322eb36ed2f6a04d3cc8ee99269b13f5dc1155d",
+      "complete": false,
+      "usable_as_page_evidence": false,
+      "bytes": 5000001,
+      "limitation": "HttpFetcher returns MAX_BODY_BYTES+1 bytes to detect oversize; body reached 5,000,001 bytes and lacks EOF. PDF parsing and Poppler failed. Not a complete PDF or usable canonical evidence fixture. No increased limit or retry."
+    },
+    {
+      "id": "omaha-citations",
+      "url": "https://public.powerdms.com/OPDEP1/documents/837820",
+      "retrieved_at": "2026-11-15T00:16:12.028964+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "application/pdf",
+      "raw_file": "omaha-citations.pdf",
+      "raw_sha256": "3fd91b016c0af32c41077edbe1f80ef5197c9a67f00c45d646f50049cc485cae",
+      "text_file": "omaha-citations.txt",
+      "text_sha256": "5c5114fd216677a938f221527983f6e0a7d2f12f71bb94f637bfbd5a460fc4f7",
+      "usable_as_page_evidence": true
+    },
+    {
+      "id": "omaha-public-list",
+      "url": "https://public.powerdms.com/OPDEP1/list",
+      "retrieved_at": "2026-11-15T00:16:12.111953+00:00",
+      "transport": "existing HttpFetcher; one GET; no redirects/authentication",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "raw_file": "omaha-public-list.html",
+      "raw_sha256": "82592e43765588404bf01d97486982414b3cbae74fd50e110d4a92f3433ebc00",
+      "text_file": "omaha-public-list.txt",
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "usable_as_page_evidence": false,
+      "limitation": "HTML shell; extracted text empty. HTTP 200 does not establish document authority or content completeness."
+    }
+  ]
+}

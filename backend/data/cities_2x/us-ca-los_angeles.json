@@ -1,0 +1,89 @@
+{
+  "city_id": "us-ca-los_angeles",
+  "name": "Los Angeles",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://ladotparking.org/adjudication-division/contest-a-parking-citation/",
+  "local_rules": "LADOT Adjudication Division handles all parking citation contests via a 3-tier process: Initial Review → Administrative Hearing → Superior Court. Written mail contests go to the Parking Violations Bureau P.O. Box — include citation number, license plate, and a signed written statement.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Los Angeles Department of Transportation",
+    "attention": "Parking Violations Bureau",
+    "address1": "P.O. Box 30247",
+    "address2": null,
+    "city": "Los Angeles",
+    "state": "CA",
+    "zip": "90030",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-06-07",
+    "source": "CityWiki municipal intel + ladotparking.org adjudication portal",
+    "confidence_score": 0.94,
+    "notes": "Appeal mail: P.O. Box 30247 (adjudication). Payment-only: P.O. Box 30420 — never route appeals there (CVC 40204). Online contest: ladotparking.org and parkingticketinfo.lacity.org.",
+    "verified_by": "citywiki_municipal_config",
+    "verified_date": "2026-05-28",
+    "last_change": "2026-06-07: corrected appeal PO Box 30388 → 30247; LADOT authority; removed prior-hearing-denial requirement for mail"
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "lapd_parking_appeals": {
+      "section_id": "lapd_parking_appeals",
+      "name": "LADOT Parking Appeals",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "LADOT Adjudication Division processes initial written contests by mail. Administrative hearing may follow if the initial review is denied."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "letter_format": "free_form",
+  "schema_version": 2,
+  "change_history": [
+    {
+      "date": "2026-06-07",
+      "change": "Corrected appeal_mail_address to P.O. Box 30247; aligned authority and online portal with CityWiki",
+      "author": "system"
+    }
+  ],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": "⚠️ CRITICAL: LA uses two different PO Box addresses. For appeals/adjudication, mail to P.O. Box 30247 (LADOT Parking Violations Bureau). For payments only, use the Financial Lockbox (P.O. Box 30420). NEVER send an appeal to a payment lockbox — CVC 40204 treats payment as admission of guilt and permanently forfeits your right to contest. Include your citation number on all correspondence. Certified mail with return receipt is recommended. If using the online portal, note the 3MB combined upload limit for evidence — compress photos before uploading.",
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://ladotparking.org/adjudication-division/contest-a-parking-citation/",
+    "official_excerpt": "LADOT Adjudication Division accepts written parking citation contests by mail to P.O. Box 30247, Los Angeles, CA 90030 (Parking Violations Bureau). Payment lockbox P.O. Box 30420 is payment-only and must not receive appeals.",
+    "verified_at": "2026-05-28",
+    "verified_by": "citywiki_municipal_config",
+    "verification_method": "official_city_source_review"
+  },
+  "human_verified": true,
+  "confirmation_note": "Los Angeles gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. ⚠️ Important: LA uses multiple PO Box addresses — if you're mailing a payment, use the financial lockbox (P.O. Box 30420). If you're mailing an appeal, use the adjudication address (P.O. Box 30247). Sending an appeal to the payment box can result in automatic forfeiture of your right to contest under CVC 40204. Los Angeles offers an online dispute portal at ladotparking.org; the portal has a 3MB upload limit for evidence — ensure photos are compressed before uploading.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "launch_ethics_signal": "YELLOW"
+}

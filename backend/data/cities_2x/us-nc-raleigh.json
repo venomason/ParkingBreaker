@@ -1,0 +1,84 @@
+{
+  "city_id": "us-nc-raleigh",
+  "name": "Raleigh",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://raleighnc.gov/parking/services/parking-citations",
+  "local_rules": "21-day window for ParkLink administrative review. Raleigh strictly enforces the postmark date for appeal eligibility.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of Raleigh – ParkLink",
+    "attention": "Parking Administration",
+    "address1": "P.O. Box 590",
+    "address2": "",
+    "city": "Raleigh",
+    "state": "NC",
+    "zip": "27602-0590",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest (revised). Address: City of Raleigh – ParkLink, Parking Administration, P.O. Box 590, Raleigh, NC 27602-0590. URL: raleighnc.gov/parking/services/parking-citations. 21-day window. Strict postmark enforcement.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "raleigh_parklink": {
+      "section_id": "raleigh_parklink",
+      "name": "City of Raleigh – ParkLink",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "21-day window. Strict postmark enforcement."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "21-day window for ParkLink administrative review. Raleigh strictly enforces the postmark date for appeal eligibility.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://raleighnc.gov/parking/services/parking-citations",
+    "official_excerpt": "Official Raleigh city of Raleigh (City of Raleigh – ParkLink) — address verified via https://raleighnc.gov/parking/services/parking-citations",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

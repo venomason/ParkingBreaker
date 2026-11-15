@@ -1,0 +1,84 @@
+{
+  "city_id": "us-oh-columbus",
+  "name": "Columbus",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.columbus.gov/Services/Parking-Street-Services/Mobility-Parking-Services/Pay-a-Ticket",
+  "local_rules": "All citation hearings and reviews are now centralized at the Impound Lot Road facility. 15-day window remains strict.",
+  "appeal_deadline_days": 15,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Division of Parking Services",
+    "attention": "Appeal Clerk",
+    "address1": "2700 Impound Lot Road",
+    "address2": "",
+    "city": "Columbus",
+    "state": "OH",
+    "zip": "43207",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Address updated per master registry manifest: Division of Parking Services, Appeal Clerk, 2700 Impound Lot Road, Columbus, OH 43207. URL updated to columbus.gov/Services/Parking-Services. All citation hearings and reviews now centralized at Impound Lot Road facility. 15-day window remains strict.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "columbus_parking_services": {
+      "section_id": "columbus_parking_services",
+      "name": "Columbus Division of Parking Services",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "All citation hearings and reviews centralized at Impound Lot Road facility. 15-day window remains strict."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Updated May 2026. All citation hearings and reviews are now centralized at the Impound Lot Road facility. 15-day window remains strict.",
+  "service_types": {
+    "certified_express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.columbus.gov/Services/Parking-Services",
+    "official_excerpt": "Official Columbus city of Columbus (Division of Parking Services) — address verified via https://www.columbus.gov/Services/Parking-Services",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "YELLOW"
+}

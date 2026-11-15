@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ca-bakersfield",
+  "name": "Bakersfield",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.bakersfieldcity.us/164/City-Clerk",
+  "local_rules": "21-day window. Distinguish between City Clerk and Kern County Superior Court.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Bakersfield Clerk Office",
+    "attention": null,
+    "address1": "1600 Truxtun Ave",
+    "address2": null,
+    "city": "Bakersfield",
+    "state": "CA",
+    "zip": "93301",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Address updated per master registry manifest: Bakersfield Clerk Office, 1600 Truxtun Ave, Bakersfield, CA 93301. URL updated to bakersfieldcity.us/164/City-Clerk. 21-day window. Distinguish between City Clerk and Kern County Superior Court.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "bakersfield_parking_services": {
+      "section_id": "bakersfield_parking_services",
+      "name": "City of Bakersfield Parking Services",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "21-day window. Distinguish between City Clerk and Kern County Superior Court."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Bakersfield gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. Distinguish between City Clerk and Kern County Superior Court when filing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.bakersfieldcity.us/164/City-Clerk",
+    "official_excerpt": "Official Bakersfield city of Bakersfield (Bakersfield Clerk Office) — address verified via https://www.bakersfieldcity.us/164/City-Clerk",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

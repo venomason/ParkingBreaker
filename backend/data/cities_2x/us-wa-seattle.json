@@ -1,0 +1,89 @@
+{
+  "city_id": "us-wa-seattle",
+  "name": "Seattle",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.seattle.gov/courts/tickets-and-payments/dispute-my-ticket",
+  "local_rules": "Seattle Municipal Court adjudicates parking infractions and traffic notices. You must request a mitigation or contested hearing within 30 days of ticket issue (33 days if mailed). After a hearing is scheduled, you may submit a written statement and evidence by mail to Seattle Municipal Court, ATTN: Magistrate Operations, PO Box 34987, Seattle, WA 98124-4987. Written statements sent without a scheduled hearing will not be reviewed; the court will set a hearing and send the appropriate form.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Seattle Municipal Court",
+    "attention": "Magistrate Operations",
+    "address1": "PO Box 34987",
+    "address2": null,
+    "city": "Seattle",
+    "state": "WA",
+    "zip": "98124-4987",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-06-07",
+    "source": "mail_dispute_canonical.yaml + seattle.gov Municipal Court hearings-by-mail",
+    "confidence_score": 0.9,
+    "notes": "Mail address from mail_dispute_canonical.yaml (adc.seattle.gov hearings-by-mail). Hearing must be scheduled before written statement is accepted. Status paused pending operator verification.",
+    "verified_by": "mail_dispute_canonical_yaml",
+    "last_verified": "2026-06-07",
+    "verified_date": null,
+    "last_change": "2026-06-07: initial tier-B config from canonical yaml"
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "seattle_municipal_court": {
+      "section_id": "seattle_municipal_court",
+      "name": "Seattle Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Hearings-by-mail require a scheduled hearing first. Submit written statement to PO Box 34987 prior to hearing date."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [
+    {
+      "date": "2026-06-07",
+      "change": "Created from mail_dispute_canonical.yaml Seattle entry; paused pending operator verification.",
+      "author": "tier_b_launch_prep"
+    }
+  ],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": false,
+  "confirmation_note": "Seattle requires you to request a hearing within 30 days (33 if the ticket was mailed). After scheduling, you may contest in writing by mail to Seattle Municipal Court, ATTN: Magistrate Operations, PO Box 34987, Seattle, WA 98124-4987. A decision by written statement is final and cannot be appealed.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.adc.seattle.gov/courts/tickets-and-payments/dispute-my-ticket/hearings-by-mail",
+    "official_excerpt": "By mail: Seattle Municipal Court ATTN: Magistrate Operations PO Box 34987 Seattle, WA 98124-4987. Written statements sent to the court without an initial hearing scheduled will not be read.",
+    "verified_at": "2026-06-07",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

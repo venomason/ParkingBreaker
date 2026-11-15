@@ -1,0 +1,84 @@
+{
+  "city_id": "us-ne-omaha",
+  "name": "Omaha",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://cityofomaha.org/departments/city-clerk/parking-citations",
+  "local_rules": "15-day window to contest through the Parking Violations Bureau. Lapsed tickets move to Douglas County Court with increased costs.",
+  "appeal_deadline_days": 15,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Omaha Douglas Civic Center",
+    "attention": "Parking Violations Bureau",
+    "address1": "1819 Farnam Street",
+    "address2": "Room 500",
+    "city": "Omaha",
+    "state": "NE",
+    "zip": "68183",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest (revised). Address: Omaha Douglas Civic Center, Parking Violations Bureau, 1819 Farnam Street, Room 500, Omaha, NE 68183. URL: cityofomaha.org/departments/city-clerk/parking-citations. 15-day window. Lapsed tickets move to Douglas County Court with increased costs.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "omaha_parking_violations": {
+      "section_id": "omaha_parking_violations",
+      "name": "Omaha Parking Violations Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "15-day window. Lapsed tickets move to Douglas County Court."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "15-day window to contest through the Parking Violations Bureau. Lapsed tickets move to Douglas County Court with increased costs.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://cityofomaha.org/departments/city-clerk/parking-citations",
+    "official_excerpt": "Official Omaha city of Omaha (Omaha Douglas Civic Center) — address verified via https://cityofomaha.org/departments/city-clerk/parking-citations",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

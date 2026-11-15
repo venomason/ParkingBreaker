@@ -1,0 +1,83 @@
+{
+  "city_id": "us-mo-st_louis",
+  "name": "St. Louis",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.stlouis-mo.gov/services/pay-parking-ticket.cfm",
+  "local_rules": "St. Louis Parking Violations Bureau (PVB) handles all parking citation appeals. Late fees double after 30 days and balloon to $80 after 45 days — timely submission is critical. SLU (Saint Louis University) tickets issued on Laclede Avenue may be private university citations rather than city-issued; verify issuer before processing.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Parking Violations Bureau (PVB)",
+    "attention": "Hearing Officer",
+    "address1": "P.O. Box 78459",
+    "address2": null,
+    "city": "St. Louis",
+    "state": "MO",
+    "zip": "63178-8459",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "New city from master registry manifest. St. Louis Parking Violations Bureau (PVB) address: P.O. Box 78459, St. Louis, MO 63178-8459. URL: stlouis-mo.gov/services/pay-parking-ticket.cfm. 30-day deadline. Late fees double after 30 days, balloon to $80 after 45 days. SLU tickets on Laclede Ave may be private university citations.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "st_louis_pvb": {
+      "section_id": "st_louis_pvb",
+      "name": "St. Louis Parking Violations Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Managed by Parking Violations Bureau (PVB). Late fees double after 30 days, balloon to $80 after 45 days. SLU tickets on Laclede Ave may be private university citations."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "St. Louis Parking Violations Bureau (PVB) handles all parking citation appeals. You have 30 days from issuance to submit your appeal. Late fees double after 30 days and balloon to $80 after 45 days — timely submission is critical. Note that SLU (Saint Louis University) tickets issued on Laclede Avenue may be private university citations rather than city-issued; verify the issuer before processing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.stlouis-mo.gov/services/pay-parking-ticket.cfm",
+    "official_excerpt": "Official St. Louis city of St. Louis (Parking Violations Bureau (PVB)) — address verified via https://www.stlouis-mo.gov/services/pay-parking-ticket.cfm",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

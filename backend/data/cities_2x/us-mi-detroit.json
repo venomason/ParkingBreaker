@@ -1,0 +1,74 @@
+{
+  "city_id": "us-mi-detroit",
+  "name": "Detroit",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Detroit",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://detroitmi.gov/departments/parking-violations-bureau",
+  "local_rules": "Parking violations in Detroit are handled by the City of Detroit Municipal Parking Violations Department under the Department of Public Works. Online appeal available through official City of Detroit site. Mail appeals accepted at Coleman A. Young Municipal Center.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of Detroit Department of Appeals and Assessments",
+    "attention": "Parking Violations Bureau",
+    "address1": "Coleman A. Young Municipal Center",
+    "address2": "2 Woodward Avenue, Suite 412",
+    "city": "Detroit",
+    "state": "MI",
+    "zip": "48226",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2025-12-16",
+    "source": "Detroit Municipal Parking Violations Bureau / City of Detroit",
+    "confidence_score": 0.85,
+    "notes": "Re-verified Detroit parking citation appeal channels. Online appeal available through official City of Detroit site. Mail address for parking ticket disputes confirmed.",
+    "verified_by": "minimax_research",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "detroit_municipal_parking": {
+      "section_id": "detroit_municipal_parking",
+      "name": "Detroit Municipal Parking Violations",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Online appeal option not found on official Detroit city domains; mail appeal option could not be confirmed from official sources."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Detroit gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "place": "Bainbridge Island, WA",
+    "state": "WA",
+    "reason": "IN_PERSON_ONLY",
+    "official_source_url": "https://bainbridgewa.gov/m/faq",
+    "quote": "If you would like to contest your ticket, you must appear in person.",
+    "saved_page_sha256": "d903065db41ae6f9495bd6465e47854dd844c1fc8cd73c9c7448efefdb9d0bb0",
+    "summary": "Contesting a parking ticket needs an in-person appearance; mitigation may still be mailed, but that is not a contest.",
+    "found_on": "2026-10-27"
+  },
+  {
+    "place": "Ithaca, NY",
+    "state": "NY",
+    "reason": "ONLINE_ONLY",
+    "official_source_url": "https://www.cityofithacany.gov/410/Make-a-Payment-View-Bills",
+    "quote": "Only online appeals are accepted",
+    "saved_page_sha256": "47651915aa7f368ee22d6ef9de2a1330766b25796c85a33d241764d16b773d1a",
+    "summary": "The city's parking-ticket row accepts appeals online only; payment and later-stage rules are not inferred.",
+    "found_on": "2026-10-27"
+  }
+]

@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "note": "These are behavioral acceptance contracts. They must be implemented as tests of the actual system; their presence is not a test pass. Synthetic wording must never be presented as real official evidence.",
+  "cases": [
+    {
+      "id": "J01",
+      "title": "Unfamiliar government issuer with complete supported official process",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "proceed",
+      "protects": "nationwide; no registry prerequisite",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J02",
+      "title": "No legacy city JSON but official route discoverable",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "research_then_proceed",
+      "protects": "missing JSON is not incompatibility",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J03",
+      "title": "Mandatory simple form and signature can be completed",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "collect_then_proceed",
+      "protects": "difficulty is not refusal",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J04",
+      "title": "Invitation to include evidence beside a separate mandatory attachment",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "require_mandatory_allow_optional",
+      "protects": "scoped requirement semantics",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J05",
+      "title": "Agency requires a prerequisite the current service cannot perform",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "evidenced_procedural_stop",
+      "protects": "explicit issuer/type/stage quote",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J06",
+      "title": "Website blocked or unavailable",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "recover_or_not_yet_verified",
+      "protects": "not invented process incompatibility",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J07",
+      "title": "Payment address and appeal address on same page",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "select_appeal_only",
+      "protects": "address purpose",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J08",
+      "title": "Old and current address conflict",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "resolve_current_with_evidence",
+      "protects": "source/version conflict",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J09",
+      "title": "Same city, different campus or county ticket",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "resolve_actual_adjudicator",
+      "protects": "issuer identity",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J10",
+      "title": "Legitimate public agency uses non-.gov host",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "verify_relationship_then_proceed",
+      "protects": "suffix is not authority",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J11",
+      "title": "Government page links user-editable or wrong tenant",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "reject_as_official_evidence",
+      "protects": "delegation scope",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J12",
+      "title": "Quote contains contest period and unrelated late-fee period",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "use_supported_contest_value",
+      "protects": "number semantic binding",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J13",
+      "title": "Quote says postmarks are not accepted",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "do_not_accept_postmark_rule",
+      "protects": "negation",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J14",
+      "title": "Issue, notice and appearance dates differ",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "use_evidenced_trigger",
+      "protects": "deadline scope",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J15",
+      "title": "Weekend/holiday/timezone near receipt deadline",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "compute_current_feasibility",
+      "protects": "date arithmetic",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J16",
+      "title": "Research record cached for a different violation/date",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "reuse_pages_recompute_facts",
+      "protects": "cache dependency correctness",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J17",
+      "title": "Packet not built yet but all requirements satisfiable",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "pending_packet_not_incompatible",
+      "protects": "phase separation",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J18",
+      "title": "Customer reason unusual or implausible",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "preserve_without_merits_judgment",
+      "protects": "clerical-only service",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J19",
+      "title": "Conflicting official requirements cannot be resolved",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "preserve_and_explain_unverified",
+      "protects": "no invented certainty",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J20",
+      "title": "Customer reports agency rejected a supposedly missing enclosure that is in frozen packet",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "report_documented_discrepancy_only",
+      "protects": "no motive inference or guaranteed consideration",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A01",
+      "title": "Verified destination and all other gates pass",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "send_system_verified",
+      "protects": "normal path",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A02",
+      "title": "Only destination unverified; no customer alternative",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "stop_no_capture_release_if_held",
+      "protects": "no charge stop",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A03",
+      "title": "Customer supplies complete unverified address and accepts specific current disclosure",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "send_customer_directed",
+      "protects": "owner-approved exception",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A04",
+      "title": "Customer address without specific affirmative consent",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "do_not_send",
+      "protects": "consent not inferred",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A05",
+      "title": "Consent refers to earlier address revision",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "invalidate_consent_and_approval",
+      "protects": "exact binding",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A06",
+      "title": "Consent belongs to another owner or case",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "refuse",
+      "protects": "authorization isolation",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A07",
+      "title": "System said verified; address later proved wrong",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "our_error_full_refund",
+      "protects": "our responsibility",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A08",
+      "title": "Customer approved system-verified address; it was wrong",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "our_error_full_refund",
+      "protects": "approval is not transfer",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A09",
+      "title": "Customer-directed address alone caused failed mailing",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "apply_narrow_address_refund_exclusion",
+      "protects": "cause-specific policy",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A10",
+      "title": "We altered customer-directed address or omitted required contents",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "our_error_remedy",
+      "protects": "exception cannot excuse us",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A11",
+      "title": "Address accepted but deadline/form requirement still unresolved",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "do_not_send_until_other_gates_pass",
+      "protects": "exception scope",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A12",
+      "title": "Legacy case has no consent/provenance record",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "no_automatic_exclusion",
+      "protects": "conservative migration",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "A13",
+      "title": "Returned mail cause unknown",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "retain_unknown_follow_existing_remedy",
+      "protects": "not presumed customer fault",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R01",
+      "title": "Crash after research save before resolution",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "resume_resolution",
+      "protects": "durable step recovery",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R02",
+      "title": "Crash after expired draft save",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "retain_expired_status",
+      "protects": "no fake DraftReady",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R03",
+      "title": "Stripe authorization response lost after provider creates hold",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "reconcile_original_intent",
+      "protects": "no abandoned hold",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R04",
+      "title": "Lob response lost after acceptance",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "recover_same_attempt_no_duplicate",
+      "protects": "idempotency",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R05",
+      "title": "Capture fails after Lob acceptance",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "recover_payment_never_resend",
+      "protects": "side-effect ordering",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R06",
+      "title": "One failed case during due sweep",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "continue_other_cases",
+      "protects": "failure isolation",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R07",
+      "title": "Late or duplicate webhook from old attempt",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "dedupe_no_backward_transition",
+      "protects": "event ordering",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "R08",
+      "title": "Restore backup around provider side effect",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "reconcile_before_processing",
+      "protects": "recovery integrity",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U01",
+      "title": "Slow dispatch beyond browser poll count",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "show_pending",
+      "protects": "truthful outcome",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U02",
+      "title": "Window expires on server while local clock differs",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "block_using_server_state",
+      "protects": "time authority",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U03",
+      "title": "Reload/back/retry after customer statement upload",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "preserve_same_work",
+      "protects": "no input loss",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U04",
+      "title": "Partial personal identifier in customer narrative",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "redact_outbound",
+      "protects": "privacy boundary",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U05",
+      "title": "Two required forms both match one item",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "refuse_or_correct_before_freeze",
+      "protects": "one-to-one packet coverage",
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J21",
+      "title": "Fine payment explicitly bars initial review for the exact issuer and stage",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "evidenced_procedural_notice_or_stop",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS01",
+      "owner_tasks": [
+        "T21",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J22",
+      "title": "Later hearing requires a deposit while retaining review",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "deposit_not_misclassified_as_waiver",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS01",
+      "owner_tasks": [
+        "T21",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J23",
+      "title": "Installment enrollment explicitly waives this review route",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "scoped_rule_and_factual_enrollment_check",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS01",
+      "owner_tasks": [
+        "T21",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J24",
+      "title": "Relief option has no evidenced waiver or enrollment fact",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "no_invented_waiver_or_blanket_refusal",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS01",
+      "owner_tasks": [
+        "T21",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J25",
+      "title": "State park citation in a city uses an official delegated adjudicator",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "resolve_actual_body_and_exact_appeal_tenant",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS02",
+      "owner_tasks": [
+        "T21",
+        "T30"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J26",
+      "title": "Public hospital authority differs from nearby city and private operator",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "evidence_not_place_name_decides_scope",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS02",
+      "owner_tasks": [
+        "T21",
+        "T30"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J27",
+      "title": "Optional online portal has two-megabyte upload cap; mail accepts attachments",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "mail_route_proceeds_without_portal_automation",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS03",
+      "owner_tasks": [
+        "T21",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J28",
+      "title": "Official mailed route requires an unsupported prior portal action",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "specific_evidenced_limitation_not_fake_success",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS03",
+      "owner_tasks": [
+        "T21",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J29",
+      "title": "Exact current stage requires an in-person-only appearance",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "evidenced_process_stop_without_invented_mail_route",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS03",
+      "owner_tasks": [
+        "T21"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J30",
+      "title": "In-person hearing is optional and mailed review is accepted",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "mail_proceeds_without_false_refusal",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS03",
+      "owner_tasks": [
+        "T21"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J31",
+      "title": "Receipt deadline remains unsafe despite certified service",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "no_postmark_substitution_or_automatic_upgrade",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS04",
+      "owner_tasks": [
+        "T21",
+        "T25",
+        "T26"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "J32",
+      "title": "Postmark deadline includes provider production delay and holidays",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "calculate_evidenced_mailing_date_not_api_creation",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS04",
+      "owner_tasks": [
+        "T21",
+        "T26"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U06",
+      "title": "Customer supplies no optional surroundings/detail photos",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "continue_unless_specific_verified_requirement",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS05",
+      "owner_tasks": [
+        "T12",
+        "T25",
+        "T37"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U07",
+      "title": "Customer selects three evidence photos then reorders and reloads",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "preserve_owner_order_exact_printed_manifest_and_preview",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS05",
+      "owner_tasks": [
+        "T12",
+        "T25",
+        "T37"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U08",
+      "title": "Photo guide cannot introduce a sign-law argument or service assertion",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "customer_reason_unchanged_no_ai_merits_inference",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS05",
+      "owner_tasks": [
+        "T21",
+        "T25",
+        "T37"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U09",
+      "title": "Later procedure discovery would require a different tier or amount",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "no_silent_hold_upgrade_reprice_or_replacement",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS06",
+      "owner_tasks": [
+        "T14",
+        "T16",
+        "T25"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U10",
+      "title": "Certified event is delayed attempted returned or out of order",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "show_actual_evidence_not_guaranteed_or_adjudicator_receipt",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS07",
+      "owner_tasks": [
+        "T17",
+        "T20",
+        "T24",
+        "T26"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    },
+    {
+      "id": "U11",
+      "title": "Additional evidence pages change actual fulfillment margin",
+      "fixture_kind": "synthetic_contract_case",
+      "expected_decision": "reconcile_actual_cost_without_assumed_profit",
+      "protects": "PROCEDURAL-SAFEGUARDS.md PS08",
+      "owner_tasks": [
+        "T33"
+      ],
+      "execution_status": "specified_not_executed_against_application"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "city_id": "us-co-colorado_springs",
+  "name": "Colorado Springs",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Denver",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://coloradosprings.gov/municipal-court/page/payments-and-parking-tickets",
+  "local_rules": "Extremely short 10-day window to contest. Lapsed appeals result in immediate $20 late fees and loss of adjudication rights.",
+  "appeal_deadline_days": 10,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Municipal Court",
+    "attention": "Violations Department",
+    "address1": "P.O. Box 2169",
+    "address2": "",
+    "city": "Colorado Springs",
+    "state": "CO",
+    "zip": "80901-2169",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Created from master registry manifest. Address: Municipal Court, Violations Department, P.O. Box 2169, Colorado Springs, CO 80901-2169. URL: coloradosprings.gov/municipal-court/page/payments-and-parking-tickets. Extremely short 10-day window. Lapsed appeals = $20 late fees and loss of adjudication rights.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "colorado_springs_municipal_court": {
+      "section_id": "colorado_springs_municipal_court",
+      "name": "Colorado Springs Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "10-day window. Late = $20 fees and loss of adjudication rights."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Extremely short 10-day window to contest. Lapsed appeals result in immediate $20 late fees and loss of adjudication rights.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://coloradosprings.gov/municipal-court/page/payments-and-parking-tickets",
+    "official_excerpt": "Official Colorado Springs city of Colorado Springs (Municipal Court) — address verified via https://coloradosprings.gov/municipal-court/page/payments-and-parking-tickets",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "city_id": "us-la-new_orleans",
+  "name": "New Orleans",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://nola.gov/find-parking-rules/",
+  "local_rules": "30-day window for parking and photo safety tickets. Handled by Central Adjudication Bureau (CAB).",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Central Adjudication Bureau",
+    "attention": "Parking/Photo Safety Division",
+    "address1": "1340 Poydras St",
+    "address2": "Suite 1100",
+    "city": "New Orleans",
+    "state": "LA",
+    "zip": "70112",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Created from master registry manifest. Address: Central Adjudication Bureau, Parking/Photo Safety Division, 1340 Poydras St, Suite 1100, New Orleans, LA 70112. URL: nola.gov/find-parking-rules/. 30-day window for parking and photo safety tickets.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "new_orleans_cab": {
+      "section_id": "new_orleans_cab",
+      "name": "Central Adjudication Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "30-day window for parking and photo safety tickets. Handled by CAB."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "30-day window for parking and photo safety tickets. Handled by Central Adjudication Bureau (CAB).",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://nola.gov/find-parking-rules/",
+    "official_excerpt": "Official New Orleans city of New Orleans (Central Adjudication Bureau) — address verified via https://nola.gov/find-parking-rules/",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

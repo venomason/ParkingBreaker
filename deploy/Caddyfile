@@ -1,0 +1,8 @@
+{
+    admin off
+}
+{$PB_DOMAIN} {
+    @private path /internal/* /api/internal/* /api/dev-worker/*
+    respond @private 404
+    reverse_proxy web:3000
+}

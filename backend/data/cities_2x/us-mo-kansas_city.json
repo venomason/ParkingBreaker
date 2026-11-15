@@ -1,0 +1,83 @@
+{
+  "city_id": "us-mo-kansas_city",
+  "name": "Kansas City",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://parkkcmo.com/",
+  "local_rules": "CRITICAL: Strict 13-day window from issuance. Failure to appeal within 13 days forfeits the right to contest and triggers automatic late fees.",
+  "appeal_deadline_days": 13,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Public Works Dept - Parking Division",
+    "attention": "ParkKC Appeals",
+    "address1": "1120 Oak Street",
+    "address2": "",
+    "city": "Kansas City",
+    "state": "MO",
+    "zip": "64106",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Paused per PR #272 §4 — online_appeal_url (parkkcmo.com) is a vendor/contractor domain without verifiable municipal source for mail_acceptance_policy. Address: Public Works Dept - Parking Division, ParkKC Appeals, 1120 Oak Street, Kansas City, MO 64106. CRITICAL: Strict 13-day window from issuance. Failure to appeal within 13 days forfeits contest rights and triggers automatic late fees.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "kansas_city_parking": {
+      "section_id": "kansas_city_parking",
+      "name": "Kansas City Parking Division",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Strict 13-day window. Late appeals forfeit contest rights and trigger automatic late fees."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "CRITICAL: Strict 13-day window from issuance. Failure to appeal within 13 days forfeits the right to contest and triggers automatic late fees.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "insufficient_source_pause_city",
+    "official_source_url": "",
+    "official_excerpt": "Paused: online_appeal_url (parkkcmo.com) is a vendor/contractor domain without verifiable municipal source for mail_acceptance_policy. Human review required to find official Kansas City municipal source or confirm vendor delegation.",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

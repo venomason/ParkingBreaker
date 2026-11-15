@@ -1,0 +1,83 @@
+{
+  "city_id": "us-nm-albuquerque",
+  "name": "Albuquerque",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Denver",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.cabq.gov/parking/paying-a-parking-citation",
+  "local_rules": "Albuquerque (ABQ) is unique: while the City issues the tickets, the Metropolitan Court adjudicates them. You must request a hearing in person or via mail to the Lomas NW address. Contesting the citation does NOT stop the fine from doubling or tripling if you lose. If a $20 ticket isn't resolved, it jumps to $40, then $60. Always include a copy of the citation and a clear 'Request for Hearing' statement.",
+  "appeal_deadline_days": 20,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Bernalillo County Metropolitan Court",
+    "attention": "Parking Citation Department",
+    "address1": "401 Lomas NW",
+    "address2": "",
+    "city": "Albuquerque",
+    "state": "NM",
+    "zip": "87102",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: Bernalillo County Metropolitan Court, Parking Citation Department, 401 Lomas NW, Albuquerque, NM 87102. URL: cabq.gov/parking/paying-a-parking-citation. City issues tickets but Metropolitan Court adjudicates. Contesting does NOT stop fine escalation ($20→$40→$60). Must include copy of citation and 'Request for Hearing' statement.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "abq_metro_court": {
+      "section_id": "abq_metro_court",
+      "name": "Bernalillo County Metropolitan Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "City issues tickets, Metropolitan Court adjudicates. Contesting does NOT stop fine escalation. Must include citation copy and 'Request for Hearing' statement."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Albuquerque (ABQ) is unique: while the City issues the tickets, the Metropolitan Court adjudicates them. You must request a hearing in person or via mail to the Lomas NW address. Crucially, contesting the citation does NOT stop the fine from doubling or tripling if you lose. If a $20 ticket isn't resolved, it jumps to $40, then $60. Always include a copy of the citation and a clear 'Request for Hearing' statement.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.cabq.gov/parking/paying-a-parking-citation",
+    "official_excerpt": "Official Albuquerque city of Albuquerque (Bernalillo County Metropolitan Court) — address verified via https://www.cabq.gov/parking/paying-a-parking-citation",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

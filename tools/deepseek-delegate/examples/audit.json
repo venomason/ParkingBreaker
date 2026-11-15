@@ -1,0 +1,7 @@
+{
+  "mode": "audit",
+  "objective": "Inspect slug.py and check_slug.py. Identify the whitespace bug without editing. Run the named slug test once. Return exact relevant excerpts, paths, line numbers, full-file hashes and observed test outcome. Finish promptly; no other work.",
+  "context": ["slug.py", "check_slug.py"],
+  "writable": [],
+  "tests": {"slug": ["/usr/bin/python3", "-B", "check_slug.py"]}
+}

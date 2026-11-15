@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "decision_date": "2026-11-05",
+  "source": "Amir, current realtime-voice-chat message on November 5, 2026",
+  "phase": "controlled_free_development_beta",
+  "adopted": true,
+  "live_activation_authorized": false,
+  "customer_charge_cents": 0,
+  "customer_authorization_hold_allowed": false,
+  "disclosure": {
+    "required": true,
+    "text": "Your selected beta appeal is free. ParkingBreaker is still in development, and errors may occur. We will ask you to confirm your facts and the exact packet before mailing. Beta participation does not extend any ticket deadline."
+  },
+  "batch": {
+    "maximum_free_appeals": 5,
+    "admission": "randomized_jurisdiction_selection_from_qualified_candidate_pool",
+    "distinct_jurisdictions": true,
+    "later_batch_requires_explicit_review_release": true,
+    "pause_new_admission_after_selection": true,
+    "continue_admitted_case_safety_and_fulfillment": true,
+    "total_participants": null,
+    "number_of_batches": null
+  },
+  "jurisdiction": {
+    "scope": "nationwide_per_request_qualification",
+    "city_allowlist": false,
+    "existing_explicit_holds_preserved": true,
+    "reuse_in_first_month": false,
+    "first_month_starts_at": null,
+    "first_month_ends_at": null,
+    "canonical_identity_policy": null
+  },
+  "entitlement": {
+    "distinct_appeals": 1,
+    "distinct_submission_attempts": 1,
+    "automatic_remail_allowed": false,
+    "same_intent_idempotent_retry_and_reconciliation_required": true,
+    "interpretation_for_owner_review": "One attempt means one distinct approved submission identity; it does not abandon an uncertain provider result or authorize a second distinct submission."
+  },
+  "owner_funded_costs": {
+    "approved_live_budget_cents": null,
+    "provider_activation_authorized": false
+  },
+  "paid_phase_preserved": {
+    "price_arms_cents": [
+      1999,
+      2499,
+      2999
+    ],
+    "acquisition_channels": [
+      "Google",
+      "Reddit"
+    ],
+    "starts_only_after_explicit_release_from_free_beta": true
+  },
+  "activation_parameters_pending": [
+    "Exact first-month start/end instants and time zone",
+    "Canonical issuing-jurisdiction identity policy used by qualification",
+    "Any additional customer eligibility exclusions, if desired",
+    "Explicit owner-funded provider/postage budget and live activation authorization"
+  ],
+  "not_implementation_blockers": [
+    "Total participant count and batch count remain unset",
+    "No live budget or campaign dates are needed for local fake-provider development"
+  ]
+}

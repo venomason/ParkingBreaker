@@ -1,0 +1,32 @@
+# Dependencies and generated output
+**/node_modules/
+**/.next/
+**/.venv/
+**/__pycache__/
+*.pyc
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.hypothesis/
+**/.turbo/
+**/coverage/
+**/dist/
+**/test-results/
+**/playwright-report/
+*.tsbuildinfo
+*.log
+.delegate.lock
+# Credentials and local application data
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+service-account*.json
+**/.pb-data/
+**/.pb-demo/
+.playwright-cli/
+output/

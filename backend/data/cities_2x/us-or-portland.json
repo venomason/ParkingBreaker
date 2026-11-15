@@ -1,0 +1,93 @@
+{
+  "city_id": "us-or-portland",
+  "name": "Portland",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.portland.gov/transportation/parking/pay-and-or-contest-parking-ticket",
+  "local_rules": "Portland parking citations are adjudicated by the Multnomah County Circuit Court. Submitting a written explanation is a 'Waiver of Hearing' — you are consenting to the judge's decision based on your documents alone. Include the 10-character citation number (usually starts with 'HA'). For expired registration violations, the court offers a standardized fine reduction (e.g., down to $20) if you include proof of correction and photos of the new stickers. Portland State University (PSU) citations are separate; avoid mailing city court for campus-specific tickets unless the ticket header explicitly directs you there.",
+  "appeal_deadline_days": 60,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Multnomah County Circuit Court",
+    "attention": "Parking Citation Office",
+    "address1": "P.O. Box 78",
+    "address2": null,
+    "city": "Portland",
+    "state": "OR",
+    "zip": "97207",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: Multnomah County Circuit Court, Parking Citation Office, P.O. Box 78, Portland, OR 97207. URL: portland.gov/transportation/parking/pay-and-or-contest-parking-ticket. 60-day deadline (corrected from 30). Written explanation constitutes 'Waiver of Hearing'. Citation number format: 10 characters, usually starts with 'HA'. Expired registration violations eligible for fine reduction with proof of correction. PSU citations are separate from city court.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "portland_multnomah_court": {
+      "section_id": "portland_multnomah_court",
+      "name": "Multnomah County Circuit Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Adjudicated by Multnomah County Circuit Court. Written explanation = 'Waiver of Hearing'. Expired registration: fine reduction available with proof of correction. PSU citations are separate."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Portland parking citations are adjudicated by the Multnomah County Circuit Court. You have 60 days from issuance to submit your written explanation — one of the most generous windows in the country, but don't let it fool you: processing times can take 6 to 12 months. Important: Submitting a written explanation is a 'Waiver of Hearing' — you are consenting to the judge's decision based on your documents alone. Include the 10-character citation number (usually starts with 'HA'). If the violation is for expired registration, the court offers a standardized fine reduction (e.g., down to $20) if you include proof of correction and photos of the new stickers in your Appeal Kit. Note: Portland State University (PSU) citations are separate; avoid mailing city court for campus-specific tickets unless the ticket header explicitly directs you there.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.portland.gov/transportation/parking/pay-and-or-contest-parking-ticket",
+    "official_excerpt": "OPTION 2 – Send a written explanation: Insert in the yellow citation envelope a separate written explanation as to why you are contesting the citation. You should include any documents you would like the judge to review with your explanation. Your written explanation is a waiver of your right to a court hearing and consent to any judgment rendered. Mail to: Multnomah County Circuit Court, Parking Citation Office, P.O. Box 78, Portland, OR 97207.",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "legal_declarations": [
+    {
+      "id": "portland_waiver_of_hearing",
+      "heading": "⚖️ Legal Declaration & Waiver of Oral Hearing",
+      "template": "Pursuant to Multnomah County Circuit Court rules, I am submitting this written explanation as my formal response to the parking citation {citation_number}. I explicitly understand and agree that this written explanation serves as a complete waiver of my right to an oral court hearing and constitutes my explicit consent to any judgment entered by the court based on this review. I further declare under penalty of perjury that the statements provided herein are true and accurate to the best of my knowledge.",
+      "placement": "before_signature",
+      "required": true
+    }
+  ],
+  "launch_ethics_signal": "YELLOW"
+}

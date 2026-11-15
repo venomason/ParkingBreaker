@@ -1,0 +1,104 @@
+# Overlay the one canonical stack. The owner supplies root-only PB_ENV_FILE.
+# compose.yaml defaults to fake providers; production must name its mode explicitly.
+services:
+  api:
+    user: "10001:10001"
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      PB_PROVIDER_MODE: ${PB_PROVIDER_MODE:?explicit provider mode required in the env file}
+      # Server-side phase (paid | controlled_free_beta); web reads it from the API.
+      PB_SERVICE_PHASE: ${PB_SERVICE_PHASE:?explicit service phase required in the env file}
+      PB_WORKER_SECRET: ${PB_WORKER_SECRET:?root-only env required}
+      # Customer routes only: research, mailing and capture sweeps run in `worker` (T31).
+      PB_API_ROLE: customer
+    env_file: !override
+      - path: ${PB_ENV_FILE:?root-only env path required}
+        required: true
+    volumes: !override
+      - type: bind
+        source: ${PB_DATA_PATH:?regional disk mount required}
+        target: /data
+        bind: { create_host_path: false }
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  web:
+    build:
+      args:
+        PB_PROVIDER_MODE: ${PB_PROVIDER_MODE:?explicit provider mode required in the env file}
+    user: "1000:1000"
+    restart: unless-stopped
+    ports: !reset []
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  worker:
+    # Same image and database as `api`, never published. It alone serves /internal, so slow
+    # provider or research calls cannot hold up customer requests on the api process (T31).
+    build: { context: ., dockerfile: backend/Dockerfile }
+    user: "10001:10001"
+    restart: unless-stopped
+    environment:
+      PB_PROVIDER_MODE: ${PB_PROVIDER_MODE:?explicit provider mode required in the env file}
+      # Same server-side phase as `api`; the worker must never disagree with it.
+      PB_SERVICE_PHASE: ${PB_SERVICE_PHASE:?explicit service phase required in the env file}
+      PB_WORKER_SECRET: ${PB_WORKER_SECRET:?root-only env required}
+      PB_API_ROLE: worker
+    env_file:
+      - path: ${PB_ENV_FILE:?root-only env path required}
+        required: true
+    volumes:
+      - type: bind
+        source: ${PB_DATA_PATH:?regional disk mount required}
+        target: /data
+        bind: { create_host_path: false }
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  scheduler:
+    user: "10001:10001"
+    restart: unless-stopped
+    depends_on: !override [worker]
+    environment:
+      PB_WORKER_SECRET: ${PB_WORKER_SECRET:?root-only env required}
+    command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch']
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  monitor:
+    # T24: independent health checks and alert email. Same image, its own container, so a
+    # hung worker or a dead scheduler is still noticed (a whole-VM failure is not). Opens
+    # the database read-only (SQLite mode=ro; the mount stays writable only because WAL
+    # readers need the shared-memory file) and keeps incident state in its own volume.
+    build: { context: ., dockerfile: backend/Dockerfile }
+    user: "10001:10001"
+    restart: unless-stopped
+    command: ["python", "-m", "parkingbreaker.health_cli", "monitor", "--data", "/data", "--state", "/monitor", "--interval", "120"]
+    env_file:
+      - path: ${PB_ENV_FILE:?root-only env path required}
+        required: true
+    volumes:
+      - type: bind
+        source: ${PB_DATA_PATH:?regional disk mount required}
+        target: /data
+        bind: { create_host_path: false }
+      - pbmonitor:/monitor
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+  caddy:
+    image: caddy:2.10.2-alpine
+    user: "10001:10001"
+    restart: unless-stopped
+    environment:
+      PB_DOMAIN: ${PB_DOMAIN:?DNS name required}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${PB_TLS_PATH:?TLS state directory required}:/data
+    # The official image's binary carries a file capability; keeping only that capability in
+    # the bounding set (and no no-new-privileges) lets it exec as the non-root user. The
+    # namespaced sysctl makes binding 80/443 independent of that file capability.
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: "0"
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    depends_on: [web]
+volumes:
+  pbmonitor: {}

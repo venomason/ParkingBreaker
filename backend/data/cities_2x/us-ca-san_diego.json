@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ca-san_diego",
+  "name": "San Diego",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.sandiego.gov/parking/citations",
+  "local_rules": "San Diego Parking Administration handles parking citation appeals. 21-day window. Fully compatible with AB 1299 Hardship. Mail-in only; no hearing required for Level 1.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of San Diego Parking Administration",
+    "attention": "Initial Review Desk",
+    "address1": "P.O. Box 129038",
+    "address2": "",
+    "city": "San Diego",
+    "state": "CA",
+    "zip": "92112-9038",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "New city from master registry manifest. San Diego Parking Administration, Initial Review Desk, P.O. Box 129038, San Diego, CA 92112-9038. URL: sandiego.gov/parking/citations. 21-day window. Fully compatible with AB 1299 Hardship. Mail-in only; no hearing required for Level 1.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "san_diego_parking_admin": {
+      "section_id": "san_diego_parking_admin",
+      "name": "San Diego Parking Administration",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "21-day window. Fully compatible with AB 1299 Hardship. Mail-in only; no hearing required for Level 1."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "San Diego Parking Administration handles parking citation appeals. 21-day window. Fully compatible with AB 1299 Hardship Declaration. Mail-in only; no hearing required for Level 1. Verified 2026 via master registry manifest.",
+  "service_types": {
+    "certified_express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.sandiego.gov/parking/citations",
+    "official_excerpt": "…Fully compatible with AB 1299 Hardship. Mail-in only; no hearing required for Level 1. New city from master registry manifest. San Diego Parking Administration, Initia…",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

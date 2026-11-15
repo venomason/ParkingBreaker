@@ -1,0 +1,83 @@
+{
+  "city_id": "us-tn-nashville",
+  "name": "Nashville",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://circuitclerk.nashville.gov/traffic-violation-bureau/",
+  "local_rules": "Nashville (Metro Nashville/Davidson County) requires a written 'Not Guilty' plea and a formal request for a hearing before a General Sessions Judge. This must be done using the form on the back of your Traffic Court Information Sheet — you cannot simply write a letter. If you have a mix of moving and non-moving (parking) violations on a single ticket, you must satisfy the non-moving violations first. If you miss your compliance date, a $50.00 administrative court cost is added per violation.",
+  "appeal_deadline_days": 14,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Traffic Violation Bureau",
+    "attention": "Citations Clerk",
+    "address1": "P.O. Box 196302",
+    "address2": null,
+    "city": "Nashville",
+    "state": "TN",
+    "zip": "37219-6302",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: Traffic Violation Bureau, Citations Clerk, P.O. Box 196302, Nashville, TN 37219-6302. URL: circuitclerk.nashville.gov/traffic-violation-bureau/. Requires written 'Not Guilty' plea using specific city-provided form (back of Traffic Court Information Sheet). Mixed moving/non-moving violations: must satisfy non-moving first. $50 admin court cost per violation if compliance date missed. Traffic Violation Bureau housed in Justice A.A. Birch Building.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "nashville_tvb": {
+      "section_id": "nashville_tvb",
+      "name": "Nashville Traffic Violation Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Requires written 'Not Guilty' plea using specific city-provided form. Mixed moving/non-moving: satisfy non-moving first. $50 admin cost per violation if compliance date missed."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Nashville (Metro Nashville/Davidson County) requires a written 'Not Guilty' plea and a formal request for a hearing before a General Sessions Judge. This must be done using the form on the back of your Traffic Court Information Sheet. Unlike some cities, you cannot simply write a letter; you must use the specific city-provided form to stop the automatic adjudication process. The Traffic Violation Bureau is housed in the Justice A.A. Birch Building. Critical: if you have a mix of moving and non-moving (parking) violations on a single ticket, you must satisfy the non-moving violations first. If you miss your compliance date, a $50.00 administrative court cost is added per violation. Using the Appeal Kit to ensure the 'Not Guilty' form is filled out correctly is vital, as the court rejects incomplete forms without notice.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://circuitclerk.nashville.gov/traffic-violation-bureau/",
+    "official_excerpt": "Official Nashville city of Nashville (Traffic Violation Bureau) — address verified via https://circuitclerk.nashville.gov/traffic-violation-bureau/",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

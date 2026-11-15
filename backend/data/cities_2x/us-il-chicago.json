@@ -1,0 +1,74 @@
+{
+  "city_id": "us-il-chicago",
+  "name": "Chicago, IL",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.chicago.gov/city/en/depts/fin/supp_info/revenue_and_billing/parking_ticket_payment_options.html",
+  "local_rules": "The Department of Finance (DOF) handles parking ticket appeals in Chicago. Both online contest and mail-in hearing request options are available. Online portal found at chicago.gov parking ticket payment options page which includes dispute/contest links.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of Chicago Department of Administrative Hearings",
+    "attention": "Parking Division",
+    "address1": "333 South State Street",
+    "address2": "Suite 322",
+    "city": "Chicago",
+    "state": "IL",
+    "zip": "60603",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2025-01-15",
+    "source": "verification_of_prior_step_url",
+    "confidence_score": 0.48,
+    "notes": "URL is on official .gov domain (chicago.gov) but path contains \"payment_options\" suggesting payment functionality, not contest/dispute. Cannot confirm from URL structure alone that this page supports contesting.",
+    "verified_by": "minimax_research",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "chicago_department_of_finance": {
+      "section_id": "chicago_department_of_finance",
+      "name": "Chicago Department of Finance",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Online hearing request via chicago.gov/account; mail-in options available through DOF"
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Chicago, IL allows 30 days to contest. Mark your calendar — missing this window means you lose the right to appeal. Chicago, IL offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  }
+}

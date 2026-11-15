@@ -1,0 +1,7 @@
+{
+  "mode": "audit",
+  "objective": "Read backend/src/parkingbreaker/research/workflow.py only. In at most 220 words, identify whether the election check could combine optional mitigation/contested language in one sentence with an unrelated mandatory choose clause in another, and whether it examines constituent evidence. Return exact code excerpts, path, line ranges and file SHA256. Distinguish code observation from unproved end-to-end behavior. Do not invent contents of unavailable dependencies or propose a whole product redesign. Finish after this bounded read; no tests are available in this packet.",
+  "context": ["backend/src/parkingbreaker/research/workflow.py"],
+  "writable": [],
+  "tests": {}
+}

@@ -1,0 +1,83 @@
+{
+  "city_id": "us-nv-las_vegas",
+  "name": "Las Vegas",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.lasvegasnevada.gov/Residents/Parking-Services",
+  "local_rules": "Las Vegas Parking Services handles Level 1 Administrative Appeals via mail. 30-day window. Level 1 is purely administrative via mail. Do not pay before appealing or the case will be closed.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of Las Vegas Parking Services",
+    "attention": "Level 1 Administrative Appeal",
+    "address1": "350 S. City Pkwy",
+    "address2": "",
+    "city": "Las Vegas",
+    "state": "NV",
+    "zip": "89106",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "New city from master registry manifest. Las Vegas Parking Services, Level 1 Administrative Appeal, 350 S. City Pkwy, Las Vegas, NV 89106. URL: lasvegasnevada.gov/Residents/Parking-Services. 30-day window. Level 1 is purely administrative via mail. Do not pay before appealing or the case will be closed.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "las_vegas_parking_services": {
+      "section_id": "las_vegas_parking_services",
+      "name": "Las Vegas Parking Services",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "30-day window. Level 1 is purely administrative via mail. Do not pay before appealing or the case will be closed."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Las Vegas Parking Services handles Level 1 Administrative Appeals via mail. 30-day window. Level 1 is purely administrative — no hearing required. Do not pay the fine before appealing or the case will be closed. Verified 2026 via master registry manifest.",
+  "service_types": {
+    "certified_express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.lasvegasnevada.gov/Residents/Parking-Services",
+    "official_excerpt": "Official Las Vegas city of Las Vegas (City of Las Vegas Parking Services) — address verified via https://www.lasvegasnevada.gov/Residents/Parking-Services",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

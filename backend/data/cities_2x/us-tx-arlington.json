@@ -1,0 +1,83 @@
+{
+  "city_id": "us-tx-arlington",
+  "name": "Arlington",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.arlingtontx.gov/Government/Municipal-Court",
+  "local_rules": "10-day window from judgment. Bond requirements apply for higher-level court appeals (minimum $100).",
+  "appeal_deadline_days": 10,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Arlington Municipal Court",
+    "attention": "P.O. Box 90403",
+    "address1": "101 S. Mesquite St",
+    "address2": "MS 63-0100",
+    "city": "Arlington",
+    "state": "TX",
+    "zip": "76004-3403",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Promoted from draft/ to active with master registry manifest data. Address: Arlington Municipal Court, P.O. Box 90403, 101 S. Mesquite St, MS 63-0100, Arlington, TX 76004-3403. URL: arlingtontx.gov/Government/Municipal-Court. 10-day window from judgment. Bond requirements for higher-level appeals (min $100).",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "arlington_municipal_court": {
+      "section_id": "arlington_municipal_court",
+      "name": "Arlington Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "10-day window. Bond required for higher-level appeals (min $100)."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "10-day window from judgment. Bond requirements apply for higher-level court appeals (minimum $100).",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.arlingtontx.gov/Government/Municipal-Court",
+    "official_excerpt": "Official Arlington city of Arlington (Arlington Municipal Court) — address verified via https://www.arlingtontx.gov/Government/Municipal-Court",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

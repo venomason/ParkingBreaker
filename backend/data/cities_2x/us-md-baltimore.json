@@ -1,0 +1,84 @@
+{
+  "city_id": "us-md-baltimore",
+  "name": "Baltimore",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://pay.baltimorecity.gov/pftr",
+  "local_rules": "Baltimore requires a 'Petition for Trial' to be requested within 30 days of the citation. If the citation is older than 45 days, the City of Baltimore loses jurisdiction and the appeal must be filed directly with the District Court of Maryland (700 E. Patapsco Avenue). Always include the 10-digit citation number on your check or petition to ensure correct routing between the City and the State Court system.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City of Baltimore",
+    "attention": "Parking Fines",
+    "address1": "200 Holliday Street",
+    "address2": "",
+    "city": "Baltimore",
+    "state": "MD",
+    "zip": "21202",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: City of Baltimore, Parking Fines, 200 Holliday Street, Baltimore, MD 21202. URL: pay.baltimorecity.gov/pftr. Requires 'Petition for Trial' within 30 days. After 45 days, City loses jurisdiction — must file with District Court of Maryland (700 E. Patapsco Avenue). Always include 10-digit citation number.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "baltimore_city_finance": {
+      "section_id": "baltimore_city_finance",
+      "name": "Baltimore City Department of Finance",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Petition for Trial required within 30 days. After 45 days, jurisdiction shifts to District Court of Maryland."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Baltimore requires a 'Petition for Trial' to be requested within 30 days of the citation. Note: If the citation is older than 45 days, the City of Baltimore loses jurisdiction and the appeal must be filed directly with the District Court of Maryland (700 E. Patapsco Avenue). Always include the 10-digit citation number on your check or petition to ensure correct routing between the City and the State Court system.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://pay.baltimorecity.gov/pftr",
+    "official_excerpt": "Official Baltimore city of Baltimore (City of Baltimore) — address verified via https://pay.baltimorecity.gov/pftr",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

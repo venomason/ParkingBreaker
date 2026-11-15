@@ -1,0 +1,86 @@
+{
+  "city_id": "us-az-phoenix",
+  "name": "Phoenix",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Phoenix",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.phoenix.gov/court/parking-tickets",
+  "local_rules": "Requires formal 'Request for Hearing' letter. Check 'Appearance Date' deadline.",
+  "appeal_deadline_days": 20,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Phoenix Municipal Court",
+    "attention": null,
+    "address1": "P.O. Box 25650",
+    "address2": null,
+    "city": "Phoenix",
+    "state": "AZ",
+    "zip": "85002",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": []
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Address updated per master registry manifest: P.O. Box 25650, Phoenix, AZ 85002. URL set to phoenix.gov/court/parking-tickets. Requires formal 'Request for Hearing' letter.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "phoenix_parking": {
+      "section_id": "phoenix_parking",
+      "name": "City of Phoenix Parking Violations",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": null,
+        "digital_signature_accepted": false
+      }
+    }
+  },
+  "citation_patterns": [],
+  "notes": "Phoenix, Arizona: 20-day appeal window. Mail appeals. Requires formal 'Request for Hearing' letter. Check 'Appearance Date' deadline.",
+  "state": "Arizona",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Phoenix gives you 20 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. Requires formal 'Request for Hearing' letter — check the 'Appearance Date' deadline on your citation.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.phoenix.gov/court/parking-tickets",
+    "official_excerpt": "Official Phoenix city of Phoenix (Phoenix Municipal Court) — address verified via https://www.phoenix.gov/court/parking-tickets",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

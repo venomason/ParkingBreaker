@@ -1,0 +1,92 @@
+{
+  "city_id": "us-mn-minneapolis",
+  "name": "Minneapolis",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.minneapolismn.gov/government/departments/reg-services/administrative-hearings/appeals/online/",
+  "local_rules": "Minneapolis: Contest parking tickets via Hennepin County Violations Bureau. Online appeal or written letter. 30-day deadline.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Hennepin County Violations Bureau",
+    "attention": "Citation Appeals",
+    "address1": "300 South Sixth Street",
+    "address2": null,
+    "city": "Minneapolis",
+    "state": "MN",
+    "zip": "55487",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": [
+      "612-348-3000"
+    ]
+  },
+  "verification_metadata": {
+    "last_updated": "2026-04-07",
+    "confidence_score": 0.85,
+    "verified_url": "https://www.minneapolismn.gov/government/departments/reg-services/administrative-hearings/appeals/online/",
+    "last_verified": "2026-04-07",
+    "sources": [
+      "official_city_gov:minneapolismn.gov"
+    ],
+    "source": "manual_migration_v2",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "default": {
+      "section_id": "default",
+      "name": "Minneapolis Parking Appeals",
+      "routing_rule": "direct",
+      "special_requirements": {}
+    }
+  },
+  "citation_patterns": [
+    {
+      "regex": "^MP\\d{8}$",
+      "section_id": "default",
+      "description": "Minneapolis parking citation",
+      "example_numbers": [
+        "MP12345678"
+      ]
+    }
+  ],
+  "notes": "Minneapolis: Routes through Hennepin County Violations Bureau (not City of Minneapolis directly). Online appeal or mail. 30-day deadline.",
+  "state": "Minnesota",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Minneapolis allows 30 days to contest. Mark your calendar — missing this window means you lose the right to appeal. Minneapolis offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.minneapolismn.gov/government/departments/reg-services/administrative-hearings/appeals/online/",
+    "official_excerpt": "Hennepin County Violations Bureau, Citation Appeals, 300 South Sixth Street, Minneapolis, MN 55487.",
+    "verified_at": "2026-06-07",
+    "verified_by": "mail_dispute_canonical_yaml",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "YELLOW"
+}

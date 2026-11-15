@@ -1,0 +1,84 @@
+{
+  "city_id": "us-nc-charlotte",
+  "name": "Charlotte",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.charlottenc.gov/Services/Parking-in-Charlotte",
+  "local_rules": "Charlotte citations managed via 'Park It' (SP+ turnkey operation). Appeals MUST be submitted within 10 calendar days of issuance. Airport citations (CLT) use a separate review committee — this address is for City/On-street violations only.",
+  "appeal_deadline_days": 10,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Park It Charlotte",
+    "attention": "Administrative Review",
+    "address1": "333 E. Trade Street",
+    "address2": "Suite A",
+    "city": "Charlotte",
+    "state": "NC",
+    "zip": "28202",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated per master registry manifest. Department changed from 'Park It (SP+)' to 'Park It Charlotte'. Attention changed from 'Citations Clerk' to 'Administrative Review'. Address remains 333 E. Trade Street, Suite A, Charlotte, NC 28202. URL unchanged. 10-day deadline. Airport citations (CLT) use separate review committee.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "charlotte_parking": {
+      "section_id": "charlotte_parking",
+      "name": "Charlotte Parking Services",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Managed via 'Park It' (SP+ turnkey operation). Airport citations (CLT) use separate review committee."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Charlotte citations are managed via 'Park It'. Appeals MUST be submitted within 10 calendar days of issuance — one of the tightest windows in the country. If you miss the 10-day mark, the system locks the 'Appeal' button and automatically triggers a $25.00 late penalty on day 11. Using Certified Express for Charlotte is a strategic necessity to prove intent to appeal before the lockout. Note that Airport citations (CLT) use a separate review committee; this address is for City/On-street violations only.",
+  "service_types": {
+    "certified_express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.charlottenc.gov/Services/Parking-in-Charlotte",
+    "official_excerpt": "Official Charlotte city of Charlotte (Park It Charlotte) — address verified via https://www.charlottenc.gov/Services/Parking-in-Charlotte",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "YELLOW"
+}

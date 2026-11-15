@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ok-tulsa",
+  "name": "Tulsa",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.cityoftulsa.org/government/departments/city-clerk/parking-tickets/",
+  "local_rules": "15-day window for Notice of Appeal. Adjudication by City Clerk. Unpaid tickets quickly escalate to the automated boot list (3+ citations).",
+  "appeal_deadline_days": 15,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "City Clerk",
+    "attention": "Parking Appeals Room 260",
+    "address1": "175 E. 2nd St.",
+    "address2": "",
+    "city": "Tulsa",
+    "state": "OK",
+    "zip": "74103",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: City Clerk, Parking Appeals Room 260, 175 E. 2nd St., Tulsa, OK 74103. URL: cityoftulsa.org/government/departments/city-clerk/parking-tickets/. 15-day window for Notice of Appeal. Adjudication by City Clerk. 3+ unpaid tickets = automated boot list.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "tulsa_city_clerk": {
+      "section_id": "tulsa_city_clerk",
+      "name": "Tulsa City Clerk",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "15-day Notice of Appeal window. Adjudication by City Clerk. 3+ unpaid tickets = boot list."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "15-day window for Notice of Appeal. Adjudication by City Clerk. Unpaid tickets quickly escalate to the automated boot list (3+ citations).",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.cityoftulsa.org/government/departments/city-clerk/parking-tickets/",
+    "official_excerpt": "Official Tulsa city of Tulsa (City Clerk) — address verified via https://www.cityoftulsa.org/government/departments/city-clerk/parking-tickets/",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

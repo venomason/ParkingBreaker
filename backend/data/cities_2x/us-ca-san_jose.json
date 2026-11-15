@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ca-san_jose",
+  "name": "San Jose",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.sanjoseca.gov/your-government/departments-offices/transportation/parking/parking-compliance/paying-or-contesting-a-parking-ticket",
+  "local_rules": "San José follows a strict 3-level process. Initial Reviews must be mailed within 21 days of issuance. If you lose at Level 1 and want a 2nd-level Administrative Hearing, California law requires paying the full fine amount as a 'deposit' upfront. Fix-it tickets (e.g., missing plate) can often be reduced to a small administrative fee if proof of correction is included.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Office of Parking Violations",
+    "attention": "Initial Review Clerk",
+    "address1": "P.O. Box 11023",
+    "address2": null,
+    "city": "San José",
+    "state": "CA",
+    "zip": "95103-1023",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Address updated per master registry manifest: Office of Parking Violations, Initial Review Clerk, P.O. Box 11023, San José, CA 95103-1023. URL updated to sanjoseca.gov/your-government/departments-offices/transportation/parking/parking-compliance/paying-or-contesting-a-parking-ticket. 3-level process. Level 1 (Initial Review) is free. Level 2 (Administrative Hearing) requires full fine deposit upfront per CA law. Fix-it tickets reducible with proof of correction.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "san_jose_transportation": {
+      "section_id": "san_jose_transportation",
+      "name": "San Jose Transportation Department",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "3-level process. Level 1 free. Level 2 requires full fine deposit. Fix-it tickets reducible with proof of correction."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "San José follows a strict 3-level process. Initial Reviews must be mailed within 21 days of issuance. The first stage (Initial Review) is free, but if you lose and want a 2nd-level Administrative Hearing, California law requires you to pay the full fine amount as a 'deposit' upfront — making the Appeal Kit for the first stage a critical cost-saving tool. If you have a 'fix-it' ticket (e.g., missing plate), you can often get the fine reduced to a small administrative fee if you include proof of correction. Using Certified Mail is highly recommended to prove receipt within the 21-day window to avoid the 2nd-level 'Pay-to-Play' requirement.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.sanjoseca.gov/your-government/departments-offices/transportation/parking/parking-compliance/paying-or-contesting-a-parking-ticket",
+    "official_excerpt": "Official San Jose city of San Jose (Office of Parking Violations) — address verified via https://www.sanjoseca.gov/your-government/departments-offices/transportation/parking/parking-compliance/paying-or-contesting-a-parking-ticket",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

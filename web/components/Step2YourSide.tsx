@@ -1,0 +1,314 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { ConciergeMark } from "./ConciergeMark";
+import { Icon } from "./Icons";
+
+import { SAMPLE_STORY as SAMPLE } from "../lib/api";
+
+interface Step2YourSideProps {
+  story: string;
+  setStory: (value: string) => void;
+  owner: string | null;
+  setOwner: (value: string) => void;
+  photo: boolean | null;
+  setPhoto: (value: boolean) => void;
+  onComplete: (data: { story: string; owner: string; photo: boolean }) => void;
+  setActionBar: (sub: React.ReactNode, buttons: React.ReactNode) => void;
+  onRulesClick: () => void;
+  // Real flow: after the questions, this form (contact and photos) replaces the sample step.
+  liveSlot?: React.ReactNode;
+}
+
+export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhoto, onComplete, setActionBar, onRulesClick, liveSlot }: Step2YourSideProps) {
+  const live = liveSlot !== undefined;
+  const restored = live && Boolean(owner && story.trim());
+  const [messages, setMessages] = useState<Array<{ sender: "c" | "u" | "g"; text?: string; html?: React.ReactNode }>>([
+    { sender: "c", text: live ? "Your ticket details are recorded. You can check them before continuing." : "Thanks. All five details on your ticket are confirmed." },
+    {
+      sender: "c",
+      text: "Now tell us what happened, in your own words. We’ll keep your wording, and we won’t add facts or arguments.",
+    },
+    ...(restored ? [{ sender: "u" as const, text: story }, { sender: "c" as const, text: "Your saved account and ownership answer are here. Continue with your contact details and photos." }] : []),
+  ]);
+  const [stage, setStage] = useState<"story" | "owner" | "photo" | "done">(restored ? "done" : "story");
+  const [storyErr, setStoryErr] = useState<boolean>(false);
+  const [markState, setMarkState] = useState<"idle" | "thinking" | "done">("idle");
+
+  useEffect(() => {
+    if (stage === "story") {
+      setActionBar(
+        "We keep your exact wording and never invent arguments",
+        <button
+          className="btn btn-primary"
+          type="button"
+          id="actSendStory"
+          onClick={() => {
+            const val = story.trim();
+            if (!val) {
+              setStoryErr(true);
+              document.getElementById("story")?.focus();
+              return;
+            }
+            setStoryErr(false);
+            setMessages((prev) => [
+              ...prev,
+              { sender: "u", text: val },
+              { sender: "c", text: "Thank you. Two quick questions so the letter is accurate." },
+              {
+                sender: "c",
+                text: live
+                  ? "Were you the registered owner of the vehicle on the date of the ticket?"
+                  : "Were you the registered owner of the vehicle on October 2, 2026?",
+              },
+            ]);
+            setStage("owner");
+          }}
+        >
+          Send my account →
+        </button>
+      );
+    } else if (stage === "owner") {
+      setActionBar("Tap one answer above", null);
+    } else if (stage === "photo") {
+      setActionBar("Tap one answer above", null);
+    } else if (stage === "done" && live) {
+      setActionBar("Fill in the details below", null);
+    } else if (stage === "done") {
+      setActionBar(
+        "Step 2 complete",
+        <button
+          className="btn btn-primary"
+          type="button"
+          data-go={3}
+          onClick={() => onComplete({ story: story || SAMPLE, owner: owner ?? "unsure", photo: photo ?? false })}
+        >
+          Start the research →
+        </button>
+      );
+    }
+  }, [stage, story, owner, photo, onComplete, setActionBar, live]);
+
+  const handleAskGuardrail = () => {
+    setMessages((prev) => [
+      ...prev,
+      { sender: "u", text: "Will this work?" },
+      {
+        sender: "g",
+        html: (
+          <div>
+            <div className="gl">
+              <Icon id="shield" size={14} /> A gentle note
+            </div>
+            We can’t predict how the agency will decide, and we won’t judge your case. What we
+            can do: format your own words, check the mailing requirements and show you the exact packet before you authorize mailing.{" "}
+            <button
+              type="button"
+              className="chip"
+              onClick={onRulesClick}
+              style={{ marginTop: "8px" }}
+            >
+              What we never do
+            </button>
+          </div>
+        ),
+      },
+      { sender: "c", text: "Whenever you’re ready, tell us what happened." },
+    ]);
+  };
+
+  const handleChooseOwner = (val: string, label: string) => {
+    setOwner(val);
+    const nextMsgs: Array<{ sender: "c" | "u" | "g"; text?: string; html?: React.ReactNode }> = [
+      ...messages,
+      { sender: "u", text: label },
+    ];
+    if (val !== "yes") {
+      nextMsgs.push({
+        sender: "c",
+        text: "Thanks for saying so. We’ll leave ownership out of the letter rather than guess.",
+      });
+    }
+    if (live) {
+      nextMsgs.push({ sender: "c", text: "Thanks. Last, a few details the agency asks for." });
+      setMessages(nextMsgs);
+      setMarkState("done");
+      setStage("done");
+      return;
+    }
+    const mentions = /photo|picture|pic\b|image/i.test(story);
+    nextMsgs.push({
+      sender: "c",
+      text: mentions
+        ? "You mentioned a photo. Do you want it kept in your evidence record?"
+        : "Do you have a photo you’d like kept in your evidence record?",
+    });
+    setMessages(nextMsgs);
+    setStage("photo");
+  };
+
+  const handleChoosePhoto = (val: boolean, label: string) => {
+    setPhoto(val);
+    const nextMsgs: Array<{ sender: "c" | "u" | "g"; text?: string; html?: React.ReactNode }> = [
+      ...messages,
+      {
+        sender: "u",
+        html: val ? (
+          <span className="photo">
+            <svg width="52" height="52" viewBox="0 0 72 72" aria-hidden="true">
+              <rect width="72" height="72" fill="#cfe3f3" />
+              <rect y="52" width="72" height="20" fill="#b9b2a5" />
+              <rect x="34" y="18" width="4" height="40" fill="#6b6b6b" />
+              <rect x="20" y="14" width="32" height="20" rx="2" fill="#fff" stroke="#b91c1c" strokeWidth="2" />
+              <g fill="#2f7d3a">
+                <ellipse cx="22" cy="18" rx="10" ry="6" />
+                <ellipse cx="34" cy="22" rx="11" ry="7" />
+                <ellipse cx="46" cy="20" rx="9" ry="6" />
+              </g>
+            </svg>
+            <span>
+              photo_of_sign.jpg<small>Uploaded · 1 photo</small>
+            </span>
+          </span>
+        ) : (
+          label
+        ),
+      },
+    ];
+    if (val) {
+      nextMsgs.push({
+        sender: "c",
+        text: "Got it. We’ll print it after your letter, labelled as uploaded by you, and keep a copy in your record.",
+      });
+    }
+    nextMsgs.push({
+      sender: "c",
+      text: "That’s everything we need from you. Next we’ll read the City of San Diego’s official pages and show you every fact with its source.",
+    });
+    setMessages(nextMsgs);
+    setMarkState("done");
+    setStage("done");
+  };
+
+  return (
+    <section className="screen on" id="s2" aria-labelledby="h-s2">
+      <div className="voice">
+        <ConciergeMark size={44} state={markState} />
+        <div>
+          <p className="eyebrow">Step 2 · Your side</p>
+          <h2 id="h-s2" tabIndex={-1}>
+            Tell us what happened.
+          </h2>
+
+        </div>
+      </div>
+
+      <div className="chat" id="chatlog" aria-live="polite" aria-relevant="additions text">
+        {messages.map((m, i) => (
+          <div key={i} className={m.sender === "u" ? "row-u" : "row-c"}>
+            {m.sender !== "u" && <ConciergeMark size={28} state="idle" />}
+            <div className={`msg ${m.sender}`}>
+              {m.html ? m.html : m.text}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {stage === "story" && (
+        <div className="composer" id="composer">
+          <form
+            id="storyForm"
+            onSubmit={(e) => {
+              e.preventDefault();
+              document.getElementById("actSendStory")?.click();
+            }}
+          >
+            <label className="sr" htmlFor="story">
+              Your side, in your own words
+            </label>
+            <textarea
+              id="story"
+              aria-invalid={storyErr}
+              aria-describedby="storyHelp storyErr"
+              placeholder="What happened? Write it the way you’d tell a friend."
+              value={story}
+              onChange={(e) => { setStory(e.target.value); setStoryErr(false); }}
+            />
+            <p className="dictate-tip" id="storyHelp">🎙️ Tip: You can tap your phone keyboard’s microphone to dictate.</p>
+            <p className="muted small" id="storyCompletenessPrompt">
+              Include any relevant dates, times, locations, or sign details in your own words. We format your exact account without adding arguments or judging your case.
+            </p>
+            <p className="err" id="storyErr" role="alert">{storyErr ? live ? "Enter your reason in your own words." : "Write a sentence or two, or tap “Use sample answer”." : ""}</p>
+            <div className="crow">
+              {!live && (
+                <button
+                  type="button"
+                  className="chip"
+                  onClick={() => {
+                    setStory(SAMPLE);
+                    setStoryErr(false);
+                  }}
+                >
+                  Use sample answer
+                </button>
+              )}
+              <button
+                type="button"
+                className="chip"
+                onClick={handleAskGuardrail}
+              >
+                Ask: “Will this work?”
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {stage === "owner" && (
+        <div className="composer" id="composer">
+          <div className="choices" role="group" aria-label="Tap one answer above">
+            {[
+              ["yes", "Yes"],
+              ["no", "No"],
+              ["unsure", "I’m not sure"],
+            ].map(([v, l]) => (
+              <button
+                key={v}
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => handleChooseOwner(v, l)}
+              >
+                <span>{l}</span>
+                <span style={{ color: "var(--coral-ink)" }}>→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {stage === "done" && live && <button type="button" className="chip" onClick={() => setStage("story")}>Edit my account or ownership answer</button>}
+      {stage === "done" && liveSlot}
+
+      {stage === "photo" && (
+        <div className="composer" id="composer">
+          <div className="choices" role="group" aria-label="Tap one answer above">
+            {[
+              [true, "Yes, save it"],
+              [false, "No photo"],
+            ].map(([v, l]) => (
+              <button
+                key={String(v)}
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => handleChoosePhoto(Boolean(v), String(l))}
+              >
+                <span>{String(l)}</span>
+                <span style={{ color: "var(--coral-ink)" }}>→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}

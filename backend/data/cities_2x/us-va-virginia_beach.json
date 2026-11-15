@@ -1,0 +1,75 @@
+{
+  "city_id": "us-va-virginia_beach",
+  "name": "Virginia Beach",
+  "jurisdiction": "city",
+  "status": "cannot-service",
+  "accepts_mail_appeals": false,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://courts.virginiabeach.gov/general-district-court/traffic-court",
+  "local_rules": "Must include a Self-Addressed Stamped Envelope (SASE) with the request for a court date. Failure to include SASE will result in a silent rejection.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "General District Court",
+    "attention": "Traffic Division",
+    "address1": "2425 Nimmo Parkway",
+    "address2": "",
+    "city": "Virginia Beach",
+    "state": "VA",
+    "zip": "23456-9057",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "BANNED — SASE requirement incompatible with Lob automated fulfillment pipeline. Address: General District Court, Traffic Division, 2425 Nimmo Parkway, Virginia Beach, VA 23456-9057. URL: courts.virginiabeach.gov/general-district-court/traffic-court. SASE required with court date request. Failure to include SASE = silent rejection.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "virginia_beach_court": {
+      "section_id": "virginia_beach_court",
+      "name": "Virginia Beach General District Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "SASE required with court date request. Silent rejection if SASE omitted."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Must include a Self-Addressed Stamped Envelope (SASE) with the request for a court date. Failure to include SASE will result in a silent rejection.",
+  "service_types": {
+    "express": false,
+    "appeal_kit": false
+  }
+}

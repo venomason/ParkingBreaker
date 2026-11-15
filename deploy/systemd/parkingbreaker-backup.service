@@ -1,0 +1,13 @@
+[Unit]
+Description=ParkingBreaker verified SQLite and artifact backup
+After=docker.service
+Requires=docker.service
+[Service]
+Type=oneshot
+TimeoutStartSec=1800
+User=root
+UMask=0077
+EnvironmentFile=/etc/parkingbreaker/ops.env
+ExecStart=/bin/bash ${PB_RELEASE}/deploy/backup.sh --apply
+StandardOutput=journal
+StandardError=journal

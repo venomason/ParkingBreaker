@@ -1,0 +1,19 @@
+# Optional, disabled. Qualify target ADC/bucket and monitoring before --profile offsite.
+services:
+  litestream:
+    image: litestream/litestream:0.5.14
+    profiles: [offsite]
+    user: "10001:10001"
+    command: [replicate, -config, /etc/litestream.yml]
+    environment:
+      PB_REPLICA_URL: ${PB_REPLICA_URL:?existing authorized replica URL required}
+    volumes:
+      - type: bind
+        source: ${PB_DATA_PATH:?regional data mount required}
+        target: /data
+        bind: { create_host_path: false }
+      - ./deploy/litestream.yml:/etc/litestream.yml:ro
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    # Failed replication remains visible; no reset/restore/restart hides its state.
+    restart: "no"

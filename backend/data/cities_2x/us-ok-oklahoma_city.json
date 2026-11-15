@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ok-oklahoma_city",
+  "name": "Oklahoma City",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.okc.gov/Services/Municipal-Court/Pay-Ticket",
+  "local_rules": "Oklahoma City (OKC) requires a 'Not Guilty' plea to be entered on or before the 'Arraignment Date' written on the bottom of the ticket. To have a trial, you must post a bond equal to the amount of the ticket plus a $35.00 bond fee. Failure to take action by the arraignment date causes the fine to increase (e.g., $15 meter tickets jump to $24). Always include the citation number on the check or money order to ensure your bond is processed for the correct case.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Oklahoma City Municipal Court",
+    "attention": "Customer Service Window",
+    "address1": "P.O. Box 26487",
+    "address2": "",
+    "city": "Oklahoma City",
+    "state": "OK",
+    "zip": "73126-0487",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Created from master registry manifest. Address: Oklahoma City Municipal Court, Customer Service Window, P.O. Box 26487, Oklahoma City, OK 73126-0487. URL: okc.gov/Services/Municipal-Court/Pay-Ticket. Requires 'Not Guilty' plea before Arraignment Date. Must post bond = ticket amount + $35 fee. Fine increases if no action by arraignment date (e.g., $15 meter → $24).",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "okc_municipal_court": {
+      "section_id": "okc_municipal_court",
+      "name": "Oklahoma City Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Not Guilty plea required before Arraignment Date. Bond = ticket amount + $35 fee. Fine increases if no action taken."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Oklahoma City (OKC) requires a 'Not Guilty' plea to be entered on or before the 'Arraignment Date' written on the bottom of the ticket. Note: To have a trial, you must post a bond equal to the amount of the ticket plus a $35.00 bond fee. Failure to take action by the arraignment date causes the fine to increase (e.g., $15 meter tickets jump to $24). Always include the citation number on the check or money order to ensure your bond is processed for the correct case.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.okc.gov/Services/Municipal-Court/Pay-Ticket",
+    "official_excerpt": "Official Oklahoma City city of Oklahoma City (Oklahoma City Municipal Court) — address verified via https://www.okc.gov/Services/Municipal-Court/Pay-Ticket",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

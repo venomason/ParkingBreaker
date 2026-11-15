@@ -1,0 +1,506 @@
+{
+  "source": "Successful canonical Next.js production build, web/.next/static/css and media",
+  "css_sources": [
+    {
+      "path": "web/.next/static/css/fa796f21b90eb5fd.css",
+      "sha256": "7d2fac9e4db799ec46febfe2d65b1a7db62e9d285e208561768deef873cb529f"
+    },
+    {
+      "path": "web/.next/static/css/e3e2389edec1fabc.css",
+      "sha256": "4d4da4756a23e2584be37333b231637bd44ff0a568b336381adc30abb741ea69"
+    }
+  ],
+  "families": [
+    "IBM Plex Mono",
+    "IBM Plex Mono Fallback",
+    "Inter",
+    "Inter Fallback",
+    "Merriweather",
+    "Merriweather Fallback",
+    "Plus Jakarta Sans",
+    "Plus Jakarta Sans Fallback"
+  ],
+  "files": [
+    {
+      "name": "027647acf05c7ff8-s.woff2",
+      "sha256": "f66e5c1890094c8a646b74a27fbd8f15e748003c43575a5ea18b726a7727349f",
+      "bytes": 74940
+    },
+    {
+      "name": "11c4c3cba9a7e226-s.woff2",
+      "sha256": "7aa405510f9da1e3b14fe24425d2b0f4123fbece19596bd9e50a76f5c85a7054",
+      "bytes": 3972
+    },
+    {
+      "name": "19cfc7226ec3afaa-s.woff2",
+      "sha256": "46dd4cdca58c26ae87cc6927657bf83b2e8abfc39ffd0ab176e301a8d28d22bf",
+      "bytes": 19044
+    },
+    {
+      "name": "1f3fe8c6df3d47c1-s.p.woff2",
+      "sha256": "af1be39e2ff60ede976bc3a93b9aceb3ac7103207b21a62d1971e3ea8cf95b97",
+      "bytes": 97608
+    },
+    {
+      "name": "21350d82a1f187e9-s.woff2",
+      "sha256": "aebf2ab4a4ce6810d73c1ac7be7cafb4e5ec4cee2d6db5fb3e09691747ec4bd6",
+      "bytes": 18744
+    },
+    {
+      "name": "279bb7a1be217873-s.woff2",
+      "sha256": "b64d53b3ffb7d9f7ae86ae645c38236ef83957c10fc2fbc48af7137c3496edac",
+      "bytes": 5532
+    },
+    {
+      "name": "3e8ab5100a4aa694-s.woff2",
+      "sha256": "ed391ae49db1a5c477ed280eb6411b4df5ae83324c90fd695f5e1b7331a9cae0",
+      "bytes": 51604
+    },
+    {
+      "name": "549c72aca63c3e8a-s.woff2",
+      "sha256": "382bddd14c18b4909e61044933271060a09d536f1800c74c2005cf1d4b0d7b61",
+      "bytes": 8968
+    },
+    {
+      "name": "58f386aa6b1a2a92-s.woff2",
+      "sha256": "c6f09ee0e0a24b7c85ecb2a601eb99332f65b1f6b37c31e0bbe73fb307625eca",
+      "bytes": 4348
+    },
+    {
+      "name": "636a5ac981f94f8b-s.p.woff2",
+      "sha256": "cd8db90cd950e26bc8761f65d323588bd5cd112d326d6d322bc7c8ea86771215",
+      "bytes": 27272
+    },
+    {
+      "name": "6fe53d21e6e7ebd8-s.woff2",
+      "sha256": "a16f29d7d2a21a4f9b3249a82eb2725ed5bdb91500dfb5c4758977de27477f20",
+      "bytes": 1716
+    },
+    {
+      "name": "73cb51aac9c97f90-s.woff2",
+      "sha256": "f746246b6b0b641f99d9e26e0bf4e42197bde692126857857f0195a94362d52a",
+      "bytes": 4320
+    },
+    {
+      "name": "82179190dde1591d-s.woff2",
+      "sha256": "77eabc24c693d98b54dff97ca5052da0f7a24e69b797193a0b6a1ea094c56c92",
+      "bytes": 5472
+    },
+    {
+      "name": "8e9860b6e62d6359-s.woff2",
+      "sha256": "a28eb6d3ccb534ae0c94ca999371df024aab60b08c3c8a5720ee9e32fa0faaa2",
+      "bytes": 85272
+    },
+    {
+      "name": "8ebc6e9dde468c4a-s.woff2",
+      "sha256": "5c913fc1b1f86f4b475e5df45a796aa480d1f7f0891ed6f1a5991d6d1be887c3",
+      "bytes": 8292
+    },
+    {
+      "name": "9754fd1e347c437b-s.woff2",
+      "sha256": "078d6e57bf60481df735df5661deb3a7a589f7fe9bb6e5ab4effe769e04de599",
+      "bytes": 2956
+    },
+    {
+      "name": "9e7b0a821b9dfcb4-s.woff2",
+      "sha256": "0303e02b53b0298fb26a0193941a2e8754f0f9a9fce50d90b178d8da3424873f",
+      "bytes": 21688
+    },
+    {
+      "name": "b78b37b810acce9f-s.woff2",
+      "sha256": "53049794c25af8b4a5e2b4b9c2345c47b8f0fdc65ec6e93b18fea74eae2ce956",
+      "bytes": 10872
+    },
+    {
+      "name": "ba9851c3c22cd980-s.woff2",
+      "sha256": "fccca918fea40089dacadc7045861314d1a6bc91f1f323cc1eeb22ebcdb321b5",
+      "bytes": 25844
+    },
+    {
+      "name": "c5fe6dc8356a8c31-s.woff2",
+      "sha256": "a2e2c783ca6f9c20486e81e72a279203e86730bbf8f01ff6a5ee9dbd09e1c271",
+      "bytes": 11272
+    },
+    {
+      "name": "c67326d545bf0a00-s.woff2",
+      "sha256": "a24038dec8b85117fe5c80057abf549cb6c9d785a5bcd723005495c5d3f0439a",
+      "bytes": 4148
+    },
+    {
+      "name": "cdec7fa3927eb560-s.p.woff2",
+      "sha256": "52de70091213c9eab340e2a7ac59e7b6b2b94e089bf69ef38479b22cfde4274c",
+      "bytes": 10016
+    },
+    {
+      "name": "d51fd126416ee4c8-s.woff2",
+      "sha256": "e2318e4993a9cd4a2aad0eb1798c41d8bddec6ee7850f627e44653c15712a2b6",
+      "bytes": 8780
+    },
+    {
+      "name": "d9a2293b6b8212a5-s.p.woff2",
+      "sha256": "5b7716398b823c97f0553b4d0d45bdba9b8a6efe73c429d3fc1cbceadd64adb0",
+      "bytes": 10108
+    },
+    {
+      "name": "dc4d8d7cae82600c-s.woff2",
+      "sha256": "5dfe096c2fc37fc780e3a061c753d1ad4aacf4749fee104d08713f4a167913a1",
+      "bytes": 2956
+    },
+    {
+      "name": "df0a9ae256c0569c-s.woff2",
+      "sha256": "8db00ff46c67b22cda8bed865acf7077651cac8d2841d5b40980556b48961931",
+      "bytes": 10280
+    },
+    {
+      "name": "e4af272ccee01ff0-s.p.woff2",
+      "sha256": "c940764593d0fe5d596be327ca7558855e018039fb78509aa21921fd3644c3e4",
+      "bytes": 48432
+    },
+    {
+      "name": "fe4c52824bfaed3e-s.woff2",
+      "sha256": "7e1822475854e1dee82df16f836b79a59c6630d350b781970c8be782b8793db8",
+      "bytes": 33792
+    }
+  ],
+  "licenses": {
+    "Plus Jakarta Sans": {
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans/OFL.txt",
+      "file": "plusjakartasans-OFL.txt",
+      "sha256": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99"
+    },
+    "Inter": {
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+      "file": "inter-OFL.txt",
+      "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+    },
+    "Merriweather": {
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/OFL.txt",
+      "file": "merriweather-OFL.txt",
+      "sha256": "715bd349bfa6116f99e351e1548321dcfa25b91df65502d22ca8d624557697d2"
+    },
+    "IBM Plex Mono": {
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/OFL.txt",
+      "file": "ibmplexmono-OFL.txt",
+      "sha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da"
+    }
+  },
+  "preload": [
+    "1f3fe8c6df3d47c1-s.p.woff2",
+    "636a5ac981f94f8b-s.p.woff2",
+    "cdec7fa3927eb560-s.p.woff2",
+    "d9a2293b6b8212a5-s.p.woff2",
+    "e4af272ccee01ff0-s.p.woff2"
+  ],
+  "faces": [
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "600",
+      "file": "6fe53d21e6e7ebd8-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "600",
+      "file": "8ebc6e9dde468c4a-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "600",
+      "file": "9e7b0a821b9dfcb4-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "600",
+      "file": "636a5ac981f94f8b-s.p.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "700",
+      "file": "6fe53d21e6e7ebd8-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "700",
+      "file": "8ebc6e9dde468c4a-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "700",
+      "file": "9e7b0a821b9dfcb4-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "700",
+      "file": "636a5ac981f94f8b-s.p.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "800",
+      "file": "6fe53d21e6e7ebd8-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "800",
+      "file": "8ebc6e9dde468c4a-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "800",
+      "file": "9e7b0a821b9dfcb4-s.woff2"
+    },
+    {
+      "family": "Plus Jakarta Sans",
+      "weight": "800",
+      "file": "636a5ac981f94f8b-s.p.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "ba9851c3c22cd980-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "21350d82a1f187e9-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "c5fe6dc8356a8c31-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "19cfc7226ec3afaa-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "df0a9ae256c0569c-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "8e9860b6e62d6359-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "400",
+      "file": "e4af272ccee01ff0-s.p.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "ba9851c3c22cd980-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "21350d82a1f187e9-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "c5fe6dc8356a8c31-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "19cfc7226ec3afaa-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "df0a9ae256c0569c-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "8e9860b6e62d6359-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "500",
+      "file": "e4af272ccee01ff0-s.p.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "ba9851c3c22cd980-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "21350d82a1f187e9-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "c5fe6dc8356a8c31-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "19cfc7226ec3afaa-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "df0a9ae256c0569c-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "8e9860b6e62d6359-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "600",
+      "file": "e4af272ccee01ff0-s.p.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "ba9851c3c22cd980-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "21350d82a1f187e9-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "c5fe6dc8356a8c31-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "19cfc7226ec3afaa-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "df0a9ae256c0569c-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "8e9860b6e62d6359-s.woff2"
+    },
+    {
+      "family": "Inter",
+      "weight": "700",
+      "file": "e4af272ccee01ff0-s.p.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "400",
+      "file": "fe4c52824bfaed3e-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "400",
+      "file": "3e8ab5100a4aa694-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "400",
+      "file": "b78b37b810acce9f-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "400",
+      "file": "027647acf05c7ff8-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "400",
+      "file": "1f3fe8c6df3d47c1-s.p.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "700",
+      "file": "fe4c52824bfaed3e-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "700",
+      "file": "3e8ab5100a4aa694-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "700",
+      "file": "b78b37b810acce9f-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "700",
+      "file": "027647acf05c7ff8-s.woff2"
+    },
+    {
+      "family": "Merriweather",
+      "weight": "700",
+      "file": "1f3fe8c6df3d47c1-s.p.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "file": "58f386aa6b1a2a92-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "file": "82179190dde1591d-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "file": "dc4d8d7cae82600c-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "file": "11c4c3cba9a7e226-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "file": "d51fd126416ee4c8-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "400",
+      "file": "cdec7fa3927eb560-s.p.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "600",
+      "file": "73cb51aac9c97f90-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "600",
+      "file": "279bb7a1be217873-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "600",
+      "file": "9754fd1e347c437b-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "600",
+      "file": "c67326d545bf0a00-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "600",
+      "file": "549c72aca63c3e8a-s.woff2"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "weight": "600",
+      "file": "d9a2293b6b8212a5-s.p.woff2"
+    }
+  ]
+}

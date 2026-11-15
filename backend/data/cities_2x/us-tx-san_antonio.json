@@ -1,0 +1,84 @@
+{
+  "city_id": "us-tx-san_antonio",
+  "name": "San Antonio",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.sa.gov/Directory/Departments/Court",
+  "local_rules": "San Antonio Municipal Court handles parking ticket appeals. Simple mail-in process. A Hearing Officer reviews the letter and mails back the ruling. No mandatory appearance for Level 1.",
+  "appeal_deadline_days": 20,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "San Antonio Municipal Court",
+    "attention": "Parking Hearing Office",
+    "address1": "401 S. Frio St.",
+    "address2": "",
+    "city": "San Antonio",
+    "state": "TX",
+    "zip": "78207",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Promoted from draft/ to active per master registry manifest. Address changed from P.O. Box 839958 (TCI Department) to San Antonio Municipal Court, Parking Hearing Office, 401 S. Frio St., San Antonio, TX 78207. URL changed from sanantonio.gov/SAParking to sa.gov/Directory/Departments/Court. Simple mail-in process; Hearing Officer reviews letter and mails back ruling. No mandatory appearance for Level 1.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "san_antonio_municipal_court": {
+      "section_id": "san_antonio_municipal_court",
+      "name": "San Antonio Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Simple mail-in process. Hearing Officer reviews letter and mails back ruling. No mandatory appearance for Level 1."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "San Antonio Municipal Court handles parking ticket appeals. Simple mail-in process — a Hearing Officer reviews your letter and mails back the ruling. No mandatory appearance for Level 1. Verified 2026 via master registry manifest.",
+  "service_types": {
+    "certified_express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.sa.gov/Directory/Departments/Court",
+    "official_excerpt": "…handles parking ticket appeals. Simple mail-in process. A Hearing Officer reviews the letter and mails back the ruling. No mandatory appearance for Level 1. Promoted…",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

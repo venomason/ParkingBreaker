@@ -1,0 +1,84 @@
+{
+  "city_id": "us-in-indianapolis",
+  "name": "Indianapolis",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Indiana/Indianapolis",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.indy.gov/activity/contest-a-parking-citation-or-ticket",
+  "local_rules": "7-day late fee pause window. OVB manages all contests. Payment = Admission.",
+  "appeal_deadline_days": 14,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Ordinance Violation Bureau",
+    "attention": null,
+    "address1": "200 E. Washington St",
+    "address2": "Suite 2201",
+    "city": "Indianapolis",
+    "state": "IN",
+    "zip": "46204",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Address updated per master registry manifest: Ordinance Violation Bureau, 200 E. Washington St, Suite 2201, Indianapolis, IN 46204. URL set to indy.gov/activity/contest-a-parking-citation-or-ticket. 7-day late fee pause window. OVB manages all contests. Payment = Admission.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "city_parking": {
+      "section_id": "city_parking",
+      "name": "City of Indianapolis",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": null
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Indianapolis gives you 14 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. 7-day late fee pause window available. OVB manages all contests. Payment = Admission of liability.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.indy.gov/activity/contest-a-parking-citation-or-ticket",
+    "official_excerpt": "Official Indianapolis city of Indianapolis (Ordinance Violation Bureau) — address verified via https://www.indy.gov/activity/contest-a-parking-citation-or-ticket",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

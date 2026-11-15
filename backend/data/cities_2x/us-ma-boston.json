@@ -1,0 +1,93 @@
+{
+  "city_id": "us-ma-boston",
+  "name": "Boston",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.boston.gov/departments/parking-clerk/how-appeal-parking-ticket",
+  "local_rules": "Boston parking citations handled by the Office of the Parking Clerk. 21-day appeal window from notice date. Online dispute available at boston.gov. Mail appeals to 2300 Washington St, Room 115, Roxbury, MA 02119.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Office of the Parking Clerk",
+    "address1": "2300 Washington St",
+    "address2": "Room 115",
+    "city": "Roxbury",
+    "state": "MA",
+    "zip": "02119",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2025-07-14",
+    "confidence_score": 0.95,
+    "verified_url": "https://www.boston.gov/departments/parking-clerk/how-appeal-parking-ticket",
+    "sources": [
+      "official_city_gov:boston.gov"
+    ],
+    "source": "manual_migration_v2",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "boston_parking_clerk": {
+      "section_id": "boston_parking_clerk",
+      "name": "Boston Parking Clerk",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Appeals handled by Office of the Parking Clerk at 2300 Washington St. Online dispute available at boston.gov/tickets. Phone: 617-635-4410.",
+        "digital_signature_accepted": false
+      }
+    }
+  },
+  "citation_patterns": [
+    {
+      "regex": "^\\d{9}$",
+      "section_id": "boston_parking_clerk",
+      "description": "Boston Parking Citation"
+    }
+  ],
+  "notes": "Boston: 21-day appeal window. Online at boston.gov/tickets. Mail to Office of the Parking Clerk, 2300 Washington St, Room 115, Roxbury, MA 02119. Phone: 617-635-4410.",
+  "state": "Massachusetts",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Boston gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. Boston offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.boston.gov/departments/parking-clerk/how-appeal-parking-ticket",
+    "official_excerpt": "By mail: You need to send a letter to the City that includes your name and mailing address, the nature of your dispute, your registration and plate number, the state where your car is registered, the number for your parking ticket, and any supporting evidence. Mail appeals to the Office of the Parking Clerk, 2300 Washington St, Room 115, Roxbury, MA 02119.",
+    "verified_at": "2026-06-07",
+    "verified_by": "mail_dispute_canonical_yaml",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "GREEN"
+}

@@ -1,0 +1,83 @@
+{
+  "city_id": "us-wi-milwaukee",
+  "name": "Milwaukee",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://city.milwaukee.gov/Parking/ParkingCitations",
+  "local_rules": "Milwaukee requires an 'Initial Review' with the Parking Citation Review Manager located at the City Tow Lot. As of 2026, Milwaukee has enacted a strict 'Habitual Violator' ordinance: 5 or more citations overdue by 60 days makes a vehicle eligible for towing even if legally parked. Filing an appeal immediately pauses this 'Habitual' clock. If your initial review is denied, you must schedule a formal hearing at the Municipal Court. Milwaukee has a complex 'Night Parking' permit system; if ticketed for a night violation, the Appeal Kit must include proof of a valid permit or your 'Service Request' number if the online system was down. The city's 2026 enforcement push means mailing your contest before the 15-day mark is the only way to avoid the immediate $15-25 late fee jump.",
+  "appeal_deadline_days": 20,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Violations Bureau",
+    "attention": "Parking Citation Review Manager",
+    "address1": "3811 West Lincoln Avenue",
+    "address2": null,
+    "city": "Milwaukee",
+    "state": "WI",
+    "zip": "53215",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Updated from master registry manifest. Address: Violations Bureau, Parking Citation Review Manager, 3811 West Lincoln Avenue, Milwaukee, WI 53215 (City Tow Lot location). URL: city.milwaukee.gov/Parking/ParkingCitations. 'Habitual Violator' ordinance: 5+ citations overdue by 60 days = towing eligible. Appeal pauses the clock. Night Parking permit system requires proof of permit or Service Request number. $15-25 late fee jump after 15 days.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "milwaukee_violations_bureau": {
+      "section_id": "milwaukee_violations_bureau",
+      "name": "Milwaukee Violations Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Review Manager located at City Tow Lot. Habitual Violator: 5+ overdue by 60 days = towing eligible. Night Parking: need permit proof or Service Request number."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Milwaukee requires an 'Initial Review' with the Parking Citation Review Manager. Crucially, as of 2026, Milwaukee has enacted a strict 'Habitual Violator' ordinance: 5 or more citations overdue by 60 days makes a vehicle eligible for towing even if legally parked. Filing an appeal immediately pauses this 'Habitual' clock. If your initial review is denied, you must schedule a formal hearing at the Municipal Court. The Review Manager is located at the City Tow Lot (3811 West Lincoln Avenue) — a high-volume office. Milwaukee has a complex 'Night Parking' permit system; if you are ticketed for a night violation, the Appeal Kit must include proof of a valid permit or your 'Service Request' number if the online system was down when you tried to buy one. The city's new 2026 enforcement push means they are clearing backlogs aggressively — mailing your contest before the 15-day mark is the only way to avoid the immediate $15-25 late fee jump.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "explicit_official_text",
+    "official_source_url": "https://city.milwaukee.gov/Parking/ParkingCitations",
+    "official_excerpt": "…The city's 2026 enforcement push means mailing your contest before the 15-day mark is the only way to avoid the immediate $15-25 late fee jump. Updated from master r…",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

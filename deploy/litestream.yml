@@ -1,0 +1,11 @@
+# Off-site PITR only; photos/PDF recovery uses the matching verified snapshot bundle.
+# Never auto-restore over the authoritative regional disk or erase LTX recovery history.
+logging:
+  type: json
+  stderr: true
+dbs:
+  - path: /data/parkingbreaker.sqlite
+    restore-if-db-not-exists: false
+    replica:
+      url: ${PB_REPLICA_URL}
+      auto-recover: false

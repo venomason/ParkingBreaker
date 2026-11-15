@@ -1,0 +1,75 @@
+{
+  "city_id": "us-tx-austin",
+  "name": "Austin",
+  "jurisdiction": "city",
+  "status": "blocked",
+  "accepts_mail_appeals": false,
+  "timezone": "America/Chicago",
+  "online_appeal_available": false,
+  "online_appeal_url": null,
+  "local_rules": "BANNED — HIGH-ENTROPY CITY. Reasons: (1) Variable 'Appearance Date' on ticket (not standard X-day count) — risk of Default Judgment + $40 fee if mailed late. (2) Appeal Bond required if initial appeal denied (double fine or $100 min). (3) Active Warrant Amnesty programs (spring 2026) allow in-person settlement at steep discount — undermines mail-in service integrity. UT citations separate (1815 Trinity St, 12-day window). Manual review only.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Austin Municipal Court",
+    "attention": "Parking Adjudication",
+    "address1": "P.O. Box 2135",
+    "address2": null,
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78768-2135",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "BANNED — HIGH-ENTROPY CITY. Data from master registry manifest is accurate but city is blocked for automation due to: variable Appearance Date, Appeal Bond requirement, and active Warrant Amnesty programs. Manual review only.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "austin_municipal_court": {
+      "section_id": "austin_municipal_court",
+      "name": "Austin Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "BANNED — HIGH-ENTROPY CITY. Variable Appearance Date, Appeal Bond, Warrant Amnesty."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Austin is currently not available for automated appeal processing. This is due to Austin's complex citation system: (1) variable 'Appearance Date' on each ticket rather than a standard deadline, (2) Appeal Bond requirements if initial appeal is denied, and (3) active Warrant Amnesty programs that may offer better terms in person. If you have an Austin citation, please contact support for manual review options.",
+  "service_types": {
+    "express": false,
+    "appeal_kit": false
+  }
+}

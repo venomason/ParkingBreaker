@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ks-wichita",
+  "name": "Wichita",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Chicago",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.wichita.gov/Government/Departments/Court/Pages/Parking.aspx",
+  "local_rules": "Very strict 10-day window. Failure to act can lead to a 'Failure to Comply' warrant and doubled fines. Does not cover WSU campus tickets.",
+  "appeal_deadline_days": 10,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Wichita Municipal Court",
+    "attention": "Parking Section",
+    "address1": "455 N. Main",
+    "address2": "2nd Floor",
+    "city": "Wichita",
+    "state": "KS",
+    "zip": "67202",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Created from master registry manifest. Address: Wichita Municipal Court, Parking Section, 455 N. Main, 2nd Floor, Wichita, KS 67202. URL: wichita.gov/Government/Departments/Court/Pages/Parking.aspx. Very strict 10-day window. Failure to act = 'Failure to Comply' warrant and doubled fines. Does not cover WSU campus tickets.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "wichita_municipal_court": {
+      "section_id": "wichita_municipal_court",
+      "name": "Wichita Municipal Court",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "10-day window. Failure to act = warrant + doubled fines. WSU campus tickets not covered."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "Very strict 10-day window. Failure to act can lead to a 'Failure to Comply' warrant and doubled fines. Does not cover WSU campus tickets.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.wichita.gov/Government/Departments/Court/Pages/Parking.aspx",
+    "official_excerpt": "Official Wichita city of Wichita (Wichita Municipal Court) — address verified via https://www.wichita.gov/Government/Departments/Court/Pages/Parking.aspx",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

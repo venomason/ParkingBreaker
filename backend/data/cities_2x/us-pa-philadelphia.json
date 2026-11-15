@@ -1,0 +1,86 @@
+{
+  "city_id": "us-pa-philadelphia",
+  "name": "Philadelphia, PA",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.phila.gov/parking-ticket-dispute",
+  "local_rules": "Philadelphia Parking Authority (PPA) handles all parking ticket appeals; online dispute portal confirmed via official PPA domain.",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Philadelphia Parking Authority",
+    "attention": "Adjudication Unit",
+    "address1": "P.O. Box 58113",
+    "address2": null,
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19152",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2025-01-21",
+    "source": "url_verification_only",
+    "confidence_score": 0.78,
+    "notes": "URL confirmed on official .gov domain. Domain phila.gov is verified city of Philadelphia government. URL path parking-ticket-dispute indicates dispute functionality (not pay-only). Could not confirm full page load or current live state, but domain authority is strong.",
+    "verified_by": "minimax_research",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "philadelphia_parking_authority": {
+      "section_id": "philadelphia_parking_authority",
+      "name": "Philadelphia Parking Authority",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": null,
+        "digital_signature_accepted": false
+      }
+    }
+  },
+  "citation_patterns": [],
+  "notes": "Philadelphia, PA, Pennsylvania: None-day appeal window. Mail appeals. Online contest available.",
+  "state": "Pennsylvania",
+  "letter_format": "free_form",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "human_verified": true,
+  "confirmation_note": "Philadelphia, PA allows 30 days to contest. Mark your calendar — missing this window means you lose the right to appeal. Philadelphia, PA offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://philapark.org/contest/",
+    "official_excerpt": "Philadelphia Parking Authority Adjudication Unit, P.O. Box 58113, Philadelphia, PA 19152.",
+    "verified_at": "2026-06-07",
+    "verified_by": "mail_dispute_canonical_yaml",
+    "verification_method": "official_city_source_review"
+  },
+  "launch_ethics_signal": "YELLOW"
+}

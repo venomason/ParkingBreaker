@@ -1,0 +1,8 @@
+[Unit]
+Description=ParkingBreaker hourly verified recovery bundle
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=parkingbreaker-backup.service
+[Install]
+WantedBy=timers.target

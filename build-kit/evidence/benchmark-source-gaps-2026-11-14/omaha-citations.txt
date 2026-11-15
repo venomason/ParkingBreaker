@@ -1,0 +1,779 @@
+CITATIONS
+
+POLICY:
+
+It is the policy of the Omaha Police Department (OPD) that officers shall take appropriate enforcement action in response to violations of City Ordinances and Nebraska Revised Statutes (NRS). Per NRS §29-422, officers are authorized to issue citations in lieu of booking for offenses that constitute a misdemeanor or infraction, and for any violation of a city ordinance, to the maximum extent consistent with the effective enforcement of the law and protection of the public. Officers shall refer to the current Douglas County Court Waiver/Fine Schedule when they issue citations for offenses that can be waived.
+
+Officers shall issue citations for criminal and traffic offenses, courtesy citations, parking citations, and/or make arrests as appropriate. Officers shall issue electronic citations when possible. Paper citations shall be used only when electronic citations are not available (i.e., the system is down).
+
+PROCEDURE:
+
+I. Citations – General
+
+A. OPD has four (4) types of citations. Officers shall issue electronic versions of citations when possible. Paper citations shall be used only when electronic citations are not available.
+
+1. Citation – i.e., Uniform Citation and Complaint (used for both traffic and criminal offenses).
+
+a. Referred to as “citation” in this policy and other OPD policies.
+
+b. Shall be completed electronically unless there is a system outage or other factor that prevents this and in such cases a paper citation would instead be required.
+
+2. Parking citations.
+
+3. Courtesy citations (Fix It or Warning).
+
+4. Courtesy Vehicle Check (See the “Tow – Parking Violations” policy).
+
+B. Officers shall not give advice to suspects regarding how to handle citations.
+
+1. Officers shall advise the suspect they must appear in court without exception when any one of the offenses does not appear on the Offenses Fine Waiver Schedule.
+
+C. Officers who are working off-duty and need to physically arrest, detain, or cite a suspect shall contact 911 as soon as reasonably possible and shall follow procedures described in the OPD “Outside Employment” policy.
+
+D. Shift assignment designation on all citations, both paper and electronic, is as follows:
+
+1. “A” to be used by “A” shift officers.
+
+2. “B” to be used by “B” shift officers.
+
+3. “C” to be used by “C” shift officers.
+
+E. Court dates and times on citations shall be assigned as follows:
+
+1. Electronic citations: Electronic citations shall automatically assign court dates and times.
+
+2
+
+a. Officers shall not pre-print citations and issue them on a future date.
+
+NOTE: If not followed, and a revised copy is issued, court dates may be different and a warrant may be issued for that person.
+
+2. Paper citations: When a paper citation is issued that requires a court appearance, officers shall schedule arraignments per the following:
+
+a. Court dates shall be on the same day of the week that the citation was issued, with the exception of Thursday, Saturday, Sunday, and court holidays. The arraignment date shall be set for no less than thirty (30) calendar days from the citation issue date.
+
+EXAMPLE:
+
+Citation Issue Day Arraignment Day
+
+Monday Monday Tuesday Tuesday Wednesday Wednesday Thursday Wednesday Friday Friday Saturday Monday Sunday Tuesday
+
+b. Court Times.
+
+(1) If all criminal charges on the citation are non-traffic offenses, the appearance time shall be 1:30 p.m.
+
+(2) If all charges on the citation are traffic offenses, the appearance time shall be 9:00 a.m.
+
+(3) If both traffic and criminal charges are listed on the citation, the arraignment time shall be 9:00 a.m.
+
+(4) All traffic offenses listed on the citation shall l have an arraignment time of 9:00 a.m.
+
+F. Court costs for traffic and criminal offenses shall be recorded on the citation as follows:
+
+1. Electronic citations automatically calculate court costs and fines for traffic and criminal offenses.
+
+2. Officers shall use the current Douglas County Court Waiver/Fine Schedule for paper citations.
+
+a. The Douglas County Court Waiver/Fine Schedule provides a list of traffic, criminal, and miscellaneous offenses that can be waived. Officers shall reference this schedule when they enter the Statute/Ordinance number and fine amount(s) on a citation.
+
+b. Waiver/Fine Schedules are updated by the Nebraska Supreme Court on a regular basis. When changes are made to the schedule, new schedules are distributed to all OPD employees via an Information Order.
+
+3
+
+c. When multiple paper citations are issued, court costs are to be shown on ONLY ONE of the citations.
+
+3. Court costs are not chargeable on parking citations.
+
+G. Multiple Offenses
+
+1. Electronic Citations: Officers are allowed to write up to nine (9) violations per citation. If more than nine (9) charges are brought against a suspect, a second electronic citation shall be issued.
+
+2. Paper Citations: Officers are allowed to enter up to four (4) violations per paper citation. If more than four (4) charges are brought against a suspect (including traffic charges), additional citations should be initiated, and all citations relating to the incident should be stapled together along with an accompanying Supplementary Report or Incident Report. Officers may:
+
+a. Check four (4) boxes and/or write in three (3) charges in the other boxes for different offenses.
+
+b. When there are multiple counts of the same charge, up to four (4) charges may be included by checking one (1) box and writing three (3) additional charges in the “Other” boxes.
+
+H. Officers shall start and finish each citation on the same computer.
+
+IMPORTANT: Starting an electronic citation on one computer and finishing it on a different computer will cause the system to create two citation numbers. This causes a problem for the Prosecutor’s Office.
+
+EXAMPLE: If a citation is started on a desktop computer but finished on a Mobile Data Computer (MDC), two citation numbers will be created.
+
+I. Citation Requests
+
+1. If officers determine there is Probable Cause to issue a citation to a suspect for a misdemeanor, but the suspect is not on scene or cannot be reached, officers shall issue a Citation Request.
+
+a. Officers shall refer to OPD’s “Locate Persons and Citation Requests” policy for procedures on issuing Citation Requests.
+
+NOTE: Officers may put charges for infractions on a Citation Request ONLY IF the Citation Request also lists misdemeanor charges. Citation Requests cannot be issued for infractions alone.
+
+2. If officers need to issue a citation to a suspect based on a Citation Request, officers shall follow the procedures in this policy for issuing the citation. Officers shall then refer to OPD’s “Locate Persons and Citation Requests” policy for procedures on cancelling the Citation Request.
+
+NOTE: If a suspect refuses to sign a citation based on a Citation Request, an arrest warrant may be issued for the suspect. Officers shall refer to OPD’s “Locate Persons and Citation Requests” policy for procedures.
+
+4
+
+J. Booking Instead of Issuing a Citation
+
+1. To the maximum extent consistent with the law and protection of the public, officers shall issue citations in lieu of arrest or booking for most misdemeanors and all infractions, unless the following criteria applies:
+
+a. The suspect fails to identify themselves satisfactorily (NRS §29-427).
+
+(1) If a suspect refuses to identify themselves and/or refuses to provide a fingerprint for the citation after multiple requests by officers, officers shall advise the suspect they will be booked since the law requires suspects to identify themselves.
+
+NOTE: See the “Fingerprints and Identification” section of this policy for more information.
+
+b. The suspect refuses to sign the citation (NRS §29-427).
+
+(1) If a suspect refuses to sign a citation for a traffic infraction, the suspect shall be charged with a misdemeanor and booked for “Refusal to Sign” (NRS §60-684, 29-426).
+
+(2) If a suspect refuses to sign a citation for a misdemeanor or a non-traffic related infraction, they shall be booked on the underlying charge but will not be booked for an additional charge of “Refusal to Sign.”
+
+EXCEPTION: If a suspect refuses to sign a citation for Possession of Marijuana (Less than 1 Ounce), officers shall NOT book the suspect but will still issue the citation without the signature.
+
+c. The officer has reasonable grounds to believe that (NRS §29-427):
+
+(1) The person will refuse to respond to the citation.
+
+(2) Such custody is necessary to protect the suspect or others when the suspect’s continued liberty would constitute a risk of immediate harm (per NRS §29-427 and 29-432).
+
+(3) Such custody is necessary to carry out legitimate investigative functions.
+
+(4) The suspect has no ties to the jurisdiction reasonably sufficient to assure their appearance.
+
+– OR –
+
+(5) The suspect has previously failed to appear in response to a citation.
+
+d. There is a reasonable likelihood the offense(s) would continue or resume.
+
+e. The prosecution of the offense(s) for which the suspect is arrested, or the prosecution of any other offense(s), would be jeopardized by the immediate release of the suspect.
+
+f. The offense is a misdemeanor that is ineligible for citation release, including the following:
+
+5
+
+(1) Certain weapons offenses, as outlined in OPD’s “Weapons Offenses – Booking and Charging” policy.
+
+(2) Certain acts committed against one (1) or more household members, whether or not committed in the presence of the officer, including (NRS §29-404.02):
+
+i. Attempting to cause or intentionally and knowingly causing bodily injury with or without a dangerous instrument;
+
+ii. Placing, by physical menace, another in fear of imminent bodily injury;
+
+– OR –
+
+iii. Engaging in sexual contact or sexual penetration without consent as defined in NRS §28-318.
+
+NOTE: See OPD’s “Domestic Violence,” “Abuse/Neglect/Injury-Child,” and “Adult Sexual Assaults – Investigations” policies for more information.
+
+(3) Violations of Protection Orders (NRS §28-311.11, §26-103, 26-119 – 26- 120).
+
+NOTE: See the OPD “Protection Orders and Harassment” policy for more information.
+
+(4) Theft by Receiving Stolen Property (NRS §28-517), Theft by Unlawful Taking or Disposition (NRS §28-511), or Unauthorized Use of a Propelled Vehicle (NRS §28-516) if the property involved in these offenses is a motor vehicle.
+
+EXCEPTION: Under certain circumstances, CIB detectives may issue a Citation or Citation Request for the above-listed theft offenses if approved by their supervisor.
+
+(5) Misdemeanors committed in the presence of the officer if the suspect may cause injury to themselves or others or damage to property unless immediately arrested or unless the suspect may destroy or conceal evidence in the commission of such misdemeanor.
+
+(6) Other offenses as described in OPD policy/ procedures, or as directed by an officer’s supervisor, the City Prosecutor, or Douglas County Attorney’s Office.
+
+2. An officer’s supervisor must approve booking in lieu of a citation for misdemeanors and infractions.
+
+a. The arresting officer shall include the name of the supervisor who authorized the booking in their report(s). Approval of reports may be completed by the authorizing supervisor or the arresting officer’s normal chain of command.
+
+3. The officer shall clearly articulate in the narrative of their report(s) all reasons and circumstances contributing to their decision to book the suspect.
+
+K. Issuing Citations to Suspects with Warrants
+
+6
+
+1. Prior to issuing a citation for a misdemeanor or infraction, officers shall conduct a complete Data Check to ensure the suspect does not have an outstanding warrant.
+
+NOTE: If the suspect has a warrant, officers MUST confirm the warrant through the OPD Data Review Squad’s Information Channel.
+
+2. If a suspect who committed an infraction and/or a misdemeanor also has a warrant, the officer shall book the suspect on their warrant.
+
+a. If a suspect has committed a new misdemeanor offense, officers shall book the suspect for their warrant AND the new misdemeanor offense instead of issuing a citation for the misdemeanor (NRS §29-404.02).
+
+b. If a suspect with a warrant has committed an infraction (criminal or traffic), officers may use their discretion to determine whether or not to issue a citation for the infraction.
+
+(1) If officers pursue an infraction for a suspect with a warrant, they shall issue a citation for the infraction, but SHALL NOT book the suspect for the infraction and only book the suspect for the warrant (NRS §29-422, 29-435).
+
+EXCEPTION: If the suspect refuses to sign the citation for the infraction after multiple requests by officers, the suspect shall be booked on their warrant and the infraction. If it is a traffic infraction, they shall also be booked on a “Refusal to Sign” charge which is a misdemeanor (See NRS §60-684, 29-426 - 29-427 for more information).
+
+NOTE: Per the City Prosecutor’s Office, this applies to suspects with an OPD warrant and/or suspects with a warrant from another law enforcement agency who have committed an infraction in OPD’s jurisdiction.
+
+3. See OPD’s “Booking – General Procedure” and “Warrants – Warrant Arrests by/for Other Jurisdictions and Extradition Limits” policies for more information on booking suspects with warrants.
+
+II. Paper Citations
+
+A. Procedures for checking out paper citations are as follows:
+
+1. Officers shall fill out the Issue Card completely and correctly and turn the hard copy of the issue card in to their sergeant no later than the end of their shift.
+
+2. The sergeant shall make certain that issue cards are turned in to the Data Unit for processing by the next shift.
+
+3. All citations and citation books that have been checked out shall be maintained in a secure, locked location when not in the immediate, personal custody of the officer.
+
+B. The minimum issue of citations is as follows:
+
+1. Citations: 20 each (for criminal and traffic offenses).
+
+2. Parking citations: 10 each.
+
+7
+
+3. Courtesy citations: 25 each.
+
+4. Officers shall be issued all types of citations as needed.
+
+C. Tracking Paper Citations.
+
+1. If citations cannot be issued within a reasonable time period due to illness, transfer, termination, etc., officers shall return them to the responsible supervisor for computer cancellation.
+
+a. The supervisor shall turn all unused citations in to the Data Unit so they can be cancelled.
+
+b. A Verification Report can be prepared by the Data Unit to account for citations issued to employees. “Courtesy Vehicle Checks” have no inventory procedure.
+
+c. Use citations in numerical order from the lowest number to the highest number.
+
+D. Submission of Paper Citations.
+
+1. Officers shall submit all completed paper citations to their supervisor no later than the end of shift.
+
+a. The supervisor shall promptly submit the citations into the appropriate box in the hallway south of the Front Desk office (HQ 3rd floor).
+
+b. Parking citations shall be turned in to the Data Unit.
+
+c. Citations for criminal offenses shall be turned in to the Data Unit.
+
+III. Completion of Paper Citations for Traffic and Criminal Offenses – Specific Details
+
+A. RB numbers should be entered in the blank space above the “Case No” field of the paper citations. When multiple RB numbers are required, for example, a suspect is cited for multiple shoplifting incidents, the officer shall write no more than four (4) RB numbers.
+
+B. Only four (4) counts/charges may be entered on a paper citation. If more than four (4) counts/charges are required, a second paper citation shall be completed.
+
+C. When there is a delay between the date of the offense and the date the paper citation is issued, officers shall note this in the space above the “Case No” field.
+
+D. The pink copy of the paper citation shall be turned into the Data Unit along with the rest of the citation.
+
+IV. Voiding Citations
+
+A. Electronic citations: Electronic citations may be deleted once they have been initiated and prior to issuance.
+
+1. The officer is required to provide an explanation in the comment field of the “Delete” dialogue box.
+
+2. Deleted citations are still saved within the system, but are not forwarded to the Court.
+
+8
+
+B. Paper Citations: Officers may void a paper citation before issuing the ticket by doing the following:
+
+1. Print “VOID” across the citation and attach all copies, including the Suspect’s Copy, to an Inter-Office Memorandum via the chain of command to their Precinct/Section Captain. The Inter-Office Memorandum shall include the reason the citation was voided.
+
+2. The captain shall forward voided citations and the Inter-Office Memorandum to the Data Unit for processing.
+
+V. Errors Found After a Citation Has Been Submitted
+
+A. If an error is found after a citation is issued to a suspect, turned in, and sent to the Data Unit for processing, it shall not be returned to the officer. The Data Unit shall prepare a notice, along with a copy of the citation, and send the notice to the officer’s captain. The captain shall determine what action the officer will take. Possible actions include:
+
+1. Re-issue the citation to the suspect.
+
+2. Contact the City Prosecutor’s Office to complete an affidavit for an arrest.
+
+3. Contact the City Prosecutor’s Office so the citation can be dismissed.
+
+B. The following list of errors will result in the citation being “Not Submitted for Prosecution”:
+
+1. Date of Offense is blank, incomplete, or wrong.
+
+2. Name of Suspect is missing.
+
+3. Location of Violation is missing.
+
+4. Violation is missing or cannot be determined.
+
+5. Officer Serial Number is missing or cannot be determined.
+
+6. Court Appearance Date is missing or wrong.
+
+7. Signature of Suspect is missing.
+
+8. To properly identify the person to whom the citation is issued, the following information is necessary:
+
+a. Date of Birth.
+
+b. Sex.
+
+c. Race.
+
+EXCEPTION: An exception to this is when the violation is Handicap Parking and the vehicle is registered to a business or institution.
+
+C. Wrong Party Citations.
+
+9
+
+1. It is OPD policy to have all original arresting/citing officers respond to a Wrong Party Citation Notification. The OPD Court Liaison Officer shall notify the issuing officer’s Deputy Chief whenever an officer has issued a citation to the wrong party.
+
+a. Upon receipt of a wrong party notification, the receiving Deputy Chief shall determine what course of action the officer will take. Possible courses of action include:
+
+(1) Attempting to locate the true suspect to issue them the citation.
+
+(2) Arresting the true suspect for subsequent charges, such as “False Information.”
+
+(3) Contacting the City Prosecutor's Office during normal business hours. At that time, the officer shall arrange to meet with the Prosecutor's Office to fill out an arrest affidavit on the true suspect. The officer shall make this appointment during their normal duty time or when they are subpoenaed into court on another traffic or criminal case.
+
+VI. Aggravating Circumstances and Mitigating Factors – Traffic Citations and Courtesy Citations
+
+A. Officers shall exercise individual discretion and will consider the elements of the violation, the severity of the violation, and the totality of the circumstances, as well as the below-listed Aggravating Circumstances and/or Mitigating Factors, when they determine whether a Courtesy Citation or Citation is issued to traffic law suspects.
+
+B. The below-listed Aggravating Circumstances and Mitigating Factors are not intended to be all- inclusive.
+
+C. Aggravating Circumstances may include the following:
+
+1. The suspect was involved in a traffic crash or near collision.
+
+2. Significant interference with traffic occurred or another motorist was forced to take evasive action.
+
+3. Considerable other traffic was present.
+
+4. The degree of the violation was great.
+
+D. Mitigating factors may include the following:
+
+1. Other traffic was light.
+
+2. There was no interference with other traffic.
+
+3. The degree of the violation was slight.
+
+VII. Citation Procedures for Traffic Offenses
+
+A. Officers shall determine the type of citation to be issued for moving violations.
+
+1. Officers shall make certain the suspect signs the paper citation or the “Citation Signature/Fingerprint” page of the electronic citation.
+
+10
+
+B. Officers shall make certain all applicable information is included on the citation so that the Data Unit staff may enter the citation electronically. The program will NOT accept incomplete information.
+
+1. For example, officers must enter the color, make, model, VIN number, and license plate of the vehicle when issuing a citation for a traffic offense. If a license plate number is not available, officers will note “no plate” on the citation.
+
+C. If any one of the violations on a citation may NOT be waived, then none of the violations may be waived.
+
+1. Officers are not allowed to separate violations that may be waived and place them on a separate citation from violations that may not be waived. If one violation may not be waived, then the ENTIRE CASE shall NOT be waived.
+
+D. Individual fines for violations that may be waived are needed, but no space has been provided on the paper citation to write them. Officers are to write the individual fines OVER the words: “If the ‘waiver allowed’ box is checked, you are ….” The total of all fines is to be written in the space: “You may pay a fine of $____ and costs of $____ for a total of $____.”
+
+E. The order in which the individual fines are to be written is to follow the letters, then the “Other” violations.
+
+1. Officers shall use the most current fine schedule and it is their responsibility to have the latest version.
+
+F. Citations Issued for Driving Without an Operator’s License.
+
+1. If a person violates NRS §60-484, "Operating a Motor Vehicle Without an Operator’s License" but has identification or can be identified by any other means, the driver is issued a citation (either a Citation or a Courtesy Citation).
+
+2. If the suspect has no operator's license, the officer will call the OPD Information Operators and request a "driver's license check."
+
+NOTE: A "driver's license check" is not the same as a "complete data check."
+
+3. The Information Operator shall:
+
+a. Check the Nebraska driver's license file if the suspect is a resident of Nebraska.
+
+b. Check NCIS for license suspension.
+
+c. Return an operator’s license number to the officer if one is on file. In this case, the suspect should be cited for NRS §60-489, “No Operator’s License on Person.”
+
+d. If the suspect can be identified through any of these checks, the suspect SHALL be issued a citation. The suspect is booked ONLY if they cannot be identified (NRS §29-427).
+
+4. When officers issue citations for an expired operator’s license and/or no operator's license, they shall use NRS §60-484.
+
+G. Refusal to Sign a Citation Issued for a Traffic Infraction (NRS §60-684).
+
+11
+
+1. When a suspect refuses to sign a citation issued for a traffic infraction, the officer shall explain to the suspect that:
+
+a. Their signature on the citation is not an admission of guilt.
+
+b. Their signature is merely their promise to appear in court.
+
+c. Their continued refusal will result in the separate and additional charge of "Refusal to Sign a Citation."
+
+2. If the suspect continues to refuse to sign the citation, the officer shall:
+
+a. Arrest the suspect and book them at Douglas County Department of Corrections (DCDC).
+
+b. Book the suspect for "Refusal to Sign a Citation" (per NRS §60-684 and §29- 426) and for the original traffic violation(s).
+
+c. If the officer completed a paper citation, the officer shall write “REFUSED- BOOKED” in the signature space of the citation and book the Court Copy (top page) of the citation into the Evidence/Property Unit as evidence to support the “Refusal to Sign a Citation” charge. The officer shall attach the remaining copies of the citation to the accompanying Continuation/Supplementary Report, and submit to the Data Unit for processing.
+
+d. If the officer completed an electronic citation, the officer shall select “Booked” and add the criminal charge of “Refusal to Sign a Citation” as well as complete any other required fields as part of the narrative. The “Defendant Copy” and the “Citation Signature/Fingerprint” copy of the electronic citation shall be booked into the Evidence/Property Unit as evidence to support the “Refusal to Sign a Citation” charge.
+
+NOTE: This applies to citations issued for traffic violations that are considered infractions, but NOT for traffic violations that are considered misdemeanors.
+
+H. Refusal to Sign a Citation Issued for a Traffic Offense (Misdemeanor)
+
+1. Officers are authorized to take into custody and further detain a suspect who refuses to sign a citation issued for a traffic-related misdemeanor. Unlike a citation issued for a traffic infraction, however, there is no separate charge for “Refusal to Sign” with which to additionally charge the suspect. Instead, the suspect shall be booked on the underlying/original charge (NRS §29-427).
+
+2. When an officer issues a citation for a traffic offense and the suspect refuses to sign the citation, the officer shall explain to the suspect that:
+
+a. Their signature on the citation is not an admission of guilt, but only a promise to appear in court.
+
+b. The citation is being issued in lieu of arrest and continued custody.
+
+3. If the suspect still refuses to sign the citation, the suspect shall be taken into custody like any normal arrest and booked for the original charge rather than cited.
+
+4. The arresting officer shall detail in the Incident Report the circumstances of the suspect’s refusal to sign the citation.
+
+12
+
+5. If the officer completed a paper citation, the officer shall write “Refused to Sign – Booked” on the signature line of the citation. The officer shall attach all copies of the citation to the accompanying Continuation/Supplementary Report and/or Incident Report and submit to the Data Unit for processing.
+
+6. If the officer completed an electronic citation, the officer shall select “Booked” and complete any other required fields as part of the Incident Report.
+
+I. When officers issue a citation for a traffic offense, they shall briefly and carefully explain the procedures to the suspect, including:
+
+1. The court appearance time, date, and location.
+
+2. Eligibility for waiver and payment of fine.
+
+3. Officers shall be sure to provide ALL cited suspects with the National Safety Council’s Driver’s Education Program information, and shall explain to ALL cited suspects that they may be eligible to dismiss their citation by completing one of the National Safety Council’s Driver’s Education Programs.
+
+a. If the officer issues an electronic citation this information shall be printed from within the electronic reporting system and provided to the suspect after the citation is printed out.
+
+b. If the officer issues a paper citation the suspect shall be provided the traditional National Safety Council card located within the paper citation book.
+
+VIII. Citation Procedures for Criminal Offenses
+
+A. The investigating officer shall determine when and where to issue a citation for criminal offenses. The investigating officer must evaluate all information, evidence, and other indicators to determine if issuing a citation is appropriate in lieu of booking.
+
+B. A citation for a criminal offense is a substitute for the booking and bonding process, and implies the accused is in custody when the citation is issued.
+
+C. When a suspect is not physically booked on misdemeanor charges, all criminal and traffic charges shall be cited together on a single citation.
+
+1. This does not include parking charges where the driver of the vehicle is identified and present.
+
+2. If narrative information is required to establish the elements of the charges these shall be documented in the narrative section of:
+
+a. The accompanying report, if issuing a paper citation.
+
+– OR –
+
+b. The electronic citation, when no accompanying Incident Report is required (crime victim is “Society”); otherwise, the officer shall use the accompanying Incident Report.
+
+D. When a citation is issued for a criminal offense in which the victim is “Society” (i.e., crimes against Society), an OPD Incident Report IS NOT REQUIRED.
+
+13
+
+NOTE: Narrative information should be documented on an OPD Supplemental Report rather than in the paper citation narrative section. Officers should make certain the “Continuation” box is checked on the Continuation/Supplementary Report.
+
+E. When a citation is issued for a criminal offense in which there is an identified victim (i.e., victim is not “Society”), an OPD Incident Report IS REQUIRED.
+
+NOTE: If an electronic citation is issued, the narrative information should be documented in the Incident Report. The citation narrative should state “See Incident Report.”
+
+F. For the following traffic-related misdemeanors, citations are issued as a criminal offense:
+
+1. Operating Motor Vehicle During Period of Suspension (NRS §60-4,108).
+
+2. Driving Under the Influence (DUI) (NRS §60-6,196, 60-6,197.02 – 60-6,197.08).
+
+3. Leaving the Scene of a Property Damage Crash (NRS §60-696 – 60-698).
+
+4. Reckless Driving (NRS §60-6,213, 60-6,215, 60-6,217 – 60-6,218).
+
+5. Willful Reckless Driving (NRS §60-6,214, 60-6,216, 60-6,217 – 60-6,218).
+
+6. No Proof of Insurance or Financial Responsibility (NRS §60-3,167).
+
+NOTE: Officers can only cite a driver for “No Proof of Insurance or Financial Responsibility” if the driver is the vehicle owner, but they cannot cite a driver for this specific charge if the driver is not the vehicle owner. Refer to OPD’s “Traffic Law Enforcement” policy for more information.
+
+7. Operating a Motor Vehicle to Avoid Arrest (NRS §28-905).
+
+NOTE: There may be times when a citation is not appropriate for the above-listed offenses, but when arrest and booking may be necessary instead (i.e., depending on prior convictions for the same or similar charges, the severity of the incident, etc.). Officers shall consult with their supervisor prior to booking.
+
+G. If any one of the violations on a citation may NOT be waived, then NONE of the violations may be waived.
+
+H. Refusal to Sign a Citation Issued for a Criminal Offense.
+
+1. Officers are authorized to take into custody and further detain a suspect who refuses to sign a citation issued for a criminal offense (NRS §29-427). Unlike a citation issued for a traffic infraction, however, there is no separate charge for “Refusal to Sign” with which to additionally charge the suspect.
+
+2. When an officer issues a citation for a criminal offense and the suspect refuses to sign the citation, the officer shall explain to the suspect that:
+
+a. Their signature on the citation is not an admission of guilt, but only a promise to appear in court.
+
+b. The citation is being issued in lieu of arrest and continued custody.
+
+14
+
+3. If the suspect still refuses to sign the citation, the suspect shall be taken into custody like any normal arrest and booked for the original charge rather than cited.
+
+EXCEPTION: Officers shall issue suspects a citation for Possession of Marijuana (Less Than 1 Ounce) even if they refuse to sign the citation, but officers shall not book suspects in these cases.
+
+4. The arresting officer shall detail in the Incident Report the circumstances of the suspect’s refusal to sign the citation.
+
+5. If the officer completed a paper citation, the officer shall write “Refused to Sign – Booked” on the signature line of the citation. The officer shall attach all copies of the citation to the accompanying Continuation/Supplementary Report and/or Incident Report and submit to the Data Unit for processing.
+
+6. If the officer completed an electronic citation, the officer shall select “Booked” and complete any other required fields as part of the Incident Report.
+
+IX. Courtesy Citations
+
+A. A Courtesy Citation may be issued to the driver of a motor vehicle who has committed certain traffic violations. Officers will use individual discretion, unless policy otherwise dictates, to determine which enforcement action will be taken.
+
+B. A Courtesy Citation may be issued for license/equipment violations including, but not limited to, the following:
+
+1. Motor vehicle registration expired ten (10) days or less.
+
+2. Operator’s license has been expired ten (10) days or less.
+
+3. No operator’s license.
+
+4. No proof of ownership.
+
+5. No license plate.
+
+6. Non-compliance with wheel tax requirements.
+
+7. No red tail light.
+
+8. No head light.
+
+9. No turn signal.
+
+10. Defective muffler.
+
+11. Defective vehicle.
+
+12. Window tint.
+
+13. Obstructed vision.
+
+C. Courtesy Citations may be appropriate for minor moving violations such as:
+
+1. Speeding.
+
+15
+
+2. No turn signal.
+
+3. Following too closely.
+
+4. Improper lane change.
+
+5. Violating a traffic control device.
+
+6. Other violations where education will accomplish the same goal as enforcement.
+
+D. Courtesy Citations are NOT appropriate for violations which have caused crashes.
+
+E. Signatures may be required for a Courtesy Citation to be issued.
+
+1. Electronic Courtesy Citation: Suspects are required to sign the “Citation Signature/Fingerprinting” page only when the Courtesy citation is issued as a “Fix It” Citation. A signature is NOT required when the Courtesy citation is issued as a “Warning.”
+
+2. Paper Courtesy Citation: The officer shall complete the top portion. Both the motorist and the officer must sign the citation.
+
+F. Records will be kept of Courtesy Citations as follows:
+
+1. Paper Courtesy Citations: The Data Unit is responsible for the record-keeping of the paper Courtesy Citations, and shall retain the original Courtesy Citation white copy.
+
+2. Electronic Courtesy Citations: Information obtained shall be maintained in the computerized tracking system.
+
+G. Refusal to Sign a Courtesy Citation.
+
+1. When a suspect refuses to sign a Courtesy Citation, the officer shall explain there is no direct penalty attached.
+
+2. Should the suspect still refuse to sign, the officer shall issue a regular citation for the traffic violation per procedures in this policy.
+
+X. Parking Citation Procedures
+
+A. The Parking citation is used to cite for traffic (parking) violations. When issued, the officer shall charge the suspect under the appropriate City Ordinance, instead of using the corresponding State Statute. OPD cannot issue an electronic parking citation.
+
+B. Officers shall contact the OPD Information Channel. The Information Channel shall complete the following and notify the officer with the following information:
+
+1. Run the vehicle through NCIC/NCIS and check whether the vehicle is stolen.
+
+2. Call the City Cashier to determine if a vehicle has accumulated three (3) or more unpaid parking tickets that are more than 30 days old and the total dollar amount owed for the unpaid parking tickets.
+
+NOTE: The City Cashier is open from 8:00 a.m. to 3:30 p.m., Monday through Friday excluding holidays (See PPM Appendix A for the telephone number).
+
+16
+
+C. If the vehicle in violation has not accumulated three (3) or more unpaid parking tickets that are more than 30 days old, the officer will issue a parking citation.
+
+1. Parking violation fees are stated in the table within the Omaha Municipal Code §36-288.
+
+2. Officers shall write the parking violation for the most serious (one) offense only.
+
+3. For all parking violations, the Parking citation is placed under the windshield wiper of the driver's side of the vehicle when the vehicle is unoccupied.
+
+4. Suspects who are issued Parking citations have the following options:
+
+a. The suspect may pay the Parking citation by mail, online or in person, by credit card or by check. Instructions are listed on the back side of the suspect's copy of the citation. Payment must be received within thirty (30) days of the violation. Checks or money orders should be made payable to "The Public School Fund" not "The City of Omaha."
+
+b. To appeal the citation, the suspect can go to www.parkomaha.com or submit a written statement with the citation number or license plate number to “Supervisor, City Cashier” located in the City/County Building.
+
+D. If the vehicle has three or more unpaid parking tickets that are more than 30 days old, officers shall tow the vehicle in accordance with the procedures in the OPD “Towing – Parking Violations” policy.
+
+E. Common parking violations in City parks include the following:
+
+1. Many parks in the City of Omaha have signs posted that indicate gasoline powered vehicles must stay on the drive. When an officer determines that a citation should be issued for a vehicle that is parked off the designated drive, the officer will issue a Parking citation and will charge the suspect under the Omaha Municipal Code §36-156 (Stopping, Standing, or Parking Prohibited in Specified Places).
+
+2. If the officer actually observes the vehicle moving off the designated drive in a restricted area, the driver will be issued a Criminal citation under the Omaha Municipal Code §21-2 (Traffic in Parks generally).
+
+F. Officers shall issue a Parking citation to suspects whom they observe/witness obstructing traffic with their vehicles on city streets.
+
+1. Officers occasionally observe vehicles that are partially or totally blocking a street. Usually, the vehicles are either loading or unloading property adjacent to loading docks. Omaha Municipal Code §36-159 (Obstructing Traffic) describes obstruction of traffic as when a vehicle is parked upon a street, other than an alley, in such a manner or under such conditions that result in less than ten (10) feet width of available roadway for free movement of traffic.
+
+G. State Senators have certain immunity from Parking citations.
+
+1. Each year, Nebraska State Senators receive a State Senator Parking Sticker from the City of Lincoln prior to the legislative session. The City of Omaha will honor this sticker.
+
+2. As a member of the Legislature under the Nebraska Constitution, a Senator is immune from traffic citations and arrest for misdemeanor offenses fifteen (15) days before,
+
+17
+
+during, and fifteen (15) days after the legislative session. The session usually occurs between January and early June of each year. These stickers, which are placed on the window of the driver's side of the vehicle, protect the Senators from receiving parking tickets.
+
+3. This privilege does not allow a vehicle to be parked illegally in a tow-in zone, e.g., 4-6 zones, etc.
+
+H. Fire lane parking violations may result in a Parking citation and/or a tow.
+
+1. OPD officers who cite any parked vehicle for a fire lane violation will issue a Parking citation for "Stopping, Standing, or Parking Prohibited in Specific Places-Fire Lanes" Omaha Municipal Code §36-156.
+
+I. When an officer tows a vehicle for a parking violation they shall adhere to all towing procedures found in the “Towing – Parking Violations” and “Towing – General Procedures” policies.
+
+J. The driver of a police vehicle who receives a Parking citation shall send an Inter-Office Memorandum via chain of command to the Prosecutor’s Office. The memo requests the citation be voided. The memo shall also include:
+
+1. The employee’s assignment.
+
+2. The reason the employee was unable to move the vehicle, or insert additional money (court, on-going investigation).
+
+XI. Handicapped Parking Citation Procedures
+
+A. Handicapped Parking suspects shall be issued citations for violations of Omaha Municipal Code §36-174 “Reserved Parking for Handicapped Persons.” Officers shall use their discretion and will consider the totality of the circumstances when determining whether to issue the citation, as opposed to a verbal warning, etc.
+
+B. Officers shall use electronic citations for Handicap Parking offenses when the suspect is present. A paper citation shall be issued when the suspect is not present.
+
+C. A Handicapped Parking violation requires court costs. It is an offense that is treated more like a traffic violation rather than a standard parking citation and shall be charged under the City Ordinance rather than the State Statute.
+
+D. Handicapped individuals and/or their designees are issued parking permits and/or specialty license plates which must be displayed in order to park in designated handicapped parking spaces/zones.
+
+1. Handicapped Parking enforcement action shall be taken if an officer receives complaints of cars illegally parked in a Handicap Parking zone, or observes vehicles parked in Handicapped Zones, without one or more of the following:
+
+a. The authorized State handicapped license plate.
+
+b. An apparently valid handicapped license plate issued by another state.
+
+c. A valid handicapped parking permit.
+
+NOTE: In order to enforce handicapped parking regulations, the designated space/zone must be identified by a handicapped parking sign that conforms to applicable state and
+
+18
+
+federal regulations (as described in NRS §18-1737). The sign must be posted “above ground and immediately adjacent to and visible from each stall or space, including access aisles…”
+
+2. Handicapped parking permit applications and handicapped license plate applications may be obtained from the Nebraska Department of Motor Vehicles (DMV) web site.
+
+a. The permanent handicapped parking permit indicates the permit holder has a permanent medical condition. The permanent handicapped parking permit is valid for a maximum of six (6) years.
+
+b. The temporary handicapped parking permit is valid for six (6) months and can be renewed once for an additional six (6) months.
+
+c. The permit must be hung from the rearview mirror while the vehicle is parked in a designated Handicapped Parking space.
+
+(1) If there is no rearview mirror in the vehicle, the permit may be displayed on the dashboard.
+
+d. Permits must remain in the condition they were issued. Permit holders must not alter the permits in any way. For example, a permit with the demographic code sticker removed is considered an altered permit.
+
+E. The holder of any current handicapped parking permit or handicapped license plate is entitled to free parking in areas designated as being reserved for handicapped persons, as well as free parking at City-owned metered parking stalls, for as long as the maximum time allowed on the meter.
+
+F. Nothing in this section is construed to mean the granting of parking privileges or conveniences to able-bodied drivers of motor vehicles bearing paraplegic license plates or permit.
+
+G. Citations may be issued for vehicles parked on private or public property, and/or on a public or City-owned parking lot.
+
+H. Off-duty uniformed privately employed officers may issue citations for violations that occur in their presence, e.g., vehicles parked illegally in handicapped zones on the business property for which the officer is employed in an off-duty capacity.
+
+I. Officers, with the assistance of the Information Channel, shall document the name, race, address, and date of birth of the registered owner of the vehicle on the citation. When there is more than one registered owner officers should attempt to locate the driver of the vehicle when reasonable. For example, the vehicle is parked in a handicapped space of a smaller business lot versus a large department store.
+
+J. OPD Volunteer Handicapped Parking Enforcement Patrol Program (HCPP) volunteers are authorized to issue parking citations for handicapped parking violations and will adhere to the OPD “Organizational Function – Volunteer and Student Intern Programs” policy.
+
+K. Handicapped Parking Citation court dates shall be set no less than thirty (30) calendar days from the date of the violation and shall be scheduled on the same day of the week that the citation is issued, with the exception of Thursday, Saturday, and Sunday.
+
+XII. Fingerprints and Identification – Citations Issued for Criminal and Traffic Offenses
+
+19
+
+A. Officers shall request suspects produce a driver’s license or other government issued photo identification when issuing a citation.
+
+B. Officers shall leave the space provided for driver’s license numbers blank when the suspect is unable to produce a valid driver’s license and the driver’s identity cannot be verified through NCJIS, and will make a notation in the narrative or comments section.
+
+C. A fingerprint is only required for traffic citations if a suspect is unable to produce a valid driver’s license or other government issued photo identification.
+
+D. A fingerprint is required on ALL criminal citations.
+
+E. Fingerprint Procedures.
+
+1. Officers shall make certain suspects sign and attach their fingerprint to the separate “Citation Signature/Fingerprint” page.
+
+2. Officers shall obtain a supply of self-adhesive “Identiprint” labels from the Police Supply Unit.
+
+3. Electronic citations - One “Identiprint” label shall be attached to the “Citation Signature/Fingerprint” page and shall be used to record the required fingerprint.
+
+4. Paper citations – The fingerprint shall be affixed to the pink Records Copy of the paper citation.
+
+a. Officers shall use an “Identiprint” sticker whenever possible to make certain that an adequate and usable fingerprint is obtained.
+
+b. The cardboard sheet should be placed between the copies of the paper citation once the fingerprint is obtained in order to protect the fingerprint from carbon copy marks.
+
+5. Both Paper and Electronic citations - If the suspect has no right index finger, the left index finger should be used. If the left index finger is used, the officer shall write the word “left” on the citation under the fingerprint.
+
+F. Suspects who refuse to be fingerprinted shall be advised that the fingerprint is only a method of establishing their identity. The officer shall also explain that if the suspect refuses to submit a fingerprint, they will be arrested and BOOKED on the underlying charge(s) per NRS §29-427 since suspects are required to sign citations and are required to identify themselves satisfactorily (including identifying themselves with their fingerprint).
+
+1. Officers shall not forcibly fingerprint a suspect who refuses to sign a citation. Suspects may be booked as a “John/Jane Doe” if they refuse to be fingerprinted. See the OPD “Fingerprinting and Identification Checks - Adults” Policy for more details.
+
+XIII. Electronic Citations – Citation Signature/Fingerprint Page
+
+A. The officer shall issue the suspect the “Defendant Copy” of the electronic citation.
+
+B. The officer shall make certain the suspect signs and attaches their fingerprint (as policy dictates) to the separate “Citation Signature/Fingerprint” page.
+
+NOTE: Electronic Courtesy citations only require a signature when issued as a “Fix It” citation. Courtesy citations that are issued as a “Warning” DO NOT require a signature.
+
+20
+
+C. The officer shall scan the Signature/Fingerprint Form into the electronic citation system prior to forwarding to their sergeant for approval.
+
+D. The original “Citation Signature/Fingerprint” page shall be forwarded to the Data Unit for filing.
+
+XIV. Miscellaneous
+
+A. Reciprocity Agreements between the State of Nebraska and two other states indicate that persons moving to the State of Nebraska from those states are not required to re-register their non-commercial passenger vehicles until the out-of-state license expires. Nebraska has reciprocity with North Carolina and Wyoming.
+
+B. Non-resident students are exempt from re-registering their vehicles in Nebraska.
+
+C. Active military personnel assigned to duty in Nebraska are exempt from registering their vehicles in Nebraska if their primary residence is in another state. Those military personnel must keep their registration current in the state of their primary residence.
+
+D. Officers should honor all valid out-of-state driver’s and CDL (commercial) licenses.
+
+REFERENCES:
+
+I. Laws
+
+A. Nebraska Revised Statutes (NRS): §18-1741.01, 18-1737, 29-422 – 29-438, 60-484, 60-489, 60-685, and 60-688.
+
+B. Omaha Municipal Codes: §20-21, 21-2, 36-156, 36-159, 36-170, 36-174, 36-231-235, 36-241- 248, and 36-281-288.
+
+II. Previous OPD Orders
+
+A. Previous General Orders: #17-88, 75-90, 35-91, 9-92, 12-92, 77-94, 27-03, 11-09, 5-11, 6-12, 29-13, 19-14, 19-14 Supplements #1 and 2, #31-17, 19-19, 19-19 Supplements #1-3, 72-21, 88- 23, 45-25, and 45-25 Supplement #1.
+
+III. Accreditation Standards
+
+A. Relevant CALEA Accreditation Standards: Chapter 61.
+
+IV. Other
+
+A. PPM Monthly Updates: #03-2020, and 08-2021.

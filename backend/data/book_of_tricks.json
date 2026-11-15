@@ -1,0 +1,58 @@
+[
+  {
+    "trick_id": "ONLINE_ONLY_APPEAL",
+    "title": "Appeals accepted online only",
+    "what_goes_wrong": "A mailed packet is treated as accepted although the issuer takes appeals online only.",
+    "signals": ["Only online appeals are accepted"],
+    "first_seen": {"place": "Ithaca, NY", "sha256": "47651915aa7f368ee22d6ef9de2a1330766b25796c85a33d241764d16b773d1a"}
+  },
+  {
+    "trick_id": "CONTEST_NEEDS_APPEARANCE",
+    "title": "Contest needs an in-person appearance",
+    "what_goes_wrong": "Mail permission for mitigation or another step is reused as permission to contest by mail.",
+    "signals": ["you must appear in person", "must appear in person to petition"],
+    "first_seen": {"place": "Bainbridge Island, WA", "sha256": "d903065db41ae6f9495bd6465e47854dd844c1fc8cd73c9c7448efefdb9d0bb0"}
+  },
+  {
+    "trick_id": "DO_NOT_PAY_WHILE_PROTESTING",
+    "title": "Paying ends the protest",
+    "what_goes_wrong": "The customer is not told that paying the citation can give up the protest.",
+    "signals": ["Do not pay your citation if you wish to protest it"],
+    "first_seen": {"place": "San Francisco, CA", "sha256": "2f253f6ebf2f34f01af93102dd0f1063fab9abc80b80afcbd438c4424905de2a"}
+  },
+  {
+    "trick_id": "LATER_STAGE_DEPOSIT",
+    "title": "Deposit belongs to a later hearing",
+    "what_goes_wrong": "A hearing deposit for a later stage is imposed on the first written protest.",
+    "signals": ["deposit equal to the amount of the fine in order to request a hearing"],
+    "first_seen": {"place": "San Francisco, CA", "sha256": "2f253f6ebf2f34f01af93102dd0f1063fab9abc80b80afcbd438c4424905de2a"}
+  },
+  {
+    "trick_id": "STOLEN_VEHICLE_FULL_REPORT",
+    "title": "Full police report, not a number",
+    "what_goes_wrong": "A police report number is sent where the issuer requires the complete report.",
+    "signals": ["not just the police report number"],
+    "first_seen": {"place": "San Francisco, CA", "sha256": "2f253f6ebf2f34f01af93102dd0f1063fab9abc80b80afcbd438c4424905de2a"}
+  },
+  {
+    "trick_id": "STATEMENT_NEEDS_SCHEDULED_HEARING",
+    "title": "Written statement needs a scheduled hearing first",
+    "what_goes_wrong": "A mailed statement is sent before the court has scheduled a hearing, and is not read.",
+    "signals": ["without an initial hearing scheduled will not be read"],
+    "first_seen": {"place": "Seattle, WA", "sha256": "1c3d79b7b278c174ade1062f69f2e9ed1e8b0363e599d3eca4e9b3d1c460f703"}
+  },
+  {
+    "trick_id": "REAPPEAL_ACCEPTS_RESPONSIBILITY",
+    "title": "Re-appeal form admits responsibility",
+    "what_goes_wrong": "A later-stage form's responsibility declaration bleeds into the first appeal.",
+    "signals": ["hereby accept responsibility for the parking citation"],
+    "first_seen": {"place": "Raleigh, NC", "sha256": "41f1836542c827bb0c5f6a3584e291c0bdb9c10168d135865ddf94578d729da8"}
+  },
+  {
+    "trick_id": "PAY_BEFORE_HEARING",
+    "title": "Hearing only after paying",
+    "what_goes_wrong": "A later hearing that requires payment first is presented as the first appeal.",
+    "signals": ["must first pay the citation"],
+    "first_seen": {"place": "Louisville, KY", "sha256": "0a751aef1477fd47e5c89bb81724c5423b80784de28a4f87443796e84ce110ac"}
+  }
+]

@@ -1,0 +1,74 @@
+{
+  "city_id": "us-ny-new_york",
+  "name": "New York, NY",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/New_York",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www1.nyc.gov/site/finance/penalties/penalty-dispute.page",
+  "local_rules": "NYC Department of Finance handles parking violations; initial hearing-by-mail uses the DOF Hearings By Mail Unit address on nyc.gov/finance (dispute-mail).",
+  "appeal_deadline_days": 30,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "NYC Department of Finance",
+    "attention": "Hearings By Mail Unit",
+    "address1": "P.O. Box 29021",
+    "address2": null,
+    "city": "Brooklyn",
+    "state": "NY",
+    "zip": "11202-9021",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2025-01-15",
+    "source": "NYC Department of Finance",
+    "confidence_score": 0.9,
+    "notes": "URL confirmed on official nyc.gov domain with 'penalty-dispute' path indicating contest function. No mail address conflict detected in this verification step.",
+    "verified_by": "minimax_research",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "nyc_parking_violations": {
+      "section_id": "nyc_parking_violations",
+      "name": "NYC Department of Finance Parking Violations Bureau",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": null
+      }
+    }
+  },
+  "citation_patterns": [],
+  "letter_format": "form_required",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "human_verified": true,
+  "confirmation_note": "New York, NY allows 30 days to contest. Mark your calendar — missing this window means you lose the right to appeal. New York, NY offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": false
+  }
+}

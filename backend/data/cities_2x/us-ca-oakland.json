@@ -1,0 +1,74 @@
+{
+  "city_id": "us-ca-oakland",
+  "name": "Oakland",
+  "jurisdiction": "city",
+  "status": "paused",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.oaklandca.gov/Public-Safety-Streets/Parking-Vehicles/Parking-Tickets/Challenge",
+  "local_rules": "City of Oakland Parking Services handles parking citation appeals; online portal and mail options available. Appealed citations go through the City of Oakland Administrative Hearings process.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Oakland Department of Transportation (Oakland Parking Enforcement)",
+    "attention": "Citation Processing / Dispute Unit",
+    "address1": "P.O. Box 7023",
+    "address2": null,
+    "city": "Oakland",
+    "state": "CA",
+    "zip": "94612",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2025-01-17",
+    "source": "prior_step_locked",
+    "confidence_score": 0.82,
+    "notes": "URL confirmed on official .gov domain. Path explicitly references appeals-and-hearings, indicating dispute functionality rather than payment-only. No mail address conflict identified in this verification step — locked address from prior step remains primary.",
+    "verified_by": "minimax_research",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "oakland_administrative_hearings": {
+      "section_id": "oakland_administrative_hearings",
+      "name": "Oakland Administrative Hearings",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "Appeals submitted via online portal or by mail to the Administrative Hearings office"
+      }
+    }
+  },
+  "citation_patterns": [],
+  "letter_format": "free_form",
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "human_verified": true,
+  "confirmation_note": "Oakland gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. Oakland offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  }
+}

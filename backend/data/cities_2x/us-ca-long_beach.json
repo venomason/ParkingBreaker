@@ -1,0 +1,83 @@
+{
+  "city_id": "us-ca-long_beach",
+  "name": "Long Beach",
+  "jurisdiction": "city",
+  "status": "active",
+  "accepts_mail_appeals": true,
+  "timezone": "America/Los_Angeles",
+  "online_appeal_available": true,
+  "online_appeal_url": "https://www.longbeach.gov/parking/citations/",
+  "local_rules": "21-day initial review period. ALPR-issued street sweeping tickets are high-volume here; clear photo evidence of signage is required.",
+  "appeal_deadline_days": 21,
+  "appeal_mail_address": {
+    "status": "complete",
+    "department": "Long Beach City Hall",
+    "attention": "Parking Citations (Lobby Level)",
+    "address1": "411 W. Ocean Blvd.",
+    "address2": "",
+    "city": "Long Beach",
+    "state": "CA",
+    "zip": "90802",
+    "country": "US"
+  },
+  "phone_confirmation_policy": {
+    "required": false,
+    "phone_format_regex": null,
+    "confirmation_message": null,
+    "confirmation_deadline_hours": null,
+    "phone_number_examples": null
+  },
+  "verification_metadata": {
+    "last_updated": "2026-05-11",
+    "source": "master_registry_manifest",
+    "confidence_score": 0.95,
+    "notes": "Created from master registry manifest. Address: Long Beach City Hall, Parking Citations (Lobby Level), 411 W. Ocean Blvd., Long Beach, CA 90802. URL: longbeach.gov/parking/citations/. 21-day initial review period. ALPR street sweeping tickets require clear photo evidence of signage.",
+    "verified_by": "master_registry_manifest",
+    "last_verified": "2026-05-11",
+    "verified_date": null,
+    "last_change": null
+  },
+  "routing_rule": "direct",
+  "sections": {
+    "long_beach_parking": {
+      "section_id": "long_beach_parking",
+      "name": "Long Beach Parking Citations",
+      "routing_rule": "direct",
+      "phone_confirmation_policy": {
+        "required": false,
+        "confirmation_message": null
+      },
+      "special_requirements": {
+        "requires_poa": false,
+        "notes": "21-day initial review. ALPR street sweeping tickets require clear photo evidence of signage."
+      }
+    }
+  },
+  "citation_patterns": [],
+  "schema_version": 2,
+  "change_history": [],
+  "special_requirements": {
+    "forbidden_phrases": [],
+    "required_phrases": [],
+    "required_attachments": [],
+    "mailing_instructions": null,
+    "timing_rules": null,
+    "required_references": [],
+    "notes": null
+  },
+  "letter_format": "free_form",
+  "human_verified": true,
+  "confirmation_note": "21-day initial review period. Note that ALPR-issued street sweeping tickets are high-volume here; clear photo evidence of signage is required.",
+  "service_types": {
+    "express": true,
+    "appeal_kit": true
+  },
+  "mail_acceptance_policy": {
+    "basis": "official_address_with_inferred_mail_acceptance",
+    "official_source_url": "https://www.longbeach.gov/parking/citations/",
+    "official_excerpt": "Official Long Beach city of Long Beach (Long Beach City Hall) — address verified via https://www.longbeach.gov/parking/citations/",
+    "verified_at": "2026-05-11",
+    "verified_by": "manual_official_source_review",
+    "verification_method": "official_city_source_review"
+  }
+}

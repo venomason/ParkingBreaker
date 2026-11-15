@@ -1,0 +1,35 @@
+# Local rehearsal of the deployed shape: API, website and the minute scheduler.
+# Fake providers by default (no keys, no network calls). Run: docker compose up --build
+services:
+  api:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    environment:
+      PB_PROVIDER_MODE: ${PB_PROVIDER_MODE:-fake}
+      PB_WORKER_SECRET: ${PB_WORKER_SECRET:-local-worker-secret-0123456789}
+    env_file:
+      - path: .env
+        required: false
+    volumes: [pbdata:/data]
+    ports: ["127.0.0.1:8000:8000"]
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+      args:
+        PB_API_ORIGIN: "http://api:8000"
+        PB_PROVIDER_MODE: ${PB_PROVIDER_MODE:-fake}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+    depends_on: [api]
+    ports: ["127.0.0.1:3000:3000"]
+  scheduler:
+    # Advances research, drafting, mailing, capture and releases every minute.
+    image: curlimages/curl:8.16.0
+    depends_on: [api]
+    environment:
+      PB_WORKER_SECRET: ${PB_WORKER_SECRET:-local-worker-secret-0123456789}
+    entrypoint: ["/bin/sh", "-c"]
+    # T24: failures are logged, never hidden; see deploy/scheduler-loop.sh.
+    command: ['exec sh /pb/scheduler-loop.sh http://api:8000/internal/dispatch']
+    volumes: ["./deploy/scheduler-loop.sh:/pb/scheduler-loop.sh:ro"]
+volumes:
+  pbdata:
