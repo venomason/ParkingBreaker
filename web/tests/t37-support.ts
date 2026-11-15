@@ -1,3 +1,4 @@
+import { ATTORNEY_DISCLOSURE } from "../components/LegalDisclosure";
 import { expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -75,7 +76,9 @@ export async function layout(page: Page) {
   }));
   expect(animations).toBe(false);
   await expect(page.locator("#jumperBtn, #demoWarn, #demoLapse")).toHaveCount(0);
-  await expect(page.locator("body")).not.toContainText(/\blawyer\b|legal advice|guaranteed|\bwin\b|dismissal rates/i);
+  // The required scope disclaimer is not a promise of representation or advice.
+  const copy = (await page.locator("body").innerText()).replaceAll(ATTORNEY_DISCLOSURE, "");
+  expect(copy).not.toMatch(/\blawyer\b|legal advice|guaranteed|\bwin\b|dismissal rates/i);
 }
 export async function openDetails(page: Page) {
   await page.goto(base!);

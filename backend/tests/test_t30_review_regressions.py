@@ -153,3 +153,41 @@ async def test_changed_instruction_between_validation_and_lock_prevents_drafting
     finally:
         await client.aclose()
         real._store.close()
+
+
+@pytest.mark.parametrize("missing", [True, False])
+async def test_missing_or_corrupt_saved_context_blocks_before_create(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, missing: bool
+) -> None:
+    from dataclasses import replace
+
+    lob = FakeLobClient([LobResponse(200, "must_not_create", evidence=LetterEvidence.PRODUCTION)])
+    client, real, case = await approved(tmp_path, monkeypatch, lob)
+    try:
+        record = real._intake(case)
+        token = record.case_token or ""
+        saved = real._store.get_research(case)
+        assert saved is not None
+        frozen = real._store.get(token, 1)
+        assert frozen is not None
+        manifest = real._store.get_approval_manifest(token, 1)
+        state = real._store.get_case(token)
+        payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+        object.__setattr__(real._deps, "payments", payments)
+        monkeypatch.setattr(
+            real._store,
+            "get_research",
+            lambda _case: None if missing else replace(saved, research_json="not JSON"),
+        )
+        with pytest.raises(ValueError, match=r"research|Expecting"):
+            real._validate_prepared_packet(frozen)
+        with pytest.raises(ServiceConflict, match=r"^research_not_ready$"):
+            real.dispatch(case)
+        assert not lob.calls
+        assert not transport.calls
+        assert real._store.get_case(token) == state
+        assert real._store.get(token, 1) == frozen
+        assert real._store.get_approval_manifest(token, 1) == manifest
+    finally:
+        await client.aclose()
+        real._store.close()

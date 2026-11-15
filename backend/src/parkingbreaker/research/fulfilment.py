@@ -30,6 +30,7 @@ from parkingbreaker.mail_pages import prints_as_letter
 from parkingbreaker.research.questions import FactKey, PacketPlan, Ticket
 from parkingbreaker.research.route_requirements import compulsory_route_stage, quoted_route_stage
 from parkingbreaker.research.sources import AuthorityClass, SourceRecord
+from parkingbreaker.research.support import direct_declaration, signed_declaration_block
 
 if TYPE_CHECKING:
     from parkingbreaker.research.findings import Finding
@@ -146,9 +147,9 @@ def signature_requirement(
 def declaration_wording(quote: str) -> str | None:
     """Only quoted agency wording following an explicit declaration requirement."""
     # A form may print the customer's declaration directly, without quotation marks.
-    direct = re.search(r"^I declare that the foregoing is true and correct[.]?$", quote, re.M)
+    direct = direct_declaration(quote)
     if direct:
-        return direct.group()
+        return direct
     if not re.search(r"\b(?:must|required|shall)\b", quote, re.I) or not re.search(
         r"\b(?:declaration|statement)\b", quote, re.I
     ):
@@ -626,6 +627,8 @@ def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
         return quoted_route_stage(item, quote) is not None
     if key is FactKey.REQUIRED_DECLARATIONS and declaration_wording(quote):
         return True
+    if key is FactKey.SIGNATURE_REQUIREMENT and signed_declaration_block(quote) == quote:
+        return True
     scoped_quote = (
         _requirement_scope(item, quote)
         if key in {FactKey.REQUIRED_ITEMS, FactKey.TICKET_SPECIFIC_REQUIREMENTS}
@@ -974,7 +977,11 @@ def requirement_fulfilled(
                     for page in reader.pages
                     if (page.extract_text() or "").splitlines()
                 )
-        if key is FactKey.SIGNATURE_REQUIREMENT and not re.search(r"declaration", quote, re.I):
+        if (
+            key is FactKey.SIGNATURE_REQUIREMENT
+            and not re.search(r"declaration", quote, re.I)
+            and declaration_wording(quote) is None
+        ):
             if re.search(r"letter|appeal", item, re.I):
                 return any(
                     "Sincerely," in (page.extract_text() or "") and _signature_present(page)

@@ -16,8 +16,12 @@ from mail_samples import make_request, seed_approval, seed_destination
 from parkingbreaker import case_state as cs
 from parkingbreaker import payment_state as ps
 from parkingbreaker.api.app import create_app
+from parkingbreaker.appeal.adoption import text_sha256
+from parkingbreaker.appeal.packet import build_packet
+from parkingbreaker.approval_manifest import build_approval_manifest
 from parkingbreaker.case_service import CaseService
 from parkingbreaker.case_status import payment_event_for
+from parkingbreaker.intake_store import SavedDraft
 from parkingbreaker.lob_fakes import FakeLobClient
 from parkingbreaker.lob_submission import Accepted, LobResponse, Uncertain
 from parkingbreaker.mail_attempt_store import StorageCorruption
@@ -29,22 +33,65 @@ from parkingbreaker.submission_records import SubmissionCursor
 from parkingbreaker.transaction_records import CaseRecord
 from parkingbreaker.transaction_store import RevisionConflict, SqliteTransactionStore
 from parkingbreaker.workspace import Workspace
+from prepared_packet_support import fetched_at
+from test_api import INTAKE
+from test_appeal_packet import CITATION, letter_text
 from test_case_service import service
 from test_submission_coordinator import NOW, step
-from test_submission_coordinator import prepared as base_prepared
 from test_t17_pieceB_review import distinct_event
 from test_tier_acceptance import extract_case, model_answers
+from test_transaction_lifecycle import letter
 
 
 def prepared(
     store: SqliteTransactionStore, expires_at: datetime = NOW + timedelta(days=5)
 ) -> CaseRecord:
     """Give handcrafted approved cases the saved timing evidence dispatch now requires."""
-    case = base_prepared(store, expires_at)
-    intake = store.intake_for_workspace(case.workspace_token)
-    assert intake is not None
+    # This suite crosses CaseService dispatch: use a real PDF and saved approval
+    # context, rather than the coordinator-only placeholder bytes.
+    store.save_workspace("workspace", Workspace(), NOW)
+    store.set_workspace_owner("workspace", "synthetic-owner", NOW)
+    intake_data = {**INTAKE, "ticket": {**INTAKE["ticket"], "citation_number": "SF-998877"}}
+    intake = store.record_intake(
+        "synthetic-intake", "workspace", json.dumps(intake_data), "{}", NOW
+    )
+    case = store.start_case("workspace", "auth", NOW, expires_at)
+    for event in (
+        cs.ResearchComplete(),
+        cs.DraftReady(),
+        cs.CustomerApproved(),
+        cs.SubmitRequested(),
+    ):
+        case = letter(store, case, event)
+    seed_destination(store, case, NOW)
+    text = letter_text()
+    packet = build_packet(text, CITATION, [], NOW, citation_number="SF-998877")
+    request = make_request(pdf=packet.pdf)
+    store.prepare(case.case_token, 1, request, NOW)
+    store.record_approval_manifest(
+        build_approval_manifest(
+            case_id=intake.intake_id,
+            case_token=case.case_token,
+            attempt=1,
+            approved_at=NOW,
+            build_commit=None,
+            raw_customer_text=text,
+            approved_text=text,
+            request=request,
+            affirmations=(),
+        )
+    )
+    store.save_draft(
+        intake.intake_id,
+        SavedDraft(
+            text, "[]", "[]", text_sha256(text), NOW, "synthetic-owner", packet.sha256, NOW, 0
+        ),
+        None,
+    )
     research, _, _ = extract_case(model_answers())
-    research = replace(research, ticket=replace(research.ticket, issue_date=NOW.date()))
+    research = replace(
+        fetched_at(research, NOW), ticket=replace(research.ticket, issue_date=NOW.date())
+    )
     answers = ResearchAnswers(
         vehicle_relationship=VehicleRelationship.REGISTERED_OWNER, notice_issue_date=NOW.date()
     )

@@ -49,8 +49,8 @@ test("pre-payment stop shows recorded message and official link without a paymen
   expect(html).toContain('href="https://issuer.gov/appeals"');
   expect(html).toContain('rel="noopener noreferrer"');
   expect(html).not.toMatch(/<input|<select|Stripe|card hold/i);
-  expect(render("Step8Stop", {liveStop: {...props.liveStop, officialUrl: null}})).not.toContain("href=");
-  expect(render("Step8Stop", {liveStop: {...props.liveStop, officialUrl: "javascript:alert(1)"}})).not.toContain("href=");
+  expect(render("Step8Stop", {liveStop: {...props.liveStop, officialUrl: null}})).not.toMatch(/<a\b[^>]*href=/);
+  expect(render("Step8Stop", {liveStop: {...props.liveStop, officialUrl: "javascript:alert(1)"}})).not.toMatch(/<a\b[^>]*href=/);
 });
 
 test("generated prototype and live price is $29", () => {

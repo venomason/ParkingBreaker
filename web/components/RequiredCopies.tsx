@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { api, ApiError, type CaseStatus, type SaveRequiredCopies } from "../lib/api";
+import { api, ApiError, PHOTO_UPLOAD_GUIDANCE, type CaseStatus, type SaveRequiredCopies } from "../lib/api";
 type View = NonNullable<CaseStatus["required_copies"]>;
 type Page = { ref: string; url: string };
 type Selection = { pages: Page[]; confirmed: boolean };
@@ -97,6 +97,7 @@ function Editor({ caseId, status, onStatus, onPendingChange, view, onReconcile }
   return <div className="card" id="requiredCopies"><h3>Required document copies</h3>
     <p className="small">Review these copies before drafting. They are fixed when drafting begins.</p>
     <p className="small">Upload complete copies in page order: JPEG or PNG, 10 MB per page, 10 pages per copy and 20 pages total. Your confirmation records your own review.</p>
+    <p className="small">{PHOTO_UPLOAD_GUIDANCE}</p>
     {view.items.map(item => { const selection = items[item.requirement_id]; return <fieldset key={item.requirement_id} disabled={!editable} style={{ marginTop: 16 }}><legend>{item.title}</legend>
       <blockquote style={{ whiteSpace: "pre-wrap" }}>{item.official_quote}</blockquote>
       <ul className="small">{item.source_urls.map(url => <li key={url}>{/^https?:\/\//.test(url) ? <a href={url} target="_blank" rel="noopener noreferrer">{url}</a> : url}</li>)}</ul>

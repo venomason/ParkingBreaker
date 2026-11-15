@@ -1,0 +1,2 @@
+# Captured reference bytes are hash-addressed evidence, not normalized source text.
+build-kit/evidence/bench-pages/* -text -diff

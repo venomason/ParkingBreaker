@@ -1,0 +1,986 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" class="GlobalMegaMenu_FF LeftNavVue_FF TopNavVueJS_FF Tabs2021_FF RssCard_FF OfficialBanner_FF GlobalFooterSocialMedia_FF PhotoGallery_FF JWPlayerUrlSigning_FF PE_Prod_FF useSiteImprove_FF boardCommissionHomeColorBlockAndBanner_FF">
+<head>
+    <script>
+        dataLayer = [{
+        }];
+        var GlobalMegaMenu_FF = true;
+		var LeftNavVue_FF = true;
+		var TopNavVueJS_FF = true;
+		var Tabs2021_FF = true;
+		var RssCard_FF = true;
+		var OfficialBanner_FF = true;
+		var GlobalFooterSocialMedia_FF = true;
+		var PhotoGallery_FF = true;
+		var JWPlayerUrlSigning_FF = true;
+		var PE_FF = false;
+		var PE_QA_FF = false;
+		var PE_Prod_FF = true;
+		var useBugHerd_FF = false;
+		var useSiteImprove_FF = true;
+		var QaBannerOn_FF = false;
+		var enableFaStylePackage_FF = false;
+		var boardCommissionHomeColorBlockAndBanner_FF = true;
+		var TranslateAPI_FF = false;
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
+<link rel="canonical" href="https://www.seattle.gov/courts/tickets-and-payments/dispute-my-ticket/hearings-by-mail" />
+        <!-- Google Tag Manager -->
+        <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || []; w[l].push({
+                    'gtm.start':
+                        new Date().getTime(), event: 'gtm.js'
+                }); var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-PXQBQ2');
+        </script>
+        <!-- End Google Tag Manager -->
+            <title>Hearings By Mail - Courts | seattle.gov</title>
+            <meta name="description" content="Hearings By Mail" />
+            <meta name="keywords" content="" />
+            <meta name="robots" content="" />
+                <base href="/" />
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/bootstrap-3.3.7.min.css"  />
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/responsive2015.min.css"  />
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/shared2016.min.css"  />
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin=anonymous integrity=sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=></script>     
+        <script type="text/javascript" src="https://www.trumba.com/scripts/spuds.js"></script>
+            <script type="text/javascript" src="cms_resources/js/axios.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jwplayer.com/libraries/Ctujouh4.js?exp=1794161248708&amp;sig=ba2af5375a0c07fcb51de9c00e7892aa"></script>
+
+
+    
+    
+
+
+<script>
+    var pageXID = 'x82710';
+    var topNavXID = 'x56939';
+    var languagesListXID = 'x121473';
+    var isDepartmentMode = 'True';
+    var leftNavTreeXID = 'x82702';
+    var tabComponentID = '';
+</script>
+</head>
+<body class="aws104" >
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="//www.googletagmanager.com/ns.html?id=GTM-PXQBQ2"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    
+<!--wrapper start-->
+
+
+
+
+    <header>
+        <div id="header">
+            
+                    <div id="vue-component-globalHeader"></div>
+            <nav id="slideMenuNav" aria-label="Slide menu navigation">
+                <ul id="seagovMenuMobile" class="list-group slidemenu-right" title="Main Menu" data-departmentname="Courts" data-departmenturl="courts">
+                    
+                    <li class="list-group-item first" id="closeMobileContainer">
+                        <button id="mainMenuCloseMobile" aria-label="Close">
+                            Close <i class="fa-regular fa-times" title="Close" aria-label="Close"></i>
+                        </button>
+                    </li>
+                    <li id="currentMenuContextWrapper" class="list-group-item">
+                        <ul id="currentMenuContext">
+                                <li id="backReturn" class="list-group-item seattleHomeMobile" data-menuTarget="Seattle.gov">
+                                    <span class='fa-regular fa-chevron-left' title="Back to" aria-label="Back to"></span>
+                                    <span id="backReturnText">Main Menu</span><span class="fa-regular fa-chevron-right" title="Back to Main Menu" aria-label="Back to Main Menu"></span>
+                                </li>
+                                    <li id="activeMobileHeading" class="list-group-item deptHomeMobile"><a href="courts"     >Courts</a>
+</li>
+        <li class="list-group-item navItem utility button" data-parenttarget="Home"><a href="courts/tickets-and-payments/pay-my-ticket"  class="title"  title="Main Menu Mobile - Home Pay My Ticket" >Pay My Ticket</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/coming-to-court"    title="Main Menu Mobile - Home Coming To Court" >Coming To Court<span class='fa-regular fa-chevron-right' title='Coming To Court' aria-label='Coming To Court Icon'></span></a>
+
+                <ul data-childrentarget="Coming To Court">
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/notification-preferences-for-hearings-and-portal-filings"    title="Main Menu Mobile - Coming To Court Notification Preferences for Hearings and Portal Filings" >Notification Preferences for Hearings and Portal Filings</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/criminal-court"    title="Main Menu Mobile - Coming To Court Criminal Court" >Criminal Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/directions-and-parking"    title="Main Menu Mobile - Coming To Court Directions and Parking" >Directions and Parking</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/security-and-weapons-screening"    title="Main Menu Mobile - Coming To Court Security & Weapons Screening" >Security & Weapons Screening</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/court-building-directory"    title="Main Menu Mobile - Coming To Court Court Building Directory" >Court Building Directory</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/find-your-courtroom"    title="Main Menu Mobile - Coming To Court Find Your Courtroom" >Find Your Courtroom</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/court-rules-and-expectations"    title="Main Menu Mobile - Coming To Court Court Rules & Expectations" >Court Rules & Expectations</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/obtaining-a-public-defender"    title="Main Menu Mobile - Coming To Court Obtaining a Public Defender" >Obtaining a Public Defender</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/representing-yourself-in-court"    title="Main Menu Mobile - Coming To Court Representing Yourself in Court" >Representing Yourself in Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/policy-on-immigration-arrests"    title="Main Menu Mobile - Coming To Court Policy On Immigration Arrests" >Policy On Immigration Arrests</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/court-faqs"    title="Main Menu Mobile - Coming To Court Frequently Asked Questions" >Frequently Asked Questions</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Home"><a href="/courts/virtual-hearings"    title="Main Menu Mobile - Home Virtual Hearings" >Virtual Hearings</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/tickets-and-payments"    title="Main Menu Mobile - Home Tickets & Payments" >Tickets & Payments<span class='fa-regular fa-chevron-right' title='Tickets & Payments' aria-label='Tickets & Payments Icon'></span></a>
+
+                <ul data-childrentarget="Tickets &amp; Payments">
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/ticket-response-options"    title="Main Menu Mobile - Tickets & Payments Ticket Response Options" >Ticket Response Options</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/find-my-ticket-info"    title="Main Menu Mobile - Tickets & Payments Find My Ticket Info" >Find My Ticket Info<span class='fa-regular fa-chevron-right' title='Find My Ticket Info' aria-label='Find My Ticket Info Icon'></span></a>
+
+                <ul data-childrentarget="Find My Ticket Info">
+        <li class="list-group-item navItem" data-parenttarget="Find My Ticket Info"><a href="/courts/tickets-and-payments/find-my-ticket-info/ticket-examples"    title="Main Menu Mobile - Find My Ticket Info My Ticket Information" >My Ticket Information</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/pay-my-ticket"    title="Main Menu Mobile - Tickets & Payments Pay My Ticket" >Pay My Ticket<span class='fa-regular fa-chevron-right' title='Pay My Ticket' aria-label='Pay My Ticket Icon'></span></a>
+
+                <ul data-childrentarget="Pay My Ticket">
+        <li class="list-group-item navItem" data-parenttarget="Pay My Ticket"><a href="/courts/tickets-and-payments/pay-my-ticket/pay-online"    title="Main Menu Mobile - Pay My Ticket Pay Online" >Pay Online</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Pay My Ticket"><a href="/courts/tickets-and-payments/pay-my-ticket/pay-at-customer-service-center"    title="Main Menu Mobile - Pay My Ticket Pay at Customer Service Center" >Pay at Customer Service Center</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Pay My Ticket"><a href="/courts/tickets-and-payments/pay-my-ticket/collections-information"    title="Main Menu Mobile - Pay My Ticket Collections Information" >Collections Information</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now"    title="Main Menu Mobile - Tickets & Payments I Can't Pay My Ticket Right Now" >I Can't Pay My Ticket Right Now<span class='fa-regular fa-chevron-right' title='I Can't Pay My Ticket Right Now' aria-label='I Can't Pay My Ticket Right Now Icon'></span></a>
+
+                <ul data-childrentarget="I Can&#39;t Pay My Ticket Right Now">
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/ticket-debt-reduction-hearings"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Parking and Traffic Ticket Debt Reduction Hearings for Low-Income People" >Parking and Traffic Ticket Debt Reduction Hearings for Low-Income People</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/payment-plan-application"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Payment Plan Application" >Payment Plan Application</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/community-service-plan"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Community Service Plan" >Community Service Plan</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/unified-payment-program"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Unified Payment Program" >Unified Payment Program</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/dispute-my-ticket"    title="Main Menu Mobile - Tickets & Payments Dispute My Ticket" >Dispute My Ticket<span class='fa-regular fa-chevron-right' title='Dispute My Ticket' aria-label='Dispute My Ticket Icon'></span></a>
+
+                <ul data-childrentarget="Dispute My Ticket">
+        <li class="list-group-item active navItem" data-parenttarget="Dispute My Ticket"><a href="/courts/tickets-and-payments/dispute-my-ticket/hearings-by-mail"    title="Main Menu Mobile - Dispute My Ticket Hearings By Mail" >Hearings By Mail</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Dispute My Ticket"><a href="/courts/tickets-and-payments/dispute-my-ticket/attending-your-scheduled-hearing"    title="Main Menu Mobile - Dispute My Ticket Attending Your Scheduled Ticket Hearing" >Attending Your Scheduled Ticket Hearing</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Dispute My Ticket"><a href="/courts/tickets-and-payments/dispute-my-ticket/reschedule-a-hearing"    title="Main Menu Mobile - Dispute My Ticket Reschedule a Hearing" >Reschedule a Hearing</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/my-car-got-booted"    title="Main Menu Mobile - Tickets & Payments What To Do When My Car Got Booted" >What To Do When My Car Got Booted<span class='fa-regular fa-chevron-right' title='What To Do When My Car Got Booted' aria-label='What To Do When My Car Got Booted Icon'></span></a>
+
+                <ul data-childrentarget="What To Do When My Car Got Booted">
+        <li class="list-group-item navItem" data-parenttarget="What To Do When My Car Got Booted"><a href="/courts/tickets-and-payments/my-car-got-booted/scofflaw-faq"    title="Main Menu Mobile - What To Do When My Car Got Booted Scofflaw FAQ" >Scofflaw FAQ</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="What To Do When My Car Got Booted"><a href="/courts/tickets-and-payments/my-car-got-booted/check-for-unpaid-tickets"    title="Main Menu Mobile - What To Do When My Car Got Booted Check For Unpaid Tickets" >Check For Unpaid Tickets</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/my-car-got-towed"    title="Main Menu Mobile - Tickets & Payments My Car Got Towed" >My Car Got Towed</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/vehicle-tabs"    title="Main Menu Mobile - Tickets & Payments Vehicle Registration Tabs" >Vehicle Registration Tabs</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/bought-and-sold-vehicles"    title="Main Menu Mobile - Tickets & Payments Bought and Sold Vehicles" >Bought and Sold Vehicles</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/camera-tickets"    title="Main Menu Mobile - Tickets & Payments Camera Tickets" >Camera Tickets</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/stolen-identity"    title="Main Menu Mobile - Tickets & Payments Stolen Identity" >Stolen Identity</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/frequently-asked-questions"    title="Main Menu Mobile - Tickets & Payments Frequently Asked Questions" >Frequently Asked Questions</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/jury-duty"    title="Main Menu Mobile - Home Jury Duty" >Jury Duty<span class='fa-regular fa-chevron-right' title='Jury Duty' aria-label='Jury Duty Icon'></span></a>
+
+                <ul data-childrentarget="Jury Duty">
+        <li class="list-group-item navItem" data-parenttarget="Jury Duty"><a href="/courts/jury-duty/received-a-jury-summons---now-what"    title="Main Menu Mobile - Jury Duty Received a Jury Summons - Now What?" >Received a Jury Summons - Now What?</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Jury Duty"><a href="/courts/jury-duty/responding-to-a-jury-summons"    title="Main Menu Mobile - Jury Duty Responding to a Jury Summons" >Responding to a Jury Summons</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Jury Duty">
+                <a href="/courts/jury-duty/reporting-for-jury-duty"    title="Main Menu Mobile - Jury Duty Reporting for Jury Duty" >Reporting for Jury Duty<span class='fa-regular fa-chevron-right' title='Reporting for Jury Duty' aria-label='Reporting for Jury Duty Icon'></span></a>
+
+                <ul data-childrentarget="Reporting for Jury Duty">
+        <li class="list-group-item navItem" data-parenttarget="Reporting for Jury Duty"><a href="/courts/jury-duty/reporting-for-jury-duty/how-a-jury-is-chosen"    title="Main Menu Mobile - Reporting for Jury Duty How a Jury is Chosen" >How a Jury is Chosen</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Reporting for Jury Duty"><a href="/courts/jury-duty/reporting-for-jury-duty/order-of-events-in-a-trial"    title="Main Menu Mobile - Reporting for Jury Duty Order of Events in a Trial" >Order of Events in a Trial</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Jury Duty"><a href="/courts/jury-duty/jury-duty-faq"    title="Main Menu Mobile - Jury Duty Jury Duty FAQ" >Jury Duty FAQ</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/for-attorneys"    title="Main Menu Mobile - Home For Attorneys" >For Attorneys<span class='fa-regular fa-chevron-right' title='For Attorneys' aria-label='For Attorneys Icon'></span></a>
+
+                <ul data-childrentarget="For Attorneys">
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/violations-information"    title="Main Menu Mobile - For Attorneys Violations Information" >Violations Information</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/case-information-and-records"    title="Main Menu Mobile - For Attorneys Case Information and Records" >Case Information and Records</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/court-forms"    title="Main Menu Mobile - For Attorneys Court Forms" >Court Forms</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/civil-cases"    title="Main Menu Mobile - For Attorneys Civil Cases" >Civil Cases</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="For Attorneys">
+                <a href="/courts/for-attorneys/local-court-rules"    title="Main Menu Mobile - For Attorneys Local Court Rules" >Local Court Rules<span class='fa-regular fa-chevron-right' title='Local Court Rules' aria-label='Local Court Rules Icon'></span></a>
+
+                <ul data-childrentarget="Local Court Rules">
+        <li class="list-group-item navItem" data-parenttarget="Local Court Rules"><a href="/courts/for-attorneys/local-court-rules/general-administrative-orders"    title="Main Menu Mobile - Local Court Rules General Administrative Orders" >General Administrative Orders</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Local Court Rules"><a href="/courts/for-attorneys/local-court-rules/proposed-rules-for-public-comment"    title="Main Menu Mobile - Local Court Rules Proposed Court Rules for Public Comment" >Proposed Court Rules for Public Comment</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/conflict-attorney-panel-cap"    title="Main Menu Mobile - For Attorneys Conflict Attorney Panel (CAP)" >Conflict Attorney Panel (CAP)</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/en-banc-rulings"    title="Main Menu Mobile - For Attorneys En Banc Rulings" >En Banc Rulings</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/programs-and-services"    title="Main Menu Mobile - Home Programs & Services" >Programs & Services<span class='fa-regular fa-chevron-right' title='Programs & Services' aria-label='Programs & Services Icon'></span></a>
+
+                <ul data-childrentarget="Programs &amp; Services">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/community-resource-center"    title="Main Menu Mobile - Programs & Services Community Resource Center" >Community Resource Center<span class='fa-regular fa-chevron-right' title='Community Resource Center' aria-label='Community Resource Center Icon'></span></a>
+
+                <ul data-childrentarget="Community Resource Center">
+        <li class="list-group-item navItem" data-parenttarget="Community Resource Center"><a href="/courts/programs-and-services/community-resource-center/crc-calendar"    title="Main Menu Mobile - Community Resource Center Community Resource Center Calendar" >Community Resource Center Calendar</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Community Resource Center"><a href="/courts/programs-and-services/community-resource-center/crc-services"    title="Main Menu Mobile - Community Resource Center CRC Services" >CRC Services</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Community Resource Center"><a href="/courts/programs-and-services/community-resource-center/about-crc"    title="Main Menu Mobile - Community Resource Center About CRC" >About CRC</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Programs &amp; Services"><a href="/courts/programs-and-services/pretrial-services"    title="Main Menu Mobile - Programs & Services Pretrial Services" >Pretrial Services</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/probation-services"    title="Main Menu Mobile - Programs & Services Probation Services" >Probation Services<span class='fa-regular fa-chevron-right' title='Probation Services' aria-label='Probation Services Icon'></span></a>
+
+                <ul data-childrentarget="Probation Services">
+        <li class="list-group-item navItem" data-parenttarget="Probation Services"><a href="/courts/programs-and-services/probation-services/probation-evolution"    title="Main Menu Mobile - Probation Services Probation Evolution" >Probation Evolution</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Services"><a href="/courts/programs-and-services/probation-services/electronic-monitoring"    title="Main Menu Mobile - Probation Services Electronic Monitoring" >Electronic Monitoring</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Services"><a href="/courts/programs-and-services/probation-services/assigned-probation-what-to-expect"    title="Main Menu Mobile - Probation Services Assigned Probation: What To Expect" >Assigned Probation: What To Expect</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/specialized-courts"    title="Main Menu Mobile - Programs & Services Specialized Courts" >Specialized Courts<span class='fa-regular fa-chevron-right' title='Specialized Courts' aria-label='Specialized Courts Icon'></span></a>
+
+                <ul data-childrentarget="Specialized Courts">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Specialized Courts">
+                <a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project"    title="Main Menu Mobile - Specialized Courts Domestic Violence Intervention Project" >Domestic Violence Intervention Project<span class='fa-regular fa-chevron-right' title='Domestic Violence Intervention Project' aria-label='Domestic Violence Intervention Project Icon'></span></a>
+
+                <ul data-childrentarget="Domestic Violence Intervention Project">
+        <li class="list-group-item navItem" data-parenttarget="Domestic Violence Intervention Project"><a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project/domestic-violence-victim-resources"    title="Main Menu Mobile - Domestic Violence Intervention Project Domestic Violence Victim Resources" >Domestic Violence Victim Resources</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Domestic Violence Intervention Project"><a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project/what-happens-in-cases-of-domestic-violence"    title="Main Menu Mobile - Domestic Violence Intervention Project What Happens in Cases of Domestic Violence" >What Happens in Cases of Domestic Violence</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Domestic Violence Intervention Project"><a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project/dv-no-contact-order-faqs-"    title="Main Menu Mobile - Domestic Violence Intervention Project DV No Contact Order FAQs" >DV No Contact Order FAQs</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Specialized Courts"><a href="/courts/programs-and-services/specialized-courts/mental-health-court"    title="Main Menu Mobile - Specialized Courts Mental Health Court" >Mental Health Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Specialized Courts"><a href="/courts/programs-and-services/specialized-courts/seattle-veterans-treatment-court"    title="Main Menu Mobile - Specialized Courts Seattle Veterans Treatment Court" >Seattle Veterans Treatment Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Specialized Courts"><a href="/courts/programs-and-services/specialized-courts/seattle-youth-traffic-court"    title="Main Menu Mobile - Specialized Courts Seattle Youth Traffic Court" >Seattle Youth Traffic Court</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/interpreter-services"    title="Main Menu Mobile - Programs & Services Interpreter Services" >Interpreter Services<span class='fa-regular fa-chevron-right' title='Interpreter Services' aria-label='Interpreter Services Icon'></span></a>
+
+                <ul data-childrentarget="Interpreter Services">
+        <li class="list-group-item navItem" data-parenttarget="Interpreter Services"><a href="/courts/programs-and-services/interpreter-services/for-smc-interpreters"    title="Main Menu Mobile - Interpreter Services For SMC Interpreters" >For SMC Interpreters</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Interpreter Services"><a href="/courts/programs-and-services/interpreter-services/for-the-public"    title="Main Menu Mobile - Interpreter Services For The Public" >For The Public</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Interpreter Services">
+                <a href="/courts/programs-and-services/interpreter-services/for-attorneys"    title="Main Menu Mobile - Interpreter Services For Attorneys" >For Attorneys<span class='fa-regular fa-chevron-right' title='For Attorneys' aria-label='For Attorneys Icon'></span></a>
+
+                <ul data-childrentarget="For Attorneys">
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/programs-and-services/interpreter-services/for-attorneys/interpreter-request-form"    title="Main Menu Mobile - For Attorneys Interpreter Request Form" >Interpreter Request Form</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/marriage-ceremonies"    title="Main Menu Mobile - Programs & Services Marriage Ceremonies" >Marriage Ceremonies<span class='fa-regular fa-chevron-right' title='Marriage Ceremonies' aria-label='Marriage Ceremonies Icon'></span></a>
+
+                <ul data-childrentarget="Marriage Ceremonies">
+        <li class="list-group-item navItem" data-parenttarget="Marriage Ceremonies"><a href="/courts/programs-and-services/marriage-ceremonies/marriage-ceremony-faqs"    title="Main Menu Mobile - Marriage Ceremonies Marriage Ceremony FAQs" >Marriage Ceremony FAQs</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Marriage Ceremonies"><a href="/courts/programs-and-services/marriage-ceremonies/marriage-ceremony-request"    title="Main Menu Mobile - Marriage Ceremonies Marriage Ceremony Request" >Marriage Ceremony Request</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Programs &amp; Services"><a href="/courts/programs-and-services/public-records-requests"    title="Main Menu Mobile - Programs & Services Public Records Requests" >Public Records Requests</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/vacating-a-conviction"    title="Main Menu Mobile - Programs & Services Vacating a Conviction" >Vacating a Conviction<span class='fa-regular fa-chevron-right' title='Vacating a Conviction' aria-label='Vacating a Conviction Icon'></span></a>
+
+                <ul data-childrentarget="Vacating a Conviction">
+        <li class="list-group-item navItem" data-parenttarget="Vacating a Conviction"><a href="/courts/programs-and-services/vacating-a-conviction/procedures-for-vacating-a-conviction"    title="Main Menu Mobile - Vacating a Conviction Procedures For Vacating a Conviction" >Procedures For Vacating a Conviction</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Programs &amp; Services"><a href="/courts/programs-and-services/warrants"    title="Main Menu Mobile - Programs & Services Resolving a Warrant" >Resolving a Warrant</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/customer-service"    title="Main Menu Mobile - Programs & Services Customer Service" >Customer Service<span class='fa-regular fa-chevron-right' title='Customer Service' aria-label='Customer Service Icon'></span></a>
+
+                <ul data-childrentarget="Customer Service">
+        <li class="list-group-item navItem" data-parenttarget="Customer Service"><a href="/courts/programs-and-services/customer-service/how-the-court-can-help-you"    title="Main Menu Mobile - Customer Service How the Court Can Help You" >How the Court Can Help You</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/about-us"    title="Main Menu Mobile - Home About Us" >About Us<span class='fa-regular fa-chevron-right' title='About Us' aria-label='About Us Icon'></span></a>
+
+                <ul data-childrentarget="About Us">
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/privacy"    title="Main Menu Mobile - About Us Seattle Municipal Court Privacy Notice " >Seattle Municipal Court Privacy Notice </a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/news-and-blog"    title="Main Menu Mobile - About Us News and Blog" >News and Blog</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/contact-information-and-hours"    title="Main Menu Mobile - About Us Contact Information & Hours" >Contact Information & Hours<span class='fa-regular fa-chevron-right' title='Contact Information & Hours' aria-label='Contact Information & Hours Icon'></span></a>
+
+                <ul data-childrentarget="Contact Information &amp; Hours">
+        <li class="list-group-item navItem" data-parenttarget="Contact Information &amp; Hours"><a href="/courts/about-us/contact-information-and-hours/court-holidays"    title="Main Menu Mobile - Contact Information & Hours Court Holidays" >Court Holidays</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/jail-locations-and-visitation"    title="Main Menu Mobile - About Us Jail Locations and Visitation" >Jail Locations and Visitation</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/seattle-municipal-court-judges"    title="Main Menu Mobile - About Us Seattle Municipal Court Judges" >Seattle Municipal Court Judges<span class='fa-regular fa-chevron-right' title='Seattle Municipal Court Judges' aria-label='Seattle Municipal Court Judges Icon'></span></a>
+
+                <ul data-childrentarget="Seattle Municipal Court Judges">
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-faye-chess"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Faye Chess" >Honorable Faye Chess</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-andrea-chin"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Andrea Chin" >Honorable Andrea Chin</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-anita-crawford-willis"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Anita Crawford-Willis" >Honorable Anita Crawford-Willis</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-willie-gregory"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Willie Gregory" >Honorable Willie Gregory</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Seattle Municipal Court Judges">
+                <a href="/courts/about-us/seattle-municipal-court-judges/honorable-catherine-mcdowall"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Catherine McDowall" >Honorable Catherine McDowall<span class='fa-regular fa-chevron-right' title='Honorable Catherine McDowall' aria-label='Honorable Catherine McDowall Icon'></span></a>
+
+                <ul data-childrentarget="Honorable Catherine McDowall">
+        <li class="list-group-item navItem" data-parenttarget="Honorable Catherine McDowall"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-catherine-mcdowall/chambers-procedures-courtroom-1101"    title="Main Menu Mobile - Honorable Catherine McDowall Chambers Procedures Courtroom 1101" >Chambers Procedures Courtroom 1101</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-damon-shadid"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Damon Shadid" >Honorable Damon Shadid</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-pooja-vaddadi"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Pooja Vaddadi" >Honorable Pooja Vaddadi</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/seattle-municipal-court-magistrates"    title="Main Menu Mobile - About Us Seattle Municipal Court Magistrates" >Seattle Municipal Court Magistrates</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/seattle-municipal-court-marshals--security"    title="Main Menu Mobile - About Us Seattle Municipal Court Marshals & Security" >Seattle Municipal Court Marshals & Security</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/community-engagement"    title="Main Menu Mobile - About Us Community Engagement" >Community Engagement<span class='fa-regular fa-chevron-right' title='Community Engagement' aria-label='Community Engagement Icon'></span></a>
+
+                <ul data-childrentarget="Community Engagement">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Community Engagement">
+                <a href="/courts/about-us/community-engagement/outreach-events"    title="Main Menu Mobile - Community Engagement Seattle Municipal Court - Outreach Events" >Seattle Municipal Court - Outreach Events<span class='fa-regular fa-chevron-right' title='Seattle Municipal Court - Outreach Events' aria-label='Seattle Municipal Court - Outreach Events Icon'></span></a>
+
+                <ul data-childrentarget="Seattle Municipal Court - Outreach Events">
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court - Outreach Events"><a href="/courts/about-us/community-engagement/outreach-events/past-events"    title="Main Menu Mobile - Seattle Municipal Court - Outreach Events Seattle Municipal Court - Past Community Events" >Seattle Municipal Court - Past Community Events</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Community Engagement"><a href="/courts/about-us/community-engagement/partner-engagement"    title="Main Menu Mobile - Community Engagement Partner Engagement " >Partner Engagement </a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Community Engagement"><a href="/courts/about-us/community-engagement/smc-engagement-partners-resource-list"    title="Main Menu Mobile - Community Engagement SMC Engagement Partners Resource List" >SMC Engagement Partners Resource List</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/data-and-publications"    title="Main Menu Mobile - About Us Data & Publications" >Data & Publications<span class='fa-regular fa-chevron-right' title='Data & Publications' aria-label='Data & Publications Icon'></span></a>
+
+                <ul data-childrentarget="Data &amp; Publications">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Data &amp; Publications">
+                <a href="/courts/about-us/data-and-publications/general-data-reports"    title="Main Menu Mobile - Data & Publications General Data Reports" >General Data Reports<span class='fa-regular fa-chevron-right' title='General Data Reports' aria-label='General Data Reports Icon'></span></a>
+
+                <ul data-childrentarget="General Data Reports">
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/top-10-criminal-charges"    title="Main Menu Mobile - General Data Reports Top 10 Criminal Charges" >Top 10 Criminal Charges</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/criminal-case-filings"    title="Main Menu Mobile - General Data Reports Criminal Case Filings" >Criminal Case Filings</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/court-hearing-volume"    title="Main Menu Mobile - General Data Reports Court Hearing Volume" >Court Hearing Volume</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/vehicle-infractions"    title="Main Menu Mobile - General Data Reports Vehicle Infractions" >Vehicle Infractions</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/traffic-camera-infractions"    title="Main Menu Mobile - General Data Reports Traffic Camera Infractions" >Traffic Camera Infractions</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Data &amp; Publications">
+                <a href="/courts/about-us/data-and-publications/probation-data-reports"    title="Main Menu Mobile - Data & Publications Probation Data Reports" >Probation Data Reports<span class='fa-regular fa-chevron-right' title='Probation Data Reports' aria-label='Probation Data Reports Icon'></span></a>
+
+                <ul data-childrentarget="Probation Data Reports">
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-caseload"    title="Main Menu Mobile - Probation Data Reports Probation Caseload, Status, and Length of Time" >Probation Caseload, Status, and Length of Time</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-reporting-level"    title="Main Menu Mobile - Probation Data Reports Probation Reporting Level" >Probation Reporting Level</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-activity-and-compliance"    title="Main Menu Mobile - Probation Data Reports Probation Activity and Compliance" >Probation Activity and Compliance</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-outcomes-revocations-and-hearings"    title="Main Menu Mobile - Probation Data Reports Probation Outcomes: Revocations and Hearings" >Probation Outcomes: Revocations and Hearings</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Data &amp; Publications"><a href="/courts/about-us/data-and-publications/domestic-violence-court-data-reports"    title="Main Menu Mobile - Data & Publications Domestic Violence Court Data Reports" >Domestic Violence Court Data Reports</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Data &amp; Publications"><a href="/courts/about-us/data-and-publications/community-court-data-reports"    title="Main Menu Mobile - Data & Publications Community Court Data Reports" >Community Court Data Reports</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Data &amp; Publications"><a href="/courts/about-us/data-and-publications/mental-health-court-and-veterans-treatment-court-data-reports"    title="Main Menu Mobile - Data & Publications Mental Health Court & Veterans Treatment Court Data Reports" >Mental Health Court & Veterans Treatment Court Data Reports</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Data &amp; Publications">
+                <a href="/courts/about-us/data-and-publications/court-performance-reports"    title="Main Menu Mobile - Data & Publications Court Performance Reports" >Court Performance Reports<span class='fa-regular fa-chevron-right' title='Court Performance Reports' aria-label='Court Performance Reports Icon'></span></a>
+
+                <ul data-childrentarget="Court Performance Reports">
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/electronic-home-monitoring"    title="Main Menu Mobile - Court Performance Reports Electronic Home Monitoring (EHM)" >Electronic Home Monitoring (EHM)</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/key-performance-indicators"    title="Main Menu Mobile - Court Performance Reports Key Performance Indicators" >Key Performance Indicators</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/court-user-survey-results"    title="Main Menu Mobile - Court Performance Reports Court User Survey Results" >Court User Survey Results</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/community-resource-center-data"    title="Main Menu Mobile - Court Performance Reports Community Resource Center Data" >Community Resource Center Data</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/technology"    title="Main Menu Mobile - About Us Seattle Municipal Court - Technology Initiatives" >Seattle Municipal Court - Technology Initiatives</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/career-and-volunteer-opportunities"    title="Main Menu Mobile - About Us Career and Volunteer Opportunities" >Career and Volunteer Opportunities<span class='fa-regular fa-chevron-right' title='Career and Volunteer Opportunities' aria-label='Career and Volunteer Opportunities Icon'></span></a>
+
+                <ul data-childrentarget="Career and Volunteer Opportunities">
+        <li class="list-group-item navItem" data-parenttarget="Career and Volunteer Opportunities"><a href="/courts/about-us/career-and-volunteer-opportunities/faqs-for-applicants"    title="Main Menu Mobile - Career and Volunteer Opportunities FAQs for Applicants" >FAQs for Applicants</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/en-espa&#241;ol"    title="Main Menu Mobile - Home En Español" >En Español<span class='fa-regular fa-chevron-right' title='En Español' aria-label='En Español Icon'></span></a>
+
+                <ul data-childrentarget="En Espa&#241;ol">
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/tr&#225;mites-para-responder-a-multas"    title="Main Menu Mobile - En Español Trámites para responder a multas" >Trámites para responder a multas</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="En Espa&#241;ol">
+                <a href="/courts/en-espa&#241;ol/pagar-la-multa"    title="Main Menu Mobile - En Español Pagar la multa" >Pagar la multa<span class='fa-regular fa-chevron-right' title='Pagar la multa' aria-label='Pagar la multa Icon'></span></a>
+
+                <ul data-childrentarget="Pagar la multa">
+        <li class="list-group-item navItem" data-parenttarget="Pagar la multa"><a href="/courts/en-espa&#241;ol/pagar-la-multa/no-puedo-pagar-la-multa-en-su-totalidad"    title="Main Menu Mobile - Pagar la multa No puedo pagar la multa en su totalidad" >No puedo pagar la multa en su totalidad</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/inmovilizaci&#243;n-de-veh&#237;culos"    title="Main Menu Mobile - En Español Inmovilización de vehículos" >Inmovilización de vehículos</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/informaci&#243;n-sobre-agencias-de-recaudaci&#243;n-"    title="Main Menu Mobile - En Español Información sobre agencias de recaudación " >Información sobre agencias de recaudación </a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/agencia-de-cobros"    title="Main Menu Mobile - En Español Agencia de cobros" >Agencia de cobros</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/multas-de-c&#225;mara"    title="Main Menu Mobile - En Español Multas de cámara" >Multas de cámara</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/retenci&#243;n-de-la-etiqueta-de-registro-de-la-matr&#237;cula-del-veh&#237;culo"    title="Main Menu Mobile - En Español Retención de la etiqueta de registro de la matrícula del vehículo" >Retención de la etiqueta de registro de la matrícula del vehículo</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/formularios-disponibles-en-espa&#241;ol-"    title="Main Menu Mobile - En Español Formularios disponibles en español" >Formularios disponibles en español</a>
+</li>
+                </ul>
+            </li>
+                                    <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="/elected-officials"    title="Main Menu Mobile - Seattle.gov Elected Officials" >Elected Officials</a>
+</li>
+        <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="/departments"    title="Main Menu Mobile - Seattle.gov City Departments" >City Departments</a>
+</li>
+        <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="https://news.seattle.gov"    title="Main Menu Mobile - Seattle.gov News.Seattle.Gov" >News.Seattle.Gov</a>
+</li>
+        <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="/event-calendar"    title="Main Menu Mobile - Seattle.gov Events Calendar" >Events Calendar</a>
+</li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>      <!-- SEATTLE.GOV HEADER ENDS -->
+    </header>
+
+    
+
+
+
+
+
+
+
+
+            <div class="container notificationContainer">
+                <div id="x106515" class="seagovBanner Medium-Alert" role="complementary" aria-label="**Case File Portal and Payment Application Offline Nov. 13-15 For System Maintenance**">
+                        <i class="fas fa-exclamation-triangle" title="Medium alert notification triangle"></i>
+
+                    <div class="title">**Case File Portal and Payment Application Offline Nov. 13-15 For System Maintenance**</div>
+                    <p>The online case file portal and web payment application will be offline from 1:30 PM on Friday, Nov. 13 through 12 noon on Sunday, Nov. 15 for system maintenance. We apologize for any inconvenience.</p>
+                    <button role="button" title="Expand">
+                        <i class="fas fa-sort-down" title="Sort down"></i>
+                        <i class="fas fa-sort-up" title="Sort up" hidden></i>
+                    </button>
+                </div>
+            </div>
+            <div id="content">
+                
+
+
+<div class=" department DepartmentDetail" id="x82710">
+
+    <div class="titleTopNavBreadcrumbWrapper fullWidthBreadCrumbs">
+        <div class="container" role="region" aria-label="Top navigation page title">
+
+
+
+
+
+    <aside role="complementary" aria-label="Department header section">
+        <nav aria-label="Department title and links">
+                <div id="deptTitle" class="deptName nonExec">
+                    <a href="courts"  class="active"   >Seattle Municipal Court</a>
+
+                </div>
+
+                            <div class="topNavUtilityLinks">
+
+	    <div class="btn-group topNavigation button">
+		    <a href="courts/tickets-and-payments/pay-my-ticket"  class="btn btn-primary"   >Pay My Ticket</a>
+
+	    </div>
+
+                            </div>
+
+        </nav>
+    </aside>
+
+
+            
+        <nav id="deptTopNav" class="top-nav" data-id="x56939" aria-label="Department top links">
+            <ul class="top-nav__list">
+                        <li class="top-nav__item">
+                                <a href="courts/coming-to-court" class="top-nav__link" aria-label="Coming to Court menu, Find directions to the court, courtroom expectations, how to obtain a public defender, and FAQs." >Coming to Court</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/virtual-hearings" class="top-nav__link" aria-label="Virtual Hearings menu, Read about attending a court hearing virtually." >Virtual Hearings</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/tickets-and-payments" class="top-nav__link activePage" aria-label="Tickets &amp; Payments menu, Know your ticket response options, how to dispute a ticket, respond to a booted or towed vehicle, and FAQs." >Tickets &amp; Payments</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/jury-duty" class="top-nav__link" aria-label="Jury Duty  menu, Learn how to respond to your jury summons and what to expect when serving on a jury." >Jury Duty </a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/for-attorneys" class="top-nav__link" aria-label="For Attorneys menu, Information and resources specifically for attorneys, including court rules, case documents, and forms. " >For Attorneys</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/programs-and-services" class="top-nav__link" aria-label="Programs &amp; Services menu, Get help with court services, from marriage ceremonies to probation, pretrial services, public records requests, and interpreter services." >Programs &amp; Services</a>
+
+                        </li>
+            </ul>
+        </nav>
+        </div>
+
+
+
+
+<nav aria-label="Department breadcrumb">
+    <div id="breadCrumbWrapper" class="">
+        <div id="dept-breadCrumbs" class="container">
+<a class="seaGovHome" aria-label="Seattle.gov Home" href="/">
+                    <svg viewBox="296 386 20 20" alt="Seattle.gov logo">
+                        <path class="stroke" d="M306.018 386.225c-5.397.005-9.77 4.384-9.765 9.782.005 5.397 4.384 9.77 9.782 9.765 5.395-.004 9.766-4.379 9.766-9.773-.003-5.401-4.383-9.776-9.783-9.774"/>
+                        <path class="fill" d="M303.116 405.39c-.314-.093-.618-.222-.902-.386 0 0 .128.17.301-.119.151-.253-.047-.997-.231-1.349-.139-.253-.546-.62-.658-1.01-.099-.342-.074-.607-.223-.868-.215-.384-.503-.782.235-.845 1.017-.086 2.1-.097 2.639.12.405.163.448.663.523.972.09.365.303 1.25.014 2.139s-.605.858-.74 1.346c-.011.048.008.097.046.127.04.041.087.075.139.1l-1.143-.227zm6.259-18.574l-.211-.075-.188-.061-.231-.069-.226-.063v4.737s-.934-.277-1.762-1.716c-.682-1.179-.586-3.217-.586-3.345h-.277l-.266.007-.26.014-.174.013-.297.069c.07 1.701.304 3.121 1.03 4.249 1.122 1.74 2.586 2.065 2.586 2.065v3.405c-1.304-.806-3.27-2.171-4.262-7.551-.133-.718-.631-.717-1.067-.556-1.365.528-2.465 2.102-3.046 2.603-.104.09-.214.139-.252.237-.039.099.099.235.175.294s.176.053.368.118c.32.11.622.453.854.63.232.178.757.486 1.067.532.148.06.139.105.139.197 0 .091-.098.157-.252.176-.153.02-.659-.02-.932.04-.272.06-.368.236-.465.374-.098.138-.128.365-.233.453-.058.044-.138.044-.194 0-.059-.039-.077-.099-.059-.217.018-.118.039-.217.059-.315.021-.157.015-.317-.02-.472-.049-.15-.135-.286-.252-.393-.171-.139-.382-.247-.602-.04-.11.104-.912 1.464-1.183 1.944-.177.308-.32.634-.428.972-.026.146.009.297.097.417.116.119.266.202.428.236.184.038.312-.017.466.02s.073.204.015.322c-.058.118-.182.117-.248.209-.121.171.021.26.076.35.069.115.014.188-.076.378-.139.302.039.519.123.694.085.176.048.569-.07.825-.069.153-.126.312-.17.475-.12.417.335.96.66 1.122.448.225 2.212.039 3.454-.04 1.241-.079 1.727-.556 2.017-1.023s.233-1.043.233-1.202c-.01-.187-.035-.373-.078-.555-.236-1.085.203-2.5.348-2.682.04-.038.103-.037.142.003.005.005.009.011.013.017.253.423.574.801.949 1.121 0 1.043-.011 9.342-.012 10.007.055.006.111.006.166 0 .065 0 .151-.007.239-.014s.171-.013.254-.021c.11-.012.213-.021.292-.032.074-.005.148-.016.222-.03v-.063-8.954c.556.386 1.008.669 1.008.669l.037.024v8.107l.158-.043.208-.061.161-.052.176-.059.179-.063.217-.084v-18.186l-.237-.088zm6.415 8.75c-.326-.942-.78-1.835-1.349-2.654-1.157-1.686-2.46-2.375-2.46-2.375v-2.279l-.172-.131-.162-.117-.222-.151-.24-.155-.202-.124-.168-.096v17.029l.17-.102.2-.119.278-.182.307-.215.19-.139.01-7.361s.677.709 1.073 2.265c.28 1.156.435 2.339.46 3.528v.084c.128-.145.247-.297.357-.455.086-.117.179-.244.262-.365.12-.168.229-.342.329-.521 0 0 .127-1.667-.748-3.832-.737-1.864-1.723-2.689-1.723-2.689v-2.172l.039.017c.661.341 1.557 1.414 2.095 2.386.629 1.16 1.08 2.406 1.339 3.7.015.046.025.092.033.139 0 .013.129-.556.139-.589.028-.129.078-.424.095-.566.029-.26.059-.527.072-.75.018-.293.015-.51.017-.529 0-.1-.019-.478-.02-.482v.002z"/>
+                    </svg>
+                </a><span class="fas fa-chevron-right" title="breadcrumb divider" aria-label="Breadcrumb divider"></span><a href="courts"     >Home</a>
+<span class="fas fa-chevron-right" title="breadcrumb divider" aria-label="Breadcrumb divider"></span><a href="courts/tickets-and-payments"    title="Tickets & Payments" >Tickets & Payments</a>
+<span class="fas fa-chevron-right" title="breadcrumb divider" aria-label="Breadcrumb divider"></span><a href="courts/tickets-and-payments/dispute-my-ticket"    title="Dispute My Ticket" >Dispute My Ticket</a>
+<span class="fas fa-chevron-down" title="breadcrumb end" aria-label="Breadcrumb divider"></span>
+        </div>
+
+    </div>
+</nav>
+
+    </div>
+                <div class="container">
+                </div>
+        <div class="container">
+            <div id="leftMainRight" class="row noRightBorder">
+                <div class="col-md-12 col-xs-12">
+                    <div class="row borderBottomNone">
+                        
+                        <div class="col-md-9 col-md-push-3">
+                            
+                            
+
+                            <div id="mainColContent" class="row">
+                                
+
+                                <main>
+                                    <div class="col-xs-12" id="mainColMain">
+                                        
+
+                                        
+
+
+        <div>
+            <h1 class="pageTitle">Hearings By Mail
+</h1>
+
+    </div>
+
+		<div  class="span">
+			<p>Instead of appearing in person, you have the option of mitigating or contesting your ticket in writing, called adjudication by mail. Once you have <a href="/courts/tickets-and-payments/dispute-my-ticket">scheduled your hearing</a>, you will receive a written statement form with your hearing notice.</p>
+<p>Submit the written statement back to the court prior to your hearing date. You may submit the written statement and evidence:</p>
+<ol>
+<li>Via the Court's <a href="https://courtrecords.seattle.gov/portal/home" target="_blank" title="SMC public portal" rel="noopener">Public Portal,</a> as shown in this video:
+<p>&nbsp;</p>
+<p><a href="https://youtu.be/1jlEOWRsock" target="_blank" rel="noopener"><img src="images/Departments/Court/Tickets/WrittenStatement.jpeg" width="680" height="383" class="blockImg" alt="Public Portal Written Statement" /></a></p>
+</li>
+<li>
+
+<p>By email to <a href="mailto:courtcalendar.smc@seattle.gov" target="_blank" rel="noopener">CourtCalendar.SMC@seattle.gov</a>.</p>
+</li>
+<li>By mail: &nbsp;&nbsp;&nbsp;
+<p>Seattle Municipal Court<br />ATTN: Magistrate Operations<br />PO Box 34987<br />Seattle, WA 98124-4987&nbsp;</p>
+</li>
+<li>By fax:&nbsp;&nbsp;&nbsp;<strong><a href="tel: +1 (206) 470-6884">(206) 470-6884</a></strong></li>
+</ol>
+<p>Once submitted, your written statement will be reviewed by a <a href="/courts/about-us/seattle-municipal-court-magistrates">Magistrate</a>. The Magistrate will make a decision and notify you by mail.<strong><br /></strong></p>
+<p>You will receive the decision within ten (10) business days from when you submitted your statement. If you do not receive a response, contact the court at <strong><a href="tel: +1 (206) 684-5600">(206) 684-5600</a></strong>.</p>
+<p>Written statements sent to the court without an initial hearing scheduled will not be read. Instead, a hearing will be set and you will be sent the appropriate written statement form.</p>
+		</div>
+
+
+
+                                    </div>
+                                </main>
+                                
+
+                            </div>
+                        </div>
+                        
+
+    <aside role="complementary" aria-labelledby="leftCol">
+        <div id="leftCol" class="col-md-3 col-md-pull-9">
+
+    <nav aria-label="Primary Leftside Navigation">
+        <div id="vue-component-left-nav" class="hidden-xs"></div>
+    </nav>
+                <span aria-hidden="true" style="display:none">No left sidebar</span>
+
+        </div>
+    </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    <div role="contentinfo" aria-label="Department footer">
+        <nav id="deptFootLinksWrapperShort" role="navigation" aria-label="Department footer links">
+            <div class="container">
+                <ul class='footerLinkList'>
+    <li><a href="courts/about-us"     aria-label="About Us link">About Us</a>
+</li>
+    <li><a href="courts/about-us/contact-information-and-hours"     aria-label="Contact Information & Hours link">Contact Information & Hours</a>
+</li>
+    <li><a href="courts/about-us/privacy"     aria-label="Privacy link">Privacy</a>
+</li>
+    <li><a href="courts/about-us/career-and-volunteer-opportunities"     aria-label="Careers link">Careers</a>
+</li>
+    <li><a href="courts/about-us/community-engagement"     aria-label="Community Engagement link">Community Engagement</a>
+</li>
+</ul>
+
+            </div>
+        </nav>
+                <div class="seafooter18Wrapper department">
+            <div class="container" id="seafooter18">
+                <div class="row borderBottomNone">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 footerContainer" id="seaFooter18Col1">
+                        <h2 translate="no">Municipal Court</h2>
+                        <div class="ContactComponent">
+                            <div class="contactText">
+                                <div class="contactAddress">
+                                    <p>
+                                        <span class="address">Address:</span>
+<a href="https://www.google.com/maps/place/600 5th Avenue, Seattle, WA, 98104" target="_blank">600 5th Avenue, Seattle, WA, 98104</a>
+<br />
+<span class="address">Mailing Address:</span>
+PO BOX 34987, Seattle, WA, 98124-4987<br />
+<span class="phone">Phone:</span>  <a href="tel: +1 (206) 684-5600" class="phoneNumber">(206) 684-5600</a><br />
+<span class="email">Email:</span>  <a href="mailto:SMC_PublicSvcs@seattle.gov">SMC_PublicSvcs@seattle.gov</a>
+<br />
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <section>
+                            <div class="contactTileSocialMediaWrapper">
+
+
+
+    <a id="x107093_deptFooter" class="socialMediaContactItem" href="https://www.facebook.com/seamunicourt/" target="_blank">
+        
+        <i class="fa-brands fa-facebook-square" title="Seattle Municipal Court Facebook"></i>
+
+    </a>
+    <a id="x85694_deptFooter" class="socialMediaContactItem" href="https://twitter.com/seamunicourt?lang=en" target="_blank">
+        
+        <i class="fa-brands fa-square-x-twitter" title="Seattle Municipal Courts Twitter"></i>
+
+    </a>
+    <a id="x109052_deptFooter" class="socialMediaContactItem" href="https://www.instagram.com/seamunicourt/" target="_blank">
+        
+        <i class="fa-brands fa-square-instagram" title="Seattle Municipal Court Instagram"></i>
+
+    </a>
+    <a id="x149057_deptFooter" class="socialMediaContactItem" href="https://www.linkedin.com/company/seattle-municipal-court" target="_blank">
+        
+        <i class="fa-brands fa-linkedin" title="Seattle Municipal Court LinkedIn"></i>
+
+    </a>
+    <a id="x188514_deptFooter" class="socialMediaContactItem" href="https://courts.seattle.gov/" target="_blank">
+        
+        <i class="fa-brands fa-wordpress" title="Seattle Municipal Court Blog"></i>
+
+    </a>
+</div>
+
+                        </section>
+
+                        
+                        <div class="subsribeNewsletter" id="subsribeNewsletter">
+                            <p class="subscribeLinkHeader">Sign Up for Latest Updates</p>
+                            <a href="https://public.govdelivery.com/accounts/WASEATTLE/subscriber/topics?qsp=WASEATTLE_21" title="Subscribe to Newsletter" class="btn-default" role="button" target="_blank">
+                                Subscribe <i class="far fa-external-link" title="external link"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 footerContainer" id="seaFooter18Col2">
+                        <h2>Citywide Information </h2>
+                        <ul>
+                            <li><a href="elected-officials" target="_blank"    >Elected Officials</a>
+</li>
+                            <li><a href="https://data.seattle.gov/" target="_blank"    >Open Data Portal</a>
+</li>
+                            <li><a href="public-records" target="_blank"    >Public Records</a>
+</li>
+                            <li><a href="holidays-and-closures"     >City Holidays and Closures</a>
+</li>
+                        </ul>
+                        <ul id="seaFooter20-col2Links">
+                                <li id="seaFooter20-col2Link0">
+                                    <i class="fas fa-newspaper"></i>
+                                    <a href="event-calendar" target="_blank"    >City Event Calendar</a>
+
+                                </li>
+                                <li id="seaFooter20-col2Link1">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <a href="https://public.govdelivery.com/accounts/WASEATTLE/subscriber/new" target="_blank"    >City Newsletters</a>
+
+                                </li>
+                                <li id="seaFooter20-col2Link2">
+                                    <i class="fas fa-envelope-open-text"></i>
+                                    <a href="departments"     >Departments & Offices</a>
+
+                                </li>
+                                <li id="seaFooter20-col2Link3">
+                                    <i class="fas fa-address-card"></i>
+                                    <a href="boards-and-commissions"     >Boards & Commissions</a>
+
+                                </li>
+
+                        </ul>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 footerContainer" id="seaFooter18Col3">
+
+
+
+    <div class="" id="popular-page-wrapper_x155792_footer" data-attr="department-pageList">
+        <h3 class="tileTitle">Popular Pages</h3>
+        <div id="popular-lists_x155792_footer">
+            <ol>
+                    <li><a href="courts/tickets-and-payments/pay-my-ticket"     >Pay My Ticket</a>
+</li>
+                    <li><a href="courts/programs-and-services/marriage-ceremonies/marriage-ceremony-request"     >Marriage Ceremony Request</a>
+</li>
+                    <li><a href="courts/for-attorneys/case-information-and-records"     >Case Information and Documents</a>
+</li>
+                    <li><a href="courts/jury-duty"     >Jury Duty</a>
+</li>
+                    <li><a href="courts/programs-and-services/community-resource-center"     >Community Resource Center</a>
+</li>
+            </ol>
+        </div>
+    </div>
+
+                    </div>
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 departmentDisclaimer">
+                        <div class="deptFooterCopy">
+                            <p style="text-align: center;"><strong>Hours:</strong> Monday - Friday 8 a.m. - 5 p.m. Closed <strong><a href="/courts/about-us/contact-information-and-hours/court-holidays">Holidays</a></strong>.<br /><strong>Contact Us:</strong> (206) 684-5600 or <strong><a href="/courts/programs-and-services/customer-service">Customer Service</a></strong>. <br /> <strong><a href="/courts/en-español">En Espa&ntilde;ol</a></strong></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+            </div>
+
+<footer aria-label="Global city links">
+    
+        <div class="clearfix"></div>
+        <div class="footerBottom18Wrapper">
+            <div class="container" id="footerBottom18">
+                <div class="row borderBottomNone">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 footerContainer copyRight">
+                        <div class="cosLogo"></div>               
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 footerContainer subLinks">
+                        <h2 class="hidden">Policies</h2>
+                            <span class="link">
+                                <a href="digital"     >About Our Digital Properties</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="tech/data-privacy/privacy-statement"     >Privacy Policy</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="americans-with-disabilities-act"     >Title II: Americans with Disabilities Act</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="civilrights/laws-we-enforce/title-vi-civil-rights-act"     >Title VI: Civil Rights Act</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="//www.seattle.gov/sitemap"     >Sitemap</a>
+
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+</footer>
+
+
+    
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/jquery-ui-1.13.1.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" crossorigin=anonymous integrity=sha512-Velp0ebMKjcd9RiCoaHhLXkR1sFoCCWXNp6w4zj1hfMifYB5441C+sKeBl/T/Ka6NjBiRfBBQRaQq65ekYz3UQ==  />
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/anda.css" media=all />
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300" media=all />
+        <link rel="stylesheet" type="text/css" href="cms_resources/js/sea_swipe/sea_swipe.min.css?v=8" />
+            <link rel="stylesheet" type="text/css" href="cms_resources/vue/components/css/leftNavComponent.css" />
+            <link rel="stylesheet" type="text/css" href="cms_resources/vue/components/css/globalHeader.css" />
+            <link rel="stylesheet" type="text/css" href="cms_resources/vue/components/css/megaMenu.css?v=3" />
+
+    <link rel="shortcut icon" href="/images/2015_IMG/logoHome.png" />
+                <link rel="stylesheet" type="text/css" href="prebuilt/css/departments/court/courts.css" />
+
+
+    
+        <script type="text/javascript" src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/bootstrap-3.3.7.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.localScroll.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/fontawesome.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/solid.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/regular.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/light.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/brands.min.js"></script>
+		<script defer type="text/javascript" src="cms_resources/js/Subsetter/custom-icons.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/application_bootstrap.min_shared2016.min_script2015_082516.min.js"></script>
+        <script async defer type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.easy-autocomplete.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/SearchResults.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/slick.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.galleryview-1.1.min_jquery.timers-1.2.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin=anonymous integrity=sha512-Y2IiVZeaBwXG1wSV7f13plqlmFOx8MdjuHyYFVoYzhyRr3nH/NMDjTBSswijzADdNzMyWNetbLMfOpIPl6Cv9g==></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js"  ></script>
+        <script type="text/javascript" src="cms_resources/js/sea_swipe/sea_swipe.min.js?v=8"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.highlight.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/parallax.js/1.5.0/parallax.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.scrollTo.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/translate-vue_gt.js"></script>
+        <script type="text/javascript" src="cms_resources/js/packery-mode.pkgd.min.js"></script>
+            <script type="text/javascript" src="cms_resources/js/siteimprove_analytics.js"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/chunk-vendors.js?v=3"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/app.js"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/leftNavComponent.js"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/globalHeader.js"></script>   
+            <script type="text/javascript" src="cms_resources/vue/components/js/megaMenu.js?v=3"></script>
+
+    
+
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="/prebuilt/js/html5.js"></script>
+        <script type="text/javascript" src="/prebuilt/js/respond.min.js"></script>
+    <![endif]-->
+
+        <script type="text/javascript" src="/prebuilt/js/departments/court/courts.js"></script>
+
+    <script>
+        dataLayer.push({'audience': 'living'});
+    </script>
+</body>
+</html>
+
+

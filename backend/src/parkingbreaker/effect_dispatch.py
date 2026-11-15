@@ -23,6 +23,7 @@ from parkingbreaker.lob_submission import (
     MetadataLookup,
     pending_evidence,
 )
+from parkingbreaker.mail_attempt_store import PreparedMailAttempt
 from parkingbreaker.payment_coordinator import run_payment_step
 from parkingbreaker.payment_records import PaymentClient
 from parkingbreaker.payment_state import EXPIRY_MARGIN, PaymentEffect, PaymentState
@@ -120,6 +121,7 @@ def dispatch_once(
     *,
     case_id: str | None = None,
     deadline_feasible: Callable[[str, datetime], bool] | None = None,
+    validate_prepared: Callable[[PreparedMailAttempt], None] | None = None,
 ) -> int:
     """One due submission and payment call per case, with crash-safe process ownership.
 
@@ -192,6 +194,7 @@ def dispatch_once(
                         clock=clock,
                         new_effect_id=new_id,
                         already_owned=True,
+                        validate_prepared=validate_prepared,
                     )
                     processed += 1
                     case = store.get_case(token)
@@ -257,6 +260,7 @@ def dispatch_once(
                             clock=clock,
                             new_effect_id=new_id,
                             already_owned=True,
+                            validate_prepared=validate_prepared,
                         )
                     except SubmissionPaused:
                         # A held create intent is scheduling inactivity, not a rejection,

@@ -12,6 +12,7 @@ import base64
 import contextlib
 import hashlib
 import hmac
+import io
 import json
 import logging
 import os
@@ -26,6 +27,7 @@ from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import TypeAdapter
+from pypdf import PdfReader
 
 from parkingbreaker import case_state, prices
 from parkingbreaker.address_disclosure import DISCLOSURE_SHA256, DISCLOSURE_TEXT, DISCLOSURE_VERSION
@@ -173,7 +175,11 @@ from parkingbreaker.lob_webhook import (
     usps_return_reason,
 )
 from parkingbreaker.lob_webhook import verify_webhook as verify_lob_webhook
-from parkingbreaker.mail_attempt_store import PreparationConflict, StorageCorruption
+from parkingbreaker.mail_attempt_store import (
+    PreparationConflict,
+    PreparedMailAttempt,
+    StorageCorruption,
+)
 from parkingbreaker.mail_config import MailClass
 from parkingbreaker.mail_request import envelope_sha256, validate_request
 from parkingbreaker.mail_timing import DeadlineRule, latest_safe_send_date
@@ -4352,6 +4358,73 @@ class CaseService:
         for row in self._store.backlog_for_case(token, WEBHOOK_REPLAY_BATCH):
             self._replay_row(row)
 
+    def _validate_prepared_packet(self, prepared: PreparedMailAttempt) -> None:
+        """Recheck existing approved bytes using the approval path's current context.
+
+        Called under submission ownership immediately before create. It reads saved
+        facts/templates/copies, never authors, rebuilds or mutates the frozen packet.
+        """
+        case = self._store.get_case(prepared.case_token)
+        record = None if case is None else self._store.intake_for_workspace(case.workspace_token)
+        if record is None or record.case_token != prepared.case_token:
+            raise ServiceConflict("research_not_ready")
+        saved = self._store.get_draft(record.intake_id)
+        research = self._store.get_research(record.intake_id)
+        manifest = self._store.get_approval_manifest(prepared.case_token, prepared.attempt)
+        if (
+            saved is None
+            or research is None
+            or manifest is None
+            or saved.adopted_by is None
+            or saved.adopted_at is None
+        ):
+            raise ServiceConflict("research_not_ready")
+        result = decode_research(research.research_json)
+        intake = s.SubmitIntake.model_validate_json(record.intake_json)
+        plan = replace(
+            result.packet_plan, customer_fields=_intake_form_plan(intake).customer_fields
+        )
+        copy_view, copies = self._required_copy_state(record, research)
+        if copy_view is not None and not copy_view.ready:
+            raise ServiceConflict("required_copies_not_ready")
+        declarations = declarations_for(result.findings, result.sources, result.ticket)
+        affirmed = affirmation_map(manifest.affirmations)
+        if unknown_affirmations(declarations, affirmed) or unaffirmed_required(
+            declarations, affirmed
+        ):
+            raise ServiceConflict("declaration_unaffirmed")
+        # A free re-mail changes only the destination block. Its manifest retains
+        # the original adoption hash; derive the constrained redirected text here
+        # rather than treating that original hash as the new PDF's text identity.
+        approved_hash = manifest.approved_text_sha256
+        if text_sha256(saved.letter_text) != approved_hash:
+            raise ServiceConflict("adopt_current_text_first")
+        packet_text_hash = approved_hash
+        if prepared.attempt == 2:
+            original = self._store.get(prepared.case_token, 1)
+            if original is None:
+                raise ServiceConflict("research_not_ready")
+            packet_text_hash = text_sha256(
+                redirect_letter_address(
+                    saved.letter_text, original.request.recipient, prepared.request.recipient
+                )
+            )
+        packet = Packet(
+            prepared.request.pdf,
+            manifest.packet_pdf_sha256,
+            packet_text_hash,
+            len(PdfReader(io.BytesIO(prepared.request.pdf)).pages),
+        )
+        approval_gate(
+            Adoption(saved.adopted_by, saved.adopted_at, packet_text_hash),
+            packet,
+            research=result,
+            answers=decode_answers(research.answers_json),
+            packet_plan=plan,
+            citation_number=intake.ticket.citation_number,
+            required_copies=copies,
+        )
+
     def _dispatch(self, token: str | None) -> int:
         if self._deps.lob is None:
             return 0
@@ -4364,6 +4437,7 @@ class CaseService:
             self._deps.new_id,
             case_id=token,
             deadline_feasible=self._mailing_deadline_feasible,
+            validate_prepared=self._validate_prepared_packet,
         )
         self._replay_case_webhooks(token)
         return processed
@@ -4467,7 +4541,12 @@ class CaseService:
         prepared = self._store.get(token, 1)
         if saved is None or prepared is None:
             raise ServiceConflict("research_not_ready")
-        timing = decode_research(saved.research_json).resolve(decode_answers(saved.answers_json))
+        try:
+            timing = decode_research(saved.research_json).resolve(
+                decode_answers(saved.answers_json)
+            )
+        except (ValueError, StorageCorruption):
+            raise ServiceConflict("research_not_ready") from None
         if timing.deadline is None or timing.counting is None or timing.counting.disclose:
             raise ServiceConflict("research_not_ready")
         return timing.deadline_feasible(production_date(now), prepared.request.options.mail_class)

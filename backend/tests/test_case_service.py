@@ -426,7 +426,7 @@ async def test_window_deadline_survives_restart(tmp_path: Path) -> None:
 
 
 async def researched_case(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, result: object
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, result: object, *, free_beta: bool = False
 ) -> tuple[AsyncClient, CaseService, str]:
     from parkingbreaker import case_service
     from parkingbreaker.case_service import ResearchDeps
@@ -437,7 +437,12 @@ async def researched_case(
         calls.append(kwargs.get("remaining_time"))
         if isinstance(result, Exception):
             raise result
-        return result
+        from parkingbreaker.research.run import ResearchResult
+        from prepared_packet_support import fetched_at
+
+        return (
+            fetched_at(result, real._deps.clock()) if isinstance(result, ResearchResult) else result
+        )
 
     monkeypatch.setattr(case_service, "run_research", run)
     unused: Any = object()
@@ -449,7 +454,32 @@ async def researched_case(
     _workspace, receipt = await submit(client, INTAKE)
     case = receipt["case_id"]
     await client.put(f"/cases/{case}/tier", headers=ALICE, json={"tier": "CERTIFIED"})
-    await client.post(f"/cases/{case}/authorization", headers=ALICE, json=PM)
+    if free_beta:
+        from parkingbreaker.beta_store import BETA_DISCLOSURE_SHA256
+        from parkingbreaker.service_phase import ServicePhase
+
+        store = real._store
+        offer = real.pre_hold(case)
+        assert isinstance(offer, s.Offer)
+        issuer = offer.issuer.issuer_id
+        digest = "a" * 64
+        store.create_beta_campaign(
+            "beta-1",
+            NOW - timedelta(days=1),
+            NOW + timedelta(days=10),
+            "synthetic-identity",
+            "synthetic-approval",
+            NOW,
+        )
+        store.bind_beta_jurisdiction("beta-1", issuer, "synthetic-jurisdiction", digest, NOW)
+        store.qualify_beta_candidate("beta-1", case, digest, NOW + timedelta(days=1), NOW)
+        store.select_beta_batch("beta-1", "batch-1", "synthetic-release", NOW)
+        object.__setattr__(real._deps, "service_phase", ServicePhase.CONTROLLED_FREE_BETA)
+        real.accept_beta(
+            case, s.AcceptBeta(terms_accepted=True, disclosure_sha256=BETA_DISCLOSURE_SHA256)
+        )
+    else:
+        await client.post(f"/cases/{case}/authorization", headers=ALICE, json=PM)
     return client, real, case
 
 
@@ -531,14 +561,14 @@ async def test_photo_upload_validates_images(api: AsyncClient) -> None:
 
 
 async def drafting_case(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, free_beta: bool = False
 ) -> tuple[AsyncClient, CaseService, str]:
     from parkingbreaker.appeal.drafting import Draft, DraftSentence
     from parkingbreaker.appeal.fakes import FakeDrafter
     from test_tier_acceptance import extract_case, model_answers
 
     result, _llm, _searcher = extract_case(model_answers())
-    client, real, case = await researched_case(tmp_path, monkeypatch, result)
+    client, real, case = await researched_case(tmp_path, monkeypatch, result, free_beta=free_beta)
     statement = INTAKE["customer_position"]["statement"]
     object.__setattr__(
         real._deps,

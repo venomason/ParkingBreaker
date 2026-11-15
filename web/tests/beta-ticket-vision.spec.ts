@@ -141,6 +141,65 @@ async function workspaceStatus(page: Page, workspaceId: string) {
   return call(page, "GET", `/workspaces/${workspaceId}/ticket-reading`) as Promise<Record<string, unknown>>;
 }
 
+test.describe("actual photo upload boundary", () => {
+  test.skip(!base || !privateApi || !worker, "requires isolated HTTPS required-mode rehearsal");
+
+  test("unsupported and corrupt files cannot start work; JPEG/PNG recovery succeeds", async ({ page }) => {
+    const mutations: string[] = [];
+    const uploads: string[] = [];
+    page.on("request", request => {
+      if (request.method() !== "POST") return;
+      const path = new URL(request.url()).pathname;
+      mutations.push(path);
+      if (path.endsWith("/photos")) uploads.push(request.postDataJSON().content_type);
+    });
+    await beginVision(page);
+    await expect(page.locator("#ticketPhotoFormats")).toContainText("PDFs, HEIC");
+    const input = page.locator("#visionFrontPhoto");
+    await expect(input).toBeEnabled();
+    const error = page.locator("#ticketVision [role=alert]");
+    for (const file of [
+      { name: "ticket.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 synthetic") },
+      { name: "ticket.heic", mimeType: "image/heic", buffer: Buffer.from("synthetic HEIC") },
+      { name: "ticket.svg", mimeType: "image/svg+xml", buffer: Buffer.from("<svg/>") },
+      { name: "ticket.gif", mimeType: "image/gif", buffer: Buffer.from("GIF89a") },
+      { name: "empty.png", mimeType: "image/png", buffer: Buffer.alloc(0) },
+      { name: "large.jpg", mimeType: "image/jpeg", buffer: Buffer.alloc(10_000_001) },
+    ]) {
+      await input.setInputFiles(file);
+      await expect(error).toContainText("was not uploaded");
+      await expect(page.locator("#visionReadBtn")).toBeDisabled();
+      await expect(page.locator("#visionFrontSaved")).toHaveCount(0);
+    }
+    expect(uploads).toEqual([]);
+    for (const file of [
+      { name: "corrupt.png", mimeType: "image/png", buffer: Buffer.from("\x89PNG\r\n\x1a\ncorrupt", "binary") },
+      { name: "disguised.jpg", mimeType: "image/jpeg", buffer: Buffer.from("%PDF-1.4 synthetic") },
+    ]) {
+      const rejected = page.waitForResponse(response => new URL(response.url()).pathname.endsWith("/photos") && response.request().method() === "POST");
+      await input.setInputFiles(file);
+      expect((await rejected).status()).toBe(409);
+      await expect(error).toContainText("was not saved");
+      await expect(page.locator("#visionReadBtn")).toBeDisabled();
+    }
+    const jpeg = await page.evaluate(() => {
+      const canvas = document.createElement("canvas"); canvas.width = 160; canvas.height = 80;
+      const context = canvas.getContext("2d")!;
+      context.fillStyle = "white"; context.fillRect(0, 0, 160, 80);
+      context.fillStyle = "black"; context.fillText("SYNTHETIC TICKET", 5, 30);
+      return canvas.toDataURL("image/jpeg").split(",")[1];
+    });
+    await input.setInputFiles({ name: "valid.jpg", mimeType: "image/jpeg", buffer: Buffer.from(jpeg, "base64") });
+    await expect(page.locator("#visionFrontSaved")).toBeVisible();
+    await page.locator("#visionBackPhoto").setInputFiles({ name: "valid.png", mimeType: "image/png", buffer: syntheticPng(120) });
+    await expect(page.locator("#visionBackSaved")).toBeVisible();
+    await expect(error).toHaveCount(0);
+    await expect(page.locator("#visionReadBtn")).toBeEnabled();
+    expect(uploads).toEqual(["image/png", "image/jpeg", "image/jpeg", "image/png"]);
+    expect(mutations.filter(path => /\/(ticket-reading|ticket-review|intake|authorization|beta-acceptance|submit)$/.test(path))).toEqual([]);
+  });
+});
+
 test.describe("ticket draft persistence units", () => {
   const legacyValues = {
     ...Object.fromEntries(LIVE_FIELDS.map((field) => [`field.${field.k}`, `saved ${field.k}`])),

@@ -425,8 +425,13 @@ def plain_to_text(text: str) -> str:
     return "\n\n".join(p for p in paragraphs if p)
 
 
+def pdf_lines_to_text(raw: str) -> str:
+    """Preserve PDF line boundaries needed to distinguish form labels and declarations."""
+    return "\n".join(" ".join(line.split()) for line in raw.splitlines()).strip()
+
+
 def pdf_to_text(body: bytes) -> str | None:
-    """Text layer of a PDF under the plain-text paragraph rules.
+    """Text layer of a PDF retaining its line boundaries.
 
     None when the file is unreadable, encrypted, longer than MAX_PDF_PAGES or has no
     text layer (a scanned image): research must not cite what it cannot read.
@@ -434,7 +439,7 @@ def pdf_to_text(body: bytes) -> str | None:
     raw = extract_pdf_text(body)
     if raw is None:
         return None
-    text = plain_to_text(raw)
+    text = pdf_lines_to_text(raw)
     return text or None
 
 
@@ -548,7 +553,7 @@ def fetch_source(
             media in _SNIFFED_TYPES and response.body.startswith(b"%PDF-")
         ):
             raw_pdf_text = bounded_pdf_text(response.body)
-            pdf_text = None if raw_pdf_text is None else (plain_to_text(raw_pdf_text) or None)
+            pdf_text = None if raw_pdf_text is None else (pdf_lines_to_text(raw_pdf_text) or None)
             if pdf_text is None:
                 return FetchFailure(url, f"PDF has no readable text at {current}")
             media, text = "application/pdf", pdf_text

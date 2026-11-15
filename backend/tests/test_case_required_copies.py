@@ -139,6 +139,8 @@ async def test_complete_copy_survives_restart_and_exact_preview_is_prepared(
         prepared = restarted._store.get(record.case_token, 1)
         assert prepared is not None
         assert prepared.request.pdf == pdf
+        # Dispatch reuses current copy selections and approved bytes, not a rebuilt packet.
+        restarted._validate_prepared_packet(prepared)
         locked = await client.put(
             f"/cases/{case}/required-copies",
             headers=ALICE,

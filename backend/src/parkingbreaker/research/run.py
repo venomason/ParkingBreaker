@@ -164,6 +164,26 @@ class ResearchResult:
             self.sources,
         )
 
+    def evidence_current_at(self, now: datetime) -> bool:
+        """Bound a new submission by the original research and fetched evidence ages.
+
+        This is a same-case freshness ceiling, not cross-case reuse permission or a
+        source refresh. Never renew it when an answer, approval or retry is recorded.
+        Lookup of an earlier send intent does not require current procedural evidence.
+        """
+        times = (self.started_at, self.finished_at, now, *(s.retrieved_at for s in self.sources))
+        return (
+            bool(self.sources)
+            and all(value.tzinfo is not None and value.utcoffset() is not None for value in times)
+            and self.started_at <= self.finished_at <= now
+            and now - self.started_at < RESEARCH_REUSE_WINDOW
+            and all(
+                timedelta(0) <= now - source.retrieved_at < RESEARCH_REUSE_WINDOW
+                and source.retrieved_at <= self.finished_at
+                for source in self.sources
+            )
+        )
+
     def reusable_for(self, ticket: Ticket, now: datetime, new_hashes: Mapping[str, str]) -> bool:
         """Reuse a saved result only for the exact ticket that produced its conclusions.
 

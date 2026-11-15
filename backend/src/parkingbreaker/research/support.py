@@ -585,6 +585,25 @@ def address_purpose_problem(value: JsonValue, quote: str) -> str | None:
     return _purpose_problem(value, quote) if address_matches(value, quote) else None
 
 
+_DIRECT_DECLARATION = r"I declare that the foregoing is true and correct[.:]?"
+
+
+def direct_declaration(text: str) -> str | None:
+    """A complete printed declaration line; never truncate a longer statement."""
+    match = re.search(rf"^{_DIRECT_DECLARATION}$", text, re.M)
+    return None if match is None else match.group()
+
+
+def signed_declaration_block(text: str) -> str | None:
+    """Exact declaration followed by the form's signature and date fields."""
+    match = re.search(
+        rf"^{_DIRECT_DECLARATION}\n+(?i:SIGNATURE)(?:[ \t]+|\n+)(?i:DATE)$",
+        text,
+        re.M,
+    )
+    return None if match is None else match.group()
+
+
 def value_supported_by_quote(key: FactKey, value: JsonValue, quote: str) -> bool:
     """True when `quote` states `value` for `key` by the rules in this module's docstring."""
     lowered = quote.lower()
@@ -677,6 +696,10 @@ def value_supported_by_quote(key: FactKey, value: JsonValue, quote: str) -> bool
             if not value:
                 return _states_absence(key, quote)
             supported = all(isinstance(v, str) and _contains(v, quote) for v in value)
+            if key is FactKey.SIGNATURE_REQUIREMENT:
+                block = signed_declaration_block(quote)
+                if block is not None and " ".join(quote.split()) == " ".join(block.split()):
+                    return supported
             if key in RULE_KEYS:
                 # A noun mentioned on a page does not establish a compulsory condition.
                 topics = {

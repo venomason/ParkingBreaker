@@ -262,7 +262,7 @@ test.describe("labelled injected states (the fake backend cannot yet produce the
     await expect(page.locator("#pillT")).toHaveText("Closed");
     await shot(page, "375-window-expired-injected");
     await page.unroute("**/api/cases/*/status");
-    await page.getByRole("button", { name: "Check saved status" }).click();
+    await page.getByRole("button", { name: "Check my appeal" }).click();
     await expect(page.locator(".guard")).toHaveCount(0, { timeout: 15000 });
     await shot(page, "375-window-recovered");
     note("375-window-expired", { injected: true, recovered: true });

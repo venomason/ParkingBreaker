@@ -151,7 +151,7 @@ async def test_scheduled_stage_does_not_reuse_initial_request_as_its_rule() -> N
     # A different stage cannot reuse initial-stage findings as verified requirements.
     scheduled = replace(result.ticket, stage="scheduled hearing")
     assert unsupported_workflow_requirements(scheduled, result.findings, result.sources) == ()
-    assert not result.reassess().resolve().ready
+    assert not replace(result, ticket=scheduled).reassess().resolve().ready
 
 
 def test_austin_saved_payment_wording_is_not_contest_evidence() -> None:

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ConciergeMark } from "./ConciergeMark";
 import { Icon } from "./Icons";
 import { TicketFactReview } from "./TicketFactReview";
+import { PHOTO_UPLOAD_GUIDANCE } from "../lib/api";
 import type {
   TicketDiscrepancyResolution,
   TicketReadingSnapshot,
@@ -329,8 +330,9 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
           <section className="card" id="ticketVision" aria-labelledby="visionTitle" aria-busy={Boolean(vision.busy)}>
             <p className="eyebrow">Read from your photos</p>
             <h2 id="visionTitle" style={{ margin: "4px 0 8px" }}>Your ticket photos</h2>
+            <p id="ticketPhotoFormats" className="muted small">{PHOTO_UPLOAD_GUIDANCE}</p>
             <p className="muted small" style={{ marginBottom: "10px" }}>
-              JPEG or PNG only. The front photo is required. Your uploaded photos are processed by an AI reading
+              The front photo is required. Your uploaded photos are processed by an AI reading
               service, which may see your plate, name or address printed on the ticket. The reading is only a set of
               suggestions; you confirm every fact below.
             </p>
@@ -342,8 +344,9 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
                 <input
                   id="visionFrontPhoto"
                   type="file"
+                  aria-describedby="ticketPhotoFormats"
                   accept="image/jpeg,image/png"
-                  disabled={Boolean(vision.busy)}
+                  disabled={Boolean(vision.busy) || vision.checking}
                   onChange={(event) => vision.onPickPhoto("ticket", event.target.files?.[0] ?? null)}
                 />
                 {vision.frontRef && <span className="small" id="visionFrontSaved">Front photo saved for this appeal.</span>}
@@ -353,8 +356,9 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
                 <input
                   id="visionBackPhoto"
                   type="file"
+                  aria-describedby="ticketPhotoFormats"
                   accept="image/jpeg,image/png"
-                  disabled={Boolean(vision.busy)}
+                  disabled={Boolean(vision.busy) || vision.checking}
                   onChange={(event) => vision.onPickPhoto("back", event.target.files?.[0] ?? null)}
                 />
                 {vision.backRef && <span className="small" id="visionBackSaved">Back photo saved for this appeal.</span>}

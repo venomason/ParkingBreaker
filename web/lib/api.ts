@@ -207,6 +207,17 @@ export function fileToBase64(file: Blob): Promise<string> {
   });
 }
 
+export const PHOTO_UPLOAD_GUIDANCE = "This beta accepts JPEG or PNG photos up to 10 MB each. PDFs, HEIC and other formats are not supported. Export a clear JPEG/PNG copy or photograph the paper original, keeping every edge and printed detail visible.";
+
+function checkPhotoUpload(file: Blob): void {
+  if (file.type !== "image/jpeg" && file.type !== "image/png") {
+    throw new ApiError(0, "photo_type_not_supported");
+  }
+  if (!file.size || file.size > 10_000_000) {
+    throw new ApiError(0, "photo_size_invalid");
+  }
+}
+
 function validatePricingAssignment(assignment: PricingAssignment): PricingAssignment {
   const validExperiment = typeof assignment.experiment_id === "string" && assignment.experiment_id.length > 0;
   const legacy = assignment.amount_cents === null && assignment.arm === null;
@@ -264,11 +275,13 @@ export const api = {
   },
   saveIntakeForm: (w: string, revision: number, form: IntakeForm) => call<WorkspaceView>("PUT", `/workspaces/${w}/intake-form`, { expected_revision: revision, form }),
   workspace: (w: string) => call<WorkspaceView>("GET", `/workspaces/${w}`),
-  uploadPhoto: async (w: string, file: Blob) =>
-    call<PhotoRef>("POST", `/workspaces/${w}/photos`, {
-      content_type: file.type === "image/png" ? "image/png" : "image/jpeg",
+  uploadPhoto: async (w: string, file: Blob) => {
+    checkPhotoUpload(file);
+    return call<PhotoRef>("POST", `/workspaces/${w}/photos`, {
+      content_type: file.type,
       data_base64: await fileToBase64(file),
-    }),
+    });
+  },
   // Owner-scoped ticket path. The caller supplies a stable request/command id so a lost
   // response can be replayed without a second paid call.
   ticketReadingStatus: (w: string) => call<TicketReadingStatus>("GET", `/workspaces/${w}/ticket-reading`),

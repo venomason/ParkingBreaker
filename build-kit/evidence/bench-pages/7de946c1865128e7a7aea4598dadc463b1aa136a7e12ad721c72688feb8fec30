@@ -1,0 +1,1488 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" class="GlobalMegaMenu_FF LeftNavVue_FF TopNavVueJS_FF Tabs2021_FF RssCard_FF OfficialBanner_FF GlobalFooterSocialMedia_FF PhotoGallery_FF JWPlayerUrlSigning_FF PE_Prod_FF useSiteImprove_FF boardCommissionHomeColorBlockAndBanner_FF">
+<head>
+    <script>
+        dataLayer = [{
+        }];
+        var GlobalMegaMenu_FF = true;
+		var LeftNavVue_FF = true;
+		var TopNavVueJS_FF = true;
+		var Tabs2021_FF = true;
+		var RssCard_FF = true;
+		var OfficialBanner_FF = true;
+		var GlobalFooterSocialMedia_FF = true;
+		var PhotoGallery_FF = true;
+		var JWPlayerUrlSigning_FF = true;
+		var PE_FF = false;
+		var PE_QA_FF = false;
+		var PE_Prod_FF = true;
+		var useBugHerd_FF = false;
+		var useSiteImprove_FF = true;
+		var QaBannerOn_FF = false;
+		var enableFaStylePackage_FF = false;
+		var boardCommissionHomeColorBlockAndBanner_FF = true;
+		var TranslateAPI_FF = false;
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
+<link rel="canonical" href="https://www.seattle.gov/courts/for-attorneys/local-court-rules" />
+        <!-- Google Tag Manager -->
+        <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || []; w[l].push({
+                    'gtm.start':
+                        new Date().getTime(), event: 'gtm.js'
+                }); var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-PXQBQ2');
+        </script>
+        <!-- End Google Tag Manager -->
+            <title>Local Court Rules - Courts | seattle.gov</title>
+            <meta name="description" content="Local Court Rules" />
+            <meta name="keywords" content="" />
+            <meta name="robots" content="" />
+                <base href="/" />
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/bootstrap-3.3.7.min.css"  />
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/responsive2015.min.css"  />
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/shared2016.min.css"  />
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin=anonymous integrity=sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=></script>     
+        <script type="text/javascript" src="https://www.trumba.com/scripts/spuds.js"></script>
+            <script type="text/javascript" src="cms_resources/js/axios.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jwplayer.com/libraries/Ctujouh4.js?exp=1794755766514&amp;sig=d9488c0a20a3f5cc187817fadcf2cb44"></script>
+
+
+    
+    
+
+
+<script>
+    var pageXID = 'x82731';
+    var topNavXID = 'x56939';
+    var languagesListXID = 'x121473';
+    var isDepartmentMode = 'True';
+    var leftNavTreeXID = 'x82726';
+    var tabComponentID = '';
+</script>
+</head>
+<body class="aws100" >
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="//www.googletagmanager.com/ns.html?id=GTM-PXQBQ2"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    
+<!--wrapper start-->
+
+
+
+
+    <header>
+        <div id="header">
+            
+                    <div id="vue-component-globalHeader"></div>
+            <nav id="slideMenuNav" aria-label="Slide menu navigation">
+                <ul id="seagovMenuMobile" class="list-group slidemenu-right" title="Main Menu" data-departmentname="Courts" data-departmenturl="courts">
+                    
+                    <li class="list-group-item first" id="closeMobileContainer">
+                        <button id="mainMenuCloseMobile" aria-label="Close">
+                            Close <i class="fa-regular fa-times" title="Close" aria-label="Close"></i>
+                        </button>
+                    </li>
+                    <li id="currentMenuContextWrapper" class="list-group-item">
+                        <ul id="currentMenuContext">
+                                <li id="backReturn" class="list-group-item seattleHomeMobile" data-menuTarget="Seattle.gov">
+                                    <span class='fa-regular fa-chevron-left' title="Back to" aria-label="Back to"></span>
+                                    <span id="backReturnText">Main Menu</span><span class="fa-regular fa-chevron-right" title="Back to Main Menu" aria-label="Back to Main Menu"></span>
+                                </li>
+                                    <li id="activeMobileHeading" class="list-group-item deptHomeMobile"><a href="courts"     >Courts</a>
+</li>
+        <li class="list-group-item navItem utility button" data-parenttarget="Home"><a href="courts/tickets-and-payments/pay-my-ticket"  class="title"  title="Main Menu Mobile - Home Pay My Ticket" >Pay My Ticket</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/coming-to-court"    title="Main Menu Mobile - Home Coming To Court" >Coming To Court<span class='fa-regular fa-chevron-right' title='Coming To Court' aria-label='Coming To Court Icon'></span></a>
+
+                <ul data-childrentarget="Coming To Court">
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/notification-preferences-for-hearings-and-portal-filings"    title="Main Menu Mobile - Coming To Court Notification Preferences for Hearings and Portal Filings" >Notification Preferences for Hearings and Portal Filings</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/criminal-court"    title="Main Menu Mobile - Coming To Court Criminal Court" >Criminal Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/directions-and-parking"    title="Main Menu Mobile - Coming To Court Directions and Parking" >Directions and Parking</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/security-and-weapons-screening"    title="Main Menu Mobile - Coming To Court Security & Weapons Screening" >Security & Weapons Screening</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/court-building-directory"    title="Main Menu Mobile - Coming To Court Court Building Directory" >Court Building Directory</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/find-your-courtroom"    title="Main Menu Mobile - Coming To Court Find Your Courtroom" >Find Your Courtroom</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/court-rules-and-expectations"    title="Main Menu Mobile - Coming To Court Court Rules & Expectations" >Court Rules & Expectations</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/obtaining-a-public-defender"    title="Main Menu Mobile - Coming To Court Obtaining a Public Defender" >Obtaining a Public Defender</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/representing-yourself-in-court"    title="Main Menu Mobile - Coming To Court Representing Yourself in Court" >Representing Yourself in Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/policy-on-immigration-arrests"    title="Main Menu Mobile - Coming To Court Policy On Immigration Arrests" >Policy On Immigration Arrests</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Coming To Court"><a href="/courts/coming-to-court/court-faqs"    title="Main Menu Mobile - Coming To Court Frequently Asked Questions" >Frequently Asked Questions</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Home"><a href="/courts/virtual-hearings"    title="Main Menu Mobile - Home Virtual Hearings" >Virtual Hearings</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/tickets-and-payments"    title="Main Menu Mobile - Home Tickets & Payments" >Tickets & Payments<span class='fa-regular fa-chevron-right' title='Tickets & Payments' aria-label='Tickets & Payments Icon'></span></a>
+
+                <ul data-childrentarget="Tickets &amp; Payments">
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/ticket-response-options"    title="Main Menu Mobile - Tickets & Payments Ticket Response Options" >Ticket Response Options</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/find-my-ticket-info"    title="Main Menu Mobile - Tickets & Payments Find My Ticket Info" >Find My Ticket Info<span class='fa-regular fa-chevron-right' title='Find My Ticket Info' aria-label='Find My Ticket Info Icon'></span></a>
+
+                <ul data-childrentarget="Find My Ticket Info">
+        <li class="list-group-item navItem" data-parenttarget="Find My Ticket Info"><a href="/courts/tickets-and-payments/find-my-ticket-info/ticket-examples"    title="Main Menu Mobile - Find My Ticket Info My Ticket Information" >My Ticket Information</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/pay-my-ticket"    title="Main Menu Mobile - Tickets & Payments Pay My Ticket" >Pay My Ticket<span class='fa-regular fa-chevron-right' title='Pay My Ticket' aria-label='Pay My Ticket Icon'></span></a>
+
+                <ul data-childrentarget="Pay My Ticket">
+        <li class="list-group-item navItem" data-parenttarget="Pay My Ticket"><a href="/courts/tickets-and-payments/pay-my-ticket/pay-online"    title="Main Menu Mobile - Pay My Ticket Pay Online" >Pay Online</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Pay My Ticket"><a href="/courts/tickets-and-payments/pay-my-ticket/pay-at-customer-service-center"    title="Main Menu Mobile - Pay My Ticket Pay at Customer Service Center" >Pay at Customer Service Center</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Pay My Ticket"><a href="/courts/tickets-and-payments/pay-my-ticket/collections-information"    title="Main Menu Mobile - Pay My Ticket Collections Information" >Collections Information</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now"    title="Main Menu Mobile - Tickets & Payments I Can't Pay My Ticket Right Now" >I Can't Pay My Ticket Right Now<span class='fa-regular fa-chevron-right' title='I Can't Pay My Ticket Right Now' aria-label='I Can't Pay My Ticket Right Now Icon'></span></a>
+
+                <ul data-childrentarget="I Can&#39;t Pay My Ticket Right Now">
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/ticket-debt-reduction-hearings"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Parking and Traffic Ticket Debt Reduction Hearings for Low-Income People" >Parking and Traffic Ticket Debt Reduction Hearings for Low-Income People</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/payment-plan-application"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Payment Plan Application" >Payment Plan Application</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/community-service-plan"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Community Service Plan" >Community Service Plan</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="I Can&#39;t Pay My Ticket Right Now"><a href="/courts/tickets-and-payments/i-cant-pay-my-ticket-right-now/unified-payment-program"    title="Main Menu Mobile - I Can't Pay My Ticket Right Now Unified Payment Program" >Unified Payment Program</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/dispute-my-ticket"    title="Main Menu Mobile - Tickets & Payments Dispute My Ticket" >Dispute My Ticket<span class='fa-regular fa-chevron-right' title='Dispute My Ticket' aria-label='Dispute My Ticket Icon'></span></a>
+
+                <ul data-childrentarget="Dispute My Ticket">
+        <li class="list-group-item navItem" data-parenttarget="Dispute My Ticket"><a href="/courts/tickets-and-payments/dispute-my-ticket/hearings-by-mail"    title="Main Menu Mobile - Dispute My Ticket Hearings By Mail" >Hearings By Mail</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Dispute My Ticket"><a href="/courts/tickets-and-payments/dispute-my-ticket/attending-your-scheduled-hearing"    title="Main Menu Mobile - Dispute My Ticket Attending Your Scheduled Ticket Hearing" >Attending Your Scheduled Ticket Hearing</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Dispute My Ticket"><a href="/courts/tickets-and-payments/dispute-my-ticket/reschedule-a-hearing"    title="Main Menu Mobile - Dispute My Ticket Reschedule a Hearing" >Reschedule a Hearing</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Tickets &amp; Payments">
+                <a href="/courts/tickets-and-payments/my-car-got-booted"    title="Main Menu Mobile - Tickets & Payments What To Do When My Car Got Booted" >What To Do When My Car Got Booted<span class='fa-regular fa-chevron-right' title='What To Do When My Car Got Booted' aria-label='What To Do When My Car Got Booted Icon'></span></a>
+
+                <ul data-childrentarget="What To Do When My Car Got Booted">
+        <li class="list-group-item navItem" data-parenttarget="What To Do When My Car Got Booted"><a href="/courts/tickets-and-payments/my-car-got-booted/scofflaw-faq"    title="Main Menu Mobile - What To Do When My Car Got Booted Scofflaw FAQ" >Scofflaw FAQ</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="What To Do When My Car Got Booted"><a href="/courts/tickets-and-payments/my-car-got-booted/check-for-unpaid-tickets"    title="Main Menu Mobile - What To Do When My Car Got Booted Check For Unpaid Tickets" >Check For Unpaid Tickets</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/my-car-got-towed"    title="Main Menu Mobile - Tickets & Payments My Car Got Towed" >My Car Got Towed</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/vehicle-tabs"    title="Main Menu Mobile - Tickets & Payments Vehicle Registration Tabs" >Vehicle Registration Tabs</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/bought-and-sold-vehicles"    title="Main Menu Mobile - Tickets & Payments Bought and Sold Vehicles" >Bought and Sold Vehicles</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/camera-tickets"    title="Main Menu Mobile - Tickets & Payments Camera Tickets" >Camera Tickets</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/stolen-identity"    title="Main Menu Mobile - Tickets & Payments Stolen Identity" >Stolen Identity</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Tickets &amp; Payments"><a href="/courts/tickets-and-payments/frequently-asked-questions"    title="Main Menu Mobile - Tickets & Payments Frequently Asked Questions" >Frequently Asked Questions</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/jury-duty"    title="Main Menu Mobile - Home Jury Duty" >Jury Duty<span class='fa-regular fa-chevron-right' title='Jury Duty' aria-label='Jury Duty Icon'></span></a>
+
+                <ul data-childrentarget="Jury Duty">
+        <li class="list-group-item navItem" data-parenttarget="Jury Duty"><a href="/courts/jury-duty/received-a-jury-summons---now-what"    title="Main Menu Mobile - Jury Duty Received a Jury Summons - Now What?" >Received a Jury Summons - Now What?</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Jury Duty"><a href="/courts/jury-duty/responding-to-a-jury-summons"    title="Main Menu Mobile - Jury Duty Responding to a Jury Summons" >Responding to a Jury Summons</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Jury Duty">
+                <a href="/courts/jury-duty/reporting-for-jury-duty"    title="Main Menu Mobile - Jury Duty Reporting for Jury Duty" >Reporting for Jury Duty<span class='fa-regular fa-chevron-right' title='Reporting for Jury Duty' aria-label='Reporting for Jury Duty Icon'></span></a>
+
+                <ul data-childrentarget="Reporting for Jury Duty">
+        <li class="list-group-item navItem" data-parenttarget="Reporting for Jury Duty"><a href="/courts/jury-duty/reporting-for-jury-duty/how-a-jury-is-chosen"    title="Main Menu Mobile - Reporting for Jury Duty How a Jury is Chosen" >How a Jury is Chosen</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Reporting for Jury Duty"><a href="/courts/jury-duty/reporting-for-jury-duty/order-of-events-in-a-trial"    title="Main Menu Mobile - Reporting for Jury Duty Order of Events in a Trial" >Order of Events in a Trial</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Jury Duty"><a href="/courts/jury-duty/jury-duty-faq"    title="Main Menu Mobile - Jury Duty Jury Duty FAQ" >Jury Duty FAQ</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/for-attorneys"    title="Main Menu Mobile - Home For Attorneys" >For Attorneys<span class='fa-regular fa-chevron-right' title='For Attorneys' aria-label='For Attorneys Icon'></span></a>
+
+                <ul data-childrentarget="For Attorneys">
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/violations-information"    title="Main Menu Mobile - For Attorneys Violations Information" >Violations Information</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/case-information-and-records"    title="Main Menu Mobile - For Attorneys Case Information and Records" >Case Information and Records</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/court-forms"    title="Main Menu Mobile - For Attorneys Court Forms" >Court Forms</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/civil-cases"    title="Main Menu Mobile - For Attorneys Civil Cases" >Civil Cases</a>
+</li>
+            <li class="list-group-item active navItem hasChildren" data-parenttarget="For Attorneys">
+                <a href="/courts/for-attorneys/local-court-rules"    title="Main Menu Mobile - For Attorneys Local Court Rules" >Local Court Rules<span class='fa-regular fa-chevron-right' title='Local Court Rules' aria-label='Local Court Rules Icon'></span></a>
+
+                <ul data-childrentarget="Local Court Rules">
+        <li class="list-group-item navItem" data-parenttarget="Local Court Rules"><a href="/courts/for-attorneys/local-court-rules/general-administrative-orders"    title="Main Menu Mobile - Local Court Rules General Administrative Orders" >General Administrative Orders</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Local Court Rules"><a href="/courts/for-attorneys/local-court-rules/proposed-rules-for-public-comment"    title="Main Menu Mobile - Local Court Rules Proposed Court Rules for Public Comment" >Proposed Court Rules for Public Comment</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/conflict-attorney-panel-cap"    title="Main Menu Mobile - For Attorneys Conflict Attorney Panel (CAP)" >Conflict Attorney Panel (CAP)</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/for-attorneys/en-banc-rulings"    title="Main Menu Mobile - For Attorneys En Banc Rulings" >En Banc Rulings</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/programs-and-services"    title="Main Menu Mobile - Home Programs & Services" >Programs & Services<span class='fa-regular fa-chevron-right' title='Programs & Services' aria-label='Programs & Services Icon'></span></a>
+
+                <ul data-childrentarget="Programs &amp; Services">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/community-resource-center"    title="Main Menu Mobile - Programs & Services Community Resource Center" >Community Resource Center<span class='fa-regular fa-chevron-right' title='Community Resource Center' aria-label='Community Resource Center Icon'></span></a>
+
+                <ul data-childrentarget="Community Resource Center">
+        <li class="list-group-item navItem" data-parenttarget="Community Resource Center"><a href="/courts/programs-and-services/community-resource-center/crc-calendar"    title="Main Menu Mobile - Community Resource Center Community Resource Center Calendar" >Community Resource Center Calendar</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Community Resource Center"><a href="/courts/programs-and-services/community-resource-center/crc-services"    title="Main Menu Mobile - Community Resource Center CRC Services" >CRC Services</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Community Resource Center"><a href="/courts/programs-and-services/community-resource-center/about-crc"    title="Main Menu Mobile - Community Resource Center About CRC" >About CRC</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Programs &amp; Services"><a href="/courts/programs-and-services/pretrial-services"    title="Main Menu Mobile - Programs & Services Pretrial Services" >Pretrial Services</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/probation-services"    title="Main Menu Mobile - Programs & Services Probation Services" >Probation Services<span class='fa-regular fa-chevron-right' title='Probation Services' aria-label='Probation Services Icon'></span></a>
+
+                <ul data-childrentarget="Probation Services">
+        <li class="list-group-item navItem" data-parenttarget="Probation Services"><a href="/courts/programs-and-services/probation-services/probation-evolution"    title="Main Menu Mobile - Probation Services Probation Evolution" >Probation Evolution</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Services"><a href="/courts/programs-and-services/probation-services/electronic-monitoring"    title="Main Menu Mobile - Probation Services Electronic Monitoring" >Electronic Monitoring</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Services"><a href="/courts/programs-and-services/probation-services/assigned-probation-what-to-expect"    title="Main Menu Mobile - Probation Services Assigned Probation: What To Expect" >Assigned Probation: What To Expect</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/specialized-courts"    title="Main Menu Mobile - Programs & Services Specialized Courts" >Specialized Courts<span class='fa-regular fa-chevron-right' title='Specialized Courts' aria-label='Specialized Courts Icon'></span></a>
+
+                <ul data-childrentarget="Specialized Courts">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Specialized Courts">
+                <a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project"    title="Main Menu Mobile - Specialized Courts Domestic Violence Intervention Project" >Domestic Violence Intervention Project<span class='fa-regular fa-chevron-right' title='Domestic Violence Intervention Project' aria-label='Domestic Violence Intervention Project Icon'></span></a>
+
+                <ul data-childrentarget="Domestic Violence Intervention Project">
+        <li class="list-group-item navItem" data-parenttarget="Domestic Violence Intervention Project"><a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project/domestic-violence-victim-resources"    title="Main Menu Mobile - Domestic Violence Intervention Project Domestic Violence Victim Resources" >Domestic Violence Victim Resources</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Domestic Violence Intervention Project"><a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project/what-happens-in-cases-of-domestic-violence"    title="Main Menu Mobile - Domestic Violence Intervention Project What Happens in Cases of Domestic Violence" >What Happens in Cases of Domestic Violence</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Domestic Violence Intervention Project"><a href="/courts/programs-and-services/specialized-courts/domestic-violence-intervention-project/dv-no-contact-order-faqs-"    title="Main Menu Mobile - Domestic Violence Intervention Project DV No Contact Order FAQs" >DV No Contact Order FAQs</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Specialized Courts"><a href="/courts/programs-and-services/specialized-courts/mental-health-court"    title="Main Menu Mobile - Specialized Courts Mental Health Court" >Mental Health Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Specialized Courts"><a href="/courts/programs-and-services/specialized-courts/seattle-veterans-treatment-court"    title="Main Menu Mobile - Specialized Courts Seattle Veterans Treatment Court" >Seattle Veterans Treatment Court</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Specialized Courts"><a href="/courts/programs-and-services/specialized-courts/seattle-youth-traffic-court"    title="Main Menu Mobile - Specialized Courts Seattle Youth Traffic Court" >Seattle Youth Traffic Court</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/interpreter-services"    title="Main Menu Mobile - Programs & Services Interpreter Services" >Interpreter Services<span class='fa-regular fa-chevron-right' title='Interpreter Services' aria-label='Interpreter Services Icon'></span></a>
+
+                <ul data-childrentarget="Interpreter Services">
+        <li class="list-group-item navItem" data-parenttarget="Interpreter Services"><a href="/courts/programs-and-services/interpreter-services/for-smc-interpreters"    title="Main Menu Mobile - Interpreter Services For SMC Interpreters" >For SMC Interpreters</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Interpreter Services"><a href="/courts/programs-and-services/interpreter-services/for-the-public"    title="Main Menu Mobile - Interpreter Services For The Public" >For The Public</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Interpreter Services">
+                <a href="/courts/programs-and-services/interpreter-services/for-attorneys"    title="Main Menu Mobile - Interpreter Services For Attorneys" >For Attorneys<span class='fa-regular fa-chevron-right' title='For Attorneys' aria-label='For Attorneys Icon'></span></a>
+
+                <ul data-childrentarget="For Attorneys">
+        <li class="list-group-item navItem" data-parenttarget="For Attorneys"><a href="/courts/programs-and-services/interpreter-services/for-attorneys/interpreter-request-form"    title="Main Menu Mobile - For Attorneys Interpreter Request Form" >Interpreter Request Form</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/marriage-ceremonies"    title="Main Menu Mobile - Programs & Services Marriage Ceremonies" >Marriage Ceremonies<span class='fa-regular fa-chevron-right' title='Marriage Ceremonies' aria-label='Marriage Ceremonies Icon'></span></a>
+
+                <ul data-childrentarget="Marriage Ceremonies">
+        <li class="list-group-item navItem" data-parenttarget="Marriage Ceremonies"><a href="/courts/programs-and-services/marriage-ceremonies/marriage-ceremony-faqs"    title="Main Menu Mobile - Marriage Ceremonies Marriage Ceremony FAQs" >Marriage Ceremony FAQs</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Marriage Ceremonies"><a href="/courts/programs-and-services/marriage-ceremonies/marriage-ceremony-request"    title="Main Menu Mobile - Marriage Ceremonies Marriage Ceremony Request" >Marriage Ceremony Request</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Programs &amp; Services"><a href="/courts/programs-and-services/public-records-requests"    title="Main Menu Mobile - Programs & Services Public Records Requests" >Public Records Requests</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/vacating-a-conviction"    title="Main Menu Mobile - Programs & Services Vacating a Conviction" >Vacating a Conviction<span class='fa-regular fa-chevron-right' title='Vacating a Conviction' aria-label='Vacating a Conviction Icon'></span></a>
+
+                <ul data-childrentarget="Vacating a Conviction">
+        <li class="list-group-item navItem" data-parenttarget="Vacating a Conviction"><a href="/courts/programs-and-services/vacating-a-conviction/procedures-for-vacating-a-conviction"    title="Main Menu Mobile - Vacating a Conviction Procedures For Vacating a Conviction" >Procedures For Vacating a Conviction</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Programs &amp; Services"><a href="/courts/programs-and-services/warrants"    title="Main Menu Mobile - Programs & Services Resolving a Warrant" >Resolving a Warrant</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Programs &amp; Services">
+                <a href="/courts/programs-and-services/customer-service"    title="Main Menu Mobile - Programs & Services Customer Service" >Customer Service<span class='fa-regular fa-chevron-right' title='Customer Service' aria-label='Customer Service Icon'></span></a>
+
+                <ul data-childrentarget="Customer Service">
+        <li class="list-group-item navItem" data-parenttarget="Customer Service"><a href="/courts/programs-and-services/customer-service/how-the-court-can-help-you"    title="Main Menu Mobile - Customer Service How the Court Can Help You" >How the Court Can Help You</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/about-us"    title="Main Menu Mobile - Home About Us" >About Us<span class='fa-regular fa-chevron-right' title='About Us' aria-label='About Us Icon'></span></a>
+
+                <ul data-childrentarget="About Us">
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/privacy"    title="Main Menu Mobile - About Us Seattle Municipal Court Privacy Notice " >Seattle Municipal Court Privacy Notice </a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/news-and-blog"    title="Main Menu Mobile - About Us News and Blog" >News and Blog</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/contact-information-and-hours"    title="Main Menu Mobile - About Us Contact Information & Hours" >Contact Information & Hours<span class='fa-regular fa-chevron-right' title='Contact Information & Hours' aria-label='Contact Information & Hours Icon'></span></a>
+
+                <ul data-childrentarget="Contact Information &amp; Hours">
+        <li class="list-group-item navItem" data-parenttarget="Contact Information &amp; Hours"><a href="/courts/about-us/contact-information-and-hours/court-holidays"    title="Main Menu Mobile - Contact Information & Hours Court Holidays" >Court Holidays</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/jail-locations-and-visitation"    title="Main Menu Mobile - About Us Jail Locations and Visitation" >Jail Locations and Visitation</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/seattle-municipal-court-judges"    title="Main Menu Mobile - About Us Seattle Municipal Court Judges" >Seattle Municipal Court Judges<span class='fa-regular fa-chevron-right' title='Seattle Municipal Court Judges' aria-label='Seattle Municipal Court Judges Icon'></span></a>
+
+                <ul data-childrentarget="Seattle Municipal Court Judges">
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-faye-chess"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Faye Chess" >Honorable Faye Chess</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-andrea-chin"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Andrea Chin" >Honorable Andrea Chin</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-anita-crawford-willis"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Anita Crawford-Willis" >Honorable Anita Crawford-Willis</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-willie-gregory"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Willie Gregory" >Honorable Willie Gregory</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Seattle Municipal Court Judges">
+                <a href="/courts/about-us/seattle-municipal-court-judges/honorable-catherine-mcdowall"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Catherine McDowall" >Honorable Catherine McDowall<span class='fa-regular fa-chevron-right' title='Honorable Catherine McDowall' aria-label='Honorable Catherine McDowall Icon'></span></a>
+
+                <ul data-childrentarget="Honorable Catherine McDowall">
+        <li class="list-group-item navItem" data-parenttarget="Honorable Catherine McDowall"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-catherine-mcdowall/chambers-procedures-courtroom-1101"    title="Main Menu Mobile - Honorable Catherine McDowall Chambers Procedures Courtroom 1101" >Chambers Procedures Courtroom 1101</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-damon-shadid"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Damon Shadid" >Honorable Damon Shadid</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court Judges"><a href="/courts/about-us/seattle-municipal-court-judges/honorable-pooja-vaddadi"    title="Main Menu Mobile - Seattle Municipal Court Judges Honorable Pooja Vaddadi" >Honorable Pooja Vaddadi</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/seattle-municipal-court-magistrates"    title="Main Menu Mobile - About Us Seattle Municipal Court Magistrates" >Seattle Municipal Court Magistrates</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/seattle-municipal-court-marshals--security"    title="Main Menu Mobile - About Us Seattle Municipal Court Marshals & Security" >Seattle Municipal Court Marshals & Security</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/community-engagement"    title="Main Menu Mobile - About Us Community Engagement" >Community Engagement<span class='fa-regular fa-chevron-right' title='Community Engagement' aria-label='Community Engagement Icon'></span></a>
+
+                <ul data-childrentarget="Community Engagement">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Community Engagement">
+                <a href="/courts/about-us/community-engagement/outreach-events"    title="Main Menu Mobile - Community Engagement Seattle Municipal Court - Outreach Events" >Seattle Municipal Court - Outreach Events<span class='fa-regular fa-chevron-right' title='Seattle Municipal Court - Outreach Events' aria-label='Seattle Municipal Court - Outreach Events Icon'></span></a>
+
+                <ul data-childrentarget="Seattle Municipal Court - Outreach Events">
+        <li class="list-group-item navItem" data-parenttarget="Seattle Municipal Court - Outreach Events"><a href="/courts/about-us/community-engagement/outreach-events/past-events"    title="Main Menu Mobile - Seattle Municipal Court - Outreach Events Seattle Municipal Court - Past Community Events" >Seattle Municipal Court - Past Community Events</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Community Engagement"><a href="/courts/about-us/community-engagement/partner-engagement"    title="Main Menu Mobile - Community Engagement Partner Engagement " >Partner Engagement </a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Community Engagement"><a href="/courts/about-us/community-engagement/smc-engagement-partners-resource-list"    title="Main Menu Mobile - Community Engagement SMC Engagement Partners Resource List" >SMC Engagement Partners Resource List</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/data-and-publications"    title="Main Menu Mobile - About Us Data & Publications" >Data & Publications<span class='fa-regular fa-chevron-right' title='Data & Publications' aria-label='Data & Publications Icon'></span></a>
+
+                <ul data-childrentarget="Data &amp; Publications">
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Data &amp; Publications">
+                <a href="/courts/about-us/data-and-publications/general-data-reports"    title="Main Menu Mobile - Data & Publications General Data Reports" >General Data Reports<span class='fa-regular fa-chevron-right' title='General Data Reports' aria-label='General Data Reports Icon'></span></a>
+
+                <ul data-childrentarget="General Data Reports">
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/top-10-criminal-charges"    title="Main Menu Mobile - General Data Reports Top 10 Criminal Charges" >Top 10 Criminal Charges</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/criminal-case-filings"    title="Main Menu Mobile - General Data Reports Criminal Case Filings" >Criminal Case Filings</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/court-hearing-volume"    title="Main Menu Mobile - General Data Reports Court Hearing Volume" >Court Hearing Volume</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/vehicle-infractions"    title="Main Menu Mobile - General Data Reports Vehicle Infractions" >Vehicle Infractions</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="General Data Reports"><a href="/courts/about-us/data-and-publications/general-data-reports/traffic-camera-infractions"    title="Main Menu Mobile - General Data Reports Traffic Camera Infractions" >Traffic Camera Infractions</a>
+</li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Data &amp; Publications">
+                <a href="/courts/about-us/data-and-publications/probation-data-reports"    title="Main Menu Mobile - Data & Publications Probation Data Reports" >Probation Data Reports<span class='fa-regular fa-chevron-right' title='Probation Data Reports' aria-label='Probation Data Reports Icon'></span></a>
+
+                <ul data-childrentarget="Probation Data Reports">
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-caseload"    title="Main Menu Mobile - Probation Data Reports Probation Caseload, Status, and Length of Time" >Probation Caseload, Status, and Length of Time</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-reporting-level"    title="Main Menu Mobile - Probation Data Reports Probation Reporting Level" >Probation Reporting Level</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-activity-and-compliance"    title="Main Menu Mobile - Probation Data Reports Probation Activity and Compliance" >Probation Activity and Compliance</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Probation Data Reports"><a href="/courts/about-us/data-and-publications/probation-data-reports/probation-outcomes-revocations-and-hearings"    title="Main Menu Mobile - Probation Data Reports Probation Outcomes: Revocations and Hearings" >Probation Outcomes: Revocations and Hearings</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="Data &amp; Publications"><a href="/courts/about-us/data-and-publications/domestic-violence-court-data-reports"    title="Main Menu Mobile - Data & Publications Domestic Violence Court Data Reports" >Domestic Violence Court Data Reports</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Data &amp; Publications"><a href="/courts/about-us/data-and-publications/community-court-data-reports"    title="Main Menu Mobile - Data & Publications Community Court Data Reports" >Community Court Data Reports</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Data &amp; Publications"><a href="/courts/about-us/data-and-publications/mental-health-court-and-veterans-treatment-court-data-reports"    title="Main Menu Mobile - Data & Publications Mental Health Court & Veterans Treatment Court Data Reports" >Mental Health Court & Veterans Treatment Court Data Reports</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Data &amp; Publications">
+                <a href="/courts/about-us/data-and-publications/court-performance-reports"    title="Main Menu Mobile - Data & Publications Court Performance Reports" >Court Performance Reports<span class='fa-regular fa-chevron-right' title='Court Performance Reports' aria-label='Court Performance Reports Icon'></span></a>
+
+                <ul data-childrentarget="Court Performance Reports">
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/electronic-home-monitoring"    title="Main Menu Mobile - Court Performance Reports Electronic Home Monitoring (EHM)" >Electronic Home Monitoring (EHM)</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/key-performance-indicators"    title="Main Menu Mobile - Court Performance Reports Key Performance Indicators" >Key Performance Indicators</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/court-user-survey-results"    title="Main Menu Mobile - Court Performance Reports Court User Survey Results" >Court User Survey Results</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="Court Performance Reports"><a href="/courts/about-us/data-and-publications/court-performance-reports/community-resource-center-data"    title="Main Menu Mobile - Court Performance Reports Community Resource Center Data" >Community Resource Center Data</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="About Us"><a href="/courts/about-us/technology"    title="Main Menu Mobile - About Us Seattle Municipal Court - Technology Initiatives" >Seattle Municipal Court - Technology Initiatives</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="About Us">
+                <a href="/courts/about-us/career-and-volunteer-opportunities"    title="Main Menu Mobile - About Us Career and Volunteer Opportunities" >Career and Volunteer Opportunities<span class='fa-regular fa-chevron-right' title='Career and Volunteer Opportunities' aria-label='Career and Volunteer Opportunities Icon'></span></a>
+
+                <ul data-childrentarget="Career and Volunteer Opportunities">
+        <li class="list-group-item navItem" data-parenttarget="Career and Volunteer Opportunities"><a href="/courts/about-us/career-and-volunteer-opportunities/faqs-for-applicants"    title="Main Menu Mobile - Career and Volunteer Opportunities FAQs for Applicants" >FAQs for Applicants</a>
+</li>
+                </ul>
+            </li>
+                </ul>
+            </li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="Home">
+                <a href="/courts/en-espa&#241;ol"    title="Main Menu Mobile - Home En Español" >En Español<span class='fa-regular fa-chevron-right' title='En Español' aria-label='En Español Icon'></span></a>
+
+                <ul data-childrentarget="En Espa&#241;ol">
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/tr&#225;mites-para-responder-a-multas"    title="Main Menu Mobile - En Español Trámites para responder a multas" >Trámites para responder a multas</a>
+</li>
+            <li class="list-group-item navItem hasChildren" data-parenttarget="En Espa&#241;ol">
+                <a href="/courts/en-espa&#241;ol/pagar-la-multa"    title="Main Menu Mobile - En Español Pagar la multa" >Pagar la multa<span class='fa-regular fa-chevron-right' title='Pagar la multa' aria-label='Pagar la multa Icon'></span></a>
+
+                <ul data-childrentarget="Pagar la multa">
+        <li class="list-group-item navItem" data-parenttarget="Pagar la multa"><a href="/courts/en-espa&#241;ol/pagar-la-multa/no-puedo-pagar-la-multa-en-su-totalidad"    title="Main Menu Mobile - Pagar la multa No puedo pagar la multa en su totalidad" >No puedo pagar la multa en su totalidad</a>
+</li>
+                </ul>
+            </li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/inmovilizaci&#243;n-de-veh&#237;culos"    title="Main Menu Mobile - En Español Inmovilización de vehículos" >Inmovilización de vehículos</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/informaci&#243;n-sobre-agencias-de-recaudaci&#243;n-"    title="Main Menu Mobile - En Español Información sobre agencias de recaudación " >Información sobre agencias de recaudación </a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/agencia-de-cobros"    title="Main Menu Mobile - En Español Agencia de cobros" >Agencia de cobros</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/multas-de-c&#225;mara"    title="Main Menu Mobile - En Español Multas de cámara" >Multas de cámara</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/retenci&#243;n-de-la-etiqueta-de-registro-de-la-matr&#237;cula-del-veh&#237;culo"    title="Main Menu Mobile - En Español Retención de la etiqueta de registro de la matrícula del vehículo" >Retención de la etiqueta de registro de la matrícula del vehículo</a>
+</li>
+        <li class="list-group-item navItem" data-parenttarget="En Espa&#241;ol"><a href="/courts/en-espa&#241;ol/formularios-disponibles-en-espa&#241;ol-"    title="Main Menu Mobile - En Español Formularios disponibles en español" >Formularios disponibles en español</a>
+</li>
+                </ul>
+            </li>
+                                    <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="/elected-officials"    title="Main Menu Mobile - Seattle.gov Elected Officials" >Elected Officials</a>
+</li>
+        <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="/departments"    title="Main Menu Mobile - Seattle.gov City Departments" >City Departments</a>
+</li>
+        <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="https://news.seattle.gov"    title="Main Menu Mobile - Seattle.gov News.Seattle.Gov" >News.Seattle.Gov</a>
+</li>
+        <li class="seagovHeaderLinksMobile list-group-item navItem" data-parenttarget="Seattle.gov"><a href="/event-calendar"    title="Main Menu Mobile - Seattle.gov Events Calendar" >Events Calendar</a>
+</li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>      <!-- SEATTLE.GOV HEADER ENDS -->
+    </header>
+
+    
+
+
+
+
+
+
+
+
+            <div class="container notificationContainer">
+                <div id="x106515" class="seagovBanner Medium-Alert" role="complementary" aria-label="**Case File Portal and Payment Application Offline Nov. 20-22 For System Maintenance**">
+                        <i class="fas fa-exclamation-triangle" title="Medium alert notification triangle"></i>
+
+                    <div class="title">**Case File Portal and Payment Application Offline Nov. 20-22 For System Maintenance**</div>
+                    <p>The online case file portal and web payment application will be offline from 1:30 PM on Friday, Nov. 20 through 12 noon on Sunday, Nov. 22 for system maintenance. We apologize for any inconvenience.</p>
+                    <button role="button" title="Expand">
+                        <i class="fas fa-sort-down" title="Sort down"></i>
+                        <i class="fas fa-sort-up" title="Sort up" hidden></i>
+                    </button>
+                </div>
+            </div>
+            <div id="content">
+                
+
+
+<div class=" department DepartmentDetail" id="x82731">
+
+    <div class="titleTopNavBreadcrumbWrapper fullWidthBreadCrumbs">
+        <div class="container" role="region" aria-label="Top navigation page title">
+
+
+
+
+
+    <aside role="complementary" aria-label="Department header section">
+        <nav aria-label="Department title and links">
+                <div id="deptTitle" class="deptName nonExec">
+                    <a href="courts"  class="active"   >Seattle Municipal Court</a>
+
+                </div>
+
+                            <div class="topNavUtilityLinks">
+
+	    <div class="btn-group topNavigation button">
+		    <a href="courts/tickets-and-payments/pay-my-ticket"  class="btn btn-primary"   >Pay My Ticket</a>
+
+	    </div>
+
+                            </div>
+
+        </nav>
+    </aside>
+
+
+            
+        <nav id="deptTopNav" class="top-nav" data-id="x56939" aria-label="Department top links">
+            <ul class="top-nav__list">
+                        <li class="top-nav__item">
+                                <a href="courts/coming-to-court" class="top-nav__link" aria-label="Coming to Court menu, Find directions to the court, courtroom expectations, how to obtain a public defender, and FAQs." >Coming to Court</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/virtual-hearings" class="top-nav__link" aria-label="Virtual Hearings menu, Read about attending a court hearing virtually." >Virtual Hearings</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/tickets-and-payments" class="top-nav__link" aria-label="Tickets &amp; Payments menu, Know your ticket response options, how to dispute a ticket, respond to a booted or towed vehicle, and FAQs." >Tickets &amp; Payments</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/jury-duty" class="top-nav__link" aria-label="Jury Duty  menu, Learn how to respond to your jury summons and what to expect when serving on a jury." >Jury Duty </a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/for-attorneys" class="top-nav__link activePage" aria-label="For Attorneys menu, Information and resources specifically for attorneys, including court rules, case documents, and forms. " >For Attorneys</a>
+
+                        </li>
+                        <li class="top-nav__item">
+                                <a href="courts/programs-and-services" class="top-nav__link" aria-label="Programs &amp; Services menu, Get help with court services, from marriage ceremonies to probation, pretrial services, public records requests, and interpreter services." >Programs &amp; Services</a>
+
+                        </li>
+            </ul>
+        </nav>
+        </div>
+
+
+
+
+<nav aria-label="Department breadcrumb">
+    <div id="breadCrumbWrapper" class="">
+        <div id="dept-breadCrumbs" class="container">
+<a class="seaGovHome" aria-label="Seattle.gov Home" href="/">
+                    <svg viewBox="296 386 20 20" alt="Seattle.gov logo">
+                        <path class="stroke" d="M306.018 386.225c-5.397.005-9.77 4.384-9.765 9.782.005 5.397 4.384 9.77 9.782 9.765 5.395-.004 9.766-4.379 9.766-9.773-.003-5.401-4.383-9.776-9.783-9.774"/>
+                        <path class="fill" d="M303.116 405.39c-.314-.093-.618-.222-.902-.386 0 0 .128.17.301-.119.151-.253-.047-.997-.231-1.349-.139-.253-.546-.62-.658-1.01-.099-.342-.074-.607-.223-.868-.215-.384-.503-.782.235-.845 1.017-.086 2.1-.097 2.639.12.405.163.448.663.523.972.09.365.303 1.25.014 2.139s-.605.858-.74 1.346c-.011.048.008.097.046.127.04.041.087.075.139.1l-1.143-.227zm6.259-18.574l-.211-.075-.188-.061-.231-.069-.226-.063v4.737s-.934-.277-1.762-1.716c-.682-1.179-.586-3.217-.586-3.345h-.277l-.266.007-.26.014-.174.013-.297.069c.07 1.701.304 3.121 1.03 4.249 1.122 1.74 2.586 2.065 2.586 2.065v3.405c-1.304-.806-3.27-2.171-4.262-7.551-.133-.718-.631-.717-1.067-.556-1.365.528-2.465 2.102-3.046 2.603-.104.09-.214.139-.252.237-.039.099.099.235.175.294s.176.053.368.118c.32.11.622.453.854.63.232.178.757.486 1.067.532.148.06.139.105.139.197 0 .091-.098.157-.252.176-.153.02-.659-.02-.932.04-.272.06-.368.236-.465.374-.098.138-.128.365-.233.453-.058.044-.138.044-.194 0-.059-.039-.077-.099-.059-.217.018-.118.039-.217.059-.315.021-.157.015-.317-.02-.472-.049-.15-.135-.286-.252-.393-.171-.139-.382-.247-.602-.04-.11.104-.912 1.464-1.183 1.944-.177.308-.32.634-.428.972-.026.146.009.297.097.417.116.119.266.202.428.236.184.038.312-.017.466.02s.073.204.015.322c-.058.118-.182.117-.248.209-.121.171.021.26.076.35.069.115.014.188-.076.378-.139.302.039.519.123.694.085.176.048.569-.07.825-.069.153-.126.312-.17.475-.12.417.335.96.66 1.122.448.225 2.212.039 3.454-.04 1.241-.079 1.727-.556 2.017-1.023s.233-1.043.233-1.202c-.01-.187-.035-.373-.078-.555-.236-1.085.203-2.5.348-2.682.04-.038.103-.037.142.003.005.005.009.011.013.017.253.423.574.801.949 1.121 0 1.043-.011 9.342-.012 10.007.055.006.111.006.166 0 .065 0 .151-.007.239-.014s.171-.013.254-.021c.11-.012.213-.021.292-.032.074-.005.148-.016.222-.03v-.063-8.954c.556.386 1.008.669 1.008.669l.037.024v8.107l.158-.043.208-.061.161-.052.176-.059.179-.063.217-.084v-18.186l-.237-.088zm6.415 8.75c-.326-.942-.78-1.835-1.349-2.654-1.157-1.686-2.46-2.375-2.46-2.375v-2.279l-.172-.131-.162-.117-.222-.151-.24-.155-.202-.124-.168-.096v17.029l.17-.102.2-.119.278-.182.307-.215.19-.139.01-7.361s.677.709 1.073 2.265c.28 1.156.435 2.339.46 3.528v.084c.128-.145.247-.297.357-.455.086-.117.179-.244.262-.365.12-.168.229-.342.329-.521 0 0 .127-1.667-.748-3.832-.737-1.864-1.723-2.689-1.723-2.689v-2.172l.039.017c.661.341 1.557 1.414 2.095 2.386.629 1.16 1.08 2.406 1.339 3.7.015.046.025.092.033.139 0 .013.129-.556.139-.589.028-.129.078-.424.095-.566.029-.26.059-.527.072-.75.018-.293.015-.51.017-.529 0-.1-.019-.478-.02-.482v.002z"/>
+                    </svg>
+                </a><span class="fas fa-chevron-right" title="breadcrumb divider" aria-label="Breadcrumb divider"></span><a href="courts"     >Home</a>
+<span class="fas fa-chevron-right" title="breadcrumb divider" aria-label="Breadcrumb divider"></span><a href="courts/for-attorneys"    title="For Attorneys" >For Attorneys</a>
+<span class="fas fa-chevron-down" title="breadcrumb end" aria-label="Breadcrumb divider"></span>
+        </div>
+
+    </div>
+</nav>
+
+    </div>
+                <div class="container">
+                </div>
+        <div class="container">
+            <div id="leftMainRight" class="row noRightBorder">
+                <div class="col-md-12 col-xs-12">
+                    <div class="row borderBottomNone">
+                        
+                        <div class="col-md-9 col-md-push-3">
+                            
+                            
+
+                            <div id="mainColContent" class="row">
+                                
+
+                                <main>
+                                    <div class="col-xs-12" id="mainColMain">
+                                        
+
+                                        
+
+
+        <div>
+            <h1 class="pageTitle">Local Court Rules
+</h1>
+
+    </div>
+
+		<div  class="span">
+			<p><a href="/courts/for-attorneys/local-court-rules/general-administrative-orders" target="_blank" rel="noopener">Click here </a>for <strong>General Administrative Orders</strong>.</p>
+		</div>
+
+
+            <div class="padTop MainColumnAccordionListComponent" id="x86786">
+
+
+
+
+
+<div class="accords accordsFa">
+        <h2 class="accordion-toggle" name="smclr1.7adoptionoflocalrules">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr1.7adoptionoflocalrules-x86788_panel-1">SMCLR 1.7 ADOPTION OF LOCAL RULES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr1.7adoptionoflocalrules-x86788_panel-1" class="content" data-name="smclr1.7adoptionoflocalrules">
+
+
+<p>These rules are adopted pursuant to&nbsp;CrRLJ 1.7.</p>
+<p>[Effective May 2, 1988.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr1.8titleofrules">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr1.8titleofrules-x86789_panel-2">SMCLR 1.8 TITLE OF RULES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr1.8titleofrules-x86789_panel-2" class="content" data-name="smclr1.8titleofrules">
+
+
+<p>These rules may be known and cited as Seattle Municipal Court Local Rules, and shall be referred to as SMCLR.<br /><br /> [Effective May 2, 1988]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr2.3searchandseizure">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr2.3searchandseizure-x86790_panel-3">SMCLR 2.3 SEARCH AND SEIZURE</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr2.3searchandseizure-x86790_panel-3" class="content" data-name="smclr2.3searchandseizure">
+
+
+<p><strong>(c) Issuance and Contents.</strong> A search warrant may be issued only if the court determines there is probable cause for the issuance of a warrant. There must be an affidavit, a document as provided in <a href="http://app.leg.wa.gov/RCW/default.aspx?cite=9A.72.085" title="RCW 9A.72.085" target="_blank">RCW 9A.72.085</a> or any law amendatory thereto, or sworn testimony establishing the grounds for issuing the warrant. The sworn testimony may be an electronically recorded telephonic statement, facsimile machine document or electronically mailed document. The recording, or a duplication of the recording facsimile, or electronic mail shall be a part of the court record and shall be transcribed if requested by a party if there is a challenge to the validity of the warrant or if ordered by the court. The evidence in support of the finding of probable cause shall be preserved and shall be subject to constitutional limitations for such determinations and may be hearsay in whole or in part. If the court finds that probable cause for the issuance of a warrant exists, it shall issue a warrant or direct an individual whom it authorizes for such purpose to affix the court's signature to a warrant identifying the property or person and naming or describing the person, place or thing to be searched. The court's authorization may be done by electronic signature process. A record shall be made of any additional submitted evidence on which the court relies. <br /><br /> <strong>(h) Search Warrants</strong>. After execution and return, the search warrant shall be filed by number and description of the person or property to be searched. An index will be maintained and available to the public by the Clerk's Office.</p>
+<p>[Effective September 1, 2015]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr2.4complaint">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr2.4complaint-x86791_panel-4">SMCLR 2.4 COMPLAINT</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr2.4complaint-x86791_panel-4" class="content" data-name="smclr2.4complaint">
+
+
+<p>Whenever the plaintiff refiles a case that has previously been dismissed without prejudice, the charging document must reflect the word "REFILED" and must set forth the Municipal Court of Seattle case number.<br /><br /> [Effective August 21, 1991]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr3.1.1indigentservicesotherthanlawyer">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr3.1.1indigentservicesotherthanlawyer-x86792_panel-5">SMCLR 3.1.1 INDIGENT SERVICES OTHER THAN LAWYER</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr3.1.1indigentservicesotherthanlawyer-x86792_panel-5" class="content" data-name="smclr3.1.1indigentservicesotherthanlawyer">
+
+
+<p>A lawyer for a defendant who is financially unable to obtain expert or investigative services necessary for an adequate defense may request them by a motion to the court. The motion must be in writing, and shall be accompanied by <strong>(1)</strong> an affidavit or sworn declaration, signed by the defendant, setting forth the defendant's assets, income, liabilities, monthly expenses, dependents and employment; <strong>(2)</strong> an affidavit or declaration setting forth the name, address of the expert or investigator, cost, qualifications of the expert or investigator and a summary of the expert's or investigator's proposed testimony as it relates to the case in question; <strong>(3)</strong> a copy of all of the discovery material provided by the plaintiff; and <strong>(4)</strong> any other materials to assist the court in determining whether the services are necessary. The pleadings may be presented ex-parte to the court which heard the last pre-trial hearing. Unless otherwise directed by the court, the motion will be decided exclusively on the pleadings without oral argument. Pursuant to <a href="http://www.courts.wa.gov/newsinfo/publication/GeneralRule31_1.pdf" target="_blank">GR 31.1</a>(l)(6), the motion and affidavits in support of expert or investigative services are exempt from public access and are not part of the court file. Requests for investigative services likely to exceed $600 and expert services likely to exceed $1000 should be submitted to the Presiding Judge.<br /><br />[Effective May 2, 1988; amended effective September 1, 1997; September 1, 2011; September 1, 2015 and April 11, 2016.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr3.2oreleaseofaccused">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr3.2oreleaseofaccused-x86793_panel-6">SMCLR 3.2(o) RELEASE OF ACCUSED</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr3.2oreleaseofaccused-x86793_panel-6" class="content" data-name="smclr3.2oreleaseofaccused">
+
+
+<p>Bail shall be set in accordance with <a href="https://www.courts.wa.gov/court_rules/Word/cljcrrlj3.2.doc" target="_blank" rel="noopener">CrRLJ 3.2</a>(o)1. Bail shall not be set for accused persons arrested for new domestic violence charges, stalking, stalking-sexual motivation, cyberstalking, assault-sexual motivation, violation of an anti-harassment order, no contact/protection order violation, willful violation of a no contact order, violation of a temporary restraining order, refuse to comply with a temporary restraining order and firearms offenses as set in <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.071AIDIFI" target="_blank" rel="noopener">12A.14.071</a> (discharge of a firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.075UNUSWEINAN" target="_blank" rel="noopener">12A.14.075</a> (unlawful use of weapons to intimidate another), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.130FAREFIOF" target="_blank" rel="noopener">12A.14.130</a> (failure to register as a firearms offender), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.140UNCAPI" target="_blank" rel="noopener">12A.14.140</a> (unlawful carrying of pistol), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.150UNPOLORIMOVE" target="_blank" rel="noopener">12A.14.150</a> (unlawful possession of loaded rifle in motor vehicle), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.180UNDEPIDE" target="_blank" rel="noopener">12A.14.180</a> (unlawful delivery of a pistol), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.195UNSATRFI" target="_blank" rel="noopener">12A.14.195</a> (unlawful sale or transfer of firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.200ALIDMAFI" target="_blank" rel="noopener">12A.14.200</a> (altering identifying marks of firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank" rel="noopener">12A.14.080</a>(c) (possess firearm - public property), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank" rel="noopener">12A.14.080</a>(e) (firearm-noise suppression device), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.06OFAGPE_12A.06.195COORRESUFIDAWECOPILI" target="_blank" rel="noopener">12A.06.195</a> (failure to surrender firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank" rel="noopener">12A.14.080</a>(f) (furtively carrying a dangerous weapon) and <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.160PODAWESCFA" target="_blank" rel="noopener">12A.14.160</a>(A) (weapon at school) except at the preliminary appearance or arraignment.<br /><br />[Adopted effective July 8, 1993; amended effective September 1, 1994; September 1, 1997; September 1, 2002; September 1, 2004; September 1, 2006; June 24, 2014; April 6, 2015; April 11, 2016 and September 1, 2018;&nbsp; December 9, 2019; and May 14, 2025.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr3.2.1electronicfilingofprobablecausedocuments">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr3.2.1electronicfilingofprobablecausedocuments-x86794_panel-7">SMCLR 3.2.1: ELECTRONIC FILING OF PROBABLE CAUSE DOCUMENTS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr3.2.1electronicfilingofprobablecausedocuments-x86794_panel-7" class="content" data-name="smclr3.2.1electronicfilingofprobablecausedocuments">
+
+
+<p>For purposes of determining probable cause to detain under <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=sup&amp;set=CrR&amp;ruleid=supCrR3.2.1" target="_blank">CrRLJ 3.2.1</a>(a), the court may rely on documents filed electronically by a law enforcement officer following the procedure established by <a href="http://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=gr&amp;ruleid=gagr30" target="_blank">GR 30</a>. The documents must be authenticated by a law enforcement officer using a digital signature that complies with the requirements of <a href="http://apps.leg.wa.gov/rcw/default.aspx?cite=19.34" target="_blank">RCW 19.34</a> or <a href="http://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=gr&amp;ruleid=gagr30" target="_blank">GR 30</a>, or by the arresting or citing officer explicitly signing the statement and transmitting the eSuperform within the King County Booking and Referral System, as permitted by <a href="http://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=gr&amp;ruleid=gagr30" target="_blank">GR 30</a>. <br /><br /> [Effective November 28, 2012]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr3.4presenceofthedefendant">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr3.4presenceofthedefendant-x86795_panel-8">SMCLR 3.4: PRESENCE OF THE DEFENDANT </button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr3.4presenceofthedefendant-x86795_panel-8" class="content" data-name="smclr3.4presenceofthedefendant">
+
+
+<p><strong>(a)</strong> Video Conference Proceedings<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong> (1)</strong> Pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=GR&amp;ruleid=gagr19" target="_blank">GR 19</a> and <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=CrRLJ&amp;ruleid=cljcrrlj3.4" target="_blank">CrRLJ 3.4</a>(d), proceedings in Seattle Municipal Court may be conducted via video conference or other similar technology.<br /><br /> [Effective July 1, 2013; amended effective September 1, 2015]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr4.1arraignment">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr4.1arraignment-x86796_panel-9">SMCLR 4.1 ARRAIGNMENT</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr4.1arraignment-x86796_panel-9" class="content" data-name="smclr4.1arraignment">
+
+
+<p><strong>(i) Arraignments. </strong>Arraignments shall be in accordance with <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=crrlj&amp;ruleid=cljcrrlj4.01" target="_blank">CrRLJ 4.1</a> and <a href="https://www.courts.wa.gov/court_rules/Word/CLJCRRLJ4.02.doc" target="_blank">4.2</a>. A lawyer may, pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=crrlj&amp;ruleid=cljcrrlj4.01" target="_blank">CrRLJ 4.1</a> (e) and SMCLR 8.4.1, enter an appearance on behalf of a client except in cases in which the docket or charging document states that one or more of the charges involves domestic violence, harassment, violation of an anti-harassment order, driving under the influence, physical control, assault, stalking, or firearms offenses as set out in <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.071AIDIFI" target="_blank">12A.14.071</a>(discharge of a firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.075UNUSWEINAN" target="_blank">12A.14.075</a> (unlawful use of weapons to intimidate another) and <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank">12A.14.080</a> (unlawful use of weapon) whereupon defendant's presence is mandatory. The clerk may continue an arraignment at the request of the defendant or counsel for no more than two weeks, except in cases in which the docket or charging document states that one or more of the charges involves domestic violence, violation of an anti-harassment order, harassment, driving under the influence, physical control, assault, stalking or firearms offenses as set out in <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.071AIDIFI" target="_blank">12A.14.071</a>(discharge of a firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.075UNUSWEINAN" target="_blank">12A.14.075</a> (unlawful use of weapons to intimidate another) and <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank">12A.14.080</a> (unlawful use of weapon). Where legislation mandates the defendant's appearance on the next judicial day following arrest if the defendant is served with a citation or complaint at the time of the arrest, the term "next judicial day" as applied in Seattle Municipal Court shall mean within 72 hours of arrest excluding Sundays and holidays. Appearances may be entered only after a complaint or citation and notice has been filed. <br /> <strong>(ii) Intake Hearings</strong>. Defendants who wish to plead not guilty who are out of custody and who are not charged with an offense involving domestic violence, violation of an anti-harassment order, harassment, driving under the influence, physical control, assault, stalking or firearms offenses as set out in <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.071AIDIFI" target="_blank">12A.14.071</a>(discharge of a firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.075UNUSWEINAN" target="_blank">12A.14.075</a> (unlawful use of weapons to intimidate another) and <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank">12A.14.080</a> (unlawful use of weapon), may at the time summoned for arraignment, appear before a clerk; the clerk shall assign a pre-trial hearing date without judicial involvement. Any defendant who so desires may appear before a judge at this initial intake appearance for formal arraignment. The clerk may continue an arraignment at the request of the defendant or counsel for no more than two weeks, except in cases in which the docket or charging document states that one or more of the charges involves domestic violence, violation of an anti-harassment order, harassment, driving under the influence, physical control, assault, stalking or firearms offenses as set out in <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.071AIDIFI" target="_blank">12A.14.071</a>(discharge of a firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.075UNUSWEINAN" target="_blank">12A.14.075</a> (unlawful use of weapons to intimidate another) and <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank">12A.14.080</a> (unlawful use of weapon).<br /> <strong>(iii) Delays</strong>. Defendants who are released from custody prior to arraignment may delay arraignment once a complaint has been filed. The clerk may continue an arraignment or Intake Hearing at the request of the defendant or counsel for no more than two weeks, except in cases in which the docket or charging document states that one or more of the charges involves domestic violence, violation of an anti-harassment order, harassment, driving under the influence, physical control, assault, stalking, or firearms offenses as set out in <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.071AIDIFI" target="_blank">12A.14.071</a> (discharge of a firearm), <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.075UNUSWEINAN" target="_blank">12A.14.075</a> (unlawful use of weapons to intimidate another) and <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT12ACRCO_SUBTITLE_ICRCO_CH12A.14WECO_12A.14.080UNUSWE" target="_blank">12A.14.080</a> (unlawful use of weapon). If a complaint has not been filed, a judge must approve the delay request. <br /><br /> [Effective May 2, 1988; amended effective June 13, 1989; September 1, 1994; September 1, 1997; September 1, 1998, changes effective January 1, 1999; September 1, 1999; September 1, 2002; September 1, 2004; September 1, 2006; and September 1, 2011; September 1, 2012, and June 24, 2014.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr4.8subpoenas">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr4.8subpoenas-x101603_panel-10">SMCLR 4.8 SUBPOENAS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr4.8subpoenas-x101603_panel-10" class="content" data-name="smclr4.8subpoenas">
+
+
+<p>(i) Any request seeking a subpoena for a witness outside the State of Washington must include a declaration regarding the materiality of the witness. Only the Presiding Judge may approve an out-of-state subpoena.</p>
+<p>[Effective January 15, 2019]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr5.4pretrialhearings">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr5.4pretrialhearings-x86797_panel-11">SMCLR 5.4 PRE-TRIAL HEARINGS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr5.4pretrialhearings-x86797_panel-11" class="content" data-name="smclr5.4pretrialhearings">
+
+
+<p>Unless a disposition of the case is entered into at the intake hearing or an arraignment, a pre-trial hearing may be held. Notice shall be issued by the clerk to the parties of the date, time and courtroom for this hearing. Defendant and all counsel must be present at the pre-trial hearing; failure of the defendant to appear may result in the issuance of a bench warrant. <br /><br /> [Effective June 13, 1989; amended effective September 1, 1997; September 1, 2002; September 1, 2004; September 1, 2006.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr6.1assignmentoftrials">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr6.1assignmentoftrials-x86798_panel-12">SMCLR 6.1 ASSIGNMENT OF TRIALS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr6.1assignmentoftrials-x86798_panel-12" class="content" data-name="smclr6.1assignmentoftrials">
+
+
+<p><strong></strong> <strong>(a)</strong> Generally, at arraignment or the pre-trial hearing, the court shall provide the parties with the jury trial date. The parties shall appear at the readiness calendar, or file an Agreed Certificate of Readiness.&nbsp; At the readiness calendar the parties will inform the court that the case is ready for trial on the assigned trial date, or will indicate witness and party scheduling conflicts that may require rescheduling of the trial date. The court may require the defendant to appear at the readiness calendar if warrants were issued previously; failure to appear may result in the issuance of a bench warrant and striking of the trial date.<br /> <strong>(b)</strong> The parties may waive appearance at the readiness calendar by filing an Agreed Certificate of Readiness on a form provided by the clerk of the court. A certificate may be filed if there is no outstanding discovery, witness or scheduling issues.<s> </s><br /><strong>(c)</strong> Following the readiness calendar, the court will determine trial priority, taking into consideration the expiration dates, the parties' and witness' scheduling conflicts and other matters deemed appropriate by the court.<br /> <strong>(d)</strong> All parties and counsel shall appear on the trial date, as directed by the court.&nbsp; <br /><strong>(e) </strong>&nbsp;Other cases may be assigned to a specific court at arraignment or pretrial.&nbsp; Otherwise all subsequent trials may be set on the Master Calendar from pretrial courtrooms.&nbsp;</p>
+<p>[Effective June 13, 1989; amended effective September 1, 1993; September 1, 1994; September 1, 1997; September 1, 2002; September 1, 2004; November 2004; September 2005; September 1, 2006; September 1, 2007 September 1, 2011, September 1, 2012; September 1, 2015; and September 1, 2018.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr7.3k1judgmentrestitution">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr7.3k1judgmentrestitution-x86799_panel-13">SMCLR 7.3 (k)(1) JUDGMENT (RESTITUTION)</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr7.3k1judgmentrestitution-x86799_panel-13" class="content" data-name="smclr7.3k1judgmentrestitution">
+
+
+<p>Where the court orders that a defendant pay restitution but does not set an amount at the time of disposition, the City Attorney shall within ninety days file with the court a motion for restitution with documentation in support thereof. <br /><br /> [Effective September 1, 1997; amended effective September 1, 2002, September 1, 2004; September 1, 2006, September 1, 2012.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr8.2.1motions">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr8.2.1motions-x86800_panel-14">SMCLR 8.2.1 MOTIONS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr8.2.1motions-x86800_panel-14" class="content" data-name="smclr8.2.1motions">
+
+
+<p><strong>(a) Motions </strong></p>
+<p style="padding-left: 30px;">(1) All motions shall be noted on Trial Setting Order and shall be filed no later than the pretrial hearing at which the matter is scheduled for trial. A party noting a motion must file a supporting affidavit pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=CrRLJ&amp;ruleid=cljcrrlj3.6">CrRLJ 3.6</a> at the same time, except that, upon good cause shown, a trial court may extend the time for the filing of a supporting affidavit for up to five business days. Counsel shall indicate whether the motion will require live testimony. The pre-trial court shall hear testimonial motions prior to the date the case is set for trial unless the trial court finds good cause to reserve the motions to the trial date.</p>
+<p style="padding-left: 30px;">(2) <em>Copies of Motions and Supporting Material.</em>&nbsp;No later than 14 business days prior to the hearing date, the moving party shall serve the motion on all parties and the clerk, a supporting brief, copies of all affidavits, photographic, video, audio, documentary and all other evidence presented in support of the motion or expected to be used at the motion hearing, unless otherwise ordered by the Court. Not later than five business days prior to the hearing date, each party opposing the motion shall file with all opposing parties and the clerk, and serve on each party that has appeared in the action, a brief in opposition to the motion, together with any supporting material. The original motion shall be filed in accordance with <a href="/courts/for-attorneys/local-court-rules">SMCLR 8.4.1</a>.</p>
+<p style="padding-left: 30px;">(3)<em>Noncompliance.</em> If the moving party fails to file the papers required by this rule the hearing shall be stricken by the court. If the opposing party fails to file the papers required by this rule or a necessary witness fails to appear on the day appointed for argument or hearing, the court shall review the court file and all pleadings to determine in an evidentiary hearing is necessary or oral argument is required. The court may grant the motion, deny the motion, strike the hearing and deem the motion waived, or upon a showing of good cause, continue the motion.<br /><br /></p>
+<p><strong>(b) Emergency Motions.</strong> Any party may request an immediate hearing before the pretrial judge if circumstances so require. The party requesting the emergency hearing must provide appropriate notice to the opposing party, allowing both parties an opportunity to be heard on the issue presented. If immediate action is necessary and the judge assigned to the case for pretrial hearing is unavailable, any other judge may hear and dispose of the matter requiring immediate attention, but such action shall not constitute reassignment of the case or proceeding.</p>
+<p><strong>(c) Reconsideration of Motions.</strong> A motion for reconsideration shall be clearly labeled. The motion for reconsideration shall be noted for consideration on the court's calendar and may be summarily denied without a hearing. No response to a motion for reconsideration shall be filed unless requested by the court. The request will set a time when the response is due and may limit the response to particular issues or points raised by the motion.</p>
+<p>[Effective September 1, 2002; Amended effective September 1, 2004; September 1, 2007; September 1, 2011; March 16, 2012; September 1, 2012; June 24, 2014; April 11, 2016 and September 1, 2020.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr8.2.2continuances">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr8.2.2continuances-x86801_panel-15">SMCLR 8.2.2 CONTINUANCES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr8.2.2continuances-x86801_panel-15" class="content" data-name="smclr8.2.2continuances">
+
+
+<p><strong>(a)</strong> Motions for continuances of hearings and trials shall be presented to the court before which the hearing is scheduled. Once a case is assigned for jury trial, a motion for continuance is presumed untimely and will be denied unless based upon facts unknown and not reasonably foreseeable to the moving party prior to assignment to the trial court.</p>
+<p><strong>(b)</strong> No case shall be continued for hearing or trial unless good cause has been shown.<br /><strong></strong></p>
+<p style="padding-left: 30px;"><strong>(1)</strong> All motions to continue a pre-trial or trial date shall be made in writing, setting forth specific facts showing good cause and justification for the specific length of the continuance. Motions for continuance of trials and any supporting documentation on such motions shall be served on the parties no later than two days prior to the readiness hearing, unless excused by the court for cause.&nbsp; Appropriate sanctions may be imposed.</p>
+<p style="padding-left: 30px;"><strong>(2)</strong><strong> </strong>In ruling on a motion to continue, the following factors will be considered by the court:</p>
+<p style="padding-left: 60px;">(a) The diligence of counsel in noting the motion.</p>
+<p style="padding-left: 60px;">(b) The proximity of the motion to the trial date, the age of the case, previous continuances.</p>
+<p style="padding-left: 60px;">(c) Any injury, inconvenience caused to the naming party.</p>
+<p style="padding-left: 60px;">(d) The earliest date all parties will be ready to proceed to trial.</p>
+<p style="padding-left: 30px;"><strong>(3)</strong> The following factors do not necessarily establish good cause for continuance:</p>
+<p style="padding-left: 60px;">(a) Convenience to or stipulation between the parties.</p>
+<p style="padding-left: 60px;">(b) Failure to expeditiously prepare for trial.</p>
+<p style="padding-left: 60px;">(c) Failure of client to adhere to financial agreement with an attorney.</p>
+<p style="padding-left: 60px;">(d) Settlement negotiations not yet completed, including the need to communicate an offer to a client appearing through counsel.</p>
+<p style="padding-left: 60px;">(e) Recent substitution of trial counsel, except where required by the Rules of Professional Conduct.</p>
+<p style="padding-left: 60px;">(f) To secure a driver's license for a defendant except at intake/arraignment.</p>
+<p></p>
+<p>[Effective June 13,1989; amended effective September 1, 1994; September 1, 1997; September 1, 2002, September 1, 2004; September 1, 2011 and September 1, 2020]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr8.2.3motiontorescindormodifydomesticviolencenocontactorder">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr8.2.3motiontorescindormodifydomesticviolencenocontactorder-x86802_panel-16">SMCLR 8.2.3 MOTION TO RESCIND OR MODIFY DOMESTIC VIOLENCE NO CONTACT ORDER</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr8.2.3motiontorescindormodifydomesticviolencenocontactorder-x86802_panel-16" class="content" data-name="smclr8.2.3motiontorescindormodifydomesticviolencenocontactorder">
+
+
+<p>Any party to the case or the protected person may request a motion to rescind or modify a no-contact order. The request must be filed using a form approved by the court. The request shall be filed with the court, together with an address form. Unless otherwise required by the Court, appearance of the defendant and attorneys is not required and absence of appearance shall be deemed a waiver of appearance. Notice of the court date shall contain language that the presence of the defendant is not required.<br /><br />[Adopted effective April 6, 2015]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr8.2.4motionofcitywidesignificance">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr8.2.4motionofcitywidesignificance-x133211_panel-17">SMCLR 8.2.4 MOTION OF CITYWIDE SIGNIFICANCE</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr8.2.4motionofcitywidesignificance-x133211_panel-17" class="content" data-name="smclr8.2.4motionofcitywidesignificance">
+
+
+<p>Upon the filing of a motion in a criminal case, any party or the assigned judge may request that such motion be designated as an "issue of citywide significance." Upon receiving such request, the Presiding Judge may designate such motion as an "issue of citywide significance."</p>
+<p>Upon designation of a motion as an "issue of citywide significance," the Presiding Judge shall create a new case name and title for the motion (e.g., "In re [subject matter]"), assign a minimum of three judges to act as a panel to hear the motion including any necessary testimony, and allow impacted parties with standing to move the Court for permission to participate in briefings and hearings regarding the "issue of citywide significance." The panel of judges shall hear testimony and argument and enter Findings of Fact and Conclusions of Law and Decision ("Ruling") on the motion. Judges of the Court shall then have the following options: (1) accept such Ruling in its entirety; (2) not accept such Ruling and request a hearing before the panel for the presentation of additional testimony and/or argument; or (3) accept the Findings of Fact and Conclusions of Law, in whole or in part, and make a separate decision thereon. A record of the hearing shall be made, and a transcript shall be made available to any judge of the Court upon their request. Copies of the transcript shall be made available through the Court to any person upon payment of the costs of transcription.</p>
+<p>[Effective&nbsp; January 14,&nbsp; 2022]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr8.4.1servicefilingandsigningofpapers">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr8.4.1servicefilingandsigningofpapers-x86803_panel-18">SMCLR 8.4.1 SERVICE, FILING AND SIGNING OF PAPERS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr8.4.1servicefilingandsigningofpapers-x86803_panel-18" class="content" data-name="smclr8.4.1servicefilingandsigningofpapers">
+
+
+<p><strong>(a) </strong>All motions, briefs and other documents in support of motions and arraignment waivers shall be filed and served as follows:</p>
+<p style="padding-left: 30px;">(1) The original shall include the date, time and court of the next hearing set forth above the caption on the first page if a hearing on the motion is already scheduled. If a hearing is not scheduled, the words "NOT SCHEDULED" shall appear above the caption;<br />(2) The original shall contain a certificate of mailing or a certificate or affidavit of service upon or acknowledgment of receipt by opposing counsel and judicial chambers;<br />(3) The original shall be filed with the clerk of the court in person or electronically via the Electronic Court File (ECF) Portal.</p>
+<p><strong>(b) </strong>The clerk is authorized to refuse to accept for filing any documents that do not, on their face, comply with these rules.</p>
+<p><strong>(c) </strong>The Seattle Municipal Court cause number shall be noted in the caption. Documents with incorrect or no cause number may be deemed null and void. Court clerks have no responsibility for obtaining or correcting cause numbers, dates, times or courts. The clerk shall make available to parties the printout of all pending cases.</p>
+<p><strong>(d) </strong>Documents requiring clerk's action, including but not limited to arraignment waivers, shall include, in the caption, above the cause number, the words "CLERK'S ACTION REQUIRED." Arraignment waivers which do not include said words and which do not conform to SMCLR 8.4.1(a)(1) may not be processed and, upon failure to appear at arraignment, a warrant may be issued for the defendant's arrest.</p>
+<p><strong>(e) </strong>All papers filed with the court shall comply with <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;set=GR&amp;ruleid=gagr14" target="_blank">GR 14</a>. All papers filed with the court shall be submitted on letter-size paper (8-1/2 by 11 inches). Papers which do not conform with this rule may be rejected by court clerks.</p>
+<p>[Effective June 13, 1989; amended effective September 1, 1997; September 1, 2002; September 1, 2011; September 1, 2012; June 24, 2014; September 1, 2015 and April 11, 2016.]<br /><br /></p>
+<p></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr9.3documentandrecordingfees">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr9.3documentandrecordingfees-x86804_panel-19">SMCLR 9.3 DOCUMENT AND RECORDING FEES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr9.3documentandrecordingfees-x86804_panel-19" class="content" data-name="smclr9.3documentandrecordingfees">
+
+
+<p>Fees for the duplication and preparation of documents and recordings shall be set at cost by the Court Administrator, from whom a schedule shall be available.<br /><br /> [Effective September 1, 1999, Amended effective September 1, 2004.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr10.2presidingjudge">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr10.2presidingjudge-x86805_panel-20">SMCLR 10.2 PRESIDING JUDGE</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr10.2presidingjudge-x86805_panel-20" class="content" data-name="smclr10.2presidingjudge">
+
+
+<p><strong>1. Election and Term of Presiding Judge</strong><br /><br /> <strong>(a)</strong> The judges shall elect by a majority of all the judges a Presiding Judge for a term of not less than two years. The term of office shall commence on January 1 following election. The election should occur a minimum of two months prior to the beginning of the new term.<br /> <strong>(b)</strong> Candidates for the position of Presiding Judge shall demonstrate their interest in the position by expressing their views to other judges about the strategic direction of the court. <br /> <strong>(c)</strong> In the same manner, the judges will elect an Assistant Presiding Judge for a term of not less than two years. The term of office for Assistant Presiding Judge shall commence on January 1 following election. The election should occur a minimum of two months prior to the beginning of the new term. <br /><strong>(d)</strong> <em>Vacancies<strong>.</strong></em> Vacancies in the office of Presiding Judge or Assistant Presiding Judge or in the event the immediate Past Presiding Judge is unavailable, the position shall be filled by a majority vote of all the judges at a regular or special meeting of the judges within 30 days after the vacancy occurs. In the case of a vacancy in the office of Presiding Judge, the Assistant Presiding Judge shall serve as the acting Presiding Judge until said election. In the case of vacancy in the office of Assistant Presiding Judge, the third member of the Executive Committee shall act as interim Assistant Presiding Judge. The judge elected to fill the vacancy shall serve the remainder of the term of the Presiding Judge or Assistant Presiding Judge. In the absence of both the Presiding Judge and Assistant Presiding Judge, the third member of the Executive Committee shall act as interim Presiding Judge until said election.<br /> <strong>(e)</strong> <em>Failure or refusal to elect.</em> If the judges fail or refuse to elect a Presiding Judge or Assistant Presiding Judge, the Presiding Judge then in office shall notify the Supreme Court of said failure or refusal no later than 45 days after the vacancy occurs, and the Chief Justice of the Supreme Court shall appoint a Presiding Judge or Assistant Presiding Judge pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=gr&amp;ruleid=gagr29" target="_blank">GR 29</a>.<br /> <strong>(f)</strong> <em>Removal.</em> The Presiding Judge or Assistant Presiding Judge may be removed by majority vote of the judges at a regular or special meeting of the judges called by any judge upon at least 10 days notice in writing or by court electronic mail sent to all judges stating that removal of the Presiding Judge or Assistant Presiding Judge is at issue. <br /><strong>(g)</strong> <em>Ballots.</em> Casting of ballots pursuant to this rule may be made in person, by court electronic mail, telephonically, by letter or other written notice or by proxy given to another judge.</p>
+<p><strong>2. Responsibilities of Presiding Judge</strong></p>
+<p><strong>(a)</strong> The Presiding Judge shall be responsible for leading the management and administration of the court's business, recommending policies and procedures that improve the court's effectiveness, and allocating resources in a way that maximizes the court's ability to resolve disputes fairly and expeditiously. Judicial caseload of the court shall be adjusted to provide the Presiding Judge with sufficient time and resources to properly perform the duties of office as required by <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=gr&amp;ruleid=gagr29" target="_blank">GR 29</a>.<br /> <strong>(b)</strong> The Presiding Judge shall direct the work of the Court Administrator in managing all administrative, non-judicial functions and all other court personnel. <br /> <strong>(c)</strong> When the Presiding Judge is unavailable, the Assistant Presiding Judge shall undertake the duties of the Presiding Judge. If both the Presiding Judge and the Assistant Presiding Judge are unavailable, the third member of the Executive Committee shall undertake the duties of the Presiding Judge.<br /> <strong>(d)</strong> The Presiding Judge shall directly supervise non-elected judicial officers.<br /> <strong>(e)</strong> The Presiding Judge may delegate specific supervisory responsibilities to other judges. The Presiding Judge shall make specific judicial assignments for supervisory duties to other judges for each calendar year. <br /> <strong>(f)</strong> <em>Executive Committee.</em> The Executive Committee will consist of the Presiding Judge, Assistant Presiding Judge, the immediate Past Presiding Judge and the Court Administrator. If the immediate Past Presiding Judge is not available to serve as the third member of the Executive Committee, the position shall be filled by a majority vote of all the judges at a regular or special meeting of the judges within 30 days after the vacancy occurs. The Executive Committee will act in an advisory capacity to the Presiding Judge in the management of the court, review administrative proposals, judicial projects and proposed court policies. The Executive Committee shall make no binding policy decisions absent prior approval by the majority of judges.<br /> <strong>(g)</strong> A Standing Advisory Committee, referred to as the Bench-Bar Committee, appointed and chaired by the Presiding Judge or his/her designee judge, may meet monthly to discuss policies, procedures and other matters that may be of mutual interest. The Bench-Bar Committee shall be comprised of the Court Administrator, Chief Clerk, Chief Bailiff, Probation Director, the City Attorney or designee and the Directors or designee of the Public Defense agencies. A member of the Washington Association of Criminal Defense Lawyers and the Chair or his/her designee of the Criminal Law Section of the King County Bar Association may also be asked to participate.</p>
+<p>[Effective June 13, 1989; amended effective September 1, 1997; September 1, 1998; September 1, 2003; September 1, 2006; September 1, 2011; January 1, 2012; and September 1, 2015 and April 11, 2016.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr10.3meetingofthejudges">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr10.3meetingofthejudges-x86806_panel-21">SMCLR 10.3 MEETING OF THE JUDGES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr10.3meetingofthejudges-x86806_panel-21" class="content" data-name="smclr10.3meetingofthejudges">
+
+
+<p>The judges shall meet at least once each month, except for July and August, at such hour and place as the Presiding Judge shall designate. The Presiding Judge shall preside at all such meetings and the judges shall consider such matters pertaining to the administration of justice in the court as may be brought before them. The Presiding Judge shall prepare an agenda for the meeting and provide a copy for the other judges in advance thereof. The judges shall at such meetings, by majority vote of those present, plus proxies, adopt rules for the proper administration of justice in the court.<br /><br /> [Effective May 2, 1988; amended September 1, 1997]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr10.4magistrates">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr10.4magistrates-x86807_panel-22">SMCLR 10.4 MAGISTRATES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr10.4magistrates-x86807_panel-22" class="content" data-name="smclr10.4magistrates">
+
+
+<p>The court may employ judicial officers as Magistrates to assist in the administration of justice and accomplishment of the work of the court. The Presiding Judge shall have the authority to assign work to the Magistrates. The duties and responsibilities that have been assigned to Magistrates include the adjudication of contested civil traffic infractions, parking infractions, and various ordinance violations, presiding over mitigation and contested settlement conferences and such other duties as may be assigned by the Presiding Judge.<br /><br /> The Presiding Judge may appoint the Magistrates to serve as Judges Pro tem and while serving in this capacity they may issue rulings on search warrant requests during and outside regular court hours and may preside over formal court proceedings.</p>
+<p>Magistrates are expected to perform their assigned duties and responsibilities in a timely and efficient manner, consistent with law, and with appropriate judicial demeanor and respect for the rights of court participants and court personnel. Magistrates are further expected to adhere to the Code of Judicial Conduct and to the Code of Conduct for Employees of Municipal Court. Failure of a Magistrate to fulfill any of his or her duties or responsibilities, as determined in the judgment and discretion of the Presiding Judge, may result in disciplinary action including termination of employment.</p>
+<p>[Effective June 13, 1989 Amended Effective September 1, 2003; September 1, 2011; September 1, 2014 and April 11, 2016.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr74rulesonappealofcodeofethicsviolations">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr74rulesonappealofcodeofethicsviolations-x86809_panel-23">SMCLR 74 - RULES ON APPEAL OF CODE OF ETHICS VIOLATIONS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr74rulesonappealofcodeofethicsviolations-x86809_panel-23" class="content" data-name="smclr74rulesonappealofcodeofethicsviolations">
+
+
+<p><strong>(a) Scope of Rule</strong>. This rule applies only to appeals of fines imposed by the Seattle Ethics and Elections Commission (Commission) upon city employees imposed pursuant to <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT4PE_CH4.16COET" target="_blank">Ch. 4.16</a>, Seattle Municipal Code.<br /> <strong>(b) Filing Notice of Appeal</strong>. When an appeal is permitted by law to the Municipal Court from a fine imposed by the Commission, such appeal shall be taken by filing a notice of appeal in the Municipal Court clerk's office and paying a filing fee to the Municipal Court in the amount set by law for filing a civil action in district court, pursuant to <a href="http://app.leg.wa.gov/rcw/default.aspx?cite=3.62.060" title="Filing Notice of Appeal - RCW 3.62.060">RCW 3.62.060</a> and<a href="https://app.leg.wa.gov/rcw/default.aspx?cite=7.75.035" title="Filing Notice of Appeal - CW 7.75.035 " target="_blank"> RCW 7.75.035</a>, within twenty days after the date of the Commission's decision. The notice of appeal shall contain in separate numbered paragraphs, statements of the specific findings of fact, conclusions of law, or aspects of the fine on which the appellant seeks review, the basis for the appeal, and a brief statement of the relief requested. The appellant shall attach a copy of the written decision of the Commission being appealed. A copy of the notice of appeal shall be served upon the Executive Director of the Commission. Timely filing and serving the notice of appeal and payment of the filing fee are the only jurisdictional requirements for an appeal. The notice of appeal shall contain the mailing address of appellant.<br /> <strong>(c) Stay of Proceedings</strong>. Upon timely filing and service of a notice of appeal, the fine imposed by the Commission shall be stayed.<br /> <strong>(d) Scope of Review</strong>. An appeal pursuant to this rule is on the Commission's record and is not de novo. The court shall uphold the Commission's decision if it determines that the decision is not arbitrary, capricious or otherwise illegal and that the decision is supported by substantial evidence in the Commission's record. No new evidence shall be taken by or submitted to the court. If the court affirms the Commission, then the fine is immediately due. Otherwise, the court shall modify, reverse or remand the matter to the Commission.<br /> <strong>(e) Procedures</strong>.<br /> &nbsp;&nbsp;&nbsp;&nbsp; <strong>(1)</strong> <em>Record on Appeal.</em> Within thirty days after the notice of appeal is filed and served, appellant shall, at appellant's expense, provide the Executive Director of the Commission with a report of proceedings to the extent deemed necessary for review by appellant. The report of proceedings may take the form of a "verbatim report of proceedings" as provided in Rules of Appellate Procedure <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=app&amp;set=rap&amp;ruleid=apprap09.02" target="_blank">(RAP) 9.2</a> or an "agreed report of proceedings" as provided in <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=app&amp;set=RAP&amp;ruleid=apprap09.04" target="_blank">RAP 9.4</a>. If appellant prepares less than all of the verbatim report of proceedings, the Executive Director may prepare a transcript of additional portions of the hearing, at the Commission's expense. The Executive Director shall review the transcript. Appellant may serve and file objections to, and propose amendments to, the verbatim report of proceedings as approved by the Executive Director. If objections or amendments are served and filed, any objections or proposed amendments must be determined by the members of the Commission before whom the proceedings were held. The Executive Director shall provide appellant with a copy of the relevant papers and exhibits which were considered by the Commission, which shall be included in the record to the court. The Executive Director shall file the report of proceedings and record with the court.<br /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong> (2)</strong><em> Sanctions for Failure to Perfect Appeal.</em> The court, upon motion, may dismiss an appeal that is not diligently pursued by appellant. The court, upon motion, may reverse a fine imposed by the Commission where the court finds that the Executive Director has not, in good faith, pursued the preparation of the record.<br /> <strong>(f) Hearing</strong>. Within thirty days of the filing of the notice of appeal, the Presiding Judge shall assign the appeal to a judge or judge <em>pro tempore</em>. Appellant shall file with the court and serve upon the Executive Director a brief, not to exceed fifteen pages, within thirty days of receipt by the court of the agreed or approved record. Respondent shall file and serve a brief, not to exceed fifteen pages, within thirty days of service of appellant's brief. Appellant may file and serve a reply brief, not to exceed five pages, within ten days of service of respondent's brief. Briefs shall conform with <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=app&amp;set=RAP&amp;ruleid=apprap10.04" target="_blank">RAP 10.4</a>(a). The court shall schedule oral argument, unless waived, within thirty days of filing of respondent's brief. Each party shall be allowed ten minutes for oral argument. Appellant may reserve part of his or her ten minutes for rebuttal argument.<br /> <strong>(g) Decision</strong>. The court shall state its decision at the conclusion of oral argument or shall prepare a written decision with thirty days of oral argument.<br /> <strong>(h) Costs</strong>. The filing fee and the costs of preparing the record may be taxed against the non-prevailing party. Where the court determines that the fine was properly imposed, then the Commission is the prevailing party. Where the court reverses the fine, then appellant is the prevailing party. Where the court modifies the fine or remands the matter to the Commission, then the court will determine which party has substantially prevailed. A prevailing party shall file a cost bill with the court and serve a copy of the bill on the non-prevailing party within ten days after the court has announced or filed its decision. The non-prevailing party may object to items in the cost bill by filing with the court objections to the cost bill within ten days after service of the cost bill. The court will determine costs within ten days after the time has expired for filing objections to the cost bill. No oral argument will be taken on costs.<br /><br /> [Emergency rule, adopted December 4, 1998; effective January 1, 1999; amended effective September 1, 2002; September 1, 2004.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr73trialdenovo">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr73trialdenovo-x86810_panel-24">SMCLR 73 TRIAL DE NOVO</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr73trialdenovo-x86810_panel-24" class="content" data-name="smclr73trialdenovo">
+
+
+<p><strong>(a) Scope of Rule</strong>. This rule applies only to proceedings pursuant to <a href="https://library.municode.com/wa/seattle/codes/municipal_code?nodeId=TIT11VETR_SUBTITLE_ITRCO_PT3EN_CH11.30IM" title="SMC Code" target="_blank">Ch. 11.30</a>, Seattle Municipal Code, relating to redemption of impounded vehicles and post-impoundment hearing procedures. The proceedings to which this rule applies is defined by and limited to those expressly set forth in the Seattle Municipal Code permitting de novo appeals from an administrative hearings officer to the Municipal Court of Seattle.<br /> <strong>(b) Filing Notice of Appeal Jurisdictional - Service</strong>. When an appeal is permitted by law from a Magistrate or Commissioner to the Municipal Court, such appeal shall be taken by filing in the Municipal Court clerk's office a notice of appeal within fifteen days after the decision of the Magistrate or Commissioner and payment of a filing fee to the Municipal Court in the sum set by law, pursuant to <a href="http://apps.leg.wa.gov/RCW/default.aspx?cite=3.62.060" title="Filing Notice of Appeal Jurisdictional - Service RCW 3.62.060" target="_blank">RCW 3.62.060</a> and <a href="http://app.leg.wa.gov/RCW/default.aspx?cite=7.75.035" title="Filing Notice of Appeal Jurisdictional - Service -  7.75.035" target="_blank">RCW 7.75.035</a>, unless said fee is waived. The Magistrate or Commissioner shall provide, upon request, a notice of appeal form approved by the Municipal Court. A copy of the notice of appeal shall be served upon the chief of police and upon the City Attorney. Filing and serving the notice of appeal and payment of the filing fee are the only jurisdictional requirements for an appeal. The notice of appeal shall contain the mailing address of appellant.<br /> <strong>(c) Waiver of Filing Fee for Indigents</strong>. A party seeking to appeal partially or wholly at public expense must seek a waiver of the filing fee from the Presiding Judge or his or her designee by filing and presenting to the Presiding Judge, or designee, within the fifteen day period, a proposed notice of appeal and an affidavit setting forth the moving party's total assets, expenses and liabilities. The Presiding Judge, or designee, shall notify the party of his or her decision in writing within three court days of filing the affidavit. If the Presiding Judge, or designee, determines that the filing fee shall be waived, the Presiding Judge, or designee, shall direct the clerk to file the notice of appeal.<br /> <strong>(d) Discovery</strong>. Upon written demand, a party shall provide the other party, within seven days of receipt of the demand, with a list of witnesses, together with their addresses and telephone numbers, and copies of all documents the party will offer at the de novo hearing; the city shall mail discovery demanded pursuant to this rule to appellant's address contained in the Notice of Appeal. No other discovery shall be required. If, after compliance with this rule or orders pursuant to it, a party discovers additional witnesses or information that is subject to disclosure, the party shall promptly notify the other party of the existence of such additional material. Failure to provide discovery in accordance with this rule is grounds for exclusion of evidence or such lesser sanction as the court deems just and equitable.<br /> <strong>(e) Scheduling of De Novo Hearing</strong>. The hearing shall be scheduled not sooner than twelve but not later than 21 days from the filing of the notice of appeal, and shall be set on a Municipal Court bench trial calendar. The clerk shall notify the parties in writing of the hearing date and shall mail notice to the parties within three days of filing of the notice of appeal. The Presiding Judge or designee has the discretion to schedule a contested hearing for a parking infraction that was alleged to occur at the time of the impoundment at the same time as the de novo hearing.<br /> <strong>(f) Procedures at Hearing</strong>. At the hearing, the city shall be represented by a lawyer. Appellant may be represented by a lawyer. The Rules of Evidence applicable to civil cases shall apply. If an infraction is consolidated with the hearing, <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj3.3" target="_blank">IRLJ 3.3</a>(c) shall apply to the infraction. If the court finds the impoundment to have been proper, the court shall enter an order so stating. If the court finds the impoundment to have been improper, the court shall enter an order so stating, and shall order the immediate release of the vehicle to the registered owner of the vehicle. If the costs of impoundment, towing, removal, storage and administrative fees and filing fee have been paid, the court shall enter a judgment in favor of appellant in that sum. If the court finds the impoundment to have been proper but that the fees charged for impoundment, removal, towing, storage or administration were improper, the court shall determine the correct fees to be charged and, if the costs and fees have been paid, the court shall enter a judgment against the city and in favor of the appellant for the amount of the overpayment.<br /> <strong>(g) Time Payments</strong>. The court may grant time payments in cases of extreme financial need and where there is an effective guarantee of payment. If the court grants time payments, the court shall order the release of the vehicle immediately if authorized by law or at the end of the authorized impound period.<br /><br /> [Emergency rule, adopted December 4, 1998, effective January 1, 1999; amended effective September 1, 2002; amended effective September 1, 2004; September 1, 2015.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclr10.7civilcaseprocedures">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclr10.7civilcaseprocedures-x86811_panel-25">SMCLR 10.7 CIVIL CASE PROCEDURES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclr10.7civilcaseprocedures-x86811_panel-25" class="content" data-name="smclr10.7civilcaseprocedures">
+
+
+<p><strong>(a) Scope of Rule.</strong> This rule applies to civil actions filed with the Seattle Municipal Court that do not fall within the scope of infractions under the IRLJ and SMCLR. <br /><strong>(b) Commencement of Action</strong>. A civil action is commenced by filing with the court a complaint signed as required under <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.rulesPDF&amp;ruleId=cljcrlj11&amp;pdf=1" target="_blank">CRLJ 11</a>. Upon the filing of a complaint, the civil clerk will assign a case number to the matter. Plaintiff must affix the case number to the summons and complaint and serve the summons and complaint on the defendant pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.rulesPDF&amp;ruleId=cljcrlj04&amp;pdf=1" target="_blank">CRLJ 4</a>, and file copies of the summons and proof of service with the court. Unless a statute or rule provides for a different time requirement, defendant(s) must file a written answer with the court and serve a copy on the other party no later than 20 days after being served. <br /><strong>(c) Pre-Settlement Conferences.</strong> Pre-settlement conferences are informal proceedings, presided over by a magistrate, to discuss the status of cases and possible settlement options. Either party may request a pre-settlement conference by filing a written request with the civil clerk. The civil clerk shall notify all parties of any pre-settlement conference dates.<br /><strong>(d) Trial Settings.</strong> Either party may request a case be set for trial by filing a note for trial for an available trial date with the civil clerk. Available trial dates may be obtained from the civil clerk. The proposed trial date must be scheduled at least 45 days after the note for trial is filed. The party filing the note for trial must serve a copy on all other parties on the same day the note is filed with the civil clerk. The note for trial may be served by first class mail. <br /><strong>(e) Disclosure of Witnesses.</strong> All parties shall disclose all persons with relevant factual or expert knowledge whom the party reserves the option to call as witnesses at trial no later than 30 days prior to the trial date. The disclosure deadline is not extended if a trial date is continued. Disclosure shall include the following:</p>
+<ol>
+<li>The name, address, and phone number of each witness.</li>
+<li><em>Lay witnesses.</em> A brief description of the witness' relevant knowledge.</li>
+<li><em>Experts.</em> A brief description of the subject matter of the expert's testimony and a statement of qualifications.</li>
+</ol>
+<p>Any person not disclosed in compliance with this rule may not be called to testify at trial, unless the Court orders otherwise for good cause and subject to such conditions as justice requires. <br /><strong>(f) Discovery.</strong> All discovery must be completed 7 days prior to the first assigned trial date. The discovery cutoff date shall not be extended if a trial date is continued unless approved by the Court or by agreement of the parties.<br /><strong>(g) Demand for Jury Trials.</strong> A demand for a jury trial shall be made by filing a jury demand with the civil clerk and paying a jury fee as authorized by <a href="http://apps.leg.wa.gov/RCW/default.aspx?cite=3.62.060" title="A demand for a jury trial shall be made by filing a jury demand with the Civil Clerk and paying a jury fee as authorized by RCW 3.62.060" target="_blank">RCW 3.62.060</a> no later than seven days after the notice of trial date is mailed or otherwise delivered to the parties. The party requesting the jury trial must serve the demand for jury to all other parties on the same date the jury demand is filed with the civil clerk. The demand for jury may be served by first class mail. Failure to comply with this rule shall be deemed a waiver of the right to a jury trial. The deadline for demanding a jury trial shall not be extended if a trial date is continued. <br /><strong>(h) Motions.</strong></p>
+<ol>
+<li><em>Dates of Filing, Hearing and Consideration.</em> The moving party shall file and serve all motion documents no later than 6 court days before the date the party wishes the motion to be considered. If the case is set for trial, all motions and supporting documents must be filed and served by the moving party no less than 14 days prior to the trial date. Either party may request oral argument by requesting it in the party's written documents.</li>
+<li><em>Note for Motion.</em> A Note for Motion designating an available hearing date shall be filed and served with the motion. Available hearing dates and Note for Motion forms are available from the civil clerk's office.</li>
+<li><em>Opposing Documents.</em> Any party opposing a motion shall file the original responsive papers in opposition to a motion and serve copies on all parties no later than 12:00 noon two court days before the date the motion is scheduled to be heard.</li>
+<li><em>Reply.</em> Any documents in strict reply shall be filed and copies served on parties no later than noon on the court day before the motion is scheduled to be heard.</li>
+<li><em>Noncompliance.</em> Any material offered at a time later than required by this rule, and any reply material which is not in strict reply, will not be considered by the court.</li>
+<li><em>Form of Motions and Opposition Documents.</em></li>
+</ol>
+<p style="padding-left: 30px;">&nbsp;&nbsp;<strong> (a)</strong> The motion and any memorandum in opposition shall conform to the following:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a. Relief Requested<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b. Statement of Facts<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; c. Statement of Issues<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d.&nbsp; Evidence relied upon<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; e. Authority<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f. Proposed Order for Relief clearly marked as "Proposed"<br />&nbsp;&nbsp;&nbsp;<strong> (b)</strong> The initial motion and opposing memorandum shall not exceed 12 pages and the reply memoranda shall not exceed&nbsp; five pages without permission of the Court.</p>
+<p><br /><strong>(i) Pleadings and Other Documents.</strong> The Seattle Municipal Court case number shall be noted in the caption of all pleadings and documents filed with the Court. Pleadings and documents with incorrect or missing case numbers may be deemed null and void. Court clerks have no responsibility for obtaining or correcting case numbers, dates, times or courts.</p>
+<ol>
+<li>Documents requiring clerk's action shall include, in the caption, above the cause number, the words "CLERK'S ACTION REQUIRED."</li>
+<li>All documents filed with the court shall comply with <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;set=GR&amp;ruleid=gagr14" target="_blank">GR14</a> and <a href="http://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=ga&amp;set=gr&amp;ruleid=gagr30" target="_blank">GR30</a>. Those which do not conform with these rules may be rejected by court clerks.</li>
+</ol>
+<p><strong>(j) Motions to Reconsider.</strong> Motions for reconsideration of an order or judgment must be filed no later than 10 days after the date of entry of the order or judgment. The form of motion shall conform to section(h). The motion shall set forth specific grounds for the reconsideration, and will be considered without oral argument unless called for by the Court. No response to a motion to reconsider shall be filed unless requested by the Court. No motion for reconsideration will be granted without such a request. If a response is called for, a reply may be filed within two days of service of the response.<br /><strong>(k) Trial Briefs.</strong> Trial briefs and bench memorandums may be submitted at the Court's discretion. <br /><strong>(l) Case Removal to Superior Court.</strong> A party seeking case removal to Superior Court shall comply with<a href="http://app.leg.wa.gov/RCW/default.aspx?cite=4.14.010" target="_blank"> RCW 4.14.010</a>, <a href="http://app.leg.wa.gov/RCW/default.aspx?cite=4.14.020" target="_blank">RCW 4.14.020</a> and <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.rulesPDF&amp;ruleId=cljcrlj14A&amp;pdf=1" target="_blank">CRLJ 14A</a>.</p>
+<p>[Effective September 1, 2012; amended September 1, 2015]<br /><br /></p>
+<p></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir2.4responsetonotice">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir2.4responsetonotice-x174474_panel-26">SMCLIR 2.4 RESPONSE TO NOTICE</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir2.4responsetonotice-x174474_panel-26" class="content" data-name="smclir2.4responsetonotice">
+
+
+<p>A request for a hearing pursuant to SMCLIR 2.6 may be made personally, in writing, or by email. If the response is mailed or e-mailed, it must be postmarked or e-mailed not later than &nbsp;midnight of the day the response is due.</p>
+<p>[Effective March 9, 2025.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir2.6schedulingofhearings">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir2.6schedulingofhearings-x86812_panel-27">SMCLIR 2.6 SCHEDULING OF HEARINGS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir2.6schedulingofhearings-x86812_panel-27" class="content" data-name="smclir2.6schedulingofhearings">
+
+
+<p><strong>(a)</strong> A defendant charged with an infraction who requests a hearing to explain mitigating circumstances per <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.4" target="_blank">IRLJ 2.4</a>, <a href="http://app.leg.wa.gov/RCW/default.aspx?cite=46.63.070" target="_blank">RCW 46.63.070</a>, shall appear before a Magistrate. The Magistrate's determination of the disposition shall be final, and is not subject to review before a Judge.<br /><br /><strong>(b)</strong> A defendant charged with an infraction who requests a hearing to contest the determination that an infraction occurred shall first appear before a Magistrate for a prehearing conference. The prehearing conference shall be held in the Magistrate's department and should be scheduled in accordance with <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.6" target="_blank">IRLJ 2.6</a>(a). The Presiding Judge or designee, defendant, or defendant's lawyer may waive the prehearing conference on his/her own motion. If the prehearing conference is waived, the case will be set for a contested hearing. A defendant who waives the prehearing conference is deemed to have waived any <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.6" target="_blank">IRLJ 2.6</a>(d) objection to the prehearing conference date. If the defendant fails to waive or appear at the prehearing conference, a default judgment shall be entered.<br /><br /><strong>(c)</strong> If the defendant who requests a hearing to contest the determination that an infraction was committed has a criminal charge pending in Seattle Municipal Court, and said criminal charge arises out of the same occurrence as the infraction, the hearing on the infraction may be heard at the same time as the criminal charge. The defendant, the City Attorney or the court may make this request as authorized by the Infraction Rules for Courts of Limited Jurisdiction.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br /><br /><strong>(d)</strong> A defendant who objects to the hearing date set by the court pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.6" target="_blank">IRLJ 2.6</a> shall file with the court and serve upon the plaintiff a written motion for a speedy hearing date. Said motion shall be filed and served no later than 10 days from the date of written notice of the hearing date. Failure to comply with this rule shall be a waiver of the objection.<br /><br /><strong>(e)</strong> Either party may request the court to consider setting the contested hearing on a special calendar or on Master calendar when the case involves multiple witnesses, complex motions, or other factors that require a lengthy hearing. The court, on its own motion, may set a case on a special calendar or on Master calendar when judicial economy requires or the court deems it appropriate.<br /><br /> [Effective September 1, 1992; Amended effective September 1, 2011; September 1, 2012; November 28, 2012.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir2.6.1continuancescontestedhearings">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir2.6.1continuancescontestedhearings-x86813_panel-28">SMCLIR 2.6.1 CONTINUANCES - CONTESTED HEARINGS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir2.6.1continuancescontestedhearings-x86813_panel-28" class="content" data-name="smclir2.6.1continuancescontestedhearings">
+
+
+<p><strong>(a)</strong> Each party is entitled to have the contested hearing continued one (1) time without judicial approval or prior notice to the opposing party, if it is the first continuance for that party and the party contacts the clerk at least fifteen (15) days prior to the scheduled contested hearing.<br /><br /><strong>(b)</strong> For continuance requests not covered by (a), the party who wishes to continue the contested hearing must file a written motion with the court and serve a copy of the motion on the opposing party at least fifteen (15) days prior to the scheduled contested hearing. For motions filed less than fifteen (15) days prior to the scheduled contested hearing, good cause must be shown.</p>
+<p><strong>(c)</strong> One (1) continuance on the day of the scheduled contested hearing may be granted if there is no prejudice to the opposing party.<br /><br />[Effective November 28, 2012]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir3.1contestedhearingspreliminaryproceedings">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir3.1contestedhearingspreliminaryproceedings-x86815_panel-29">SMCLIR 3.1 CONTESTED HEARINGS - PRELIMINARY PROCEEDINGS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir3.1contestedhearingspreliminaryproceedings-x86815_panel-29" class="content" data-name="smclir3.1contestedhearingspreliminaryproceedings">
+
+
+<p><strong>(a)</strong> <strong>Subpoena.</strong> A defendant who requests a hearing to contest the determination that an infraction was committed may file upon the court, a written demand that the court subpoena the parking enforcement, police or other law enforcement officer who issued the citation. The demand must be filed with the court at least fifteen (15) days prior to the contested hearing. Upon receipt of such demand, the court will issue and serve the subpoena. The court may continue the hearing upon receipt of such a demand to assure the officer's presence, upon written notice to the defendant. A defendant is responsible for obtaining and serving subpoenas in accordance with <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=irlj&amp;ruleid=cljirlj3.1" target="_blank">IRLJ 3.1</a> in all other circumstances.<br /><br /> [Effective November 28, 2012]<strong></strong><br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir3.2failuretoappear">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir3.2failuretoappear-x86817_panel-30">SMCLIR 3.2 FAILURE TO APPEAR</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir3.2failuretoappear-x86817_panel-30" class="content" data-name="smclir3.2failuretoappear">
+
+
+<p><strong>(a)</strong> If a defendant who was personally served with a notice of infraction fails to respond within thirty days (30) or fails to appear for a contested hearing, a prehearing conference or a mitigation hearing, the court shall enter a default judgment. If notice of the infraction was mailed to the defendant, defendant has thirty-three (33) days to respond. If the defendant fails to satisfy the judgment, the court may refer the delinquent judgment to a collection agency pursuant to <a href="http://app.leg.wa.gov/RCW/default.aspx?cite=3.02.045" target="_blank" rel="noopener">RCW 3.02.045</a>. Remuneration for collection services will be assessed as costs, at the rate agreed to between the Court and the collection agency, and added to the judgment.<br /><br /><strong>(b)</strong> Motions to set aside a default judgment under <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj3.2" title="Motions to set aside a default judgment under IRLJ 3.2(b)" target="_blank" rel="noopener">IRLJ 3.2</a>(b). The court may consider a request to set aside a default judgment entered upon a defendant's failure to appear as provided in <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj3.2" title="The court may consider a request to set aside a default judgment entered upon a defendant's failure to appear as provided in IRLJ 3.2(b)" target="_blank" rel="noopener">IRLJ 3.2</a>(b) and <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=CRLJ&amp;ruleid=cljcrlj60" target="_blank" rel="noopener">CRLJ 60</a>(b). If the request is made within 45 days of the entry of the default judgment, the court may administratively schedule a hearing to determine whether there is "good cause" to set aside a default judgment entered upon a failure to appear. Requests received after 45 days must be made in writing and submitted to the Presiding Judge or designee.<br /><br /><strong>(c)</strong> If the defendant fails to pay a fine and/or a default penalty, the court may refer the delinquent judgment to a collection agency pursuant to <a href="http://app.leg.wa.gov/RCW/default.aspx?cite=3.02.045" target="_blank" rel="noopener">RCW 3.02.045</a>. Remuneration for collection services will be assessed as costs, at the rate agreed to between the Court and the collection agency, and added to the judgment.<br /><br />[Effective November 28, 2012, amended effective September 1, 2015, March 10, 2023]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir3.3procedureatcontestedhearings">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir3.3procedureatcontestedhearings-x86818_panel-31">SMCLIR 3.3 PROCEDURE AT CONTESTED HEARINGS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir3.3procedureatcontestedhearings-x86818_panel-31" class="content" data-name="smclir3.3procedureatcontestedhearings">
+
+
+<p><strong>(a)</strong> The plaintiff need not be represented by a lawyer at a contested hearing unless directed to do so by the court.<br /><br /><strong>(b)</strong> Only printed copies of photos, photos/videos saved to CD/DVD or photos/videos emailed to the Courtroom will be considered by the court.<br /><br /> [Effective September 1, 2007; Amended effective November 28, 2012; September 1, 2015 and April 11, 2016.]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir3.5decisiononwrittenstatements">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir3.5decisiononwrittenstatements-x86819_panel-32">SMCLIR 3.5 DECISION ON WRITTEN STATEMENTS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir3.5decisiononwrittenstatements-x86819_panel-32" class="content" data-name="smclir3.5decisiononwrittenstatements">
+
+
+<p><strong>(a)</strong> Mitigation hearings of infractions based on sworn written statements are authorized pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.4" target="_blank">IRLJ 2.4</a>(b)(4), <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.6" target="_blank">2.6</a>, and <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj3.5" target="_blank">3.5</a>. The defendant shall be informed of the option to mitigate by written statement at the time defendant receives written notice of their date to appear in court for the mitigation conference. If the defendant elects to mitigate the infraction by written statement, the defendant's sworn statement must be received by the Court no later than three (3) calendar days before the scheduled mitigation conference or it will not be considered by the Court. There shall be no appeal from a decision based on written statements.<br /><br /><strong>(b)</strong> Contested hearings of infractions based on sworn written statements are authorized pursuant to <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.4" target="_blank">IRLJ 2.4</a>(b)(4), <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj2.6" target="_blank">2.6</a>, <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj3.4" target="_blank">3.4</a> and <a href="https://www.courts.wa.gov/court_rules/?fa=court_rules.display&amp;group=clj&amp;set=IRLJ&amp;ruleid=cljirlj3.5" target="_blank">3.5</a>. The defendant shall be informed of the option to contest by written statement at the time defendant receives written notice of their date to appear in court for the prehearing conference. If the defendant elects to contest the infraction by written statement, the defendant's sworn statement must be received by the Court no later than three (3) calendar days before the scheduled prehearing conference or it will not be considered by the Court. There shall be no appeal from a decision based on written statements.<br /><br /><strong>(c)</strong> The court, on its own motion, may decline to adjudicate a case by written statement and may schedule the matter for a formal court hearing.<br /><br /> [Effective November 28, 2012]<br /><br /></p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir6.2monetarypenaltyscheduleforinfractions">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir6.2monetarypenaltyscheduleforinfractions-x86820_panel-33">SMCLIR 6.2 MONETARY PENALTY SCHEDULE FOR INFRACTIONS</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir6.2monetarypenaltyscheduleforinfractions-x86820_panel-33" class="content" data-name="smclir6.2monetarypenaltyscheduleforinfractions">
+
+
+<p><a href="documents/Departments/Court/Attorneys/SMCLIR_6_A%20_updated_9-2023.docx" target="_blank" rel="noopener"><strong>(a)</strong> <strong>Schedule for Selected Infractions</strong></a></p>
+<p></p>
+<p><a href="documents/Departments/Court/SCLRIR6.2bparking.docx" target="_blank" rel="noopener"><strong>(b) Schedule for Selected Parking Infractions</strong></a></p>
+<p>[Effective; October 23, 2011; Amended Effective November 28, 2012, January 23, 2014; April 11, 2016;&nbsp; September 1, 2018; and January 1, 2025.]</p>
+
+
+            </div>
+        </div>
+        <h2 class="accordion-toggle" name="smclir6.6.1certificationofscalesusedinthemeasurementofweightforcommercialmotorvehicles">
+            <i class="far fa-plus" title="collapsed accordion"></i>
+            <button type="button" class="toggleBtn" aria-expanded="false" aria-controls="smclir6.6.1certificationofscalesusedinthemeasurementofweightforcommercialmotorvehicles-x86821_panel-34">SMCLIR 6.6.1 CERTIFICATION OF SCALES USED IN THE MEASUREMENT OF WEIGHT FOR COMMERCIAL MOTOR VEHICLES</button>
+        </h2>
+        <div class="accordionWrapper">
+            <div id="smclir6.6.1certificationofscalesusedinthemeasurementofweightforcommercialmotorvehicles-x86821_panel-34" class="content" data-name="smclir6.6.1certificationofscalesusedinthemeasurementofweightforcommercialmotorvehicles">
+
+
+<p><strong>(a) In General.</strong> This rule applies only to contested hearings in traffic infraction cases.<br /><br /><strong>(b) Scale Test Report and Certification of Inspection.</strong> In the absence of proof of a request, on a separate pleading, to produce a scale inspection expert, served on the prosecuting authority and filed with the clerk of the court at least 30 days prior to trial or such lesser time as the court deems proper, a sworn statement setting forth the results of any inspection, test, and/or certification of any scale used primarily for the purpose of measuring the weights of commercial motor vehicles is admissible in lieu of an expert witness in any court proceeding in which the scale accuracy is an issue. Such scale test report and certification of inspection is admissible in evidence without additional foundation, and shall not be subject to objection on grounds of hearsay, provided that such document is maintained in a manner consistent with subsection (d) of this rule. Any party may present evidence supporting or attacking the result of any such measurement of weight or the inspection, test and/or certification of any such scale.<br /><br /><strong>(c) Continuance.</strong> The court at the time of the formal hearing shall hear testimony concerning the infraction and if necessary, may continue the proceeding for the purpose of obtaining evidence concerning the scale accuracy and the certification or inspection thereof. If, at the time it is supplied, the evidence is insufficient, a motion to suppress the readings of such test shall be granted.<br /><br /><strong>(d)&nbsp; Maintaining Certificates as Public Records.</strong> Any document of inspection, test and/or certification of any State scale as set forth in subsection (b) of this rule may be filed with the court and maintained by the court as a public record. The documents will be available for inspection by the public. Copies will be provided on request. The court may charge any allowable copying fees. The documents are available without a formal request for discovery. In the alternative, or in addition, such documents may be maintained on a website established for that purpose by the Washington State Patrol. The court is entitled to take judicial notice of the fact that the document has been filed with the court or maintained on the website. Evidence will not be suppressed merely because there is not a representative of the prosecuting authority present who actually offers the document.<br /><br /> [Effective April 11, 2013]<br /><br /></p>
+
+
+            </div>
+        </div>
+
+</div>
+            </div>
+
+                                    </div>
+                                </main>
+                                
+
+                            </div>
+                        </div>
+                        
+
+    <aside role="complementary" aria-labelledby="leftCol">
+        <div id="leftCol" class="col-md-3 col-md-pull-9">
+
+    <nav aria-label="Primary Leftside Navigation">
+        <div id="vue-component-left-nav" class="hidden-xs"></div>
+    </nav>
+                <span aria-hidden="true" style="display:none">No left sidebar</span>
+
+        </div>
+    </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    <div role="contentinfo" aria-label="Department footer">
+        <nav id="deptFootLinksWrapperShort" role="navigation" aria-label="Department footer links">
+            <div class="container">
+                <ul class='footerLinkList'>
+    <li><a href="courts/about-us"     aria-label="About Us link">About Us</a>
+</li>
+    <li><a href="courts/about-us/contact-information-and-hours"     aria-label="Contact Information & Hours link">Contact Information & Hours</a>
+</li>
+    <li><a href="courts/about-us/privacy"     aria-label="Privacy link">Privacy</a>
+</li>
+    <li><a href="courts/about-us/career-and-volunteer-opportunities"     aria-label="Careers link">Careers</a>
+</li>
+    <li><a href="courts/about-us/community-engagement"     aria-label="Community Engagement link">Community Engagement</a>
+</li>
+</ul>
+
+            </div>
+        </nav>
+                <div class="seafooter18Wrapper department">
+            <div class="container" id="seafooter18">
+                <div class="row borderBottomNone">
+                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 footerContainer" id="seaFooter18Col1">
+                        <h2 translate="no">Municipal Court</h2>
+                        <div class="ContactComponent">
+                            <div class="contactText">
+                                <div class="contactAddress">
+                                    <p>
+                                        <span class="address">Address:</span>
+<a href="https://www.google.com/maps/place/600 5th Avenue, Seattle, WA, 98104" target="_blank">600 5th Avenue, Seattle, WA, 98104</a>
+<br />
+<span class="address">Mailing Address:</span>
+PO BOX 34987, Seattle, WA, 98124-4987<br />
+<span class="phone">Phone:</span>  <a href="tel: +1 (206) 684-5600" class="phoneNumber">(206) 684-5600</a><br />
+<span class="email">Email:</span>  <a href="mailto:SMC_PublicSvcs@seattle.gov">SMC_PublicSvcs@seattle.gov</a>
+<br />
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <section>
+                            <div class="contactTileSocialMediaWrapper">
+
+
+
+    <a id="x107093_deptFooter" class="socialMediaContactItem" href="https://www.facebook.com/seamunicourt/" target="_blank">
+        
+        <i class="fa-brands fa-facebook-square" title="Seattle Municipal Court Facebook"></i>
+
+    </a>
+    <a id="x85694_deptFooter" class="socialMediaContactItem" href="https://twitter.com/seamunicourt?lang=en" target="_blank">
+        
+        <i class="fa-brands fa-square-x-twitter" title="Seattle Municipal Courts Twitter"></i>
+
+    </a>
+    <a id="x109052_deptFooter" class="socialMediaContactItem" href="https://www.instagram.com/seamunicourt/" target="_blank">
+        
+        <i class="fa-brands fa-square-instagram" title="Seattle Municipal Court Instagram"></i>
+
+    </a>
+    <a id="x149057_deptFooter" class="socialMediaContactItem" href="https://www.linkedin.com/company/seattle-municipal-court" target="_blank">
+        
+        <i class="fa-brands fa-linkedin" title="Seattle Municipal Court LinkedIn"></i>
+
+    </a>
+    <a id="x188514_deptFooter" class="socialMediaContactItem" href="https://courts.seattle.gov/" target="_blank">
+        
+        <i class="fa-brands fa-wordpress" title="Seattle Municipal Court Blog"></i>
+
+    </a>
+</div>
+
+                        </section>
+
+                        
+                        <div class="subsribeNewsletter" id="subsribeNewsletter">
+                            <p class="subscribeLinkHeader">Sign Up for Latest Updates</p>
+                            <a href="https://public.govdelivery.com/accounts/WASEATTLE/subscriber/topics?qsp=WASEATTLE_21" title="Subscribe to Newsletter" class="btn-default" role="button" target="_blank">
+                                Subscribe <i class="far fa-external-link" title="external link"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 footerContainer" id="seaFooter18Col2">
+                        <h2>Citywide Information </h2>
+                        <ul>
+                            <li><a href="elected-officials" target="_blank"    >Elected Officials</a>
+</li>
+                            <li><a href="https://data.seattle.gov/" target="_blank"    >Open Data Portal</a>
+</li>
+                            <li><a href="public-records" target="_blank"    >Public Records</a>
+</li>
+                            <li><a href="holidays-and-closures"     >City Holidays and Closures</a>
+</li>
+                        </ul>
+                        <ul id="seaFooter20-col2Links">
+                                <li id="seaFooter20-col2Link0">
+                                    <i class="fas fa-newspaper"></i>
+                                    <a href="event-calendar" target="_blank"    >City Event Calendar</a>
+
+                                </li>
+                                <li id="seaFooter20-col2Link1">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <a href="https://public.govdelivery.com/accounts/WASEATTLE/subscriber/new" target="_blank"    >City Newsletters</a>
+
+                                </li>
+                                <li id="seaFooter20-col2Link2">
+                                    <i class="fas fa-envelope-open-text"></i>
+                                    <a href="departments"     >Departments & Offices</a>
+
+                                </li>
+                                <li id="seaFooter20-col2Link3">
+                                    <i class="fas fa-address-card"></i>
+                                    <a href="boards-and-commissions"     >Boards & Commissions</a>
+
+                                </li>
+
+                        </ul>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 footerContainer" id="seaFooter18Col3">
+
+
+
+    <div class="" id="popular-page-wrapper_x155792_footer" data-attr="department-pageList">
+        <h3 class="tileTitle">Popular Pages</h3>
+        <div id="popular-lists_x155792_footer">
+            <ol>
+                    <li><a href="courts/tickets-and-payments/pay-my-ticket"     >Pay My Ticket</a>
+</li>
+                    <li><a href="courts/programs-and-services/marriage-ceremonies/marriage-ceremony-request"     >Marriage Ceremony Request</a>
+</li>
+                    <li><a href="courts/for-attorneys/case-information-and-records"     >Case Information and Documents</a>
+</li>
+                    <li><a href="courts/jury-duty"     >Jury Duty</a>
+</li>
+                    <li><a href="courts/programs-and-services/community-resource-center"     >Community Resource Center</a>
+</li>
+            </ol>
+        </div>
+    </div>
+
+                    </div>
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 departmentDisclaimer">
+                        <div class="deptFooterCopy">
+                            <p style="text-align: center;"><strong>Hours:</strong> Monday - Friday 8 a.m. - 5 p.m. Closed <strong><a href="/courts/about-us/contact-information-and-hours/court-holidays">Holidays</a></strong>.<br /><strong>Contact Us:</strong> (206) 684-5600 or <strong><a href="/courts/programs-and-services/customer-service">Customer Service</a></strong>. <br /> <strong><a href="/courts/en-español">En Espa&ntilde;ol</a></strong></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+            </div>
+
+<footer aria-label="Global city links">
+    
+        <div class="clearfix"></div>
+        <div class="footerBottom18Wrapper">
+            <div class="container" id="footerBottom18">
+                <div class="row borderBottomNone">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 footerContainer copyRight">
+                        <div class="cosLogo"></div>               
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 footerContainer subLinks">
+                        <h2 class="hidden">Policies</h2>
+                            <span class="link">
+                                <a href="digital"     >About Our Digital Properties</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="tech/data-privacy/privacy-statement"     >Privacy Policy</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="americans-with-disabilities-act"     >Title II: Americans with Disabilities Act</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="civilrights/laws-we-enforce/title-vi-civil-rights-act"     >Title VI: Civil Rights Act</a>
+
+                            </span>
+                            <span class="link">
+                                <a href="//www.seattle.gov/sitemap"     >Sitemap</a>
+
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+</footer>
+
+
+    
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/jquery-ui-1.13.1.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" crossorigin=anonymous integrity=sha512-Velp0ebMKjcd9RiCoaHhLXkR1sFoCCWXNp6w4zj1hfMifYB5441C+sKeBl/T/Ka6NjBiRfBBQRaQq65ekYz3UQ==  />
+        <link rel="stylesheet" type="text/css" href="cms_resources/css/anda.css" media=all />
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300" media=all />
+        <link rel="stylesheet" type="text/css" href="cms_resources/js/sea_swipe/sea_swipe.min.css?v=8" />
+            <link rel="stylesheet" type="text/css" href="cms_resources/vue/components/css/leftNavComponent.css" />
+            <link rel="stylesheet" type="text/css" href="cms_resources/vue/components/css/globalHeader.css" />
+            <link rel="stylesheet" type="text/css" href="cms_resources/vue/components/css/megaMenu.css?v=3" />
+
+    <link rel="shortcut icon" href="/images/2015_IMG/logoHome.png" />
+                <link rel="stylesheet" type="text/css" href="prebuilt/css/departments/court/courts.css" />
+            <link rel="stylesheet" type="text/css" href="/prebuilt/css/departments/Court/style.css" />
+
+
+    
+        <script type="text/javascript" src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/bootstrap-3.3.7.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.localScroll.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/fontawesome.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/solid.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/regular.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/light.min.js"></script>
+        <script defer type="text/javascript" src="cms_resources/js/Subsetter/brands.min.js"></script>
+		<script defer type="text/javascript" src="cms_resources/js/Subsetter/custom-icons.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/application_bootstrap.min_shared2016.min_script2015_082516.min.js"></script>
+        <script async defer type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.easy-autocomplete.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/SearchResults.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/slick.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.galleryview-1.1.min_jquery.timers-1.2.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin=anonymous integrity=sha512-Y2IiVZeaBwXG1wSV7f13plqlmFOx8MdjuHyYFVoYzhyRr3nH/NMDjTBSswijzADdNzMyWNetbLMfOpIPl6Cv9g==></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js"  ></script>
+        <script type="text/javascript" src="cms_resources/js/sea_swipe/sea_swipe.min.js?v=8"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.highlight.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/parallax.js/1.5.0/parallax.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/jquery.scrollTo.min.js"></script>
+        <script type="text/javascript" src="cms_resources/js/translate-vue_gt.js"></script>
+        <script type="text/javascript" src="cms_resources/js/packery-mode.pkgd.min.js"></script>
+            <script type="text/javascript" src="cms_resources/js/siteimprove_analytics.js"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/chunk-vendors.js?v=3"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/app.js"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/leftNavComponent.js"></script>
+            <script type="text/javascript" src="cms_resources/vue/components/js/globalHeader.js"></script>   
+            <script type="text/javascript" src="cms_resources/vue/components/js/megaMenu.js?v=3"></script>
+
+    
+
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="/prebuilt/js/html5.js"></script>
+        <script type="text/javascript" src="/prebuilt/js/respond.min.js"></script>
+    <![endif]-->
+
+        <script type="text/javascript" src="/prebuilt/js/departments/court/courts.js"></script>
+
+    <script>
+        dataLayer.push({'audience': 'living'});
+    </script>
+</body>
+</html>
+
+

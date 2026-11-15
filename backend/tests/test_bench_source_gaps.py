@@ -90,7 +90,7 @@ def test_seattle_later_statement_receipt_is_not_an_initial_deadline() -> None:
     assert score_run(later, current).deadline_correct is False
     assert current.expected.deadline.alternatives[0].days == 33
     assert current.expected.deadline.alternatives[0].counting == "postmark"
-    assert current.expected.outcome_family == "BUSINESS_EXCLUSION"
+    assert current.expected.outcome_family == "PROCESS_INCOMPATIBLE"
     assert current.expected.destination.purpose == "initial hearing request"
     for evidence in current.evidence:
         if evidence.url.endswith("/hearings-by-mail"):
@@ -105,11 +105,11 @@ def test_legacy_placeholders_and_payment_period_do_not_become_verified(
     current = row(case_id)
     value = fact(run(case_id), "DEADLINE_DAYS", days)
     score = score_run(value, current)
-    assert score.verdict == "excluded"
+    assert score.verdict == "wrong SERVICEABLE"
     assert score.destination_correct is None
     assert score.purpose_correct is None
     assert score.deadline_correct is None
-    assert score.expected_family is None
+    assert score.expected_family == "NOT_YET_VERIFIED"
     assert current.expected.outcome_family == "NOT_YET_VERIFIED"
     assert "SERVICEABLE" not in current.expected.safe_set
 

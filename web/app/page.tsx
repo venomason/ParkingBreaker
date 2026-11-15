@@ -58,7 +58,9 @@ function plainError(error: unknown): string {
   const known: Record<string, string> = {
     network_unavailable: "We couldn’t reach the service. Check your connection and try again.",
     unknown_photo_ref: "One of your photos didn't upload. Please add it again.",
-    photo_not_readable: "That photo couldn't be read. Please use a JPEG or PNG photo.",
+    photo_not_readable: "That file could not be read and was not saved. Export a fresh JPEG or PNG, or take another clear photo of the paper original.",
+    photo_type_not_supported: "That file was not uploaded. This beta accepts JPEG or PNG only. For a PDF or HEIC file, export a clear JPEG/PNG copy or photograph the paper original, keeping all printed details visible.",
+    photo_size_invalid: "That file was not uploaded. Choose a non-empty JPEG or PNG up to 10 MB. Export a smaller image without making the printed details unreadable.",
     card_not_authorized: "The card wasn't authorized. Nothing was charged. Try another card.",
     choose_tier_first: "Choose how your letter should be mailed first.",
     card_form_unavailable: "The secure card form is unavailable. No authorization was requested. Please try again later.",
@@ -326,6 +328,7 @@ function Journey() {
   const [visionStatus, setVisionStatus] = useState<TicketReadingStatus | null>(null);
   const [visionChecking, setVisionChecking] = useState(false);
   const [visionError, setVisionError] = useState<string | null>(null);
+  const [ticketUploadError, setTicketUploadError] = useState<string | null>(null);
   const [visionBusy, setVisionBusy] = useState<"reading" | "review" | "confirm" | null>(null);
   const [visionDraft, setVisionDraft] = useState<FactDraft>(emptyFactDraft);
   const [visionLiteral, setVisionLiteral] = useState<TicketLiteral | null>(null);
@@ -1210,18 +1213,25 @@ function Journey() {
 
   const selectPhoto = useCallback(async (kind: "ticket" | "back", file: File | null) => {
     const version = ++photoVersions.current[kind];
+    setTicketUploadError(null);
     setPhotoFiles(previous => ({...previous,[kind]:file}));
     setPhotoRefs(previous => ({...previous,[kind]:null}));
     // Changed ticket bytes invalidate the current reading, comparison and confirmation.
     if (LIVE && !PREVIEW_AUTH && (kind === "ticket" || kind === "back")) invalidateVisionPhotos();
     if (!file || PREVIEW_AUTH) return;
-    setPhotoUploads(count => count + 1); setLiveError(null);
+    setPhotoUploads(count => count + 1); setLiveError(null); setVisionError(null);
     try {
       const workspace = await ensureWorkspace();
       setWorkspaceId(workspace.workspace_id);
       const uploaded = await api.uploadPhoto(workspace.workspace_id,file);
       if (photoVersions.current[kind] === version) setPhotoRefs(previous => ({...previous,[kind]:uploaded.photo_ref}));
-    } catch (error) { setLiveError(plainError(error)); }
+    } catch (error) {
+      if (photoVersions.current[kind] === version) {
+        const message = plainError(error);
+        setLiveError(message);
+        setTicketUploadError(message);
+      }
+    }
     finally { setPhotoUploads(count => count - 1); }
   }, [ensureWorkspace, invalidateVisionPhotos]);
 
@@ -1698,7 +1708,7 @@ function Journey() {
     enabled: Boolean(visionStatus?.enabled),
     required: visionRequired,
     checking: visionChecking,
-    error: visionError,
+    error: ticketUploadError ?? visionError,
     status: visionStatus,
     reading: visionStatus?.extraction ?? null,
     review: visionReview,
@@ -1723,7 +1733,7 @@ function Journey() {
     onSaveFacts: (facts) => { void saveAndReviewVision(facts); },
     onConfirm: () => { void confirmTicketVision(); },
     onContinue: handleVisionContinue,
-  }), [visionMode, visionStatus, visionRequired, visionChecking, visionError, visionReview, visionLiteral, visionDraft, updateVisionDraft, visionResolutions, visionBusy, visionConfirmed, visionDirty, photoRefs, discoverVision, selectPhoto, readTicketVision, refreshVisionStatusOnly, saveAndReviewVision, confirmTicketVision, handleVisionContinue]);
+  }), [visionMode, visionStatus, visionRequired, visionChecking, visionError, ticketUploadError, visionReview, visionLiteral, visionDraft, updateVisionDraft, visionResolutions, visionBusy, visionConfirmed, visionDirty, photoRefs, discoverVision, selectPhoto, readTicketVision, refreshVisionStatusOnly, saveAndReviewVision, confirmTicketVision, handleVisionContinue]);
 
   const visionAdoptedFacts = useMemo(() => validateFactDraft(visionDraft).facts, [visionDraft]);
 

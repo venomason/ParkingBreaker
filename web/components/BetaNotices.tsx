@@ -5,12 +5,13 @@ import Image from "next/image";
 import {
   ApiError,
   api,
+  PHOTO_UPLOAD_GUIDANCE,
   type BetaFeedbackNoticeReceipt,
   type BetaFeedbackNoticeRequest,
 } from "../lib/api";
 
 const MAX_IMAGES = 20;
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10_000_000;
 const LIST_PAGE_SIZE = 25;
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png"]);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -540,6 +541,7 @@ export function BetaNotices({ caseId, workspaceId }: { caseId: string; workspace
                 onChange={(event) => { addFiles(event.target.files); }}
               />
               <p className="small muted" id="betaNoticeFileHelp">
+                {PHOTO_UPLOAD_GUIDANCE}{" "}
                 Up to 20 images, each 10 MB or less. Choose Envelope or Page for every image after adding it.
                 Images are uploaded only when you press Save notice.
               </p>

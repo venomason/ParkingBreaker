@@ -46,6 +46,7 @@ from parkingbreaker.submission_coordinator import run_submission_step
 from parkingbreaker.transaction_records import CaseRecord
 from parkingbreaker.transaction_store import SqliteTransactionStore, SubmissionPaused
 from parkingbreaker.workspace import Workspace
+from prepared_packet_support import redirected_pdf
 from test_beta_admission import NOW
 from test_beta_dispatch_timing import (
     ORIGINAL,
@@ -594,7 +595,10 @@ async def test_held_paid_attempt_two_remail_stays_paused_until_valid_resume(
         assert returned_case is not None
         seed_destination(real._store, returned_case, PAID_NOW, corrected)
         remail_request = replace(
-            original.request, submission_token="sub_remail", recipient=corrected
+            original.request,
+            submission_token="sub_remail",
+            recipient=corrected,
+            pdf=redirected_pdf(real, case, corrected),
         )
         packet = real._store.prepare(token, 2, remail_request, PAID_NOW)
         seed_approval(real._store, token, 2)
@@ -703,7 +707,10 @@ async def test_held_paid_attempt_two_destination_mismatch_refuses_the_resume(
         assert returned_case is not None
         seed_destination(real._store, returned_case, PAID_NOW, corrected)
         remail_request = replace(
-            original.request, submission_token="sub_remail", recipient=corrected
+            original.request,
+            submission_token="sub_remail",
+            recipient=corrected,
+            pdf=redirected_pdf(real, case, corrected),
         )
         packet = real._store.prepare(token, 2, remail_request, PAID_NOW)
         seed_approval(real._store, token, 2)

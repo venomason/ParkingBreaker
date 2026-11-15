@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thymeleaf.org">
+<head>
+    <title>City of Chicago Parking :: eHearing Web</title>
+    
+    <meta http-equiv="X-UA-Compatible" content="EmulateIE=11,chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="content-type" content="no-cache" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+    <link type="text/css" rel="stylesheet" href="/EHearingWeb/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/EHearingWeb/css/bootstrap-datepicker.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/EHearingWeb/css/main.css"/>
+    <link type="text/css" rel="stylesheet" href="/EHearingWeb/css/responsive.css"/>
+    <link rel="shortcut icon" href="/EHearingWeb/images/favicon.png"/>
+
+    <script type="text/javascript" src="/EHearingWeb/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/EHearingWeb/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/EHearingWeb/js/bootstrap-datepicker.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div><div role="banner">
+    <div class="header">
+        <div class="media">
+            <a href="https://www.chicago.gov/city/en.html" target="_blank">
+                <img class="header-media" src="/EHearingWeb/images/chicago_logo.png" alt="City of Chicago Logo">
+            </a>
+        </div>
+    </div>
+
+    <div class="landscape">
+        <a href="/EHearingWeb/home" target="_self">
+            <img class="header-banner" src="/EHearingWeb/images/ChicagoHearingFacility.png" alt="eHearing Portal">
+        </a>
+    </div>
+
+</div></div>
+
+        <div><div class="menu" role="menubar">
+    <div class="menu-nav">
+        <a href="https://www.chicago.gov/content/city/en/depts/fin/supp_info/revenue/challenging_tickets.html"
+           target="_blank" role="menuitem">CONTEST TICKET</a>
+        <a href="https://www.chicago.gov/content/city/en/depts/fin/supp_info/revenue/parking_and_red-lightticketpaymentplans.html"
+           target="_blank" role="menuitem">PAYMENT PLANS</a>
+        <a href="https://www.chicago.gov/content/city/en/depts/fin/supp_info/revenue/challenging_tickets/requesting_ticketcopies.html"
+           target="_blank" role="menuitem">TICKET COPIES</a>
+        <a href="https://parkingticketimage.chicago.gov/pbw/include/chicago/ChicagoImages.jsp"
+           target="_blank" role="menuitem">TICKET PHOTOS</a>
+        <a href="https://www.chicago.gov/content/city/en/depts/fin/provdrs/parking_and_redlightcitationadministration/svcs/view_red-light_video.html"
+           target="_blank" role="menuitem">RED-LIGHT VIDEOS</a>
+        <a href="https://www.violationinfo.com/Chicago/" target="_blank" role="menuitem">SPEED CAMERA VIDEOS</a>
+    </div>
+</div></div>
+
+        <div class="content-container" role="main">
+            <h3 class="content-heading">Frequently Asked Questions</h3>
+            <hr>
+
+            <p><strong>Can I contest any ticket online? </strong><br/>
+                As a registered owner of a vehicle, you have the right to contest the issuance of a parking,
+                red light and automated speed enforcement violation notice. You have seven (7) days from the
+                date of issuance to contest a ticket. If nothing is received, you are then sent a Notice of Violation
+                allowing you twenty-one (21) days to request a hearing. Still if no response is received, a
+                Notice of Determination is sent notifying you that you have been found liable by default and
+                must appear in person to petition to set the default aside. This option must be exercised within
+                twenty-one (21) days of the date of the Determination. Once the twenty-one (21) days have lapsed,
+                your opportunity to contest has expired.
+            </p>
+            <br/>
+
+            <p><strong>Are there different contest options? </strong><br/></p>
+            <ul>
+                <li><strong>Correspondence:</strong> When submitting a written correspondence hearing, an
+                    Administrative Law Judge (ALJ) will review your ticket, photographs and any other evidence
+                    that you submit. Once the ALJ completes their review and enters a decision, a hearing
+                    decision letter will be mailed to the address at which the vehicle is registered.
+                </li>
+                <li><strong>In-Person:</strong> When submitting an in-person contest, you will receive correspondence
+                    in the mail letting you know when you can appear in-person to dispute the validity of the violation
+                    in front of an Administrative Law Judge (ALJ).
+                </li>
+                <li><strong>Virtual:</strong> When submitting  a virtual contest, you will receive correspondence in the
+                    mail and via email letting you know when you can appear virtually to dispute the validity of the
+                    violation with an Administrative Law Judge (ALJ). All virtual hearings will be conducted via the
+                    Webex application. Please note, there are certain
+                    <a href="#" title="Violation" data-bs-toggle="modal" data-bs-target="#systemRequirements">system requirements</a>
+                    that you must verify prior to your scheduled virtual hearing. Evidence should be submitted
+                    when requesting your virtual hearing.
+                </li>
+            </ul>
+            <br/>
+
+            <p><strong>How many tickets can I contest at 1 time online? </strong><br/>
+                3 tickets under the same notice number can be contested at once online.
+            </p>
+            <br/>
+
+            <p><strong>How many documents can I submit per ticket? </strong><br/>
+                Up to 5 files can be submitted per ticket. Files may be up to 1 megabyte in size.
+            </p>
+            <br/>
+
+            <p><strong>How do I know if my documents were uploaded? </strong><br/>
+                Once a document is uploaded you will see your document under the File Uploaded section.
+            </p>
+            <br/>
+
+            <p><strong>Will I receive a confirmation that my contest was received? </strong><br/>
+                Yes, you will receive an email confirmation letting you know that your contest has been received.
+            </p>
+            <br/>
+
+            <p><strong>How do I convert my documents into the specified documents required? </strong><br/>
+                Please see instructions below for Converting your document or Image into PDF, JPEG, or PNG</p>
+                <br/>
+            <ul>
+                <li><strong><i>Converting a Word Document to PDF</i></strong>
+                    <br />
+                    When saving your document name your File and select from the drop-down to Save as type PDF (*.pdf).
+                    This will turn your Word document into a PDF.
+                    <br/>
+                    <img alt="Word To PDF" src="/EHearingWeb/images/img_02.png" />
+                    <br/>
+                </li>
+                <li><strong><i>Converting an Image to a JPEG or PNG</i></strong>
+                    <br/>
+                    1) Open the picture that you want to convert to Jpeg form in any photograph program. Click file and select 'Save As'<br/>
+                    <img alt="Save As" src="/EHearingWeb/images/img_03.png"/>
+                    <br/><br/>
+                    2) Click on the drop-down menu; it usually says 'save as type' on the left.
+                    <br/><br/>
+                    3) Click JPEG (often it will have '(*.jpg;*.jpeg;*.jpe;*.jfif)' next to it or click PNG(*.png)<br />
+                    <img alt="To JPEG Or PNG" src="/EHearingWeb/images/img_04.png"/>
+                    <br/><br/>
+                    4) Rename file as necessary.
+                </li>
+            </ul>
+
+            <br/>
+
+            <p><strong>Who can assist me if I have questions or concerns with the website? </strong><br/>
+                You may contact the City of Chicago's ticket helpline at (312) 744.7275.
+                The City of Chicago's ticket helpline is open Monday through Friday 7AM - 7PM Central Times.
+            </p>
+            <br/>
+
+        </div>
+
+        <div><div class="footer" role="contentinfo">
+    <div class="footer-nav" aria-label="Footer navigation">
+        <a href="/EHearingWeb/home" target="_self">Home</a>
+        <a href="/EHearingWeb/FrequentlyAskedQuestions" target="_blank">Frequently Asked Questions</a>
+        <a href="https://www.chicago.gov/city/en/general/disclaimer.html" target="_blank">Disclaimer</a>
+        <a href="https://www.chicago.gov/city/en/general/privacy.html" target="_blank">Privacy Policy</a>
+        <a href="https://www.chicago.gov/city/en/general/contact.html" target="_blank">Contact Us</a>
+        <a href="https://www.chicago.gov/city/en/depts/mayor.html" target="_blank">Press Room</a>
+    </div>
+
+    <div class="footer-media">
+        <img src="/EHearingWeb/images/city_seal_clr.png" alt="City of Chicago Seal">
+        <div style="display:inline-block;">
+            <br/>
+            <h1 class="h3">City of Chicago</h1>
+            <small>Copyright @ 2022 City of Chicago</small>
+        </div>
+    </div>
+
+</div></div>
+    </div>
+
+</body>
+</html>
+
+
+
+<!---------   Faq Modal contents   --------->
+
+<div id="systemRequirements" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="content-subheading">Virtual Hearing System Requirements</h4>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>TO TAKE PART IN YOUR VIRTUAL HEARING, YOU MUST:</strong></p>
+                <ul>
+                    <li>Have a computer with a webcam, mobile device, or video conference system.</li>
+                    <li>Have a reliable, high-speed Internet connection (at least 1 - 1.5 megabits/second).</li>
+                    <li>Download the Cisco WebEx application prior to joining your Virtual Hearing,
+                        <a href="https://www.webex.com/downloads.html" target="_blank">WebEx Download</a></li>
+                    <li>Test your system by visiting WebEx
+                        <a href="https://www.webex.com/test-meeting.html" target="_blank">test meeting</a>
+                        at least 48 hours prior to your virtual hearing</li>
+                    <li>Add the WebEx extension to your browser if prompted when using a computer.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

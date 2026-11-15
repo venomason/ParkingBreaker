@@ -21,6 +21,7 @@ from parkingbreaker.lob_submission import LetterEvidence, LobResponse
 from parkingbreaker.payment_state import PaymentState
 from parkingbreaker.session_window import DEFAULT_WINDOW
 from parkingbreaker.transaction_store import SqliteTransactionStore
+from prepared_packet_support import redirected_pdf
 from test_case_service import (
     ALICE,
     INTAKE,
@@ -495,7 +496,12 @@ async def test_certified_return_and_free_remail_never_capture_again(
         remail = real._store.prepare(
             token,
             2,
-            replace(original.request, submission_token="sub_remail", recipient=corrected),
+            replace(
+                original.request,
+                submission_token="sub_remail",
+                recipient=corrected,
+                pdf=redirected_pdf(real, case, corrected),
+            ),
             NOW,
         )
         original_manifest = real._store.get_approval_manifest(token, 1)

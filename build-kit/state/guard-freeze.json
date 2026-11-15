@@ -1,0 +1,28 @@
+{
+  "purpose": "Owner directive 2026-10-27: research guard files are frozen at the committed T21-TRIGGERS baseline. make doctor fails when any listed file differs from its hash. A hash may change only after the Phase 3 benchmark, for a failure demonstrated on a real captured official page, with owner_approved_exception filled in and the captured page saved under build-kit/evidence/bench-pages/.",
+  "phase": "pre_benchmark_freeze",
+  "frozen_at_commit": "2490fb59db52dadd6fb72ec7eb2e88dfe392c915",
+  "files": {
+    "backend/src/parkingbreaker/research/support.py": "7ecd2b1d6a547af57e09aad5672728d17c63a7b9406b6a8bf32ff6d3f53475c8",
+    "backend/src/parkingbreaker/research/findings.py": "9a1d84aa9a7eea69e21964a19ea61be2efdfcd43026e34728b415bb43d0169f1",
+    "backend/src/parkingbreaker/research/procedure.py": "f1c2b8132bf60d44b4bf863a9449dd96dadbdaecae27d40104aad22df98f000a",
+    "backend/src/parkingbreaker/research/route_requirements.py": "c5a1b3a026c1f585c989b773412103d747a746ed53652c63c2302f34b74bd279"
+  },
+  "owner_approved_exception": {
+    "approved_by": "Amir (owner), current resumed local bug-fixing authorization of November 15; no separate exact-patch approval asserted",
+    "approved_on": "2026-11-15",
+    "case_id": "sfmta-captured-declaration-signature-lines",
+    "captured_url": "https://www.sfmta.com/media/40967/download?inline",
+    "captured_page_sha256": "08fbc461e49a55375e6d6304c168e3bfbacec91f04045b611cd0ebd89f50a258"
+  },
+  "exception_history": [
+    {
+      "approved_by": "Amir (owner), current chat PROCEED after saved Phase 3 patch review, 2026-11-08",
+      "approved_on": "2026-11-08",
+      "case_id": "san-jacinto-official-appeal-received-within",
+      "captured_url": "https://www.sanjacintoca.gov/city_departments/community-development/street-sweeping/make_a_payment",
+      "captured_page_sha256": "067df271cc0fe9a45ae24fbed708d1bc792a37677b071530c0f726a441ddb452"
+    }
+  ],
+  "current_exception_authority": "Current owner instruction to resume and finish remaining fixes/testing; authority assessment and preserved invariants in build-kit/evidence/beta-candidate-2026-11-15/form-guard-proposal/REVIEW.md. Historical freeze purpose does not grant release or model qualification."
+}

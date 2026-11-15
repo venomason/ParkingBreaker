@@ -1,0 +1,159 @@
+{
+  "date": "2026-11-15",
+  "classification": "VERIFIED",
+  "base_commit": "13042776582aeecc3b516f8b5ea02aff8965f97c",
+  "source_commit": "996f35ee8839dc104ada29be5f9d0b2c806dc03e",
+  "branch": "beta/consolidate-2026-11-15",
+  "application_fingerprint": "05bade16c9f8408ea2d64602245ba9a658ff974d52076064d5687c0e318daacf",
+  "checks": [
+    {
+      "name": "focused-system-python",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/test_workflow_review_repairs.py",
+        "tests/test_dispatch_research_freshness.py",
+        "tests/test_official_form_lines.py",
+        "tests/test_photo_upload_boundary.py",
+        "tests/test_bench_source_gaps.py",
+        "tests/test_case_required_copies.py",
+        "tests/test_effect_dispatch.py",
+        "tests/test_t20_webhook_recovery.py",
+        "tests/test_t30_review_regressions.py",
+        "tests/test_t74_mail_hold_boundary.py"
+      ],
+      "exit_code": 0,
+      "passed_tests": 130,
+      "seconds": 44.292,
+      "receipt_sha256": "f8e04f5f3c0b696c3af4cceaaa4725bc6a3038a7de7d8656c01e1ea988165c1e",
+      "log_sha256": "0a4d3c0688ed9dd9bf6fa1e652a178ceea360d6456a82b210bfc82848ce14a54"
+    },
+    {
+      "name": "backend-release-system-python",
+      "command": [
+        "make",
+        "check"
+      ],
+      "exit_code": 0,
+      "passed_tests": 13635,
+      "seconds": 618.689,
+      "receipt_sha256": "fe450d59afe79808ec44e6f4a66d6c777912ceb8d2c1408d31df685f29255dac",
+      "log_sha256": "ee738c396fba82116214609489857664cce96bb5b2830bc182ef987d6deb65c5"
+    },
+    {
+      "name": "web-release",
+      "command": [
+        "make",
+        "web-check"
+      ],
+      "exit_code": 0,
+      "passed_tests": null,
+      "seconds": 21.87,
+      "receipt_sha256": "431a9b1807a49c6a295e9b597dbb720c58e341de1f3056b6285415ef9cfbff60",
+      "log_sha256": "2c4eb5be7d697510755319b7eafc323ae9e2b8a66ca0f924dc40ed9063dae0d9"
+    },
+    {
+      "name": "qualification-system-python",
+      "command": [
+        "make",
+        "qualification-check"
+      ],
+      "exit_code": 0,
+      "passed_tests": null,
+      "seconds": 2.198,
+      "receipt_sha256": "33e21753cbac2d0244b2e52ae1ab7e8a83b8166155847edf4266c1b320e1a41a",
+      "log_sha256": "f1e1cc1289446f6b52d4634e386f554aca41c4a8462980c3a5bdcdf18bbae0d6"
+    },
+    {
+      "name": "tooling",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "passed_tests": 3,
+      "seconds": 0.07,
+      "receipt_sha256": "76395c1825b1701079ee8e716dc95825786fcfe196405e7c8d3b80420c20972f",
+      "log_sha256": "c3a50d8528f787864325cc0f56fe9f71173f006344c5eb8d9e94d0dba9b071ba"
+    },
+    {
+      "name": "browser-free-fixed",
+      "command": [
+        "python3",
+        "build-kit/scripts/synthetic_browser_matrix.py",
+        "--out",
+        "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-consolidation-20261115/browser-free-fixed-matrix"
+      ],
+      "exit_code": 0,
+      "passed_tests": 196,
+      "seconds": 446.459,
+      "receipt_sha256": "b263d018d1b4b26856a7cda9bc57bf33a276d33464950151228f75193bfc6448",
+      "log_sha256": "32faa1e91d5bd3e1b59ffaa87f88d1a0fa4f95fdd417150e5b54c778f3e7bd91"
+    },
+    {
+      "name": "browser-paid",
+      "command": [
+        "python3",
+        "build-kit/scripts/synthetic_rehearsal.py",
+        "--service-phase",
+        "paid",
+        "--out",
+        "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-consolidation-20261115/browser-paid"
+      ],
+      "exit_code": 0,
+      "passed_tests": 152,
+      "seconds": 273.558,
+      "receipt_sha256": "401d584540c224575a0d6a1afb6b85c96cf3a8c745e33bbae3608d9a47d2b9ad",
+      "log_sha256": "e602022cea7371aec524a71fc7c745f1f6f0d7b2e6e4fa4aa158a59b4d2b5b56"
+    }
+  ],
+  "browser_matrix": {
+    "projects": 4,
+    "free_tests": 196,
+    "paid_tests": 152,
+    "skips": 0,
+    "qualification": "synthetic only; mobile viewport emulation, not physical cameras",
+    "owned_services_stopped": true,
+    "owned_connect_proxies_stopped": true
+  },
+  "benchmark_evidence": {
+    "rows": 23,
+    "quotes": 109,
+    "quotes_verified": 109,
+    "unsigned_rows": 23,
+    "not_live_qualification": true,
+    "unverified_quotes": []
+  },
+  "application_parity": {
+    "compared_files": 625,
+    "different": [],
+    "missing_from_source": [],
+    "result": "all published application, frontend, deployment and backend-test files match the source snapshot"
+  },
+  "history_recovery": {
+    "reachable_source_commits_restored": 447,
+    "includes_detached_worktree_head": true,
+    "git_fsck_exit": 0,
+    "bundle_sha256": "c6fd7b677841916731d863e121945b5de749fdba5826fa7757f5f1e26aec5412"
+  },
+  "limitations": [
+    "Live beta remains unreleased and unqualified",
+    "Owner signatures absent on all 23 benchmark rows",
+    "Provider accounts, balances and target configuration not refreshed during consolidation",
+    "One Starlette/anyio dependency deprecation warning",
+    "Historical governance commands still require archived state"
+  ],
+  "external_mutations": {
+    "git_push": false,
+    "deployment": false,
+    "customer_charges": false,
+    "mail": false,
+    "account_or_security_settings": false
+  }
+}

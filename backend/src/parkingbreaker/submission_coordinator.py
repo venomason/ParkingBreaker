@@ -34,7 +34,7 @@ from parkingbreaker.lob_submission import (
     reconcile_with_original,
     resolve_lookup,
 )
-from parkingbreaker.mail_attempt_store import StorageCorruption
+from parkingbreaker.mail_attempt_store import PreparedMailAttempt, StorageCorruption
 from parkingbreaker.payment_state import EXPIRY_MARGIN, PaymentState
 from parkingbreaker.research_records import decode_answers, decode_research
 from parkingbreaker.submission_records import SubmissionCursor
@@ -111,6 +111,7 @@ def run_submission_step(
     new_effect_id: Callable[[], str] | None = None,
     already_owned: bool = False,
     effect_ids: tuple[str, ...] = (),
+    validate_prepared: Callable[[PreparedMailAttempt], None] | None = None,
 ) -> SubmissionCursor:
     """Perform at most one due call. No sleeps, network setup or implicit clock.
 
@@ -141,6 +142,7 @@ def run_submission_step(
         # These are lookups only; legacy/unlinked cases acquire no implicit decision.
         gate = None
         integrity_error: str | None = None
+        research = None
         if kind == "create":
             # The one free re-mail follows a return: it needs a SYSTEM_VERIFIED destination
             # that differs from the address the returned letter went to.
@@ -196,15 +198,23 @@ def run_submission_step(
             # historical intents: refusal follows the existing no-create/reconcile
             # branch below, never a bulk state or frozen-packet rewrite.
             research_record = None if intake is None else store.get_research(intake.intake_id)
-            if research_record is not None and gate.allowed:
+            if gate.allowed:
                 try:
-                    research = decode_research(research_record.research_json)
-                    resolution = research.resolve(
-                        decode_answers(research_record.answers_json),
-                    )
-                    if not resolution.research_complete:
-                        integrity_error = "submission_requirements_not_verified"
-                except (ValueError, StorageCorruption):
+                    if research_record is not None:
+                        research = decode_research(research_record.research_json)
+                        resolution = research.resolve(decode_answers(research_record.answers_json))
+                        if not resolution.research_complete or not research.evidence_current_at(
+                            now
+                        ):
+                            raise ValueError("current research is unresolved or stale")
+                    if validate_prepared is not None:
+                        # CaseService always supplies its approval-context validator.
+                        # Standalone coordinator callers have no photo/intake services;
+                        # their existing durable identity gates remain independent.
+                        validate_prepared(prepared)
+                except Exception:
+                    # Missing/corrupt application context or validator failure refuses
+                    # create; a prior intent still follows uncertainty below.
                     integrity_error = "submission_requirements_not_verified"
 
         outcome: SubmissionOutcome
@@ -226,6 +236,8 @@ def run_submission_step(
             call_at = clock()
             if call_at.tzinfo is None or call_at < now:
                 raise ValueError("invalid caller call time")
+            if research is not None and not research.evidence_current_at(call_at):
+                integrity_error = "submission_requirements_not_verified"
             # The fallback bounds an existing mailing-evidence wait. A first create
             # still uses the existing pre-send authorization guard and safety margin.
             at_fallback = (

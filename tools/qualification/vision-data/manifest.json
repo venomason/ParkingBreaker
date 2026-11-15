@@ -1,0 +1,305 @@
+{
+  "synthetic_only": true,
+  "created_at": "2026-11-15T16:16:51.997846+00:00",
+  "model": "gemini-3.8-flash",
+  "repeats": 2,
+  "per_call_cap_cents": 25,
+  "maximum_calls": 32,
+  "maximum_reserved_cents": 800,
+  "cases": [
+    {
+      "id": "clear_png",
+      "files": [
+        {
+          "path": "clear_png.png",
+          "sha256": "0b15fc04ab90a7c08447fd4152f1e3d57e9d2b8d2d232e39ba1e5ce279384173",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "clear_jpeg",
+      "files": [
+        {
+          "path": "clear_jpeg.jpg",
+          "sha256": "abb2cb2da0f7ad4190954172591e6fa38846b7a4f29270c46b996b6c04acde9d",
+          "media_type": "image/jpeg"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "front_back",
+      "files": [
+        {
+          "path": "front_back.png",
+          "sha256": "0b15fc04ab90a7c08447fd4152f1e3d57e9d2b8d2d232e39ba1e5ce279384173",
+          "media_type": "image/png"
+        },
+        {
+          "path": "back.png",
+          "sha256": "0e6f36ecddeb443bdf930eaf0ac449f3648202567e593cd46179378ef17e8a2d",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "missing_notice_date",
+      "files": [
+        {
+          "path": "missing_notice_date.png",
+          "sha256": "1235ecae6ab1da1b9d2734e024f3b6fd1b4c4a6df9d4ce24b32ab8ab39378f00",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "wrong_confirmation",
+      "files": [
+        {
+          "path": "wrong_confirmation.png",
+          "sha256": "0b15fc04ab90a7c08447fd4152f1e3d57e9d2b8d2d232e39ba1e5ce279384173",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-9999",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "rotated",
+      "files": [
+        {
+          "path": "rotated.png",
+          "sha256": "a8e4481e1e6910f41d4b35a1818163b32dd02d44e628a410a1bae0de479c83ae",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "untrusted_annotation",
+      "files": [
+        {
+          "path": "untrusted_annotation.png",
+          "sha256": "fc68006d1f669e40741c6bb8e9cf082bf4045a5e92ac775da4bd0b1130f9c3af",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "printed_deadline": "12/01/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    },
+    {
+      "id": "missing_deadline",
+      "files": [
+        {
+          "path": "missing_deadline.png",
+          "sha256": "772610416aff123fef8c9fa730e0f38936ad651d5a99242fc30c985537879d52",
+          "media_type": "image/png"
+        }
+      ],
+      "visible_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      },
+      "confirmed_fields": {
+        "citation_number": "PB-SYN-0101",
+        "license_plate": "SYN101",
+        "license_plate_state": "CA",
+        "issuer_name": "Synthetic City Parking Department",
+        "issue_date": "11/10/2026",
+        "notice_date": "11/11/2026",
+        "violation_text": "SYNTHETIC METER NOTICE",
+        "issued_city": "Synthetic City",
+        "issued_state": "CA",
+        "stage_text": "Initial review"
+      }
+    }
+  ],
+  "limits": [
+    "Synthetic fixtures are not physical phone-camera qualification.",
+    "Direct PDF input is unsupported by the ticket reader; official procedure PDFs have a separate existing regression.",
+    "Customer confirmation/dispatch durability is covered by local assembled tests; this probe only qualifies real adapter reading/review behavior."
+  ]
+}

@@ -81,7 +81,7 @@ test("letter edits save exactly, survive refresh, and replay an uncertain save b
   });
   const uncertain = changed+"\nMy first update.";
   await page.locator("#liveLetterText").fill(uncertain);
-  await expect(page.locator("#s6 [role=alert]")).toContainText(/couldn't reach|couldn’t confirm/);
+  await expect(page.locator("#s6 [role=alert]")).toContainText(/couldn[’']t (?:reach|confirm)/);
   const latest = uncertain+"\nMy newer update.";
   await page.locator("#liveLetterText").fill(latest);
   await page.locator("#liveSaveEdit").click();
@@ -104,7 +104,7 @@ test("unsaved edits cannot approve a previous adopted letter after navigating aw
   });
   await page.locator("#liveLetterText").fill(changed);
   await page.locator("#liveSaveEdit").click();
-  await expect(page.locator("#s6 [role=alert]")).toContainText(/couldn't reach/);
+  await expect(page.locator("#s6 [role=alert]")).toContainText(/couldn[’']t reach/);
   await page.getByRole("button",{name:/Reopen Official research/}).click();
   await expect(page.getByRole("textbox",{name:"Unsaved letter edits"})).toHaveValue(changed);
   await page.locator("#liveDraftBtn").click();
@@ -121,7 +121,15 @@ test("server expiry stops approval and retains the saved letter without a protot
   await page.locator("#liveAdopt").click();
   await previewAndInspect(page);
   try {
-    writeFileSync(clock!,"1900");
+    // Advance past the actual server window in bounded harness-clock steps.
+    const current = await call(page,"GET",`/cases/${id}/status`);
+    let advance = current.seconds_remaining + 5;
+    while (advance > 0) {
+      const seconds = Math.min(advance, 3600);
+      writeFileSync(clock!, String(seconds));
+      await call(page,"GET",`/cases/${id}/status`);
+      advance -= seconds;
+    }
     await expect(page.locator("#liveStopMessage")).toBeVisible({timeout:12000});
     await expect(page.locator("#liveApprove, #demoWarn, #demoLapse, #jumperBtn")).toHaveCount(0);
     await expect(page.getByRole("button",{name:"Start a new window"})).toHaveCount(0);

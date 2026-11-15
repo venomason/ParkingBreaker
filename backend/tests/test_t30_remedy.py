@@ -55,6 +55,7 @@ from parkingbreaker.returned_mail import RemedyKind, ReturnCause, UspsReturnReas
 from parkingbreaker.state_table import IllegalTransition
 from parkingbreaker.transaction_records import CaseRecord
 from parkingbreaker.transaction_store import SqliteTransactionStore
+from prepared_packet_support import redirected_pdf
 from test_case_service import Clock, approve_with_preview, drafting_case, fake_resolution
 from test_payment_coordinator import compensation_client
 from test_stripe_payment import CHARGE
@@ -554,7 +555,12 @@ async def test_second_return_closes_without_third_letter_or_capture(
         mailing.store.prepare(
             mailing.token,
             2,
-            replace(first.request, recipient=correction.address, submission_token=uuid4().hex),
+            replace(
+                first.request,
+                recipient=correction.address,
+                submission_token=uuid4().hex,
+                pdf=redirected_pdf(mailing.real, mailing.case_id, correction.address),
+            ),
             mailing.clock(),
         )
         seed_approval(mailing.store, mailing.token, 2)

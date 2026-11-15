@@ -1,3 +1,4 @@
+import { ATTORNEY_DISCLOSURE } from "../components/LegalDisclosure";
 import { mkdtempSync, openSync, readFileSync, closeSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -79,8 +80,8 @@ test.describe("M2 authoritative fulfillment", () => {
     expect(decide("fulfillment","customerStage",{...status,state:"AWAITING_ADOPTION"})).toBe(6);
   });
   test("payment is independent of postal state and describes uncertainty without new charges", () => {
-    expect(decide("fulfillment","paymentCopy",{...status,payment_state:"CAPTURE_PENDING"})).toMatch(/not yet confirmed/);
-    expect(decide("fulfillment","paymentCopy",{...status,payment_state:"CAPTURE_RETRYING"})).toMatch(/original/);
+    expect(decide("fulfillment","paymentCopy",{...status,payment_state:"CAPTURE_PENDING"})).toMatch(/checking your existing payment/);
+    expect(decide("fulfillment","paymentCopy",{...status,payment_state:"CAPTURE_RETRYING"})).toMatch(/existing card payment/);
     expect(decide("fulfillment","paymentCopy",{...status,payment_state:"CAPTURED"})).toContain("$29.99");
     expect(decide("fulfillment","paymentCopy",{...status,payment_state:"REFUNDED"})).toMatch(/refunded/i);
     expect(decide("fulfillment","paymentCopy",{...status,payment_state:null})).not.toMatch(/nothing was charged/i);
@@ -96,7 +97,7 @@ test.describe("M2 authoritative fulfillment", () => {
     expect(html).toContain("Mail returned");
     expect(html).toContain("Refund pending");
     expect(html).not.toContain("Refund completed");
-    expect(html).not.toMatch(/lawyer|legal advice|guaranteed|\bwin\b|dismissal rates/i);
+    expect(html.replaceAll(ATTORNEY_DISCLOSURE, "")).not.toMatch(/lawyer|legal advice|guaranteed|\bwin\b|dismissal rates/i);
     expect(html).not.toContain("dev-worker");
   });
   test("free beta copy states no card hold and replaces only the paid footer", () => {
@@ -112,7 +113,7 @@ test.describe("M2 authoritative fulfillment", () => {
   });
   test("paid fulfillment keeps its paid footer, hold copy and record control", () => {
     const html = render("LiveFulfillment",{status,tracking,busy:false,error:null});
-    expect(html).toContain("You can return using this appeal’s private link. Our packet, address, payment and mailing mistakes remain our responsibility to fix or refund.");
+    expect(html).toContain("You can return using this appeal’s private link. Our mailing mistakes are ours to fix under the return policy.");
     expect(html).toContain("$29.99 card hold authorized.");
     expect(html).not.toContain("This selected beta appeal is free");
     const paidMailed = render("LiveFulfillment",{status:{...status,payment_state:"CAPTURED"},tracking,busy:false,error:null});
@@ -159,9 +160,10 @@ test.describe("M2 authoritative fulfillment", () => {
   test("service explains the first USPS scan charge and contains no prohibited promotion", () => {
     const aside = render("DesktopAside",{servicePhase:"paid",funding:"paid"});
     const offer = render("Step4Offer",{selectedTier:"certified",liveOffer:{issuerName:"Synthetic agency",decidingBody:"Synthetic review office",standardOffered:false,testMode:false,certifiedCents:2999,standardCents:null},cardSlot:"Card entry"});
+    expect(offer).toContain(ATTORNEY_DISCLOSURE);
     for (const html of [aside,offer]) {
       expect(html).toContain("first USPS scan");
-      expect(html).not.toMatch(/lawyer|legal advice|guaranteed|\bwin\b|dismissal rates/i);
+      expect(html.replaceAll(ATTORNEY_DISCLOSURE, "")).not.toMatch(/lawyer|legal advice|guaranteed|\bwin\b|dismissal rates/i);
     }
   });
 });

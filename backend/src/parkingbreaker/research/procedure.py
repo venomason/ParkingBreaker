@@ -12,7 +12,11 @@ from parkingbreaker.research.route_requirements import (
     route_local_requirement,
 )
 from parkingbreaker.research.sources import AuthorityClass, SourceRecord
-from parkingbreaker.research.support import value_supported_by_quote
+from parkingbreaker.research.support import (
+    direct_declaration,
+    signed_declaration_block,
+    value_supported_by_quote,
+)
 
 SILENCE_KEYS = RULE_KEYS | {FactKey.REQUIRED_DECLARATIONS}
 MAX_PROCEDURE_CHARS = 30_000
@@ -295,9 +299,13 @@ def requirement_sentences(key: FactKey, text: str) -> tuple[str, ...]:
     if key not in topics:
         return ()
     if key is FactKey.REQUIRED_DECLARATIONS:
-        direct = re.search(r"^I declare that the foregoing is true and correct[.]?$", text, re.M)
+        direct = direct_declaration(text)
         if direct:
-            return (direct.group(),)
+            return (direct,)
+    if key is FactKey.SIGNATURE_REQUIREMENT:
+        block = signed_declaration_block(text)
+        if block:
+            return (block,)
     sentences = re.split(r"(?<=[.!?])\s+|\n+|;\s*", text)
     return tuple(
         s.strip()

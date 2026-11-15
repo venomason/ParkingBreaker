@@ -686,18 +686,18 @@ def main(argv=None) -> int:
         if args.command == "preflight":
             print(json.dumps(preflight(), indent=2))
             return 0
+        if args.command == "run-check":
+            if args.value not in CHECKS:
+                raise ValueError("Choose a defined check ID")
+            receipt = run_check(args.value, args.project)
+            print(json.dumps({"receipt": str(receipt.relative_to(KIT)), "exit_code": read(receipt)["exit_code"]}))
+            return int(read(receipt)["exit_code"] != 0)
         tasks = read(KIT / "tasks.json")["tasks"]
         ledger = read(KIT / "state/progress.json")
         if args.command in {"status", "next"}:
             choices = ready(tasks, ledger["tasks"])
             print(json.dumps({"next": [{"id": t["id"], "title": t["title"], "spec": t["spec"]} for t in choices],
                 "accepted": sum(s["status"] == "accepted" for s in ledger["tasks"].values()), "total": len(tasks)}, indent=2))
-        elif args.command == "run-check":
-            if args.value not in CHECKS:
-                raise ValueError("Choose a defined check ID")
-            receipt = run_check(args.value, args.project)
-            print(json.dumps({"receipt": str(receipt.relative_to(KIT)), "exit_code": read(receipt)["exit_code"]}))
-            return int(read(receipt)["exit_code"] != 0)
         elif args.command == "accept":
             if not args.value:
                 raise ValueError("accept needs an evidence receipt path relative to the kit")

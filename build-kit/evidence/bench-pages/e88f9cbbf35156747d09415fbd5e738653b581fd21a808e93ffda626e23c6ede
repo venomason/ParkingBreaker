@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Dispute a Ticket - NYC.gov/Finance</title>
+<!--fixed-layout-->
+<!--ls:begin[stylesheet]-->
+<link href="/iwov-resources/fixed-layout/3-Row Simple.css" type="text/css" rel="stylesheet">
+<!--ls:end[stylesheet]-->
+<!--ls:begin[meta-keywords]-->
+<meta name="keywords" content="">
+<!--ls:end[meta-keywords]-->
+<!--ls:begin[meta-description]-->
+<meta name="description" content="">
+<!--ls:end[meta-description]-->
+<!--ls:begin[custom-meta-data]-->
+<!--ls:end[custom-meta-data]-->
+<!--ls:begin[meta-vpath]-->
+<meta name="vpath" content="">
+<!--ls:end[meta-vpath]-->
+<!--ls:begin[meta-page-locale-name]-->
+<meta name="page-locale-name" content="">
+<!--ls:end[meta-page-locale-name]-->
+<!--
+					ls:begin[pre-head-injection]
+				--><!--
+					ls:end[pre-head-injection]
+				--><!--
+					ls:begin[social_media_injection]
+				--><!--
+					ls:end[social_media_injection]
+				--><!--ls:begin[head-injection]--><!-- Global site tag (gtag.js) - Google Analytics --><script type="text/javascript" src="/ruxitagentjs_ICA7NVfqrux_10349261020121938.js" data-dtconfig="app=f936b00c6760395e|srtbv=4|owasp=1|featureHash=ICA7NVfqrux|rdnt=1|uxrgce=1|cuc=x8kxxto7|mel=100000|expw=1|dpvc=1|lastModification=1794210739013|tp=500,50,0|srbbv=3|agentUri=/ruxitagentjs_ICA7NVfqrux_10349261020121938.js|reportUrl=/rb_bf46289yka|rid=RID_-474995521|rpid=-1874381816|domain=nyc.gov"></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-4TNDD8X9Z5"></script><script>  window.dataLayer = window.dataLayer || [];  function gtag(){dataLayer.push(arguments);}  gtag('js', new Date());  gtag('config', 'G-4TNDD8X9Z5');</script><meta charset="utf-8" /><!--[if IE]>        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">        <![endif]--><meta name="viewport" content="width=device-width, initial-scale=1.0"/><!-- Google Translate Plugin --><meta name="google-translate-customization" content="4707bd7f535893a0-45bca7b6a97e5a2d-g609df9381571b349-c"/><!--[if lt IE 9]>            <script src="/assets/home/js/libs/html5shiv.js" type="text/javascript"></script>        <![endif]--><!-- GLOBAL STYLES --><link href="/assets/home/css/css-min/global.css" media="screen" rel="stylesheet" type="text/css" /><link href="/assets/home/css/css-min/module.css" media="screen" rel="stylesheet" type="text/css" /><!-- PRINT STYLE --><link rel="stylesheet" href="/assets/home/css/print.css" type="text/css" media="print" /><!-- PAGE SPECIFIC STYLES --><link href="/assets/home/css/includes/header-agencies.css" media="screen" rel="stylesheet" type="text/css" /><link href="/assets/home/css/modules/news-panel.css" media="screen" rel="stylesheet" type="text/css" /><link href="/assets/home/css/modules/share-icons.css" media="screen" rel="stylesheet" type="text/css" /><link href="/assets/home/css/modules/agencies-about-links.css" media="screen" rel="stylesheet" type="text/css" /><link href="/assets/home/css/modules/programs-and-initiatives.css" media="screen" rel="stylesheet" type="text/css" /><!--<link href="/assets/finance/css/pages/agencies/inside.css" media="screen" rel="stylesheet" type="text/css" />--><!-- centralized css --><link href="/assets/home/css/pages/agencies/inside.css" media="screen" rel="stylesheet" type="text/css" /><link href="/assets/finance/css/agency-styles.css" media="screen" rel="stylesheet" type="text/css" /><!--[if (gte IE 6)&(lte IE 8)]>        <script type="text/javascript" src="/assets/home/js/libs/selectivizr.js"></script>        <![endif]--><!--[if IE 8]>        <script type="text/javascript" src="/assets/home/js/libs/respond.min.js"></script>        <![endif]--><script src="/assets/home/js/libs/modernizr-2.6.2.min.js" type="text/javascript"></script><!--ls:end[head-injection]--><!--ls:begin[tracker-injection]--><!--ls:end[tracker-injection]--><!--ls:begin[script]--><!--ls:end[script]-->
+                                <script>!function(a){var e="https://s.go-mpulse.net/boomerang/",t="addEventListener";if("False"=="True")a.BOOMR_config=a.BOOMR_config||{},a.BOOMR_config.PageParams=a.BOOMR_config.PageParams||{},a.BOOMR_config.PageParams.pci=!0,e="https://s2.go-mpulse.net/boomerang/";if(window.BOOMR_API_key="QMXLB-WG9C2-LTK58-FW2PB-6ST8X",function(){function n(e){a.BOOMR_onload=e&&e.timeStamp||(new Date).getTime()}if(!a.BOOMR||!a.BOOMR.version&&!a.BOOMR.snippetExecuted){a.BOOMR=a.BOOMR||{},a.BOOMR.snippetExecuted=!0;var i,_,o,r=document.createElement("iframe");if(a[t])a[t]("load",n,!1);else if(a.attachEvent)a.attachEvent("onload",n);r.src="javascript:void(0)",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="width:0;height:0;border:0;display:none;",o=document.getElementsByTagName("script")[0],o.parentNode.insertBefore(r,o);try{_=r.contentWindow.document}catch(O){i=document.domain,r.src="javascript:var d=document.open();d.domain='"+i+"';void(0);",_=r.contentWindow.document}_.open()._l=function(){var a=this.createElement("script");if(i)this.domain=i;a.id="boomr-if-as",a.src=e+"QMXLB-WG9C2-LTK58-FW2PB-6ST8X",BOOMR_lstart=(new Date).getTime(),this.body.appendChild(a)},_.write("<bo"+'dy onload="document._l();">'),_.close()}}(),"".length>0)if(a&&"performance"in a&&a.performance&&"function"==typeof a.performance.setResourceTimingBufferSize)a.performance.setResourceTimingBufferSize();!function(){if(BOOMR=a.BOOMR||{},BOOMR.plugins=BOOMR.plugins||{},!BOOMR.plugins.AK){var e=""=="true"?1:0,t="",n="c7vfb2yxfpivw2xz3ecq-f-f3bac0874-clientnsv4-s.akamaihd.net",i="false"=="true"?2:1,_={"ak.v":"41","ak.cp":"1071053","ak.ai":parseInt("181928",10),"ak.ol":"0","ak.cr":72,"ak.ipv":4,"ak.proto":"http/1.1","ak.rid":"21599617","ak.r":47761,"ak.a2":e,"ak.m":"dscb","ak.n":"essl","ak.cport":40156,"ak.gh":"23.47.205.144","ak.quicv":"","ak.tlsv":"tls1.3","ak.0rtt":"","ak.0rtt.ed":"","ak.csrc":"-","ak.acc":"bbr","ak.t":"1794758917","ak.ak":"hOBiQwZUYzCg5VSAfCLimQ==rRLf2CPOmljYXWsbpTBMHZ3qe0DPonYixCOiS6kFfNeb9eVmXpzU01CqkKB+tRu8F5dQtKuKQ7tQ4dDVsTPrE7BjJi9Nh9PBDbwSXjrulsy/usKREZC9OucB5/jeBg4GVXiA42HZANq0bNdnsa5QgYu14khkpMNpANcp29qXigOwWFiawaJ0y5BsA40W2zmAhzwxR+pr8oui+dtKZhZ2U3UKUcfbZC6VO7eLNyIb1G0jNKu95VxDf6NobJu1BozOf5sK8zAgHh9m+5da9HOKsWo7iga9QZdhLUinodw2EMdcVFJfDaL2gZJRMhXZXnAfEUr10+hfVwDLQencrGNmtpr8BEzm4vfmvnA65JogvG4pTVWG9+bm3/4QukbfUo+69v5zW6KZYyUx9sKrKMZ9QMyjrrJORfchAKjJJfqoiA0=","ak.pv":"125","ak.dpoabenc":"","ak.tf":i};if(""!==t)_["ak.ruds"]=t;var o={i:!1,av:function(e){var t="http.initiator";if(e&&(!e[t]||"spa_hard"===e[t]))_["ak.feo"]=void 0!==a.aFeoApplied?1:0,BOOMR.addVar(_)},rv:function(){var a=["ak.cport","ak.cr","ak.csrc","ak.gh","ak.ipv","ak.m","ak.n","ak.ol","ak.proto","ak.quicv","ak.tlsv","ak.0rtt","ak.0rtt.ed","ak.r","ak.acc","ak.t","ak.tf"];BOOMR.removeVar(a)}};BOOMR.plugins.AK={akVars:_,akDNSPreFetchDomain:n,init:function(){if(!o.i){var a=BOOMR.subscribe;a("before_beacon",o.av,null,null),a("onbeacon",o.rv,null,null),o.i=!0}return this},is_complete:function(){return!0}}}}()}(window);</script></head>
+<body id="page">
+<!--ls:begin[body]--><div class="ls-canvas page" id="outer-wrap">
+<div class="ls-row" id="inner-wrap">
+<div class="ls-fxr" id="ls-gen25401440-ls-fxr">
+<div class="ls-col" id="ls-row-1-col-1">
+<div class="ls-col-body" id="ls-gen25401441-ls-col-body">
+<div class="ls-row main-header" id="top">
+<div class="ls-fxr" id="ls-gen25401442-ls-fxr">
+<div class="ls-col block" id="ls-row-1-col-1-row-1-col-1">
+<div class="ls-col-body" id="ls-gen25401443-ls-col-body">
+<div class="ls-row" id="ls-row-1-col-1-row-1-col-1-row-1">
+<div class="ls-fxr" id="ls-gen25401444-ls-fxr">
+<div class="ls-area" id="ls-row-1-col-1-row-1-col-1-row-1-area-1">
+<div class="ls-area-body" id="ls-gen25401445-ls-area-body">
+<div class="ls-cmp-wrap ls-1st" id="w1411686924174">
+<!--ls:begin[component-1411686924174]-->
+<div class="iw_component" id="1411686924174">
+</div>
+<!--ls:end[component-1411686924174]-->
+</div>
+<div class="ls-cmp-wrap" id="w1411686924175">
+<!--ls:begin[component-1411686924175]-->
+<div class="iw_component" id="1411686924175"><div class="agency-header">
+<div class="upper-header-black">
+<div class="container">
+<span class="upper-header-left"><a href="http://www1.nyc.gov"><img src="/assets/home/images/global/nyc_white.png" alt="NYC" class="small-nyc-logo"></a><img src="/assets/home/images/global/upper-header-divider.gif" alt=""><span class="upper-header-black-title">Department of Finance</span></span><span class="upper-header-padding"></span><span class="upper-header-right"><span class="upper-header-three-one-one"><a href="/311/index.page">311</a></span><img src="/assets/home/images/global/upper-header-divider.gif" alt=""><span class="upper-header-search"><a href="/home/search/index.page">Search all NYC.gov websites</a></span></span>
+</div>
+</div>
+</div><div role="banner" class="main-header">
+<div class="block">
+<div class="header-top">
+<div class="container">
+<a href="#" class="toggle-mobile-side-nav visible-phone" id="nav-open-btn">Menu</a><span class="welcome-text hidden-phone agency-header"></span>
+<div class="agency-logo-wrapper">
+<a href="/site/finance/index.page"><img class="agency-logo" src="/assets/finance/images/content/header/nyc_finance_logo.png" alt="Official logo of the NYC Department of Finance"></a>
+</div>
+<div class="hidden-phone" id="header-links">
+<div class="language-gif">
+<img src="/assets/home/images/global/language.gif" alt="Language"></div>
+<div class="language-selector">
+<div id="google_translate_element"></div>
+</div>
+<a class="text-size hidden-phone" href="http://www1.nyc.gov/home/text-size.page">Text-Size</a>
+</div>
+<a href="#" class="visible-phone nav-sprite-mobile" id="toggle-mobile-search"><span class="hidden">Search</span></a>
+</div>
+</div>
+<div class="container nav-outer">
+<nav role="navigation" class="hidden-phone" id="nav">
+<div class="block">
+<ul>
+<li class="nav-home hidden-phone">
+<a href="/site/finance/index.page">
+                      Home</a>
+</li>
+<li class="active">
+<a href="/site/finance/vehicles/vehicles.page">Vehicles</a>
+</li>
+<li>
+<a href="/site/finance/property/property.page">Property</a>
+</li>
+<li>
+<a href="/site/finance/business/business-info.page">Business</a>
+</li>
+<li>
+<a href="/site/finance/vehicles/auctions.page">Auctions</a>
+</li>
+<li>
+<a href="/site/finance/sheriff-courts/sheriff-courts.page">Courts</a>
+</li>
+<li>
+<a href="/site/finance/about/about-us.page">About</a>
+</li>
+<li>
+<a href="/site/finance/pay-now/pay.page">Payments</a>
+</li>
+<li class="hidden-phone toggle-search-wide-background-ico-search" id="toggle-search-wide"></li>
+</ul>
+</div>
+</nav>
+<div class="global-input-search">
+<form method="GET" action="/home/search/index.page" name="filter-search-form" class="hidden hidden-phone" id="global-search-form1">
+<div class="field-search">
+<input style="color: transparent" type="submit" class="ico-search btn-filter-search" value="submit" aria-hidden="true">
+<div class="input-padding">
+<label for="search-header" class="sr-only">Search</label><input id="search-header" type="text" name="search-terms" placeholder="Search" class="input-search input-black filter-item placeholder"><input type="hidden" name="sitesearch" value="www1.nyc.gov/site/finance"><span class="reader-only"><input value="submit" aria-label="Submit" type="submit"></span>
+</div>
+</div>
+</form>
+</div>
+<div class="global-input-search visible-phone hidden-phone" id="nav-top-searches">
+<div class="block">
+<form class="hidden" method="GET" action="/home/search/index.page" name="filter-search-form" id="global-search-form2">
+<div class="field-search">
+<input style="color: transparent" aria-label="Submit" value="Submit" class="ico-search btn-filter-search" type="submit">
+<div class="input-padding">
+<label for="search-header-2" class="sr-only">Search</label><input id="search-header-2" class="input-search input-black filter-item" placeholder="Search" name="search-terms" type="text"><input type="hidden" name="sitesearch" value="www1.nyc.gov/site/finance">
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--ls:end[component-1411686924175]-->
+</div>
+</div>
+</div>
+<div class="ls-row-clr"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="ls-row-clr"></div>
+</div>
+</div>
+<div class="ls-row main" id="main">
+<div class="ls-fxr" id="ls-gen25401446-ls-fxr">
+<div class="ls-area" id="ls-row-1-col-1-row-2-area-1">
+<div class="ls-area-body" id="ls-gen25401447-ls-area-body">
+<div class="ls-cmp-wrap ls-1st" id="w1411686924176">
+<!--ls:begin[component-1411686924176]-->
+<div class="iw_component" id="1411686924176"><div class="row">
+<div class="subheader">
+<div class="container">
+<div class="subheader-button-row quatro">
+<a class="main-filter-category active" href="/site/finance/vehicles/services.page">Tickets</a><a class="main-filter-category" href="/site/finance/vehicles/services-booting.page">Booting and Towing</a><a class="main-filter-category" href="/site/finance/vehicles/commercial.page">Commercial Vehicles</a><a class="main-filter-category" href="/site/finance/vehicles/vehicles-benefits.page">Benefits</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--ls:end[component-1411686924176]-->
+</div>
+<div class="ls-cmp-wrap" id="w1411686924178">
+<!--ls:begin[component-1411686924178]-->
+<div class="iw_component" id="1411686924178"><!-- Left nav component --><div class="row">
+<div class="container content-container">
+<div class="span3 agencies-about-links">
+<div class="agencies-about-share">
+<div class="share">
+<a aria-label="Share on facebook" target="_blank" href="#"><span aria-hidden="true" class="facebook_custom" data-url="https://www1.nyc.gov/site/finance/vehicles/dispute-a-ticket.page?" data-title="Dispute a Ticket - NYC.gov/Finance"></span></a><a aria-label="Share on twitter" target="_blank" href="#"><span aria-hidden="true" class="twitter_custom" data-url="https://www1.nyc.gov/site/finance/vehicles/dispute-a-ticket.page?" data-title="Dispute a Ticket - NYC.gov/Finance"></span></a><a aria-label="Share on google plus" target="_blank" href="#"><span aria-hidden="true" class="googleplus_custom" data-url="https://www1.nyc.gov/site/finance/vehicles/dispute-a-ticket.page?" data-title="Dispute a Ticket - NYC.gov/Finance"></span></a><a aria-label="Share on tumblr" target="_blank" href="#"><span aria-hidden="true" class="tumblr_custom" data-url="https://www1.nyc.gov/site/finance/vehicles/dispute-a-ticket.page?" data-title="Dispute a Ticket - NYC.gov/Finance"></span></a><a aria-label="Share in email" href="#"><span aria-hidden="true" class="email_custom" data-url="https://www1.nyc.gov/site/finance/vehicles/dispute-a-ticket.page?" data-title="Dispute a Ticket - NYC.gov/Finance"></span></a>
+          Share
+  </div>
+<div class="print-event hidden-phone hidden-tablet">
+<img alt="Print icon" src="/assets/home/images/global/print.png"><span class="print-label"> Print </span>
+</div>
+</div>
+</div>
+<div class="span9 about-main-image">
+<div class="span6 about-description"><section class="page-header">
+    <div class="region flow">
+    <h1>Dispute a ticket</h1>
+    <div class="grid" data-layout="col-4" data-flow-space="l">
+        <article class="card" data-variant="large"><header class="card__header">
+        <h3><a href="/assets/finance/jump/hearing-by-web.html" class="card__primary-action" title="Pay Ticket Online &nbsp;" target="_blank" rel="noopener"> <span>Dispute ticket online </span> <span> <span class="i-ri:arrow-right-line">&nbsp;</span> </span> </a></h3>
+        </header></article>
+        <article class="card" data-variant="large"><header class="card__header">
+        <h3><a href="/site/finance/vehicles/nyc-pay-or-dispute.page" class="card__primary-action" title="Pay Ticket Online &nbsp;" target="_self" rel="noopener"> <span>Dispute ticket by mobile app</span> <span> <span class="i-ri:arrow-right-line">&nbsp;</span> </span> </a></h3>
+        </header></article>
+        <article class="card" data-variant="large"><header class="card__header">
+        <h3><a href="/site/finance/vehicles/dispute-mail.page" class="card__primary-action"> <span>Dispute a ticket by mail</span><span> <span class="i-ri:arrow-right-line">&nbsp;</span> </span></a></h3>
+        </header></article>
+        <article class="card" data-variant="large"><header class="card__header">
+        <h3><a href="/site/finance/vehicles/dispute-person.page" class="card__primary-action"> <span>Dispute a ticket in-person</span><span> <span class="i-ri:arrow-right-line">&nbsp;</span> </span></a></h3>
+        </header></article>
+        </div>
+    </div>
+    </section>
+    
+    
+    
+    
+    <p>
+    To dispute a ticket, you must request a hearing within 30 days after the ticket was issued to avoid paying late penalties. You can dispute a ticket <a href="/site/finance/vehicles/dispute-web.page">online</a>, by <a href="/site/finance/vehicles/dispute-mail.page" target="_self">mail</a>, or via the <a href="/assets/finance/jump/pay-or-dispute-app.html">Pay or Dispute mobile app</a>. 
+    </p>
+    
+    <p>
+    If you cannot conduct your hearing online, by mail, or via the app, you can <a href="/site/finance/about/make-an-appointment.page">schedule an in-person hearing</a> or visit a <a href="/site/finance/about/contact-us-by-visit.page">Department of Finance business center</a> between the hours of 8:30 a.m. and 4:30 p.m.
+    </p>
+    
+    
+    <!--<img title="Adjudications Infographic" src="/assets/finance/images/content/misc/infographic-parkingtickethearings.png" alt="Infographic depicting the number of parking ticket adjudications held online, by web, by mail and in person." style="width:500px;">-->
+    
+    
+    
+    <div class="dof accordion-item">
+    <div class="accordion-heading"><i class="fa fa-caret-right" hidden="true"></i><a href="#">
+    <h4>Important information about disputing a ticket</h4>
+    </a></div>
+    <div class="accordion-content" >
+    
+    <ul>
+        <li>You must meet all deadlines. Contacting anyone other than the Department of Finance does not change the deadline.</li>
+        <li>If you request a hearing after 30 days and an administrative law judge finds you guilty, you will have to pay late penalties.</li>
+        <li>Please note that appearing at an in-person hearing does not increase your chances of getting a ticket dismissed. The Department of Finance encourages customers to use online, mobile app, or mail hearings to save time over in-person hearings.</li>
+        <li>All statements you make and information or documents you submit must be true and accurate to the best of your knowledge. Any false statements made may subject you to the penalties.</li>
+        <li>The Department of Finance has the right to <a href="/site/finance/vehicles/services-ticket-reinstatement.page" target="_self">Reinstate a Previously Dismissed Ticket</a> if we determine the ticket was dismissed based on false evidence or testimony.</li>
+    </ul>
+    
+    
+    
+    </div>
+    </div>
+    
+    
+    <div class="dof accordion-item">
+    <div class="accordion-heading"><i class="fa fa-caret-right" hidden="true"></i><a href="#">
+    <h4>Tickets in judgment</h4>
+    </a></div>
+    <div class="accordion-content" >
+    
+    <p>
+    If we do not receive payment for the ticket or a hearing request from you, then approximately 100 days after your ticket is issued, it will go into judgment. You cannot have a hearing on your ticket in <a href="/site/finance/vehicles/services-tickets-in-judgment.page" >judgment</a> if is more than one year old.
+    </p>
+    
+    </div>
+    </div>
+    
+    
+    <a href="/site/finance/vehicles/dispute-already-paid-dismissed.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target1">Previously paid or dismissed tickets</a><div id="target1" class="tunnelResult"></div>
+    
+    
+    <a href="/site/finance/vehicles/opsa.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target121">Learn how the Office of the Parking Summons Advocate can help you.</a>
+    <div id="target121" class="tunnelResult"></div>
+    
+    <a href="/site/finance/vehicles/common-reasons.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target3">Common reasons for ticket disputes</a>
+    <div id="target3" class="tunnelResult"></div>
+    
+    
+    
+    
+    <a href="/site/finance/vehicles/required-elements-in-a-ticket.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target10">Required elements in a ticket</a>
+    <div id="target10" class="tunnelResult"></div>
+    
+    
+    <a href="/site/finance/vehicles/preparing-for-hearing.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target30">Preparing for your hearing</a>
+    <div id="target30" class="tunnelResult"></div>
+    
+    
+    <a href="/site/finance/vehicles/evidence-suggestions.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target4">Evidence recommendations</a>
+    <div id="target4" class="tunnelResult"></div>
+    
+    
+    
+    
+    <a href="/site/finance/vehicles/common-misconceptions.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target377">Defenses that will not be upheld</a>
+    <div id="target377" class="tunnelResult"></div>
+    
+    
+    
+    <div class="dof accordion-item">
+    <div class="accordion-heading"><i class="fa fa-caret-right" hidden="true"></i><a href="#">
+    <h4>When will you receive a decision?</h4>
+    </a></div>
+    <div class="accordion-content" >
+    
+    <p>
+    <strong>In-person hearing:</strong> you will receive the administrative judge’s decision right away.
+    </p>
+    
+    <p>
+    <strong>Online hearing or hearing-by-mail:</strong> an administrative law judge’s decision will be emailed to the email address you supplied. If you are asked to send additional evidence, follow the instructions on the <a href="/site/finance/vehicles/dispute-mail.page">Hearing-by-Mail</a> page.
+    </p>
+    
+    <p>
+    If you disputed a violation and have not received a decision within three weeks of requesting a hearing-by-mail or an online hearing (via our website or the Pay or Dispute app), please <a href="/assets/finance/jump/crm/contact-parking-decision-order.html" target="_blank">contact us</a> to check whether a decision has been made.
+    </p>
+    
+    
+    
+    
+    
+    </div>
+    </div>
+    
+    
+    <a href="/site/finance/vehicles/dispute-appeal-hearing.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target2">Appeal a hearing decision</a>
+    <div id="target2" class="tunnelResult"></div>
+    
+    
+    
+<div class="dof accordion-item">
+    <div class="accordion-heading"><i class="fa fa-caret-right" hidden="true"></i><a href="#">
+    <h4>Request an in-person hearing transcript</h4>
+    </a></div>
+    <div class="accordion-content" >
+    
+    <p>
+    If you attended an in-person hearing, you may request a transcript of the hearing record for your appeal. You are responsible for paying the cost of the transcript. To submit a request for a transcript and to learn the cost, submit the online <a href="/site/finance/about/contact-by-email/contact-hearing-transcript-request.page">Request a Hearing Transcript form</a>, or mail a letter with the summons number(s), hearing date(s), the vehicle’s license plate number and state of registration, and the respondent’s name or the name of the vehicle owner, to:
+    </p>
+    
+    <p>
+    New York City Department of Finance
+    <br/>Adjudications Division
+    <br/>Parking Ticket Transcript Processing
+    <br/>66 John Street, 3rd Floor
+    <br/>New York, NY 10038
+    </p>
+    
+    <p>
+    You will be informed of the cost of the transcript within seven business days from our receipt of your request. If you submitted your request online, we will notify you of the cost by email; if you submitted your request by mail, we will notify you by mail. If you wish to accept the cost and order the transcript, you must pay by check payable to “NYC Department of Finance.” The check must be received by the Department of Finance within 10 business days of the date on the letter or email in which we informed you of the transcript’s cost. You must include a copy of your transcript request with your check. A mailing address for your check will be provided when we inform you of the transcript’s cost.
+    </p>
+    
+    <p>
+    If payment is not received by that time, your transcript request will be denied and your appeal will go forward as scheduled. No further transcript requests for your appeal will be accepted. Please note that the Department of Finance does not currently charge an administrative fee for transcript requests and will not do so until such time as the agency updates its rules or revises its procedures.
+    </p>
+    
+    
+    </div>
+    </div>
+    
+    
+    
+    
+<div class="dof accordion-item">
+    <div class="accordion-heading"><i class="fa fa-caret-right" hidden="true"></i><a href="#">
+    <h4>Parking Permit for People with Disabilities / Special Parking Identification Permit</h4>
+    </a></div>
+    <div class="accordion-content">
+<p>
+    If you hold a NYC Parking Permit for People with Disabilities (PPPD), also known as the Special Parking Identification (SPI) Permit, and you received a parking summons, you can mail your dispute to the Parking Violation Advocacy Unit, 66 John Street, 3rd Floor, New York, NY 10038.
+</p>
+
+<p>
+In your dispute, write your permit number on the original summons and attach a copy of the front and back of the permit. You may also submit supporting evidence.
+</p>
+
+     
+    </div>
+    </div>   <!-- ## end accordion -->
+    
+    
+    
+    
+    <div class="dof accordion-item">
+    <div class="accordion-heading"><i class="fa fa-caret-right" hidden="true"></i><a href="#">
+    <h4>Using a parking ticket broker</h4>
+    </a></div>
+    <div class="accordion-content" >
+    
+    <p>
+    The Department of Finance recognizes that members of the public have the right to choose whether to represent themselves or rely on the services of a broker. While we will not endorse or recommend a particular broker, it is our obligation to inform the public when brokers have been found guilty of unethical conduct in the performance of their duty.
+    </p>
+    
+    
+    <ul>
+        <li><a href="/assets/finance/downloads/pdf/18pdf/39-09.pdf" target="_blank">Broker sanction rules</a></li>
+        <li><a href="/assets/finance/downloads/pdf/18pdf/comm-jiha-letter--adopting-rr.pdf" target="_blank">DOF vs. Parking Ticket Busters & Emmanuel Amofah (suspension expired)</a></li>
+        <li><a href="/assets/finance/downloads/pdf/21pdf/wertzberger-commissioner-signed-letter.pdf" target="_blank">DOF vs. Parking Expert Inc. and Arye Wertzberger (suspension expired)</a></li>
+    </ul>
+    
+    
+    </div>
+    </div>
+    
+    
+    
+    <a href="/site/finance/vehicles/dispute-diplomats-consular-staff.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target5">Diplomats and consular staff</a>
+    <div id="target5" class="tunnelResult"></div>
+    
+    
+    
+    
+    
+    
+    <style type="text/css" title="text/css"><!--
+    .brochures {	
+        margin-top:1em;    	    
+    
+    }
+    
+    
+    
+    .brochures > div{	
+    
+        margin:1px;
+        background:#f3f3f3;
+    }
+    
+    
+    
+    .brochures div div:last-child {	
+    
+        margin-top:0px;
+        padding:.5em 1em 1em 1em;
+    
+    }
+    
+    .brochures img {margin-bottom:1em;}
+    
+    
+    
+    
+    .brochures div div{	
+    
+        padding:1em;
+        padding-bottom:0em;
+        margin:0px;
+    
+    
+    }
+    
+    
+    
+    
+    @supports (flex-wrap: wrap) {
+    
+    
+        
+    .brochures {	
+        margin-top:1em;
+        display:-webkit-box;
+        display:-ms-flexbox;
+        display:flex;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;	    	    
+    
+    }
+    
+    .brochures > div{	
+    
+        margin:1px;
+        display:-webkit-box;
+        display:-ms-flexbox;
+        display:flex;
+        -webkit-box-orient:vertical;
+        -webkit-box-direction:normal;
+            -ms-flex-direction:column;
+                flex-direction:column;
+        -webkit-box-pack:justify;
+            -ms-flex-pack:justify;
+                justify-content:space-between;
+        -webkit-box-flex: 1;
+            -ms-flex: 1 250px;
+                flex: 1 250px;	
+        background:#f3f3f3;
+    }
+    
+    
+    .brochures div div{	
+    
+    
+        -webkit-box-flex:0;
+            -ms-flex:0;
+                flex:0;
+    
+    }
+    
+    
+    }/*//end supports block*/
+    --></style>
+    
+    
+    
+    <div class="brochures"><!-- item one -->
+    <div>
+    <div><a href="/assets/finance/downloads/pdf/brochures/parking_brochure.pdf" title="Got a Ticket or Camera Violation Brochure" target="_blank" rel="noopener"><img src="/assets/finance/images/content/misc/parking_camera_violations.png" alt="Got a Ticket or Camera Violation Brochure"></a> <a target="_blank" title="Got a Parking Ticket or Camera Violation? (Brochure)" href="/assets/finance/downloads/pdf/brochures/parking_brochure.pdf" rel="noopener">Got a Ticket or Camera Violation?</a></div>
+    <!-- translations -->
+    <div><a target="_blank" title="Parking Ticket Brochure (Arabic)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_arabic.pdf" rel="noopener">اللغة العربية</a>&nbsp; | <a target="_blank" title="Parking Ticket Brochure (Bengali)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_bengali.pdf" rel="noopener">বাঙালি</a>&nbsp; | <a target="_blank" title="Parking Ticket Brochure (Chinese)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_chinese.pdf" rel="noopener">中文</a> | <a target="_blank" title="Parking Brochure (French)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_french.pdf" rel="noopener">français</a> | <a target="_blank" title="Parking Brochure (Haitian Creole)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_creole.pdf" rel="noopener">kreyòl ayisyen</a> | <a target="_blank" title="Parking Brochure (Korean)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_korean.pdf" rel="noopener">한국어</a> | <a target="_blank" title="Parking Brochure (Polish)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_polish.pdf" rel="noopener">Polski</a> | <a target="_blank" title="Parking Brochure (Russian)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_russian.pdf" rel="noopener">русский</a> | <a target="_blank" title="Parking Brochure (Spanish)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_spanish.pdf" rel="noopener">español</a> | <a target="_blank" title="Parking Brochure (Urdu)" href="/assets/finance/downloads/pdf/translations/got_a_parkingticket_urdu.pdf" rel="noopener">اردو</a></div>
+    </div>
+    <!-- item two -->
+    <div>
+    <div><a href="/assets/finance/downloads/pdf/brochures/opsa-brochure.pdf" title="A Guide to Paying or Disputing Parking Violations" target="_blank" rel="noopener"><img title="A Guide to Paying or Disputing Parking Violations" src="/assets/finance/images/content/misc/opsa-brochure-cover.png" alt="A Guide to Paying or Disputing Parking Violations" height="150"></a> <a target="_blank" title="A Guide to Paying or Disputing Parking Violations" href="/assets/finance/downloads/pdf/brochures/opsa-brochure.pdf" rel="noopener">A Guide to Paying or Disputing Parking Violations</a></div>
+    <div><a target="_blank" title="OPSA Brochure - Arabic" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-arabic.pdf" rel="noopener">اللغة العربية</a>&nbsp; | <a target="_blank" title="OPSA Brochure - Bengali" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-bengali.pdf" rel="noopener">বাঙালি</a> | <a target="_blank" title="OPSA Brochure - Chinese" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-chinese.pdf" rel="noopener">中文</a> | <a target="_blank" title="OPSA Brochure - French" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-french.pdf" rel="noopener">français</a> | <a target="_blank" title="OPSA Brochure - Haitian Creole" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-haitian.pdf" rel="noopener">kreyòl ayisyen</a> | <a target="_blank" title="OPSA Brochure - Korean" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-korean.pdf" rel="noopener">한국어</a> | <a target="_blank" title="OPSA Brochure - Polish" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-polish.pdf" rel="noopener">Polski</a> | <a target="_blank" title="OPSA Brochure - Russian" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-russian.pdf" rel="noopener">русский</a> | <a target="_blank" title="OPSA Brochure - Spanish" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-spanish.pdf" rel="noopener">español</a> | <a target="_blank" title="OPSA Brochure - Urdu" href="/assets/finance/downloads/pdf/translations/opsa-brochure/opsa-brochure-urdu.pdf" rel="noopener">اردو</a></div>
+    </div>
+    </div>
+    <!-- end of brochures -->
+    
+    
+    <a href="/site/finance/vehicles/dispute-a-ticket-faqs.page" class="tunnel" data-location=".abstract" data-abstract="yes" data-target="#target1234">Frequently Asked Questions</a>
+    <div id="target1234" class="tunnelResult" style="margin-bottom:1em;"></div>
+    
+    
+    
+    </div>
+</div>
+</div>
+</div>
+</div>
+<!--ls:end[component-1411686924178]-->
+</div>
+<div class="ls-cmp-wrap" id="w1411686924179">
+<!--ls:begin[component-1411686924179]-->
+<div class="iw_component" id="1411686924179"><div class="row">
+<div class="container clearfix">
+<hr class="module-divider">
+</div>
+</div><div class="row hidden-phone">
+<div class="container clearfix">
+<hr class="module-divider">
+</div>
+</div>
+</div>
+<!--ls:end[component-1411686924179]-->
+</div>
+<div class="ls-cmp-wrap" id="w1457495654319">
+<!--ls:begin[component-1457495654319]-->
+<div class="iw_component" id="1457495654319"><!--
+Artifact: Programs Tout component.
+Purpose:  Support shared programs across nyc.gov and agencies
+Author:   Dan Jung
+Date:     10/3/2014
+
+Update: Modify structure for compliance to WCAG. 
+Date: 6/2021
+Author: Visham Subrath
+--><div id="programInt" class="row programs-row">
+<div class="row">
+<div class="container clearfix">
+<div class="module module-programs-and-initiatives clearfix">
+<div class="module-header">
+<a id="programs-screen-reader" name="programs-screen-reader"></a>
+<h2></h2>
+<!--DEBUG exception messages:guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+guidEle is null
+-->
+</div>
+<div class="module-content span12 clearfix">
+<div class="row desktop tablet mobile"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--ls:end[component-1457495654319]-->
+</div>
+</div>
+</div>
+<div class="ls-row-clr"></div>
+</div>
+</div>
+<div class="ls-row" id="ls-row-1-col-1-row-3">
+<div class="ls-fxr" id="ls-gen25401448-ls-fxr">
+<div class="ls-area" id="ls-row-1-col-1-row-3-area-1">
+<div class="ls-area-body" id="ls-gen25401449-ls-area-body">
+<div class="ls-cmp-wrap ls-1st" id="w1457495654320">
+<!--ls:begin[component-1457495654320]-->
+<div class="iw_component" id="1457495654320"><div class="row">
+<footer>
+<div class="container">
+<div class="span9 footer-links">
+<a href="/main">nyc.gov home</a><a href="/main/services">Services</a><a href="/main/events/?">Events</a><a href="/main/your-government">Your government</a><a href="https://portal.311.nyc.gov/">311</a><a href="/main/your-government/contact-nyc-government">Contact NYC government</a><a href="https://www.nycvotes.org/">Register to vote</a><a href="https://a858-nycnotify.nyc.gov/notifynyc/">Emergency alerts </a><a href="https://cityjobs.nyc.gov/">Careers</a><a href="/main/forms/website-feedback">Website feedback</a><a href="https://www.nyc.gov/site/mopd/resources/digital-accessibility.page">Accessibility resources</a><a href="/main/nyc-gov-privacy-policy">Privacy policy</a><a href="/main/terms-of-use">Terms of use</a><a href="/main/about-our-content">About nyc.gov content</a>
+</div>
+<div class="span3">
+<span class="logo-nyc">NYC</span>
+<form class="form-search" method="get" action="/home/search/index.page">
+<label for="footer-search" class="sr-only">Search</label><input id="footer-search" type="text" placeholder="Search" class="input-search placeholder" name="search-terms"><button class="ico-search">Search</button>
+</form>
+<div class="copyright">
+<div><p>&copy; City of New York. 2025 All Rights Reserved. NYC is a trademark and service mark of the City of New York.</p>
+<!-- nyc footer 07-16-2025 --></div>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</div>
+<!--ls:end[component-1457495654320]-->
+</div>
+</div>
+</div>
+<div class="ls-row-clr"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="ls-row-clr"></div>
+</div>
+</div>
+</div><!--ls:end[body]--><!--ls:begin[page_track]--><!--ls:end[page_track]--></body>
+<!--ls:begin[foot-injection]--><!-- GLOBAL JAVASCRIPT INCLUDES (/js/_global.js.html.erb) --><script src="/assets/home/js/libs/jquery-1.9.1.js" type="text/javascript"></script><script src="/assets/home/js/libs/jquery-ui-1.10.1.custom.min.js" type="text/javascript"></script><script src="/assets/home/js/libs/i18n/jquery-ui-i18n.js" type="text/javascript"></script><script src="/assets/home/js/utils.js" type="text/javascript"></script><script src="/assets/home/js/libs/class.js" type="text/javascript"></script><script src="/assets/home/js/classes/NYC.MainNav.js" type="text/javascript"></script><script src="/assets/home/js/classes/NYC.MobileNav.js" type="text/javascript"></script><script src="/assets/home/js/classes/NYC.Global.js" type="text/javascript"></script><script src="/assets/home/js/libs/ZeroClipboard.min.js" type="text/javascript"></script><script src="/assets/home/js/classes/NYC.InfoShare.js" type="text/javascript"></script><script src="/assets/home/js/classes/NYC.ProgramsAndInitiatives.js" type="text/javascript"></script><script src="/assets/home/js/share.js" type="text/javascript"></script><script src="/assets/home/js/libs/jquery.colorbox-min.js" type="text/javascript"></script><!-- IE7 support for JSON --><!--[if (gte IE 6)&(lte IE 8)]>        <script src="/assets/home/js/libs/json2.js" type="text/javascript"></script>        <![endif]--><!-- PAGE SPECIFIC JAVASCRIPT --><script src="/assets/home/js/pages/agencies/about.js" type="text/javascript"></script><script src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"></script><!-- Google Translate Plugin --><script type="text/javascript">            function googleTranslateElementInit() {                new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');            }        </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script><!-- webtrends --><script type="text/javascript" src="/assets/finance/js/agencies/agency-wt.js"></script><script type="text/javascript" src="/assets/home/js/webtrends/webtrends_v10.js"></script><!-- End Analytics Tagging 8/4/14 TL. (NYC.gov Specific) --><!--ls:end[foot-injection]--></html></html>

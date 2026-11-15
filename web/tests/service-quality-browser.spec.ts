@@ -76,9 +76,18 @@ for (const width of [320,375,768,1440]) {
     await page.reload();
     await expect(page.locator("#h-s6")).toHaveText("Your letter is paused.");
     // A resumed review window must never flash a nonsensical countdown before the first clock tick.
-    await expect(page.locator("#pillT")).toHaveText(/^(?:[0-9]|[12][0-9]|30):\d{2}$/);
-    expect((await page.evaluate(()=>(window as unknown as {__pill:string[]}).__pill)).length).toBeGreaterThan(0);
-    for (const text of await page.evaluate(()=>(window as unknown as {__pill:string[]}).__pill)) expect(text).toMatch(/^(?:[0-9]|[12][0-9]|30):\d{2}$/);
+    const status = await call(page,"GET",`/cases/${id}/status`);
+    const windowSeconds = (Date.parse(status.window_expires_at) - Date.parse(status.window_started_at)) / 1000;
+    const checkCountdown = (text: string) => {
+      expect(text).toMatch(/^\d{1,3}:[0-5]\d$/);
+      const [minutes, seconds] = text.split(":").map(Number);
+      expect(minutes * 60 + seconds).toBeGreaterThan(0);
+      expect(minutes * 60 + seconds).toBeLessThanOrEqual(windowSeconds);
+    };
+    await expect(page.locator("#pillT")).toHaveText(/^\d{1,3}:[0-5]\d$/);
+    const seen = await page.evaluate(()=>(window as unknown as {__pill:string[]}).__pill);
+    expect(seen.length).toBeGreaterThan(0);
+    for (const text of seen) checkCountdown(text);
     expect(approvals).toBe(0);
     await shot(page,`${width}-refused`);
     await page.locator("#liveResumeLetter").click();
