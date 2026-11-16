@@ -35,7 +35,7 @@ export function IntakeTrust() {
           <div><Icon id="check" size={22} /><h3>Nothing goes out without your OK.</h3><p>You inspect and approve the exact PDF first.</p></div>
           <div><Icon id="lock" size={22} /><h3>Private by default.</h3><p>Each appeal has its own private link.</p></div>
           <div><Icon id="doc" size={22} /><h3>A mailing record you can keep.</h3><p>Keep the available USPS delivery or attempted-delivery updates and a copy of your mailed packet. Tracking does not tell us when the agency opens or reviews it, and it isn’t a USPS Return Receipt. Delivery is not guaranteed.</p></div>
-          <div><Icon id="globe" size={22} /><h3>An address you can check.</h3><p>We look for the appeal address on the agency’s official pages and show you the sources. If we can’t verify it, you can supply an address after reading the separate terms, or stop. You approve the exact destination before mailing.</p></div>
+          <div><Icon id="globe" size={22} /><h3>An address you can check.</h3><p>We look for the appeal address on the agency’s official pages and show you the sources. If we cannot establish the required submission details, we pause or stop without charging for mailing. You approve the exact destination before mailing.</p></div>
         </div>
       </section>
     </div>

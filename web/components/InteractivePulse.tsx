@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 const INTERACTIVE_SELECTOR =
   "button, .btn, .chip, .card, .drop, .access-card, a[href], input, textarea, select, label.check";
-const TILT_SELECTOR = ".card, .drop, .access-card, .intake-introduction";
+const TILT_SELECTOR = ".intake-introduction, .how-pillar";
 
 export function InteractivePulse() {
   useEffect(() => {
@@ -43,7 +43,9 @@ export function InteractivePulse() {
       window.setTimeout(() => pulse.remove(), 520);
     };
 
+    const hoverPointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" || !hoverPointer.matches) return;
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
 

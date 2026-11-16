@@ -34,9 +34,9 @@ export function CustomerChoiceRules() {
 /** Keep the customer journey brief; the complete rule stays in Rules and terms. */
 export function CustomerChoiceNotice({ onOpenRules }: { onOpenRules?: () => void }) {
   return (
-    <p className="small muted" data-customer-choice-notice>
+    <p className="small muted notice-pipeline" data-customer-choice-notice>
       Your chosen details aren’t covered by our correct-office refund guarantee if they cause the rejection.
-      {onOpenRules && <> <button className="btn btn-ghost btn-sm" type="button" onClick={onOpenRules}>Rules</button></>}
+      {onOpenRules && <> <button className="notice-rules-btn" type="button" onClick={onOpenRules}>Rules</button></>}
     </p>
   );
 }
