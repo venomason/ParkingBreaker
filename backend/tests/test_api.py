@@ -364,6 +364,7 @@ async def _contract_examples(
                 "expected_revision": 2,
                 "review_request_id": "contract-ticket-review",
                 "expected_confirmation_generation": 0,
+                "accuracy_acknowledged": True,
                 "resolved_fields": {},
             },
             expected_status=409,

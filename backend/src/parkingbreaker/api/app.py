@@ -316,7 +316,7 @@ def create_app(
         response_model=s.TicketReviewSnapshot,
     )
     async def request_ticket_review(
-        body: s.TicketOperationRequest,
+        body: s.TicketReviewRequest,
         workspace: Annotated[str, Depends(owned_workspace)],
     ) -> s.TicketReviewSnapshot:
         return services.request_ticket_review(workspace, body)

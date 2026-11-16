@@ -6,6 +6,7 @@ import type { Draft, PacketPreview } from "../lib/api";
 type Affirmation = { declaration_id: string; text_sha256: string };
 import { PacketReviewProgress } from "./CaseVisuals";
 import { LegalDisclosure } from "./LegalDisclosure";
+import { CustomerChoiceNotice } from "./CustomerChoiceRules";
 
 interface LiveLetterProps {
   draft: Draft;
@@ -23,10 +24,11 @@ interface LiveLetterProps {
   onSave: (text: string, replaceCustomerContent?: boolean) => void;
   onAdopt: () => void;
   onApprove: (affirmations: Affirmation[]) => void;
+  onOpenRules?: () => void;
 }
 
 /** Adopt exact words, inspect the assembled packet and envelope, then authorize mailing. */
-export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy, error, submissionPending = false, approvalUncertain = false, preview, previewUrl, onInvalidatePreview, onPreview, onSave, onAdopt, onApprove }: LiveLetterProps) {
+export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy, error, submissionPending = false, approvalUncertain = false, preview, previewUrl, onInvalidatePreview, onPreview, onSave, onAdopt, onApprove, onOpenRules }: LiveLetterProps) {
   const [localText, setLocalText] = useState(draft.text);
   const text = value ?? localText;
   const setText = onTextChange ?? setLocalText;
@@ -374,8 +376,14 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
               <iframe title="Exact packet PDF" src={previewUrl} style={{ width: "100%", minHeight: "500px", border: "1px solid var(--line-strong)" }} />
               <label className="packet-inspect">
                 <input id="livePacketReviewed" type="checkbox" checked={inspected} disabled={busy || locked} onChange={event => setReviewedUrl(event.target.checked ? previewUrl : null)} />
-                I have inspected this exact PDF, its mailing destination and my return address.
+                I have inspected this exact PDF, checked the ticket facts, mailing destination and
+                return address, corrected any mistakes, and confirm that this is what I want mailed.
               </label>
+              <p className="small">A confident OCR reading does not guarantee correct facts or a correct
+                appeal address. If anything is wrong, stop and correct it before authorizing mailing.</p>
+              <CustomerChoiceNotice onOpenRules={onOpenRules} />
+              {!locked && <button id="liveCorrectBeforeMail" type="button" className="btn"
+                disabled={busy} onClick={pause}>Stop — information or address needs correcting</button>}
               {declarations.length > 0 && (
                 <fieldset id="liveDeclarations" style={{ marginTop: "12px" }}>
                   <legend><b>Declarations the agency requires</b></legend>

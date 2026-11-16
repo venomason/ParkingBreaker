@@ -19,6 +19,7 @@ from parkingbreaker.brave_search import BraveSearcher
 from parkingbreaker.config import ConfigError, ProviderMode, build_services, load_settings
 from parkingbreaker.llm import LlmClient
 from parkingbreaker.llm_models import ModelPricing
+from parkingbreaker.ticket_ocr import RoutedTicketReader
 
 pytestmark = pytest.mark.anyio
 ALICE = {"Authorization": "Bearer fake-alice"}
@@ -153,6 +154,63 @@ def test_provider_absence_fails_closed_without_a_fallback(
     settings = load_settings(values, tmp_path / "no.env")
     with pytest.raises(ValueError, match=expected_error):
         build_services(settings)
+
+
+@pytest.mark.parametrize("ocr_preset", ["deepseek-flash", "minimax-m3.1", "gemini-3.8-flash"])
+@pytest.mark.parametrize("google_available", [False, True])
+def test_ocr_switch_is_independent_and_google_escalation_is_optional(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, ocr_preset: str, google_available: bool
+) -> None:
+    values = _test_mode_values(tmp_path)
+    values.update({"PB_TICKET_OCR_PRESET": ocr_preset, "DEEPSEEK_API_KEY": "test-placeholder"})
+    if google_available or ocr_preset.startswith("gemini-"):
+        values["GEMINI_API_KEY"] = "test-placeholder"
+    seen: list[str] = []
+    original = llm_config.build_llm_client
+
+    def observe(
+        preset: str, environ: Mapping[str, str], *, minimax_pricing: ModelPricing | None = None
+    ) -> LlmClient:
+        seen.append(preset)
+        return original(preset, environ, minimax_pricing=minimax_pricing)
+
+    monkeypatch.setattr(llm_config, "build_llm_client", observe)
+    services = build_services(load_settings(values, tmp_path / "no.env"))
+    assert services is not None
+    coordinator = services._deps.ticket_intake  # type: ignore[attr-defined]
+    reader = coordinator._deps.reader_for_subject("synthetic-ocr-switch")
+    assert isinstance(reader, RoutedTicketReader)
+    assert reader._primary_model == ocr_preset
+    expected = ["minimax-m3.1"]
+    if ocr_preset != "minimax-m3.1":
+        expected.append(ocr_preset)
+    escalate = google_available and not ocr_preset.startswith("gemini-")
+    if escalate:
+        expected.append("gemini-3.8-flash")
+    assert seen == expected
+    assert (reader._secondary is not None) == escalate
+
+
+def test_fake_ocr_never_constructs_real_provider_even_with_keys(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def forbidden(*args: object, **kwargs: object) -> LlmClient:
+        raise AssertionError("fake mode attempted a real provider")
+
+    monkeypatch.setattr(llm_config, "build_llm_client", forbidden)
+    values = {
+        "PB_PROVIDER_MODE": "fake",
+        "PB_WORKER_SECRET": SECRET,
+        "PB_DATA_DIR": str(tmp_path),
+        "PB_TICKET_READING_PREVIEW": "1",
+        "PB_TICKET_OCR_PRESET": "minimax-m3.1",
+        "GEMINI_API_KEY": "test-placeholder",
+    }
+    services = build_services(load_settings(values, tmp_path / "no.env"))
+    assert services is not None
+    coordinator = services._deps.ticket_intake  # type: ignore[attr-defined]
+    reader = coordinator._deps.reader_for_subject("synthetic-offline")
+    assert not isinstance(reader, RoutedTicketReader)
 
 
 async def ok(response: Any, status: int = 200) -> Any:

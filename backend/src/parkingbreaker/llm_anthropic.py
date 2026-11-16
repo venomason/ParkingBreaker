@@ -13,12 +13,14 @@ import anthropic as anthropic
 
 from parkingbreaker.json_types import JsonValue
 from parkingbreaker.llm import (
+    ImageAttachment,
     LlmProviderError,
     Usage,
     conservative_input_tokens,
     parse_json_text,
     schema_json,
 )
+from parkingbreaker.llm_input_budget import image_attachment_tokens
 from parkingbreaker.llm_models import (
     MINIMAX_BASE_URL,
     SONNET_5_5,
@@ -57,7 +59,7 @@ class LlmCallMetadata:
 
 class MessageInput(TypedDict):
     role: Literal["user"]
-    content: str
+    content: str | list[dict[str, JsonValue]]
 
 
 class CountRequest(TypedDict):
@@ -189,6 +191,7 @@ class AnthropicLlmClient:
         schema: Mapping[str, JsonValue],
         *,
         max_cost_cents: int | None = None,
+        images: Sequence[ImageAttachment] | None = None,
     ) -> tuple[JsonValue, Usage]:
         # Do not let a preflight/count failure expose metadata from an earlier call.
         self.last_call = None
@@ -198,10 +201,27 @@ class AnthropicLlmClient:
         structured = self._config.structured_output and _supports_structured_output(dict(schema))
         if not structured:
             user += "\nReply with JSON only matching this schema: " + schema_text
+        content: str | list[dict[str, JsonValue]] = user
+        if images:
+            if self._config.base_url != MINIMAX_BASE_URL:
+                raise ValueError("image input is qualified only for the MiniMax boundary")
+            image_attachment_tokens(images)
+            content = [{"type": "text", "text": user}]
+            content.extend(
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": image.media_type,
+                        "data": image.data_base64,
+                    },
+                }
+                for image in images
+            )
         request: MessageRequest = {
             "model": self._config.model_id,
             "system": system,
-            "messages": [{"role": "user", "content": user}],
+            "messages": [{"role": "user", "content": content}],
             "max_tokens": self._config.max_output_tokens,
         }
         output_config: dict[str, JsonValue] = {}
@@ -222,7 +242,7 @@ class AnthropicLlmClient:
         if output_config:
             count_request["output_config"] = output_config
 
-        if is_minimax and max_cost_cents is not None:
+        if is_minimax and (max_cost_cents is not None or images):
             try:
                 raw_counted = self._client.messages.count_tokens(**count_request).input_tokens
                 counted = _validate_count(raw_counted)

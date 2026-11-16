@@ -93,6 +93,7 @@ export type TicketReadingField = {
   field: TicketLiteralFieldName;
   state: TicketReadingState;
   value: string | null;
+  confidence?: number | null;
 };
 export type TicketReadingSnapshot = {
   request_id?: string | null;
@@ -100,6 +101,9 @@ export type TicketReadingSnapshot = {
   current: boolean;
   synthetic: boolean;
   fields: TicketReadingField[];
+  primary_model?: string | null;
+  escalation?: "not_needed" | "manual" | "unavailable" | "budget_exhausted" | "failed" | "refused" | "completed" | null;
+  confidence_basis?: "uncalibrated model estimate";
 };
 export type TicketReviewField = {
   field: TicketLiteralFieldName;
@@ -111,7 +115,7 @@ export type TicketReviewSnapshot = {
   status: "missing" | "pending" | "success" | "refused" | "unknown";
   current: boolean;
   synthetic: boolean;
-  basis: "model comparison only; not external verification";
+  basis: "model comparison only; not external verification" | "customer-supplied facts; no model comparison";
   fields: TicketReviewField[];
 };
 export type TicketConfirmationSnapshot = {
@@ -290,8 +294,9 @@ export const api = {
       request_id: requestId,
       expected_revision: expectedRevision,
     }),
-  requestTicketReview: (w: string, requestId: string, expectedRevision: number) =>
+  requestTicketReview: (w: string, requestId: string, expectedRevision: number, customerSupplied = false) =>
     call<TicketReviewSnapshot>("POST", `/workspaces/${w}/ticket-review`, {
+      customer_supplied: customerSupplied,
       request_id: requestId,
       expected_revision: expectedRevision,
     }),
@@ -303,6 +308,7 @@ export const api = {
       reviewRequestId: string;
       expectedConfirmationGeneration: number;
       resolvedFields: Record<string, TicketDiscrepancyResolution>;
+      accuracyAcknowledged: boolean;
     },
   ) =>
     call<TicketConfirmationReceipt>("POST", `/workspaces/${w}/ticket-confirmation`, {
@@ -311,6 +317,7 @@ export const api = {
       review_request_id: command.reviewRequestId,
       expected_confirmation_generation: command.expectedConfirmationGeneration,
       resolved_fields: command.resolvedFields,
+      accuracy_acknowledged: command.accuracyAcknowledged,
     }),
   submitIntake: (w: string, intake: SubmitIntake) =>
     call<IntakeReceipt>("POST", `/workspaces/${w}/intake`, intake),

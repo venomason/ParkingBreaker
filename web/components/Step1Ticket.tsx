@@ -41,9 +41,10 @@ export interface Step1VisionProps {
   onPickPhoto: (kind: "ticket" | "back", file: File | null) => void;
   onRead: () => void;
   onCheckReading: () => void;
-  onSaveFacts: (facts: AdoptedFacts) => void;
+  onSaveFacts: (facts: AdoptedFacts, customerSupplied?: boolean) => void;
   onConfirm: () => void;
   onContinue: (facts: AdoptedFacts) => void;
+  onOpenRules?: () => void;
 }
 
 interface Step1TicketProps {
@@ -67,11 +68,11 @@ interface Step1TicketProps {
 function readingStateText(reading: TicketReadingSnapshot | null) {
   if (!reading || reading.status === "missing") return "Your ticket has not been read yet.";
   if (reading.status === "pending") return "The reading is still being processed. It will not be repeated automatically.";
-  if (reading.status === "unknown") return "The reading result is unknown. Check the saved status; the same request will not start a second reading.";
-  if (reading.status === "refused") return "The reading service could not return usable suggestions. Start a new reading.";
-  return reading.current
-    ? "Reading complete. These are unverified suggestions; check them below."
-    : "Your photos changed since this reading. Read your current photos again.";
+  if (reading.status === "unknown") return "The reading result is unknown. Check its saved status or enter the facts yourself below; it will not be repeated automatically.";
+  if (!reading.current) return "Your photos changed since this reading. Read your current photos again.";
+  if (reading.status === "refused") return "We couldn’t read these photos. Enter the facts yourself below or upload a clearer photo. Re-reading the same photo returns the saved result.";
+  if (!reading.fields.some((field) => field.state === "shown" && field.value)) return "We couldn’t read any ticket details. Enter the facts yourself below. You must supply every required fact before confirming.";
+  return "Reading complete. These are unverified suggestions; check them below.";
 }
 
 export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, setPlateState, backPhoto, setBackPhoto, onComplete, setActionBar, live = false, vision }: Step1TicketProps) {
@@ -368,7 +369,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
               )}
             </div>
             <div className="row" style={{ gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
-              {(!vision.reading || vision.reading.status === "missing" || vision.reading.status === "refused" || !vision.reading.current) && (
+              {(!vision.reading || vision.reading.status === "missing" || !vision.reading.current) && (
                 <button className="btn btn-primary" type="button" id="visionReadBtn" disabled={!vision.frontRef || Boolean(vision.busy)} onClick={vision.onRead}>
                   {vision.busy === "reading" ? <><span className="spinner" /> Reading…</> : "Read my ticket photos"}
                 </button>
@@ -382,7 +383,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             <p className="small" id="visionReadingState" role="status" aria-live="polite">{readingStateText(vision.reading)}</p>
             {vision.status?.synthetic && <p className="muted small" id="visionSynthetic">This environment returns synthetic readings for acceptance testing; no provider is called.</p>}
             {vision.reading && vision.reading.status !== "success" && vision.reading.status !== "missing" && (
-              <p className="muted small">No comparison or confirmation is possible until a readable result is saved.</p>
+              <p className="muted small">You can supply and confirm the facts yourself. If an essential fact is unavailable, stop here until you can provide it.</p>
             )}
             {vision.confirmedCommandId && !vision.dirty && (
               <p id="visionConfirmed" role="status" className="small" style={{ marginTop: "8px", color: "var(--sage)" }}>
@@ -396,7 +397,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             )}
           </section>
 
-          {vision.literal && vision.reading?.status === "success" ? (
+          {vision.frontRef ? (
             <TicketFactReview
               draft={vision.draft}
               onDraftChange={(next) => vision.setDraft(next)}
@@ -410,9 +411,8 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
               confirmed={Boolean(vision.confirmedCommandId) && !vision.dirty}
               onSaveFacts={vision.onSaveFacts}
               onConfirm={vision.onConfirm}
+              onOpenRules={vision.onOpenRules}
             />
-          ) : vision.reading?.status === "success" ? (
-            <p className="muted small">Preparing your facts…</p>
           ) : null}
         </div>
       )}

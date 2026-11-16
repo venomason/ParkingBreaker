@@ -79,6 +79,43 @@ class FakeClient:
     messages: FakeMessages = field(default_factory=FakeMessages)
 
 
+def test_minimax_images_reach_both_token_count_and_inference() -> None:
+    from test_ticket_intake_service import FRONT, attachment
+
+    image = attachment(FRONT)
+    fake = FakeClient()
+    fake.messages.response.usage = FakeUsage(100, 200, None, None)
+    client = adapter.AnthropicLlmClient(minimax_config(), "offline-key", client=fake)
+    result, _ = client.complete_json(
+        "Copy ticket text only", "Read", SCHEMA, images=[image], max_cost_cents=3
+    )
+    assert result == {"ok": True}
+    messages = fake.messages.calls[0]["messages"]
+    assert messages == fake.messages.count_calls[0]["messages"]
+    content = messages[0]["content"]
+    assert isinstance(content, list)
+    assert content[1] == {
+        "type": "image",
+        "source": {
+            "type": "base64",
+            "media_type": "image/png",
+            "data": image.data_base64,
+        },
+    }
+    assert len(fake.messages.calls) == 1
+
+
+def test_minimax_failed_image_count_never_calls_inference() -> None:
+    from test_ticket_intake_service import FRONT, attachment
+
+    fake = FakeClient()
+    fake.messages.count_error = RuntimeError("offline count failure")
+    client = adapter.AnthropicLlmClient(minimax_config(), "offline-key", client=fake)
+    with pytest.raises(LlmProviderError, match="count_tokens failed"):
+        client.complete_json("Copy", "Read", SCHEMA, images=[attachment(FRONT)], max_cost_cents=3)
+    assert fake.messages.calls == []
+
+
 def test_structured_request_usage_and_ceiling() -> None:
     fake = FakeClient()
     fake.messages.response.usage = FakeUsage(100, 200, None, None)

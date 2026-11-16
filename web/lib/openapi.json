@@ -591,7 +591,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TicketOperationRequest"
+                "$ref": "#/components/schemas/TicketReviewRequest"
               }
             }
           }
@@ -4349,6 +4349,40 @@
             ],
             "title": "Mode",
             "default": "fake"
+          },
+          "customer_authored_mode": {
+            "type": "boolean",
+            "title": "Customer Authored Mode",
+            "default": false
+          },
+          "customer_authored_mode_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Authored Mode Version"
+          },
+          "build_commit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Build Commit"
+          },
+          "policy_hashes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Policy Hashes"
           }
         },
         "additionalProperties": false,
@@ -5543,6 +5577,11 @@
             "minimum": 0.0,
             "title": "Expected Confirmation Generation"
           },
+          "accuracy_acknowledged": {
+            "type": "boolean",
+            "title": "Accuracy Acknowledged",
+            "default": false
+          },
           "resolved_fields": {
             "additionalProperties": {
               "$ref": "#/components/schemas/TicketDiscrepancyResolution"
@@ -5871,6 +5910,19 @@
               }
             ],
             "title": "Value"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
           }
         },
         "additionalProperties": false,
@@ -5924,6 +5976,43 @@
             },
             "type": "array",
             "title": "Fields"
+          },
+          "primary_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Model"
+          },
+          "escalation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "not_needed",
+                  "manual",
+                  "unavailable",
+                  "budget_exhausted",
+                  "failed",
+                  "refused",
+                  "completed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation"
+          },
+          "confidence_basis": {
+            "type": "string",
+            "const": "uncalibrated model estimate",
+            "title": "Confidence Basis",
+            "default": "uncalibrated model estimate"
           }
         },
         "additionalProperties": false,
@@ -6008,6 +6097,35 @@
         "title": "TicketReviewField",
         "description": "One model comparison and the literal visible text; never adoption or verification."
       },
+      "TicketReviewRequest": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}$",
+            "title": "Request Id"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "customer_supplied": {
+            "type": "boolean",
+            "title": "Customer Supplied",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "expected_revision"
+        ],
+        "title": "TicketReviewRequest",
+        "description": "Explicit customer-only confirmation preparation; never a model result."
+      },
       "TicketReviewSnapshot": {
         "properties": {
           "request_id": {
@@ -6045,7 +6163,10 @@
           },
           "basis": {
             "type": "string",
-            "const": "model comparison only; not external verification",
+            "enum": [
+              "model comparison only; not external verification",
+              "customer-supplied facts; no model comparison"
+            ],
             "title": "Basis",
             "default": "model comparison only; not external verification"
           },

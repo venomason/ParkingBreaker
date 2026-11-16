@@ -127,6 +127,7 @@ async def test_owner_routes_reading_review_confirmation_and_readback(tmp_path: P
                 "expected_revision": 2,
                 "review_request_id": "req-review",
                 "expected_confirmation_generation": 0,
+                "accuracy_acknowledged": True,
                 "resolved_fields": {},
             },
         )
@@ -192,6 +193,7 @@ async def test_owner_routes_reading_review_confirmation_and_readback(tmp_path: P
                 "expected_revision": 3,
                 "review_request_id": "req-review",
                 "expected_confirmation_generation": 1,
+                "accuracy_acknowledged": True,
                 "resolved_fields": {"not_a_field": "ABSENCE_ACKNOWLEDGED"},
             },
         )
@@ -247,6 +249,7 @@ async def test_quorum_replays_and_story_edits_do_not_invalidate_confirmation(
                 "expected_revision": 2,
                 "review_request_id": "req-review",
                 "expected_confirmation_generation": 0,
+                "accuracy_acknowledged": True,
                 "resolved_fields": {},
             },
         )
@@ -260,6 +263,7 @@ async def test_quorum_replays_and_story_edits_do_not_invalidate_confirmation(
                 "expected_revision": 2,
                 "review_request_id": "req-review",
                 "expected_confirmation_generation": 0,
+                "accuracy_acknowledged": True,
                 "resolved_fields": {},
             },
         )

@@ -14,6 +14,7 @@ import { Receipts, Receipt } from "../components/Receipts";
 import { StepJumper } from "../components/StepJumper";
 import { DesktopAside } from "../components/DesktopAside";
 import { BottomSheet } from "../components/BottomSheet";
+import { CustomerChoiceRules } from "../components/CustomerChoiceRules";
 import { SvgDefs, Icon } from "../components/Icons";
 
 import { Step1Ticket, TicketField, type Step1VisionMode, type Step1VisionProps } from "../components/Step1Ticket";
@@ -47,7 +48,7 @@ import { CARD_FORM_AVAILABLE, CardField, CardFieldHandle } from "../components/C
 import { CustomerGate, savedFundingKind, useServicePhase } from "../components/CustomerAccess";
 import { PREVIEW_AUTH } from "../lib/api";
 import { useWorkspaceAutosave } from "../lib/useWorkspaceAutosave";
-import { emptyFactDraft, factDraftFromAdopted, factDraftFromReading, factDraftFromValues, literalFromReading, ticketFactsFromAdopted, ticketFormWithDraft, restoredTicketStep, validateFactDraft, type AdoptedFacts, type FactDraft, type TicketLiteral } from "../lib/intake";
+import { emptyFactDraft, factDraftFromAdopted, factDraftFromReading, factDraftFromValues, literalFromReading, literalFromSnapshot, ticketFactsFromAdopted, ticketFormWithDraft, restoredTicketStep, validateFactDraft, type AdoptedFacts, type FactDraft, type TicketLiteral } from "../lib/intake";
 import { customerStage, fulfillmentCopy, mailingConfirmed, offlinePaymentAllowed } from "../lib/fulfillment";
 
 // The real flow against the API (fake, test or live providers behind it). Off: the prototype.
@@ -604,10 +605,7 @@ function Journey() {
     setVisionError(null);
     setVisionDirty(false);
     const binding = view.intake_form?.ticket_fact_binding ?? null;
-    if (status.extraction.status === "success") {
-      const literal = literalFromReading(status.extraction.fields);
-      if (literal) setVisionLiteral(literal);
-    }
+    setVisionLiteral(literalFromSnapshot(status.extraction));
     visionReadingRequest.current = status.extraction.request_id
       ? { id: status.extraction.request_id, signature: visionPhotoSignatureFor(view) }
       : null;
@@ -661,10 +659,7 @@ function Journey() {
     setVisionStatus(status);
     setVisionMode(view.ticket_reading_required || status.enabled ? "vision" : "legacy");
     setWorkspaceTicketReadingRequired(Boolean(view.ticket_reading_required));
-    if (status.extraction.status === "success") {
-      const literal = literalFromReading(status.extraction.fields);
-      if (literal) setVisionLiteral(literal);
-    }
+    setVisionLiteral(literalFromSnapshot(status.extraction));
     setVisionReview(status.review.request_id ? status.review : null);
     if (status.confirmation.state === "current" && status.confirmation.command_id) {
       setVisionConfirmed({
@@ -745,11 +740,11 @@ function Journey() {
           setVisionDraft((previous) => factDraftFromReading(snapshot.fields, previous));
         } else {
           setVisionLiteral(null);
-          setVisionError("The reading did not return a complete set of suggestions. Start a new reading.");
+          setVisionError("The reading returned no usable suggestions. Enter the ticket facts yourself below.");
         }
       } else if (snapshot.status === "refused") {
-        setVisionLiteral(null);
-        setVisionError("The reading service could not return usable suggestions. Start a new reading with clearer photos.");
+        setVisionLiteral(literalFromSnapshot(snapshot));
+        setVisionError("The reading could not return usable suggestions. Enter the ticket facts yourself below, or upload clearer photos.");
       }
     } catch (error) {
       setVisionError(plainError(error));
@@ -758,25 +753,20 @@ function Journey() {
     }
   }, [visionBusy, flushVisionForm, photoRefs, visionPhotoSignatureFor]);
 
-  const saveAndReviewVision = useCallback(async (facts: AdoptedFacts) => {
+  const saveAndReviewVision = useCallback(async (facts: AdoptedFacts, customerSupplied = false) => {
     if (!LIVE || PREVIEW_AUTH || visionBusy) return;
-    if (!visionLiteral) { setVisionError("Read your ticket photos before comparing."); return; }
     setVisionError(null); setVisionBusy("review");
     try {
+      const currentView = await flushVisionForm({
+        ticket_photo_ref: photoRefs.ticket,
+        ticket_back_photo_ref: photoRefs.back,
+      });
+      const currentStatus = await api.ticketReadingStatus(currentView.workspace_id);
+      const literal = literalFromSnapshot(currentStatus.extraction);
+      setVisionLiteral(literal);
+      setVisionStatus(currentStatus);
       const binding: TicketFactBindingPayload = {
-        literal: {
-          citation_number: visionLiteral.citation_number ?? facts.citation_number,
-          license_plate: visionLiteral.license_plate ?? facts.license_plate,
-          license_plate_state: visionLiteral.license_plate_state ?? facts.license_plate_state,
-          issuer_name: visionLiteral.issuer_name ?? facts.issuer_hint,
-          issue_date: visionLiteral.issue_date,
-          notice_date: visionLiteral.notice_date,
-          printed_deadline: visionLiteral.printed_deadline,
-          violation_text: visionLiteral.violation_text ?? facts.violation_description,
-          issued_city: visionLiteral.issued_city ?? facts.issued_city,
-          issued_state: visionLiteral.issued_state ?? facts.issued_state,
-          stage_text: visionLiteral.stage_text,
-        },
+        literal,
         adopted: {
           citation_number: facts.citation_number,
           license_plate: facts.license_plate,
@@ -799,26 +789,26 @@ function Journey() {
       });
       const canonical = view.intake_form?.ticket_fact_binding ?? binding;
       setVisionBinding(canonical);
-      const signature = visionBindingSignatureFor(canonical, view);
+      const signature = `${customerSupplied ? "customer" : "compare"}|${visionBindingSignatureFor(canonical, view)}`;
       const existing = visionReviewRequest.current;
       // The same saved envelope replays the same request id after a lost response.
       const requestId = existing && existing.signature === signature ? existing.id : crypto.randomUUID();
       visionReviewRequest.current = { id: requestId, signature };
-      const snapshot = await api.requestTicketReview(view.workspace_id, requestId, view.draft_revision ?? 1);
+      const snapshot = await api.requestTicketReview(view.workspace_id, requestId, view.draft_revision ?? 1, customerSupplied);
       setVisionReview(snapshot);
       setVisionStatus((previous) => previous ? { ...previous, review: snapshot } : previous);
       setVisionResolutions({});
       if (snapshot.status === "success") {
         setVisionDirty(false);
       } else if (snapshot.status === "refused") {
-        setVisionError("The comparison service could not return usable results. Save your facts to start a fresh comparison.");
+        setVisionError("The comparison returned no usable result. You can confirm your own supplied facts below.");
       }
     } catch (error) {
       setVisionError(plainError(error));
     } finally {
       setVisionBusy(null);
     }
-  }, [visionBusy, visionLiteral, flushVisionForm, visionBindingSignatureFor]);
+  }, [visionBusy, flushVisionForm, visionBindingSignatureFor, photoRefs]);
 
   const confirmTicketVision = useCallback(async () => {
     if (!LIVE || PREVIEW_AUTH || visionBusy || !visionReview) return;
@@ -859,6 +849,7 @@ function Journey() {
         reviewRequestId,
         expectedConfirmationGeneration: generation,
         resolvedFields: resolved,
+        accuracyAcknowledged: true,
       });
       setVisionConfirmed({ commandId: receipt.command_id, reviewRequestId: receipt.review_request_id, generation: receipt.generation });
       setVisionResolutions({});
@@ -1730,10 +1721,11 @@ function Journey() {
     onPickPhoto: (kind, file) => { void selectPhoto(kind, file); },
     onRead: () => { void readTicketVision(); },
     onCheckReading: () => { void refreshVisionStatusOnly().catch((error) => setVisionError(plainError(error))); },
-    onSaveFacts: (facts) => { void saveAndReviewVision(facts); },
+    onSaveFacts: (facts, customerSupplied) => { void saveAndReviewVision(facts, customerSupplied); },
     onConfirm: () => { void confirmTicketVision(); },
     onContinue: handleVisionContinue,
-  }), [visionMode, visionStatus, visionRequired, visionChecking, visionError, ticketUploadError, visionReview, visionLiteral, visionDraft, updateVisionDraft, visionResolutions, visionBusy, visionConfirmed, visionDirty, photoRefs, discoverVision, selectPhoto, readTicketVision, refreshVisionStatusOnly, saveAndReviewVision, confirmTicketVision, handleVisionContinue]);
+    onOpenRules: openTerms,
+  }), [visionMode, visionStatus, visionRequired, visionChecking, visionError, ticketUploadError, visionReview, visionLiteral, visionDraft, updateVisionDraft, visionResolutions, visionBusy, visionConfirmed, visionDirty, photoRefs, discoverVision, selectPhoto, readTicketVision, refreshVisionStatusOnly, saveAndReviewVision, confirmTicketVision, handleVisionContinue, openTerms]);
 
   const visionAdoptedFacts = useMemo(() => validateFactDraft(visionDraft).facts, [visionDraft]);
 
@@ -1766,7 +1758,7 @@ function Journey() {
           {step === 4 && LIVE && !liveBeta && (!liveOffer || phase !== "paid" || paidPaused || newPaidBlocked) && (<ControlledBetaWaiting paused={paidPaused} admittedPaid={admittedPaid} savedPending={savedPending} phaseRefreshFailed={pricingRefreshFailed} busy={liveBusy} onRetry={checkSavedStatus} setActionBar={setActionBar} />)}
           {step === 4 && !(LIVE && (liveBeta || !liveOffer || phase !== "paid" || paidPaused || newPaidBlocked)) && (<Step4Offer liveOffer={LIVE && liveOffer ? { issuerName: liveOffer.issuer.issuer_name, decidingBody: liveOffer.issuer.deciding_body, standardOffered: liveOffer.tiers.some((t) => t.tier === "STANDARD"), testMode: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_") ?? false, certifiedCents: liveOffer.tiers.find(t => t.tier === "CERTIFIED")?.amount_cents ?? null, standardCents: liveOffer.tiers.find(t => t.tier === "STANDARD")?.amount_cents ?? null } : undefined} cardSlot={LIVE ? CARD_FORM_AVAILABLE ? <CardField ref={cardRef} /> : <p className="small" role="status">The secure card form is unavailable. Please try again later.</p> : undefined} selectedTier={tier} setSelectedTier={setTier} onComplete={handleStep4Complete} setActionBar={setActionBar} onOpenTerms={openTerms} onOpenSample={openSample} />)}
           {step === 5 && (<Step5Window live={LIVE} beta={Boolean(LIVE && (liveStatus?.payment_state === "NO_CHARGE" || liveBeta?.accepted_at))} amountCents={liveAmount} now={now} tier={tier ?? "certified"} timerEnd={timerEnd} lapsed={lapsed} onComplete={handleStep5Complete} setActionBar={setActionBar} onDemoWarn={() => { setTimerEnd(Date.now() + 5 * 60 * 1000); setWarned(false); setLapsed(false); }} onDemoLapse={() => { setTimerEnd(Date.now()); setWarned(true); setLapsed(false); }} />)}
-          {step === 6 && LIVE && liveDraft && (<LiveLetter key={liveDraft.text_sha256 + (liveDraft.adopted_sha256 ?? "")} draft={liveDraft} value={liveLetterText ?? liveDraft.text} onTextChange={setLiveLetterText} autoSave busy={liveBusy || (lapsed && !liveSubmissionPending && !liveApprovalUncertain)} error={liveError} submissionPending={liveSubmissionPending} approvalUncertain={liveApprovalUncertain} preview={livePacketPreview?.packet ?? null} previewUrl={livePacketPreview?.url ?? null} onInvalidatePreview={invalidateLivePreview} onSave={saveLiveLetter} onAdopt={() => liveDraftAction((c) => api.adopt(c, liveDraft.text, liveDraft.text_sha256))} onPreview={handleLivePreview} onApprove={handleLiveApprove} />)}
+          {step === 6 && LIVE && liveDraft && (<LiveLetter key={liveDraft.text_sha256 + (liveDraft.adopted_sha256 ?? "")} draft={liveDraft} value={liveLetterText ?? liveDraft.text} onTextChange={setLiveLetterText} autoSave busy={liveBusy || (lapsed && !liveSubmissionPending && !liveApprovalUncertain)} error={liveError} submissionPending={liveSubmissionPending} approvalUncertain={liveApprovalUncertain} preview={livePacketPreview?.packet ?? null} previewUrl={livePacketPreview?.url ?? null} onInvalidatePreview={invalidateLivePreview} onSave={saveLiveLetter} onAdopt={() => liveDraftAction((c) => api.adopt(c, liveDraft.text, liveDraft.text_sha256))} onPreview={handleLivePreview} onApprove={handleLiveApprove} onOpenRules={openTerms} />)}
           {LIVE && step !== 6 && liveLetterText != null && liveLetterText !== liveDraft?.text && <div className="card"><p role="alert">These letter edits have not been saved. Keep this page open and copy your text before leaving.</p><textarea aria-label="Unsaved letter edits" value={liveLetterText} readOnly /></div>}
           {step === 6 && !LIVE && (<Step6LetterStudio traceMode={traceMode} setTraceMode={setTraceMode} citationNumber={fv("cit")} lapsed={lapsed} onOpenNotes={openNotes} onOpenSentenceModal={handleOpenSentenceModal} onOpenExactPdf={handleOpenExactPdf} onRestartWindow={handleRestartWindow} setActionBar={setActionBar} sents={sents} adopted={adopted} setAdopted={setAdopted} senderName={senderName} setSenderName={setSenderName} senderAddress={senderAddress} setSenderAddress={setSenderAddress} />)}
           {step === 7 && LIVE && liveStatus && <LiveFulfillment status={liveStatus} tracking={liveTracking} busy={liveBusy} error={liveError} onRefresh={() => { void refreshMailing(); }} />}
@@ -1831,6 +1823,7 @@ function Journey() {
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>Claim that the agency has opened, read or decided your appeal. We report the postal updates available for your mailing.</span></li>
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>Pre-select options or hide prices.</span></li>
         </ul>
+        <CustomerChoiceRules />
       </BottomSheet>
 
       {/* Single fact */}
@@ -1878,9 +1871,10 @@ function Journey() {
         <ul className="never">
           <li>If we stop before mailing, the hold is released and you are not charged.</li>
           <li>A duplicate charge is refunded.</li>
-          <li>Our mailing errors: a free re-mail where feasible, otherwise a full refund. Agency-side returns do not receive a refund. When the cause is unknown, a re-mail or refund minus mailing cost may apply. Customer-supplied addresses have the separate terms shown before acceptance.</li>
+          <li>If a destination we verified proves wrong, you receive a full refund. For other mailing errors of ours: a free re-mail where feasible, otherwise a full refund. Agency-side returns do not receive a refund. When the cause is unknown, a re-mail or refund minus mailing cost may apply.</li>
           <li>After mailing, a change of mind or the agency&#39;s decision is not a refund reason.</li>
         </ul>
+        <CustomerChoiceRules />
         <LegalDisclosure id="termsAttorneyDisclosure" />
       </BottomSheet>
 

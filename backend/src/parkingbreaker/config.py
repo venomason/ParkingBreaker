@@ -58,6 +58,7 @@ from parkingbreaker.smoke import LOB_API_VERSION, load_environment
 from parkingbreaker.stripe_payment import STRIPE_API_VERSION, StripePaymentClient
 from parkingbreaker.ticket_intake_service import TicketIntakeCoordinator, TicketIntakeDeps
 from parkingbreaker.ticket_intake_store import TicketIntakeStore
+from parkingbreaker.ticket_ocr import OcrPolicy, RoutedTicketReader
 from parkingbreaker.ticket_vision import TicketVisionReader
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from parkingbreaker.tricks import Trick, parse_catalog
@@ -331,9 +332,34 @@ def build_services(
         # The role-routed intake client is the configured image client in production
         # role mode; it is wrapped per subject below with the existing intake cap.
         vision_llm = cast(MultimodalLlmClient, intake_llm)
-        vision_preset = intake_preset
+        vision_preset = settings.values.get("PB_TICKET_OCR_PRESET", intake_preset)
+        if "PB_TICKET_OCR_PRESET" in settings.values and vision_preset not in {
+            "deepseek-flash",
+            "minimax-m3.1",
+            "gemini-3.8-flash",
+            "gemini-3.5-flash-lite",
+        }:
+            raise ValueError("Unsupported ticket OCR preset")
+        if vision_preset != intake_preset:
+            vision_llm = cast(MultimodalLlmClient, build_llm_client(vision_preset, settings.values))
     else:
         vision_preset = SYNTHETIC_VISION_MODEL
+
+    secondary_llm: LlmClient | None = None
+    secondary_preset = settings.values.get("PB_TICKET_OCR_ESCALATION_PRESET", "gemini-3.8-flash")
+    if secondary_preset not in {"none", "gemini-3.8-flash", "gemini-3.5-flash-lite"}:
+        raise ValueError("Ticket OCR escalation must use Gemini or none")
+    policy = OcrPolicy(
+        float(settings.values.get("PB_TICKET_OCR_MANUAL_BELOW", "0.80")),
+        float(settings.values.get("PB_TICKET_OCR_ESCALATE_BELOW", "0.90")),
+    )
+    if (
+        settings.mode is not ProviderMode.FAKE
+        and secondary_preset != "none"
+        and not vision_preset.startswith("gemini-")
+        and (settings.values.get("GEMINI_API_KEY") or settings.values.get("GOOGLE_API_KEY"))
+    ):
+        secondary_llm = build_llm_client(secondary_preset, settings.values)
 
     def vision_reader_for_subject(subject: str) -> TicketVisionReader:
         gateway = CallLoggingLlmClient(
@@ -346,7 +372,24 @@ def build_services(
             spend=spend_ledger,
             cap_cents=WORKER_CAPS_CENTS[AiWorker.INTAKE_READING],
         )
-        return TicketVisionReader(gateway)
+        if settings.mode is ProviderMode.FAKE:
+            return TicketVisionReader(gateway)
+        secondary = None
+        if secondary_llm is not None:
+            secondary_gateway = CallLoggingLlmClient(
+                secondary_llm,
+                subject,
+                AiWorker.INTAKE_READING,
+                secondary_preset,
+                store.try_append_ai_call,
+                clock,
+                spend=spend_ledger,
+                cap_cents=WORKER_CAPS_CENTS[AiWorker.INTAKE_READING],
+            )
+            secondary = TicketVisionReader(secondary_gateway, confidence=True)
+        return RoutedTicketReader(
+            TicketVisionReader(gateway, confidence=True), vision_preset, secondary, policy
+        )
 
     ticket_intake: TicketIntakeCoordinator | None = None
     if settings.mode is not ProviderMode.FAKE or required_ticket_reading:

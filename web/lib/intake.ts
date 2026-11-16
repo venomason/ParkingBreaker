@@ -7,6 +7,7 @@ import type {
   TicketFacts,
   TicketLiteralFieldName,
   TicketReadingField,
+  TicketReadingSnapshot,
   TicketReviewComparison,
   TicketReadingStatus,
   WorkspaceView,
@@ -247,6 +248,15 @@ export function literalFromReading(fields: TicketReadingField[]): TicketLiteral 
   }
   if (TICKET_LITERAL_FIELD_ORDER.some((field) => !(field in literal))) return null;
   return literal as TicketLiteral;
+}
+
+/** Failed or stale reading supplies no AI facts. Customer input stays in adopted. */
+export function literalFromSnapshot(reading: TicketReadingSnapshot | null): TicketLiteral {
+  if (reading?.current && reading.status === "success") {
+    const literal = literalFromReading(reading.fields);
+    if (literal) return literal;
+  }
+  return Object.fromEntries(TICKET_LITERAL_FIELD_ORDER.map((field) => [field, null])) as TicketLiteral;
 }
 
 /** Prefill only plainly shown text suggestions; never stage, issuer kind, code or a date conversion. */

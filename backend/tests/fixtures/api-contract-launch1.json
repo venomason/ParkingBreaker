@@ -708,7 +708,10 @@
         "status": "missing",
         "current": false,
         "synthetic": false,
-        "fields": []
+        "fields": [],
+        "primary_model": null,
+        "escalation": null,
+        "confidence_basis": "uncalibrated model estimate"
       },
       "review": {
         "request_id": null,
@@ -761,6 +764,7 @@
       "expected_revision": 2,
       "review_request_id": "contract-ticket-review",
       "expected_confirmation_generation": 0,
+      "accuracy_acknowledged": true,
       "resolved_fields": {}
     },
     "status": 409,

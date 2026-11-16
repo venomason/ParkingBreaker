@@ -112,7 +112,7 @@ async def test_fake_preview_enables_full_synthetic_acceptance(tmp_path: Path) ->
     assert services._deps.ticket_intake is not None
     app = create_app(services, worker_secret=settings.worker_secret, provider_mode="fake")
 
-    binding = binding_for()
+    binding = binding_for(dict.fromkeys(dict(binding_for().literal)))
     async with AsyncClient(transport=ASGITransport(app=app), base_url=ORIGIN) as api:
         workspace = (
             await api.post("/workspaces", headers=ALICE_HEADERS, json={"notes": ""})
@@ -154,7 +154,8 @@ async def test_fake_preview_enables_full_synthetic_acceptance(tmp_path: Path) ->
             item["field"]: s.TicketDiscrepancyResolution.ABSENCE_ACKNOWLEDGED
             for item in review.json()["fields"]
         }
-        assert resolved
+        assert resolved == {}
+        assert review.json()["basis"] == "customer-supplied facts; no model comparison"
 
         confirmation = await api.post(
             f"/workspaces/{workspace}/ticket-confirmation",
@@ -164,6 +165,7 @@ async def test_fake_preview_enables_full_synthetic_acceptance(tmp_path: Path) ->
                 "expected_revision": 2,
                 "review_request_id": "req-synthetic-review",
                 "expected_confirmation_generation": 0,
+                "accuracy_acknowledged": True,
                 "resolved_fields": {
                     name: resolution.value for name, resolution in resolved.items()
                 },

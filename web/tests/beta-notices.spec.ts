@@ -227,21 +227,22 @@ async function intakeCase(page: Page): Promise<{ caseId: string; workspaceId: st
         values: {},
         ticket_photo_ref: photo.photo_ref,
         ticket_fact_binding: {
-          literal: {
-            citation_number: ticket.citation_number, license_plate: ticket.license_plate,
-            license_plate_state: ticket.license_plate_state, issuer_name: ticket.issuer_hint,
-            issue_date: issueDate, notice_date: null, printed_deadline: null,
-            violation_text: ticket.violation_description, issued_city: ticket.issued_city,
-            issued_state: ticket.issued_state, stage_text: ticket.stage,
-          },
+          // Customer entry does not invent image-extraction provenance.
+          literal: Object.fromEntries([
+            "citation_number", "license_plate", "license_plate_state", "issuer_name",
+            "issue_date", "notice_date", "printed_deadline", "violation_text",
+            "issued_city", "issued_state", "stage_text",
+          ].map(field => [field, null])),
           adopted: ticket,
         },
       },
     }) as { draft_revision?: number };
     const reviewRequestId = `req-${workspace.workspace_id}`;
     const review = await call(page, "POST", `/workspaces/${workspace.workspace_id}/ticket-review`, {
-      request_id: reviewRequestId, expected_revision: saved.draft_revision ?? 2,
-    }) as { fields: Array<{ field: string; comparison: string }> };
+      request_id: reviewRequestId, expected_revision: saved.draft_revision ?? 2, customer_supplied: true,
+    }) as { basis: string; fields: Array<{ field: string; comparison: string }> };
+    expect(review.basis).toBe("customer-supplied facts; no model comparison");
+    expect(review.fields).toEqual([]);
     const resolved_fields: Record<string, string> = {};
     for (const item of review.fields) {
       if (item.comparison === "conflict") resolved_fields[item.field] = "CONFIRMED_VALUE_STANDS";
@@ -251,7 +252,7 @@ async function intakeCase(page: Page): Promise<{ caseId: string; workspaceId: st
     ticketConfirmationCommandId = `cmd-${workspace.workspace_id}`;
     await call(page, "POST", `/workspaces/${workspace.workspace_id}/ticket-confirmation`, {
       command_id: ticketConfirmationCommandId, expected_revision: saved.draft_revision ?? 2,
-      review_request_id: reviewRequestId, expected_confirmation_generation: 0,
+      review_request_id: reviewRequestId, expected_confirmation_generation: 0, accuracy_acknowledged: true,
       resolved_fields,
     });
   }

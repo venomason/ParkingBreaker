@@ -120,6 +120,7 @@ class _ReviewRecord:
     fields_digest: str
     literal: tuple[tuple[str, str | None], ...]
     adopted: tuple[tuple[str, str | None], ...]
+    customer_supplied: bool = False
 
     @property
     def envelope(self) -> TicketFactBinding:
@@ -138,7 +139,13 @@ def _usage_json(usage: Usage) -> str:
 
 
 def _reading_result_json(
-    fields: Sequence[FieldReading], *, refused: bool, input_hash: str, synthetic: bool
+    fields: Sequence[FieldReading],
+    *,
+    refused: bool,
+    input_hash: str,
+    synthetic: bool,
+    primary_model: str | None = None,
+    escalation: str | None = None,
 ) -> str:
     return json.dumps(
         {
@@ -147,8 +154,14 @@ def _reading_result_json(
             "synthetic": synthetic,
             "refused": refused,
             "input_hash": input_hash,
+            "primary_model": primary_model,
+            "escalation": escalation,
             "fields": {
-                item.field.value: {"state": item.state.value, "value": item.value}
+                item.field.value: {
+                    "state": item.state.value,
+                    "value": item.value,
+                    "confidence": item.confidence,
+                }
                 for item in fields
             },
         },
@@ -240,11 +253,25 @@ def _parse_stored_reading(claim: OperationClaim) -> tuple[tuple[s.TicketReadingF
         raise StorageCorruption("malformed ticket reading")
     return (
         tuple(
-            s.TicketReadingField(field=item.field, state=item.state.value, value=item.value)
+            s.TicketReadingField(
+                field=item.field,
+                state=item.state.value,
+                value=item.value,
+                confidence=item.confidence,
+            )
             for item in parsed
         ),
         False,
     )
+
+
+def _customer_supplied(data: Mapping[str, object]) -> bool:
+    value = data.get("customer_supplied", False)
+    if type(value) is not bool:
+        raise StorageCorruption("malformed review provenance")
+    if value and (data.get("fields") != {} or data.get("confirmed") != {}):
+        raise StorageCorruption("customer facts cannot contain model comparisons")
+    return value
 
 
 def _parse_stored_review(claim: OperationClaim) -> tuple[tuple[s.TicketReviewField, ...], bool]:
@@ -257,7 +284,7 @@ def _parse_stored_review(claim: OperationClaim) -> tuple[tuple[s.TicketReviewFie
         raise StorageCorruption("malformed ticket review")
     if not all(isinstance(key, str) and isinstance(value, str) for key, value in confirmed.items()):
         raise StorageCorruption("malformed ticket review")
-    parsed = parse_review(comparisons, dict(confirmed))
+    parsed = () if _customer_supplied(data) else parse_review(comparisons, dict(confirmed))
     if parsed is None:
         raise StorageCorruption("malformed ticket review")
     return (
@@ -288,7 +315,7 @@ def _parse_review_record(claim: OperationClaim) -> _ReviewRecord:
         raise StorageCorruption("malformed ticket review")
     if not all(isinstance(key, str) and isinstance(value, str) for key, value in confirmed.items()):
         raise StorageCorruption("malformed ticket review")
-    fields = parse_review(comparisons, dict(confirmed))
+    fields = () if _customer_supplied(data) else parse_review(comparisons, dict(confirmed))
     if fields is None:
         raise StorageCorruption("malformed ticket review")
     try:
@@ -305,6 +332,7 @@ def _parse_review_record(claim: OperationClaim) -> _ReviewRecord:
         _digest_text(data.get("fields_digest"), "ticket review fields digest"),
         binding.literal,
         binding.adopted,
+        _customer_supplied(data),
     )
 
 
@@ -558,6 +586,8 @@ class TicketIntakeCoordinator:
                     refused=False,
                     input_hash=reading.input_hash,
                     synthetic=self._deps.synthetic,
+                    primary_model=reading.primary_model,
+                    escalation=reading.escalation,
                 ),
                 _usage_json(reading.usage),
             )
@@ -595,28 +625,62 @@ class TicketIntakeCoordinator:
             is_current = claim.binding_sha256 == input_binding_hash(
                 EXTRACT_OPERATION, current.images
             )
-        return s.TicketReadingSnapshot(
-            request_id=claim.request_id,
-            status=claim.status.value,
-            current=is_current,
-            synthetic=synthetic,
-            fields=list(fields),
+        metadata = _json_object(claim.result_json) if claim.result_json is not None else {}
+        return s.TicketReadingSnapshot.model_validate(
+            {
+                "request_id": claim.request_id,
+                "status": claim.status.value,
+                "current": is_current,
+                "synthetic": synthetic,
+                "fields": list(fields),
+                "primary_model": metadata.get("primary_model"),
+                "escalation": metadata.get("escalation"),
+            }
         )
+
+    def _validate_literal_provenance(
+        self, workspace_id: str, images: Sequence[ImageAttachment], binding: TicketFactBinding
+    ) -> None:
+        expected: dict[str, str | None] = {field.value: None for field in TicketField}
+        reservation = self._deps.intake.reservation_for(workspace_id)
+        extraction_hash = input_binding_hash(EXTRACT_OPERATION, images)
+        if reservation is not None:
+            for claim in self._deps.intake.claims_for(reservation.intake_id):
+                if (
+                    claim.operation is IntakeOperation.EXTRACT
+                    and claim.binding_sha256 == extraction_hash
+                ):
+                    if claim.status is ClaimStatus.SUCCESS:
+                        fields, refused = _parse_stored_reading(claim)
+                        if refused:
+                            raise StorageCorruption("successful reading marked refused")
+                        expected = {
+                            item.field.value: item.value if item.state == "shown" else None
+                            for item in fields
+                        }
+                    break
+        if dict(binding.literal) != expected:
+            raise _error("ticket_reading_provenance_mismatch")
 
     # Review -------------------------------------------------------------------------
     def request_review(
-        self, workspace_id: str, request_id: str, expected_revision: int
+        self,
+        workspace_id: str,
+        request_id: str,
+        expected_revision: int,
+        *,
+        customer_supplied: bool = False,
     ) -> s.TicketReviewSnapshot:
         current = self._load_current(workspace_id, require_binding=True)
         if expected_revision != current.revision:
             raise _error("workspace_changed_reload_required")
         binding = current.binding
         assert binding is not None
+        self._validate_literal_provenance(workspace_id, current.images, binding)
         review_fields = binding.review_fields()
-        if not review_fields:
-            raise _error("ticket_facts_incomplete")
+        customer_supplied = customer_supplied or not review_fields
         binding_sha256 = review_confirmation_binding(
-            current.images_digest, binding.closed_field_digest
+            current.images_digest, binding.closed_field_digest, customer_supplied=customer_supplied
         )
         existing = self._deps.intake.operation_claim(request_id)
         if existing is not None:
@@ -637,6 +701,23 @@ class TicketIntakeCoordinator:
         )
         if not claim.should_call:
             return self._review_snapshot(claim, current)
+        if customer_supplied:
+            data = json.loads(
+                _review_result_json(
+                    (),
+                    {},
+                    binding,
+                    current.images_digest,
+                    refused=False,
+                    input_hash="",
+                    synthetic=self._deps.synthetic,
+                )
+            )
+            data["customer_supplied"] = True
+            completed = self._finish(
+                claim, ClaimStatus.SUCCESS, json.dumps(data), _usage_json(Usage())
+            )
+            return self._review_snapshot(completed, current)
         reader = self._deps.reader_for_subject(intake_id)
         try:
             review = reader.review(
@@ -692,10 +773,15 @@ class TicketIntakeCoordinator:
             claim.status is ClaimStatus.REFUSED and claim.result_json is not None
         ):
             fields, _refused = _parse_stored_review(claim)
+        customer_supplied = claim.status is ClaimStatus.SUCCESS and _customer_supplied(
+            _json_object(claim.result_json)
+        )
         is_current = False
         if current is not None and current.binding is not None:
             is_current = claim.binding_sha256 == review_confirmation_binding(
-                current.images_digest, current.binding.closed_field_digest
+                current.images_digest,
+                current.binding.closed_field_digest,
+                customer_supplied=customer_supplied,
             )
         return s.TicketReviewSnapshot(
             request_id=claim.request_id,
@@ -703,6 +789,9 @@ class TicketIntakeCoordinator:
             current=is_current,
             synthetic=synthetic,
             fields=list(fields),
+            basis="customer-supplied facts; no model comparison"
+            if customer_supplied
+            else "model comparison only; not external verification",
         )
 
     # Confirmation -------------------------------------------------------------------
@@ -747,9 +836,7 @@ class TicketIntakeCoordinator:
         except (TicketIntakeConflict, StorageCorruption):
             raise _error("ticket_confirmation_unavailable") from None
 
-    def _review_claim_for(
-        self, review_request_id: str, intake_id: str, expected_binding: str
-    ) -> OperationClaim:
+    def _review_claim_for(self, review_request_id: str, intake_id: str) -> OperationClaim:
         claim = self._deps.intake.operation_claim(review_request_id)
         if claim is None:
             raise _error("ticket_review_not_found")
@@ -757,8 +844,6 @@ class TicketIntakeCoordinator:
             raise _error("ticket_review_not_found")
         if claim.status is not ClaimStatus.SUCCESS or claim.result_json is None:
             raise _error("ticket_review_not_completed")
-        if claim.binding_sha256 != expected_binding:
-            raise _error("ticket_review_binding_mismatch")
         return claim
 
     def confirm(
@@ -766,6 +851,8 @@ class TicketIntakeCoordinator:
         workspace_id: str,
         command: s.TicketConfirmationRequest,
     ) -> s.TicketConfirmationReceipt:
+        if not command.accuracy_acknowledged:
+            raise _error("ticket_accuracy_confirmation_required")
         current = self._load_current(workspace_id, require_binding=True)
         if command.expected_revision != current.revision:
             raise _error("workspace_changed_reload_required")
@@ -776,13 +863,16 @@ class TicketIntakeCoordinator:
         reservation = self._deps.intake.reservation_for(workspace_id)
         if reservation is None:
             raise _error("ticket_review_not_found")
-        expected_binding = review_confirmation_binding(
-            current.images_digest, binding.closed_field_digest
-        )
-        claim = self._review_claim_for(
-            command.review_request_id, reservation.intake_id, expected_binding
-        )
+        self._validate_literal_provenance(workspace_id, current.images, binding)
+        claim = self._review_claim_for(command.review_request_id, reservation.intake_id)
         record = _parse_review_record(claim)
+        expected_binding = review_confirmation_binding(
+            current.images_digest,
+            binding.closed_field_digest,
+            customer_supplied=record.customer_supplied,
+        )
+        if claim.binding_sha256 != expected_binding:
+            raise _error("ticket_review_binding_mismatch")
         if (
             record.images_digest != current.images_digest
             or record.fields_digest != binding.closed_field_digest
@@ -839,7 +929,7 @@ class TicketIntakeCoordinator:
             expected = _expected_resolution(item.comparison.value)
             if resolved.get(item.field.value) != expected:
                 raise _error("discrepancy_resolution_required")
-        if discrepancies and len(resolved) != discrepancies:
+        if len(resolved) != discrepancies:
             raise _error("discrepancy_resolution_invalid")
         return DiscrepancyStatus.NONE if not discrepancies else DiscrepancyStatus.RESOLVED
 
@@ -920,6 +1010,7 @@ class TicketIntakeCoordinator:
         current = self._load_current(workspace_id, require_binding=True)
         binding = current.binding
         assert binding is not None
+        self._validate_literal_provenance(workspace_id, current.images, binding)
         if not binding.matches(body.ticket):
             raise _error("ticket_facts_changed")
         if (
@@ -974,7 +1065,11 @@ class TicketIntakeCoordinator:
             or record_review.fields_digest != latest.fields_sha256
             or latest.fields_sha256 != record_review.envelope.closed_field_digest
             or claim.binding_sha256
-            != review_confirmation_binding(latest.images_sha256, latest.fields_sha256)
+            != review_confirmation_binding(
+                latest.images_sha256,
+                latest.fields_sha256,
+                customer_supplied=record_review.customer_supplied,
+            )
         ):
             raise _error("ticket_confirmation_stale")
         if not record_review.envelope.matches(body.ticket):
@@ -990,6 +1085,7 @@ class TicketIntakeCoordinator:
             raise _error("ticket_photo_not_supported") from None
         if images_digest != latest.images_sha256:
             raise _error("ticket_photo_changed")
+        self._validate_literal_provenance(record.workspace_token, images, record_review.envelope)
         read = self._freshness(
             latest,
             reservation.intake_id,

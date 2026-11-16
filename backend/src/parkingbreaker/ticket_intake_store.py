@@ -782,7 +782,11 @@ def _validate_confirmation(
         or review.result_json is None
         or _digest_text(review.result_json) != confirmation.review_result_sha256
         or review.binding_sha256
-        != review_confirmation_binding(confirmation.images_sha256, confirmation.fields_sha256)
+        != review_confirmation_binding(
+            confirmation.images_sha256,
+            confirmation.fields_sha256,
+            customer_supplied=_customer_review_result(review.result_json),
+        )
     ):
         raise StorageCorruption("ticket intake confirmation review mismatch")
 
@@ -851,7 +855,19 @@ def latest_ticket_intake_confirmation(
     return confirmation
 
 
-def review_confirmation_binding(images_sha256: str, fields_sha256: str) -> str:
+def _customer_review_result(result_json: str | None) -> bool:
+    if result_json is None:
+        return False
+    try:
+        data = json.loads(result_json)
+    except (ValueError, TypeError):
+        raise StorageCorruption("malformed review result") from None
+    return isinstance(data, dict) and data.get("customer_supplied") is True
+
+
+def review_confirmation_binding(
+    images_sha256: str, fields_sha256: str, *, customer_supplied: bool = False
+) -> str:
     """Domain-separated SHA256 binding of the exact ordered images plus closed fields.
 
     A REVIEW operation claim uses this value as its ``binding_sha256``, and a recorded
@@ -862,7 +878,12 @@ def review_confirmation_binding(images_sha256: str, fields_sha256: str) -> str:
     images = _digest(images_sha256, "images digest")
     fields = _digest(fields_sha256, "fields digest")
     payload = json.dumps(
-        ["ticket-review-binding-v1", images, fields], separators=(",", ":")
+        [
+            "ticket-customer-confirmation-v1" if customer_supplied else "ticket-review-binding-v1",
+            images,
+            fields,
+        ],
+        separators=(",", ":"),
     ).encode("ascii")
     return hashlib.sha256(payload).hexdigest()
 
@@ -1271,7 +1292,13 @@ def record_ticket_intake_confirmation(
                 database.execute("COMMIT")
                 return confirmation
             raise TicketIntakeConflict("confirmation_command_reused")
-        if review.binding_sha256 != review_confirmation_binding(images, fields):
+        result_data = json.loads(review.result_json)
+        customer_supplied = (
+            isinstance(result_data, dict) and result_data.get("customer_supplied") is True
+        )
+        if review.binding_sha256 != review_confirmation_binding(
+            images, fields, customer_supplied=customer_supplied
+        ):
             raise TicketIntakeConflict("review_binding_mismatch")
         latest_row = database.execute(
             f"SELECT {_CONFIRMATION_COLUMNS} FROM pb_ticket_intake_confirmations "

@@ -1,10 +1,9 @@
 """Closed ticket-image reading and independent critical-fact review.
 
 This module is a pure, injected-client boundary. It constructs no provider, reads
-no environment, touches no disk or network, and is **not** wired into routes,
-storage or the UI yet. Callers inject a :class:`MultimodalLlmClient`; tests inject
-an in-memory fake. PDF rasterisation, durable confirmation, persistence and any
-route/UI integration are deliberately later units.
+no environment, and touches no disk or network directly. Callers inject a
+:class:`MultimodalLlmClient`; tests inject an in-memory fake. The intake coordinator
+owns durable confirmation, persistence and route/UI integration.
 
 Reading (``TicketVisionReader.extract``) returns bounded string *suggestions* or
 an explicit ``not_shown`` / ``unreadable`` state for a closed field set. Nothing
@@ -27,6 +26,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
@@ -115,8 +115,15 @@ class FieldReading:
     field: TicketField
     state: ReadingState
     value: str | None
+    confidence: float | None = None
 
     def __post_init__(self) -> None:
+        if self.confidence is not None and (
+            type(self.confidence) not in (int, float)
+            or not math.isfinite(self.confidence)
+            or not 0 <= self.confidence <= 1
+        ):
+            raise ValueError("confidence must be a finite estimate from zero to one")
         if type(self.field) is not TicketField:
             raise ValueError("field must be a TicketField")
         if type(self.state) is not ReadingState:
@@ -137,6 +144,8 @@ class TicketReading:
     usage: Usage
     input_hash: str
     refused: bool = False
+    primary_model: str | None = None
+    escalation: str | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.usage, Usage):
@@ -284,17 +293,24 @@ document titles, example/test-case labels, identifiers and fixture labels do not
 - Return JSON only, matching the schema, with exactly the supplied fields and no extra keys."""
 
 
-def _field_reading_schema() -> dict[str, JsonValue]:
+def _field_reading_schema(*, confidence: bool = False) -> dict[str, JsonValue]:
     properties: dict[str, JsonValue] = {}
     for field in FIELD_ORDER:
+        field_properties: dict[str, JsonValue] = {
+            "state": {"type": "string", "enum": [state.value for state in ReadingState]},
+            "value": {"type": ["string", "null"]},
+        }
+        if confidence:
+            field_properties["confidence"] = {
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1,
+            }
         properties[field.value] = {
             "type": "object",
-            "required": ["state", "value"],
+            "required": ["state", "value", "confidence"] if confidence else ["state", "value"],
             "additionalProperties": False,
-            "properties": {
-                "state": {"type": "string", "enum": [state.value for state in ReadingState]},
-                "value": {"type": ["string", "null"]},
-            },
+            "properties": field_properties,
         }
     return {
         "type": "object",
@@ -305,6 +321,13 @@ def _field_reading_schema() -> dict[str, JsonValue]:
 
 
 READING_SCHEMA: Final[dict[str, JsonValue]] = _field_reading_schema()
+CONFIDENCE_READING_SCHEMA: Final[dict[str, JsonValue]] = _field_reading_schema(confidence=True)
+CONFIDENCE_INSTRUCTION: Final[str] = (
+    "\nFor each field also return confidence: your estimate from 0 to 1 that the entire "
+    "copied value is character-for-character correct, or null when not shown/unreadable. "
+    "This is an uncalibrated model estimate, not a measured probability. Do not raise it "
+    "to meet a threshold. The no-guessing and whole-field unreadability rules still apply."
+)
 
 
 def review_schema(field_names: Sequence[str]) -> dict[str, JsonValue]:
@@ -420,11 +443,23 @@ def _parse_reading(data: JsonValue) -> tuple[FieldReading, ...]:
     readings: list[FieldReading] = []
     for field in FIELD_ORDER:
         item = data[field.value]
-        if not isinstance(item, dict) or set(item) != {"state", "value"}:
+        if not isinstance(item, dict) or set(item) not in (
+            {"state", "value"},
+            {"state", "value", "confidence"},
+        ):
             raise _RefusedSchema("each reading needs exactly state and value")
+        score = item.get("confidence")
+        if score is not None and (
+            isinstance(score, bool)
+            or not isinstance(score, (int, float))
+            or not math.isfinite(score)
+            or not 0 <= score <= 1
+        ):
+            raise _RefusedSchema("invalid confidence estimate")
+        confidence = float(score) if isinstance(score, (int, float)) else None
         state = _reading_state(item["state"])
         if state is ReadingState.SHOWN:
-            readings.append(FieldReading(field, state, _visible_value(item["value"])))
+            readings.append(FieldReading(field, state, _visible_value(item["value"]), confidence))
         else:
             if item["value"] is not None:
                 raise _RefusedSchema("an absent reading must not carry a value")
@@ -553,8 +588,9 @@ def _preflight_confirmed(
 class TicketVisionReader:
     """Injected-client boundary: at most one call per method and never a retry."""
 
-    def __init__(self, client: MultimodalLlmClient) -> None:
+    def __init__(self, client: MultimodalLlmClient, *, confidence: bool = False) -> None:
         self._client = client
+        self._confidence = confidence
 
     def extract(self, images: Sequence[ImageAttachment], *, max_cost_cents: int) -> TicketReading:
         """Make one multimodal call and return bounded suggestions or a refusal."""
@@ -562,9 +598,9 @@ class TicketVisionReader:
         validated = _preflight_images(images)
         binding = input_binding_hash(EXTRACT_OPERATION, validated)
         data, usage = self._client.complete_json(
-            EXTRACT_SYSTEM,
+            EXTRACT_SYSTEM + (CONFIDENCE_INSTRUCTION if self._confidence else ""),
             extract_user_prompt(),
-            READING_SCHEMA,
+            CONFIDENCE_READING_SCHEMA if self._confidence else READING_SCHEMA,
             max_cost_cents=ceiling,
             images=validated,
         )

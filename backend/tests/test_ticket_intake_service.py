@@ -122,7 +122,14 @@ def payload(binding: TicketFactBinding) -> s.TicketFactBindingPayload:
 
 
 def reading_payload() -> dict[str, JsonValue]:
-    return {field.value: {"state": "not_shown", "value": None} for field in FIELD_ORDER}
+    # The default successful extraction must agree with the saved literal envelope.
+    return {
+        field.value: {
+            "state": "shown" if literal_values()[field.value] is not None else "not_shown",
+            "value": cast(JsonValue, literal_values()[field.value]),
+        }
+        for field in FIELD_ORDER
+    }
 
 
 def shown(payload_map: dict[str, JsonValue], field: TicketField, value: str) -> None:
@@ -345,6 +352,7 @@ def confirm_command(
         expected_revision=revision(harnessed, workspace),
         review_request_id=review_id,
         expected_confirmation_generation=expected_generation,
+        accuracy_acknowledged=True,
         resolved_fields={} if resolved is None else dict(resolved),
     )
 

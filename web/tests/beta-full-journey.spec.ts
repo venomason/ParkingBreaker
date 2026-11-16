@@ -295,11 +295,12 @@ async function visionTicket(page: Page) {
   await page.locator("#fact-notice_date-absent").check();
   await page.locator("#fact-printed_deadline-absent").check();
   await page.locator("#visionReviewBtn").click();
-  await expect(page.locator("#visionReviewList")).toBeVisible();
+  await expect(page.locator("#visionReview")).toContainText("No AI comparison was performed.");
   for (const field of VISION_LITERAL_FIELDS) {
     const select = page.locator(`#resolve-${field}`);
     if (await select.count()) await select.selectOption("ABSENCE_ACKNOWLEDGED");
   }
+  await page.locator("#visionAccuracyAcknowledged").check();
   await expect(page.locator("#visionConfirmBtn")).toBeEnabled();
   await page.locator("#visionConfirmBtn").click();
   await expect(page.locator("#visionConfirmed")).toBeVisible();
@@ -439,7 +440,7 @@ for (const recovery of [false, true]) {
     await page.locator("#livePreview").click();
     const previewResult = await previewResponse;
     expect(previewResult.status(), await previewResult.text()).toBe(200);
-    const preview = await previewResult.json();
+    let preview = await previewResult.json();
     await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
     const bytes = Buffer.from(await page.locator("#liveOpenPacket").evaluate(async link => Array.from(new Uint8Array(await (await fetch((link as HTMLAnchorElement).href)).arrayBuffer()))));
     expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
@@ -450,6 +451,27 @@ for (const recovery of [false, true]) {
     await expect(page.locator("#livePacketReviewed")).not.toBeChecked();
     if (!recovery) await accessible(page, "full-beta-exact-packet");
     await page.locator("#livePacketReviewed").check();
+    if (!recovery) {
+      const mailingRequests: string[] = [];
+      page.on("request", request => {
+        if (/\/(approval|submit)$/.test(new URL(request.url()).pathname)) mailingRequests.push(request.url());
+      });
+      await page.locator("#liveCorrectBeforeMail").click();
+      await expect(page.locator("#h-s6")).toHaveText("Your letter is paused.");
+      await expect(page.locator("#liveApprove")).toHaveCount(0);
+      await page.reload();
+      await expect(page.locator("#h-s6")).toHaveText("Your letter is paused.");
+      await page.locator("#liveResumeLetter").click();
+      await expect(page.locator("#livePacketPreview")).toHaveCount(0);
+      await expect(page.locator("#liveApprove")).toHaveCount(0);
+      expect(mailingRequests).toEqual([]);
+      await page.locator("#liveSignatureFile").setInputFiles({ name: "own-synthetic-signature.png", mimeType: "image/png", buffer: syntheticPng(40, true) });
+      const replacement = page.waitForResponse(response => response.url().endsWith("/packet-preview"));
+      await page.locator("#livePreview").click();
+      preview = await (await replacement).json();
+      await expect(page.locator("#livePacketReviewed")).not.toBeChecked();
+      await page.locator("#livePacketReviewed").check();
+    }
     const approvalBodies: string[] = [];
     let lost = false;
     await page.route("**/api/cases/*/approval", async route => {

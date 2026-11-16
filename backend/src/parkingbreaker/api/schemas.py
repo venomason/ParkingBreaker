@@ -782,12 +782,19 @@ class TicketOperationRequest(Model):
     expected_revision: Annotated[int, Field(ge=1, strict=True)]
 
 
+class TicketReviewRequest(TicketOperationRequest):
+    """Explicit customer-only confirmation preparation; never a model result."""
+
+    customer_supplied: StrictBool = False
+
+
 class TicketReadingField(Model):
     """One closed reading suggestion or an explicit absence state. Never a verified fact."""
 
     field: TicketField
     state: Literal["shown", "not_shown", "unreadable"]
     value: str | None
+    confidence: Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)] | None = None
 
 
 class TicketReadingSnapshot(Model):
@@ -798,6 +805,11 @@ class TicketReadingSnapshot(Model):
     current: bool = False
     synthetic: bool = False
     fields: list[TicketReadingField] = Field(default_factory=list)
+    primary_model: str | None = None
+    escalation: Literal[
+        "not_needed", "manual", "unavailable", "budget_exhausted", "failed", "refused", "completed"
+    ] | None = None
+    confidence_basis: Literal["uncalibrated model estimate"] = "uncalibrated model estimate"
 
 
 class TicketReviewField(Model):
@@ -815,9 +827,10 @@ class TicketReviewSnapshot(Model):
     status: Literal["missing", "pending", "success", "refused", "unknown"] = "missing"
     current: bool = False
     synthetic: bool = False
-    basis: Literal["model comparison only; not external verification"] = (
-        "model comparison only; not external verification"
-    )
+    basis: Literal[
+        "model comparison only; not external verification",
+        "customer-supplied facts; no model comparison",
+    ] = "model comparison only; not external verification"
     fields: list[TicketReviewField] = Field(default_factory=list)
 
 
@@ -836,6 +849,7 @@ class TicketConfirmationRequest(Model):
     expected_revision: Annotated[int, Field(ge=1, strict=True)]
     review_request_id: TicketOperationId
     expected_confirmation_generation: Annotated[int, Field(ge=0, strict=True)]
+    accuracy_acknowledged: StrictBool = False
     resolved_fields: dict[str, TicketDiscrepancyResolution] = Field(
         default_factory=dict, max_length=11
     )

@@ -948,7 +948,11 @@ class CaseService:
         coordinator = self._ticket_intake()
         return self._ticket_path(
             lambda: coordinator.request_review(
-                workspace_id, body.request_id, body.expected_revision
+                workspace_id,
+                body.request_id,
+                body.expected_revision,
+                customer_supplied=isinstance(body, s.TicketReviewRequest)
+                and body.customer_supplied,
             )
         )
 

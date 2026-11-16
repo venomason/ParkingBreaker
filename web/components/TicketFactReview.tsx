@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
+import { CustomerChoiceNotice } from "./CustomerChoiceRules";
 import type {
   TicketDiscrepancyResolution,
   TicketReadingSnapshot,
@@ -28,8 +29,9 @@ export interface TicketFactReviewProps {
   locked: boolean;
   dirty: boolean;
   confirmed: boolean;
-  onSaveFacts: (facts: AdoptedFacts) => void;
+  onSaveFacts: (facts: AdoptedFacts, customerSupplied?: boolean) => void;
   onConfirm: () => void;
+  onOpenRules?: () => void;
 }
 
 const COMPARISON_LABELS: Record<string, string> = {
@@ -65,10 +67,18 @@ export function TicketFactReview({
   confirmed,
   onSaveFacts,
   onConfirm,
+  onOpenRules,
 }: TicketFactReviewProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [acknowledgedFor, setAcknowledgedFor] = useState<string | null>(null);
+  const reviewKey = JSON.stringify([review?.request_id, draft, resolutions]);
+  const accuracyAcknowledged = acknowledgedFor === reviewKey;
   const formRef = useRef<HTMLFormElement>(null);
-  const set = (key: keyof FactDraft) => (value: FactDraft[typeof key]) => onDraftChange({ ...draft, [key]: value });
+  const changeDraft = (next: FactDraft) => {
+    setAcknowledgedFor(null);
+    onDraftChange(next);
+  };
+  const set = (key: keyof FactDraft) => (value: FactDraft[typeof key]) => changeDraft({ ...draft, [key]: value });
   const textField = (key: keyof FactDraft, label: string, extra?: React.ReactNode) => (
     <label>
       {label}
@@ -96,7 +106,8 @@ export function TicketFactReview({
       requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
       return;
     }
-    onSaveFacts(result.facts);
+    const customerSupplied = (event.nativeEvent as SubmitEvent).submitter?.id === "visionCustomerReviewBtn";
+    onSaveFacts(result.facts, customerSupplied);
   }, [draft, locked, busy, onSaveFacts]);
 
   const literalEntries = TICKET_LITERAL_FIELD_ORDER.map((field) => {
@@ -107,13 +118,22 @@ export function TicketFactReview({
   const reviewFields = review?.status === "success" && review.current ? review.fields : [];
   const expectedResolutions = reviewFields.filter((field) => field.comparison !== "match").map((field) => field.field);
   const unresolved = dirty || expectedResolutions.some((field) => !resolutions[field]);
-  const hasReview = reviewFields.length > 0;
+  const customerOnly = review?.basis === "customer-supplied facts; no model comparison";
+  const hasReview = Boolean(review?.status === "success" && review.current && (customerOnly || reviewFields.length > 0));
+  const hasReading = reading?.current && reading.status === "success" && reading.fields.some((field) => field.state === "shown");
 
   return (
     <div id="visionFactReview" className="stack">
       <section aria-labelledby="visionReadingsTitle" className="card" id="visionReadings">
         <p className="eyebrow">Unverified reading</p>
         <h3 id="visionReadingsTitle" style={{ marginBottom: "6px" }}>What the reading suggests</h3>
+        {reading?.escalation === "completed" && <p className="small" role="status">
+          Gemini independently checked borderline text. Any remaining uncertain or conflicting
+          fields need your input. Agreement between models is not proof of accuracy.
+        </p>}
+        {reading?.escalation && ["unavailable", "budget_exhausted", "failed", "refused"].includes(reading.escalation)
+          && <p className="small" role="status">The additional reading was unavailable or unusable.
+            Enter the remaining facts yourself; no uncertain value has been filled in for you.</p>}
         <p className="muted small" style={{ marginBottom: "10px" }}>
           These are suggestions from an AI reading of your uploaded photos, not confirmed facts. The reading can see
           everything printed on the photo, which may include your name, plate or address. Check every value yourself.
@@ -135,11 +155,11 @@ export function TicketFactReview({
       </section>
 
       <form ref={formRef} id="visionFactsForm" className="card" onSubmit={submit} noValidate aria-busy={busy}>
-        <p className="eyebrow">Your confirmed facts</p>
+        <p className="eyebrow">Your supplied facts</p>
         <h3 style={{ marginBottom: "6px" }}>Enter the ticket facts yourself</h3>
         <p className="muted small" style={{ marginBottom: "10px" }}>
           Printed dates stay as they appear on the ticket above. Below, choose the calendar dates, stage and issuer
-          yourself. Nothing is filled in for you, and nothing is verified.
+          yourself. Suggestions may be prefilled; your corrections are recorded as customer-supplied facts, never as AI-extracted text. Do not guess an uncertain character. Supply every required fact before continuing.
         </p>
         <div className="local-ids single">
           {textField("citation_number", "Citation number")}
@@ -206,7 +226,7 @@ export function TicketFactReview({
                 type="checkbox"
                 checked={draft.notice_date_absent}
                 disabled={locked || busy}
-                onChange={(event) => onDraftChange({ ...draft, notice_date_absent: event.target.checked, notice_date: event.target.checked ? "" : draft.notice_date })}
+                onChange={(event) => changeDraft({ ...draft, notice_date_absent: event.target.checked, notice_date: event.target.checked ? "" : draft.notice_date })}
                 style={{ width: "auto", minHeight: 0 }}
               />
               This ticket does not print a notice date
@@ -231,7 +251,7 @@ export function TicketFactReview({
                 type="checkbox"
                 checked={draft.printed_deadline_absent}
                 disabled={locked || busy}
-                onChange={(event) => onDraftChange({ ...draft, printed_deadline_absent: event.target.checked, printed_deadline: event.target.checked ? "" : draft.printed_deadline })}
+                onChange={(event) => changeDraft({ ...draft, printed_deadline_absent: event.target.checked, printed_deadline: event.target.checked ? "" : draft.printed_deadline })}
                 style={{ width: "auto", minHeight: 0 }}
               />
               This ticket does not print a deadline
@@ -242,24 +262,30 @@ export function TicketFactReview({
         {Object.keys(errors).length > 0 && (
           <p className="err" role="alert">Check the marked facts above. Your entries are still here.</p>
         )}
-        <button className="btn btn-primary" type="submit" id="visionReviewBtn" disabled={locked || busy || !reading || reading.status !== "success"}>
-          {busy ? <><span className="spinner" /> Comparing…</> : "Save facts and compare"}
+        <button className="btn btn-primary" type="submit" id="visionReviewBtn" disabled={locked || busy}>
+          {busy ? <><span className="spinner" /> Saving…</> : hasReading ? "Save facts and compare" : "Save my facts for confirmation"}
         </button>
-        {!reading && <p className="muted small">Read your ticket photos above before comparing.</p>}
+        {hasReading && (
+          <button className="btn" type="submit" id="visionCustomerReviewBtn" disabled={locked || busy}>
+            Use my supplied facts without an AI comparison
+          </button>
+        )}
+        {!hasReading && <p className="muted small">These facts come from you. No AI reading or comparison verifies them.</p>}
       </form>
 
       {review && (
         <section className="card" id="visionReview" aria-labelledby="visionReviewTitle">
-          <p className="eyebrow">Independent comparison</p>
-          <h3 id="visionReviewTitle" style={{ marginBottom: "6px" }}>What the comparison found</h3>
+          <p className="eyebrow">{customerOnly ? "Customer-supplied facts" : "Independent comparison"}</p>
+          <h3 id="visionReviewTitle" style={{ marginBottom: "6px" }}>{customerOnly ? "Check and confirm your supplied facts" : "What the comparison found"}</h3>
           <p className="muted small" style={{ marginBottom: "10px" }}>
-            This is a model comparison only, not external verification. A match does not prove a fact. For every
-            difference, you must choose your own resolution before you can confirm.
+            {customerOnly
+              ? "No AI comparison was performed. Confirm that the facts you entered are accurate. If an essential fact is still unknown, correct it before continuing."
+              : "This is a model comparison only, not external verification. A match does not prove a fact. For every difference, choose your own resolution before confirming."}
           </p>
           {review.status !== "success" || !review.current ? (
             <p className="small" role="status" id="visionReviewState">
               {review.status === "refused"
-                ? "The comparison service could not return usable results. Save your facts again to start a fresh comparison."
+                ? "The comparison returned no usable result. You can use your supplied facts without an AI comparison using the button above."
                 : review.status === "pending" || review.status === "unknown"
                   ? "The comparison is not confirmed yet. Check the saved status; it will not be repeated automatically."
                   : review.status === "missing"
@@ -286,7 +312,10 @@ export function TicketFactReview({
                             id={`resolve-${item.field}`}
                             value={resolutions[item.field] ?? ""}
                             disabled={locked || busy}
-                            onChange={(event) => onResolutionsChange({ ...resolutions, [item.field]: event.target.value as TicketDiscrepancyResolution })}
+                            onChange={(event) => {
+                              setAcknowledgedFor(null);
+                              onResolutionsChange({ ...resolutions, [item.field]: event.target.value as TicketDiscrepancyResolution });
+                            }}
                           >
                             <option value="">Choose a resolution</option>
                             <option value={expected}>{RESOLUTION_LABELS[expected]}</option>
@@ -301,12 +330,25 @@ export function TicketFactReview({
               {review.basis && <p className="muted small">{review.basis}</p>}
               {!confirmed && (
                 <>
+                  <p className="small" id="ticketAccuracyWarning">
+                    OCR can misread a character even when its confidence is high. Check every fact
+                    against your ticket and correct anything above before continuing. A model’s
+                    confidence estimate is not a guarantee of accuracy.
+                  </p>
+                  <CustomerChoiceNotice onOpenRules={onOpenRules} />
+                  <label className="packet-inspect">
+                    <input id="visionAccuracyAcknowledged" type="checkbox"
+                      checked={accuracyAcknowledged} disabled={locked || busy || dirty}
+                      onChange={event => setAcknowledgedFor(event.target.checked ? reviewKey : null)} />
+                    I have checked every ticket fact, corrected any mistakes, and confirm that
+                    the information I am submitting is accurate.
+                  </label>
                   <button
                     className="btn btn-primary"
                     type="button"
                     id="visionConfirmBtn"
-                    disabled={locked || busy || unresolved || !hasReview}
-                    onClick={() => onConfirm()}
+                    disabled={locked || busy || dirty || unresolved || !hasReview || !accuracyAcknowledged}
+                    onClick={() => { if (accuracyAcknowledged && !dirty) onConfirm(); }}
                   >
                     {busy ? <><span className="spinner" /> Confirming…</> : "Confirm these ticket facts"}
                   </button>

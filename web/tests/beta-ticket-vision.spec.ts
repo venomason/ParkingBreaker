@@ -5,7 +5,7 @@ import { EMPTY_CONTACT } from "../components/LiveDetails";
 import { emptyFactDraft, factDraftFromAdopted, factDraftFromValues, restoredTicketStep, ticketFormWithDraft, ticketValuesFromDraft, validateFactDraft } from "../lib/intake";
 
 // Required ticket-reading mode only: real owner-scoped upload -> unverified reading ->
-// explicit 13 facts -> independent comparison -> per-field resolution -> confirmation.
+// explicit 13 facts -> manual review when extraction is empty -> explicit confirmation.
 // No fixture stands in for the customer path and no required runtime is disabled here.
 const base = process.env.SECURE_BASE;
 const privateApi = process.env.INGRESS_API_BASE;
@@ -115,7 +115,7 @@ async function fillFacts(page: Page) {
 
 async function reviewFacts(page: Page) {
   await page.locator("#visionReviewBtn").click();
-  await expect(page.locator("#visionReviewList")).toBeVisible({ timeout: 20000 });
+  await expect(page.locator("#visionReview")).toContainText("No AI comparison was performed.", { timeout: 20000 });
 }
 
 async function resolveEveryDifference(page: Page) {
@@ -132,6 +132,9 @@ async function resolveEveryDifference(page: Page) {
 }
 
 async function confirmFacts(page: Page) {
+  await expect(page.locator("#visionConfirmBtn")).toBeDisabled();
+  await expect(page.locator("#visionAccuracyAcknowledged")).not.toBeChecked();
+  await page.locator("#visionAccuracyAcknowledged").check();
   await expect(page.locator("#visionConfirmBtn")).toBeEnabled();
   await page.locator("#visionConfirmBtn").click();
   await expect(page.locator("#visionConfirmed")).toBeVisible({ timeout: 20000 });
@@ -300,7 +303,7 @@ test.afterEach(() => {
   expect(saveStatuses.every((status) => status === 200), "autosave/flush must be accepted").toBe(true);
 });
 
-test("required reading, explicit facts, comparison and confirmation save, restore and authorize intake", async ({ page }) => {
+test("empty reading, explicit manual facts and confirmation save, restore and authorize intake", async ({ page }) => {
   await beginVision(page);
   await uploadAndRead(page);
   await expect(page.locator("#visionReadings")).toContainText(/unverified|suggestion/i);
@@ -314,8 +317,17 @@ test("required reading, explicit facts, comparison and confirmation save, restor
 
   await reviewFacts(page);
   const resolved = await resolveEveryDifference(page);
-  expect(resolved).toBeGreaterThan(0);
+  expect(resolved).toBe(0);
   await expect(page.locator("#actContinueTicket")).toHaveCount(0);
+  await page.locator("#visionAccuracyAcknowledged").check();
+  await expect(page.locator("#visionConfirmBtn")).toBeEnabled();
+  await page.locator("#fact-license_plate").fill("CORRECTED123");
+  await expect(page.locator("#visionConfirmBtn")).toHaveCount(0);
+  await page.locator("#fact-license_plate").fill(FACTS.license_plate);
+  // Even restoring the old value must not restore consent.
+  await reviewFacts(page);
+  await resolveEveryDifference(page);
+  await expect(page.locator("#visionAccuracyAcknowledged")).not.toBeChecked();
   await confirmFacts(page);
   await expect(page.locator("#actContinueTicket")).toBeVisible();
 
@@ -389,6 +401,7 @@ test("missing confirmation cannot advance and the required intake is refused", a
   await fillFacts(page);
   await reviewFacts(page);
   await resolveEveryDifference(page);
+  await page.locator("#visionAccuracyAcknowledged").check();
   await expect(page.locator("#visionConfirmBtn")).toBeEnabled();
   await expect(page.locator("#visionConfirmed")).toHaveCount(0);
   await expect(page.locator("#actContinueTicket")).toHaveCount(0);
@@ -439,11 +452,12 @@ test("fact edits invalidate comparison/confirmation and a lost confirmation resp
   await expect(page.locator("#actContinueTicket")).toHaveCount(0);
   await expect(page.locator("#visionDirty")).toBeVisible();
   await page.locator("#visionReviewBtn").click();
-  await expect(page.locator("#visionReviewList")).toBeVisible({ timeout: 20000 });
+  await expect(page.locator("#visionReview")).toContainText("No AI comparison was performed.", { timeout: 20000 });
   const firstReview = JSON.parse(reviewBodies[reviewBodies.length - 1]) as { request_id: string };
   expect(firstReview.request_id).not.toBe(reviewRequestId);
   await resolveEveryDifference(page);
 
+  await page.locator("#visionAccuracyAcknowledged").check();
   let lost = false;
   await page.route("**/api/workspaces/*/ticket-confirmation", async (route) => {
     const response = await forward(route);
@@ -481,7 +495,9 @@ test("a lost reading response replays the exact request id and never starts a se
   });
   await page.locator("#visionReadBtn").click();
   await expect(page.locator("#ticketVision")).toContainText(/couldn.t reach|could not|unavailable/i, { timeout: 20000 });
+  const replay = page.waitForResponse(response => new URL(response.url()).pathname.endsWith("/ticket-reading") && response.request().method() === "POST");
   await page.locator("#visionReadBtn").click();
+  expect((await replay).status()).toBe(200);
   await expect(page.locator("#visionSuggestions")).toBeVisible({ timeout: 20000 });
   expect(bodies.length).toBe(2);
   const first = JSON.parse(bodies[0]) as { request_id: string };

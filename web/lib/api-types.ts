@@ -1179,6 +1179,19 @@ export interface components {
              * @enum {string}
              */
             mode: "preview" | "fake" | "test" | "live";
+            /**
+             * Customer Authored Mode
+             * @default false
+             */
+            customer_authored_mode: boolean;
+            /** Customer Authored Mode Version */
+            customer_authored_mode_version?: string | null;
+            /** Build Commit */
+            build_commit?: string | null;
+            /** Policy Hashes */
+            policy_hashes?: {
+                [key: string]: string;
+            };
         };
         /**
          * IntakeForm
@@ -1606,6 +1619,11 @@ export interface components {
             review_request_id: string;
             /** Expected Confirmation Generation */
             expected_confirmation_generation: number;
+            /**
+             * Accuracy Acknowledged
+             * @default false
+             */
+            accuracy_acknowledged: boolean;
             /** Resolved Fields */
             resolved_fields?: {
                 [key: string]: components["schemas"]["TicketDiscrepancyResolution"];
@@ -1728,6 +1746,8 @@ export interface components {
             state: "shown" | "not_shown" | "unreadable";
             /** Value */
             value: string | null;
+            /** Confidence */
+            confidence?: number | null;
         };
         /**
          * TicketReadingSnapshot
@@ -1754,6 +1774,16 @@ export interface components {
             synthetic: boolean;
             /** Fields */
             fields?: components["schemas"]["TicketReadingField"][];
+            /** Primary Model */
+            primary_model?: string | null;
+            /** Escalation */
+            escalation?: ("not_needed" | "manual" | "unavailable" | "budget_exhausted" | "failed" | "refused" | "completed") | null;
+            /**
+             * Confidence Basis
+             * @default uncalibrated model estimate
+             * @constant
+             */
+            confidence_basis: "uncalibrated model estimate";
         };
         /**
          * TicketReadingStatus
@@ -1793,6 +1823,21 @@ export interface components {
             visible_text: string | null;
         };
         /**
+         * TicketReviewRequest
+         * @description Explicit customer-only confirmation preparation; never a model result.
+         */
+        TicketReviewRequest: {
+            /** Request Id */
+            request_id: string;
+            /** Expected Revision */
+            expected_revision: number;
+            /**
+             * Customer Supplied
+             * @default false
+             */
+            customer_supplied: boolean;
+        };
+        /**
          * TicketReviewSnapshot
          * @description The current durable independent review for this workspace.
          */
@@ -1818,9 +1863,9 @@ export interface components {
             /**
              * Basis
              * @default model comparison only; not external verification
-             * @constant
+             * @enum {string}
              */
-            basis: "model comparison only; not external verification";
+            basis: "model comparison only; not external verification" | "customer-supplied facts; no model comparison";
             /** Fields */
             fields?: components["schemas"]["TicketReviewField"][];
         };
@@ -2408,7 +2453,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TicketOperationRequest"];
+                "application/json": components["schemas"]["TicketReviewRequest"];
             };
         };
         responses: {
