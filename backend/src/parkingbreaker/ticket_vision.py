@@ -231,8 +231,19 @@ For every field in the closed field set return exactly one state:
 
 Rules:
 - Never guess, complete, correct or invent a value.
+- Every shown value must be one visible line of at most 200 characters. Represent \
+printed line wraps with a single space; preserve all other visible characters.
+- If any character of a field is obscured, missing or ambiguous, return unreadable \
+with a null value for the whole field. Never join readable fragments across damage, \
+drop an unreadable character, or resolve a letter/digit ambiguity from a pattern.
 - Keep dates as literal visible strings; do not convert, reformat or infer a locale.
 - Do not infer a jurisdiction, issuer, stage, violation code or meaning.
+- issued_city and issued_state mean the explicitly printed place of issuance. An \
+issuer's name or a license-plate state does not establish that place. If only those \
+appear, return not_shown for the issuance fields.
+- stage_text means an explicitly printed appeal, review, hearing or procedural stage. \
+Document titles, example/test-case labels, citation identifiers and fixture labels \
+are not procedural stages. If no procedural stage is printed, return not_shown.
 - Do not translate, summarise or explain.
 - Return JSON only, matching the schema, with every field and no extra keys."""
 
@@ -258,7 +269,17 @@ character; do not normalise, translate or paraphrase it.
 
 Rules:
 - Compare only. Never correct, adopt, replace or add a customer value.
+- Every visible_text must be one visible line of at most 200 characters. Represent \
+printed line wraps with a single space; preserve all other visible characters.
+- If any character of a field is obscured, missing or ambiguous, return unreadable \
+with null visible_text for the whole field, even if some fragments are readable. \
+Never drop a damaged character, join fragments across damage, or use the customer's \
+confirmed value or a familiar pattern to guess a letter or digit.
 - Never decide merits, defences or arguments.
+- For issued_city and issued_state, compare only an explicitly printed place of \
+issuance; do not substitute the issuer's name or license-plate state.
+- For stage_text, compare only a printed appeal, review, hearing or procedural stage; \
+document titles, example/test-case labels, identifiers and fixture labels do not count.
 - A match is this comparison only; it is not external verification.
 - Return JSON only, matching the schema, with exactly the supplied fields and no extra keys."""
 

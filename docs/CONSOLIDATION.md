@@ -1,8 +1,10 @@
 # November 15, 2026 consolidation
 
 The active checkout is `Desktop/ParkingBreaker-Codebase`, backed by
-`https://github.com/venomason/ParkingBreaker`. Work is prepared on
-`beta/consolidate-2026-11-15`; publication requires the owner's exact push approval.
+`https://github.com/venomason/ParkingBreaker`. With the owner's explicit approval,
+`main` was fast-forwarded and pushed to signed commit
+`e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b`. A fresh remote query on November 15
+confirmed that same commit. The local consolidation branch is retained for recovery.
 
 ## Provenance and integration
 
@@ -47,8 +49,8 @@ Before consolidation, 12 local archives were hashed and verified against their
 member manifests; two additional historical copies received verified archives
 before their later relocation, bringing the total to 14. A separate verified Git bundle preserves all 447 reachable
 source commits and refs. Original history is retained locally instead of being
-attached as unrelated ancestry to the publication branch. The GitHub `main` branch
-and its history remain unchanged.
+attached as unrelated ancestry to the publication branch. GitHub `main` history
+was preserved by the fast-forward; no remote history was rewritten.
 
 Local run records are under
 `~/Vault/Ops/runs/parkingbreaker-consolidation-20261115/`, including:
@@ -114,6 +116,6 @@ do not mirror or push its historical refs. The original legacy directories remai
 available alongside the backups, including protected local files omitted from
 archive copying.
 
-The proposed push creates the named review branch only. It does not update `main`,
+The approved push updated `main` to the signed consolidation commit. It did not
 force-push, deploy, configure providers, charge customers or mail anything.
 See `BETA-READINESS.md` for validation and the remaining release gates.

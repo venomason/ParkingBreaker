@@ -1,18 +1,28 @@
 from __future__ import annotations
 
+import base64
 from collections.abc import Mapping
 from decimal import Decimal
+from io import BytesIO
 from types import SimpleNamespace
 from typing import cast
 
 import httpx2 as httpx
 import openai
 import pytest
+from PIL import Image
 
 from parkingbreaker.json_types import JsonValue
-from parkingbreaker.llm import LlmBudgetExceeded, LlmProviderError, Usage, schema_json
+from parkingbreaker.llm import (
+    ImageAttachment,
+    LlmBudgetExceeded,
+    LlmProviderError,
+    Usage,
+    schema_json,
+)
 from parkingbreaker.llm_deepseek import DeepSeekLlmClient
 from parkingbreaker.llm_input_budget import (
+    MIN_TOKENS_PER_IMAGE,
     UnboundableRequestError,
     request_input_tokens,
 )
@@ -126,7 +136,7 @@ def test_payload_is_exact_chat_completions_json_mode() -> None:
     assert payload["model"] == "deepseek-flash"
     assert payload["response_format"] == {"type": "json_object"}
     assert payload["stream"] is False
-    assert payload["max_completion_tokens"] == 8192
+    assert payload["max_tokens"] == 8192
     messages = cast(list[dict[str, str]], payload["messages"])
     assert [m["role"] for m in messages] == ["system", "user"]
     assert messages[1]["content"] == "prompt 🙂"
@@ -141,7 +151,7 @@ def test_tiny_text_succeeds_at_25_cent_ceiling() -> None:
     assert result == {"ok": True}
     assert usage.input_tokens == 1000
     (payload,) = transport.payloads
-    sent = cast(int, payload["max_completion_tokens"])
+    sent = cast(int, payload["max_tokens"])
     assert sent == output_for(25) == 8192
     assert sent >= 1024
     assert worst_case_cents(config(), input_bound(), sent) <= 25
@@ -156,8 +166,8 @@ def test_tighter_ceiling_reduces_output_and_stays_within_ceiling() -> None:
     DeepSeekLlmClient(config(), "offline-key", transport=tight).complete_json(
         SYSTEM, USER, SCHEMA, max_cost_cents=1
     )
-    loose_output = cast(int, loose.payloads[0]["max_completion_tokens"])
-    tight_output = cast(int, tight.payloads[0]["max_completion_tokens"])
+    loose_output = cast(int, loose.payloads[0]["max_tokens"])
+    tight_output = cast(int, tight.payloads[0]["max_tokens"])
     assert tight_output < loose_output
     assert tight_output >= 1024
     assert tight_output == output_for(1)
@@ -173,19 +183,101 @@ def test_bound_counts_unicode_system_and_schema_in_transport_cap() -> None:
     DeepSeekLlmClient(config(), "offline-key", transport=unicode_transport).complete_json(
         "s", "🙂" * 100, {}, max_cost_cents=1
     )
-    ascii_output = cast(int, ascii_transport.payloads[0]["max_completion_tokens"])
-    unicode_output = cast(int, unicode_transport.payloads[0]["max_completion_tokens"])
+    ascii_output = cast(int, ascii_transport.payloads[0]["max_tokens"])
+    unicode_output = cast(int, unicode_transport.payloads[0]["max_tokens"])
     assert ascii_output > unicode_output >= 1024
     assert unicode_output == request_output_tokens(config(), input_bound("s", "🙂" * 100, {}), 1)
 
 
-def test_deepseek_refuses_image_attachments() -> None:
-    from parkingbreaker.llm import ImageAttachment
+def ticket_image(fmt: str = "JPEG", size: tuple[int, int] = (1300, 1100)) -> ImageAttachment:
+    buffer = BytesIO()
+    Image.new("RGB", size, "white").save(buffer, format=fmt)
+    return ImageAttachment(
+        media_type="image/jpeg" if fmt == "JPEG" else "image/png",
+        data_base64=base64.b64encode(buffer.getvalue()).decode("ascii"),
+    )
+
+
+def test_flash_sends_front_and_back_without_treating_pixels_as_text_tokens() -> None:
+    images = [ticket_image(), ticket_image("PNG")]
+    transport = Transport()
+    result, usage = DeepSeekLlmClient(config(), "offline-key", transport=transport).complete_json(
+        SYSTEM, USER, SCHEMA, images=images, max_cost_cents=25
+    )
+    assert result == {"ok": True}
+    assert usage.cost_cents > 0
+    (payload,) = transport.payloads
+    messages = cast(list[dict[str, object]], payload["messages"])
+    assert messages[1]["content"] == [
+        {"type": "text", "text": USER},
+        *[
+            {"type": "image_url", "image_url": {"url": img.data_url(), "detail": "original"}}
+            for img in images
+        ],
+    ]
+    bounded_input = input_bound() + 2 * MIN_TOKENS_PER_IMAGE
+    sent_output = cast(int, payload["max_tokens"])
+    assert worst_case_cents(config(), bounded_input, sent_output) <= 25
+    assert payload["model"] == "deepseek-flash"
+
+
+def test_v4_pro_refuses_images_without_switching_models() -> None:
+    transport = Transport()
+    client = DeepSeekLlmClient(config("deepseek-v4-pro"), "offline-key", transport=transport)
+    with pytest.raises(ValueError, match="require deepseek-flash"):
+        client.complete_json("s", "u", {}, images=[ticket_image()])
+    assert transport.payloads == []
+
+
+@pytest.mark.parametrize(
+    ("media_type", "data"),
+    [
+        ("image/png", "AAAA"),
+        ("image/jpeg", ""),
+        ("image/png", "%%%"),
+        ("application/pdf", "JVBERi0xLjQ="),
+    ],
+)
+def test_flash_rejects_invalid_media_before_transport(media_type: str, data: str) -> None:
+    transport = Transport()
+    client = DeepSeekLlmClient(config(), "offline-key", transport=transport)
+    with pytest.raises(UnboundableRequestError):
+        client.complete_json("s", "u", {}, images=[ImageAttachment(media_type, data)])
+    assert transport.payloads == []
+
+
+def test_flash_rejects_mislabeled_and_oversized_images_before_transport() -> None:
+    png = ticket_image("PNG")
+    for img in [ImageAttachment("image/jpeg", png.data_base64), ticket_image(size=(8001, 1))]:
+        transport = Transport()
+        with pytest.raises(UnboundableRequestError):
+            DeepSeekLlmClient(config(), "offline-key", transport=transport).complete_json(
+                "s", "u", {}, images=[img]
+            )
+        assert transport.payloads == []
+
+
+def test_flash_image_budget_refuses_before_transport() -> None:
+    transport = Transport()
+    with pytest.raises(LlmBudgetExceeded):
+        DeepSeekLlmClient(config(), "offline-key", transport=transport).complete_json(
+            "s", "u", {}, images=[ticket_image()], max_cost_cents=0
+        )
+    assert transport.payloads == []
+
+
+def test_flash_image_count_and_request_size_refuse_before_transport(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import parkingbreaker.llm_deepseek as adapter
 
     transport = Transport()
     client = DeepSeekLlmClient(config(), "offline-key", transport=transport)
-    img = ImageAttachment(media_type="image/png", data_base64="AAAA")
-    with pytest.raises(ValueError, match="does not support image attachments"):
+    img = ticket_image()
+    with pytest.raises(UnboundableRequestError, match="too many"):
+        client.complete_json("s", "u", {}, images=[img] * 601)
+    monkeypatch.setattr(adapter, "MAX_REQUEST_BYTES", 100)
+    with pytest.raises(UnboundableRequestError, match="body size"):
         client.complete_json("s", "u", {}, images=[img])
     assert transport.payloads == []
 

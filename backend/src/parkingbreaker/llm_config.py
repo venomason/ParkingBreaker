@@ -22,7 +22,8 @@ from parkingbreaker.llm_openai import OpenAiLlmClient
 from parkingbreaker.oplog.ai_journal import AiWorker
 from parkingbreaker.provider_credentials import valid_header_credential
 
-DEFAULT_INTAKE_PRESET = "gemini-3.8-flash"
+DEFAULT_INTAKE_PRESET = "deepseek-flash"
+DEFAULT_PACKET_CHECK_PRESET = "gemini-3.8-flash"
 DEFAULT_RESEARCH_PRESET = "deepseek-v4-pro"
 DEFAULT_DRAFTING_PRESET = "deepseek-flash"
 
@@ -32,7 +33,7 @@ def resolve_role_preset(worker: AiWorker, environ: Mapping[str, str]) -> str:
 
     If PB_LLM_PRESET is set, it serves as the uniform preset for backward compatibility.
     Otherwise, role-specific environment variables or defaults apply:
-    - INTAKE_READING: PB_LLM_INTAKE_PRESET or gemini-3.8-flash
+    - INTAKE_READING: PB_LLM_INTAKE_PRESET or deepseek-flash (V4.1 Flash)
     - RESEARCH: PB_LLM_RESEARCH_PRESET or deepseek-v4-pro
     - DRAFTING: PB_LLM_DRAFTING_PRESET or deepseek-flash
     - PACKET_CHECK: PB_LLM_PACKET_CHECK_PRESET or gemini-3.8-flash
@@ -46,7 +47,7 @@ def resolve_role_preset(worker: AiWorker, environ: Mapping[str, str]) -> str:
     if worker is AiWorker.DRAFTING:
         return environ.get("PB_LLM_DRAFTING_PRESET", DEFAULT_DRAFTING_PRESET)
     if worker is AiWorker.PACKET_CHECK:
-        return environ.get("PB_LLM_PACKET_CHECK_PRESET", DEFAULT_INTAKE_PRESET)
+        return environ.get("PB_LLM_PACKET_CHECK_PRESET", DEFAULT_PACKET_CHECK_PRESET)
     return environ.get("PB_LLM_PRESET", "minimax-m3.1")
 
 

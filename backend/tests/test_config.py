@@ -471,7 +471,6 @@ def test_role_routing_composes_dedicated_providers(
     values.update(
         {
             "PB_LLM_ROLE_ROUTING": "1",
-            "GEMINI_API_KEY": "test-gemini-key",
             "DEEPSEEK_API_KEY": "test-deepseek-key",
         }
     )
@@ -499,7 +498,7 @@ def test_role_routing_composes_dedicated_providers(
     assert services is not None
     # Customer-authored drafting composes no drafting provider: only the reading and
     # research roles route to a model now.
-    assert seen_presets == ["gemini-3.8-flash", "deepseek-v4-pro"]
+    assert seen_presets == ["deepseek-flash", "deepseek-v4-pro"]
     from parkingbreaker.appeal.drafting import CustomerTextDrafter
     from parkingbreaker.case_service import CaseService
 

@@ -8,6 +8,7 @@ Customer text is neutralized to prevent delimiter breakouts.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
 from typing import Protocol, cast
 
@@ -23,8 +24,11 @@ from parkingbreaker.llm import (
     schema_json,
 )
 from parkingbreaker.llm_input_budget import (
+    MIN_TOKENS_PER_IMAGE,
     SCHEMA_INSTRUCTION,
+    UnboundableRequestError,
     ensure_request_fits_context,
+    image_attachment_tokens,
     text_request_tokens,
 )
 from parkingbreaker.llm_models import (
@@ -38,6 +42,12 @@ from parkingbreaker.llm_models import (
 from parkingbreaker.provider_credentials import valid_header_credential
 
 MAX_TEXT_BYTES = 1_048_576
+# https://api-docs.deepseek.com/guides/vision/ (checked 2026-11-15).
+# Flash V4.1 documents at most 1024 tokens per image; reserve 8192 including
+# framing allowance. This is an offline allocation, not live qualification.
+MAX_INLINE_IMAGES = 600
+MAX_INLINE_IMAGE_BASE64_CHARS = 4 * ((32 * 1024 * 1024) // 3)
+MAX_REQUEST_BYTES = 48 * 1024 * 1024
 
 
 class ChatTransport(Protocol):
@@ -153,23 +163,53 @@ class DeepSeekLlmClient:
         max_cost_cents: int | None = None,
         images: Sequence[ImageAttachment] | None = None,
     ) -> tuple[JsonValue, Usage]:
-        if images:
-            raise ValueError("DeepSeek client does not support image attachments; use Gemini")
+        if images and self._config.model_id != "deepseek-flash":
+            raise ValueError("DeepSeek image attachments require deepseek-flash")
         schema_text = schema_json(schema)
         input_tokens = text_request_tokens(system, user, schema_text)
+        if images:
+            if len(images) > MAX_INLINE_IMAGES:
+                raise UnboundableRequestError("too many DeepSeek image attachments")
+            for image in images:
+                if not isinstance(image, ImageAttachment):
+                    raise UnboundableRequestError("invalid DeepSeek image attachment")
+                if not isinstance(image.data_base64, str) or (
+                    len(image.data_base64) > MAX_INLINE_IMAGE_BASE64_CHARS
+                ):
+                    raise UnboundableRequestError("DeepSeek inline image exceeds the size limit")
+            if sum(len(image.data_base64) for image in images) > MAX_REQUEST_BYTES:
+                raise UnboundableRequestError("DeepSeek request exceeds the inline body size limit")
+            # Reuse structural JPEG/PNG validation, but not the generic pixel/byte
+            # token estimate: Flash resizes images into a bounded visual token set.
+            image_attachment_tokens(images)
+            input_tokens += len(images) * MIN_TOKENS_PER_IMAGE
         output_tokens = request_output_tokens(self._config, input_tokens, max_cost_cents)
         ensure_request_fits_context(input_tokens, output_tokens, DEEPSEEK_CONTEXT_TOKENS)
         instructions = SCHEMA_INSTRUCTION + schema_text
+        user_content: object = neutralise(user)
+        if images:
+            user_content = [
+                {"type": "text", "text": neutralise(user)},
+                *[
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": image.data_url(), "detail": "original"},
+                    }
+                    for image in images
+                ],
+            ]
         payload: dict[str, object] = {
             "model": self._config.model_id,
             "messages": [
                 {"role": "system", "content": system + "\n" + instructions},
-                {"role": "user", "content": neutralise(user)},
+                {"role": "user", "content": user_content},
             ],
             "response_format": {"type": "json_object"},
-            "max_completion_tokens": output_tokens,
+            "max_tokens": output_tokens,
             "stream": False,
         }
+        if len(json.dumps(payload, ensure_ascii=True).encode("utf-8")) > MAX_REQUEST_BYTES:
+            raise UnboundableRequestError("DeepSeek request exceeds the inline body size limit")
         try:
             response = self._transport.create(payload)
         except openai.APIError as exc:

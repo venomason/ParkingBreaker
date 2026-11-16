@@ -1,0 +1,53 @@
+{
+  "as_of": "2026-11-16T07:07:08.835619+00:00",
+  "application_commit": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+  "application_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c",
+  "device": {
+    "model": "revoview A56",
+    "android": "13",
+    "chrome": "157.0.8103.78",
+    "viewport": {
+      "width": 384,
+      "height": 640,
+      "horizontalOverflow": false
+    }
+  },
+  "passed": true,
+  "provider_mode": "fake",
+  "native_front": [
+    {
+      "name": "A-skew-shadow.png",
+      "type": "image/png",
+      "size": 2900140
+    }
+  ],
+  "native_back": [
+    {
+      "name": "back.png",
+      "type": "image/png",
+      "size": 12910
+    }
+  ],
+  "checks": {
+    "picker_cancel": true,
+    "missing_facts_block_confirmation": true,
+    "reload_preserves_exact_photo_fact_binding": true,
+    "fact_edit_invalidates_confirmation": true,
+    "invalid_file_recovery": true,
+    "connection_failure_refuses_and_recovers": true,
+    "background_return_no_duplicate_upload": true
+  },
+  "page_errors": [],
+  "charge_or_dispatch_requests": 0,
+  "evidence_sha256": "d6ba69ccd50a713451fa34cc3d6d601df2fafb734bfbf0bf4a82fe321d160a92",
+  "evidence_path": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-controlled-beta-20261115/android-ready-065047/smoke-result.json",
+  "limitations": [
+    "Providers are fake; no real OCR inference or quality claim",
+    "Invalid-file and connection-error inputs were injected via CDP on actual Android Chrome",
+    "Native Files selection tested; camera capture, physical rotation and actual library selection remain open",
+    "USB localhost adapter does not qualify production origin/TLS/DNS security",
+    "iPhone remains untested"
+  ],
+  "deployment_performed": false,
+  "real_ocr_calls": 0
+}

@@ -310,7 +310,8 @@ def test_resolve_role_preset() -> None:
 
     # Default role routing:
     env_empty: dict[str, str] = {}
-    assert llm_config.resolve_role_preset(AiWorker.INTAKE_READING, env_empty) == "gemini-3.8-flash"
+    assert llm_config.resolve_role_preset(AiWorker.INTAKE_READING, env_empty) == "deepseek-flash"
+    assert llm_config.resolve_role_preset(AiWorker.PACKET_CHECK, env_empty) == "gemini-3.8-flash"
     assert llm_config.resolve_role_preset(AiWorker.RESEARCH, env_empty) == "deepseek-v4-pro"
     assert llm_config.resolve_role_preset(AiWorker.DRAFTING, env_empty) == "deepseek-flash"
 

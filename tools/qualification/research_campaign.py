@@ -13,7 +13,7 @@ from parkingbreaker.bench.runner import run_case
 from parkingbreaker.dotgov_source import load_dotgov_snapshot
 from parkingbreaker.llm import Usage,LlmBudgetExceeded
 from parkingbreaker.research import extractor,issuer_assessment,link_assessment
-PROFILE={'intake':'gemini-3.8-flash','research':'deepseek-v4-pro','search':'brave','max_output_tokens':8192,'response_format':'json_object','stream':False,'sdk_retries':0,'thinking':'not explicitly sent; provider default, not a pinned reasoning mode','text_only':True,'maximum_intake_calls_per_run':7,'maximum_research_calls_per_run':3,'maximum_search_calls_per_run':6}
+PROFILE={'intake':'deepseek-flash','research':'deepseek-v4-pro','search':'brave','max_output_tokens':8192,'response_format':'json_object','stream':False,'sdk_retries':0,'thinking':'not explicitly sent; provider default, not a pinned reasoning mode','text_only':True,'maximum_intake_calls_per_run':7,'maximum_research_calls_per_run':3,'maximum_search_calls_per_run':6}
 class RoutedClient:
  def __init__(self,intake,research,ledger=None):
   self.intake=intake;self.research=research;self.ledger=ledger
@@ -96,7 +96,7 @@ def main():
  if not Decimal(0)<a.cap_usd<=Decimal(62):raise RuntimeError('Campaign cap must be at most the proposed 62 USD; exact authority still required')
  if a.out.exists():raise RuntimeError('Use a fresh campaign directory; never resume an uncertain paid run automatically')
  a.out.mkdir(parents=True)
- (a.out/'role-profile.json').write_text(json.dumps({'profile':PROFILE,'cases_sha256':hashlib.sha256(a.cases.read_bytes()).hexdigest(),'snapshot_sha256':hashlib.sha256(a.snapshot.read_bytes()).hexdigest(),'scope':'research-only production seams; does not bypass intake-age, image review, packet approval or provider/target qualification','report_preset_label':'deepseek-v4-pro labels research model; issuer/delegation calls use Gemini as recorded here'},indent=2)+'\n')
+ (a.out/'role-profile.json').write_text(json.dumps({'profile':PROFILE,'cases_sha256':hashlib.sha256(a.cases.read_bytes()).hexdigest(),'snapshot_sha256':hashlib.sha256(a.snapshot.read_bytes()).hexdigest(),'scope':'research-only production seams; does not bypass intake-age, image review, packet approval or provider/target qualification','report_preset_label':'deepseek-v4-pro labels research model; issuer/delegation calls use DeepSeek Flash as recorded here'},indent=2)+'\n')
  private=qualify_private_scope(next(r for r in rows if r.case_id=='S05'))
  (a.out/'private-scope.json').write_text(json.dumps(private,indent=2)+'\n')
  result=run_bench(preset='deepseek-v4-pro',cases=a.cases,case_ids=[r.case_id for r in rows if r.case_id!='S05'],repeat=3,out=a.out,cap_usd=a.cap_usd,search='brave',snapshot=a.snapshot,execute=process)

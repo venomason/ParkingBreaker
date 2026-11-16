@@ -328,7 +328,7 @@ def build_services(
     required_ticket_reading = ticket_reading_required(settings.mode, settings.values)
 
     if settings.mode is not ProviderMode.FAKE:
-        # The role-routed intake client is the real Gemini image client in production
+        # The role-routed intake client is the configured image client in production
         # role mode; it is wrapped per subject below with the existing intake cap.
         vision_llm = cast(MultimodalLlmClient, intake_llm)
         vision_preset = intake_preset

@@ -1,0 +1,136 @@
+{
+  "as_of": "2026-11-16T13:13:47.747840+00:00",
+  "repository": "https://github.com/venomason/ParkingBreaker",
+  "publication_target": "main",
+  "parent_commit": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+  "application_fingerprint": "20eed44a059e83b616bb741741c669f5e4cb08c462992fe3318b89c0e9cd8df4",
+  "source_binding": {
+    "scope": [
+      "backend/**",
+      "tools/qualification/**",
+      "Makefile",
+      ".env.example"
+    ],
+    "tracked_files": 549,
+    "manifest_sha256": "501185b9596be276ff4db00e1a61bb57418ee2bca52af2874f46412e3f9382f5",
+    "encoding": "SHA-256 of compact sort_keys JSON [{path,sha256}] sorted by path, using UTF-8"
+  },
+  "commit_binding": "This receipt is included in the signed publication commit; the local publication receipt records its SHA and remote verification.",
+  "checks": {
+    "backend-tests": {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "--offline",
+        "--no-sync",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "seconds": 568.49,
+      "log_sha256": "41d4ce3bf667e84483d284720355e20735ad3cc256dd979697f09b0f4bacbc93"
+    },
+    "ruff-lint": {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "--offline",
+        "--no-sync",
+        "ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 0.03,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "ruff-format": {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "--offline",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 0.03,
+      "log_sha256": "2cb8fa95e0dfe8e876de7a1500272f55f26ead8573102c2d73f88a0b2ef9d3c1"
+    },
+    "mypy": {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "--offline",
+        "--no-sync",
+        "mypy"
+      ],
+      "exit_code": 0,
+      "seconds": 3.33,
+      "log_sha256": "a728079fcae0ffaf45406a239fada3cd6def99769fad96d053259b592d5d10e2"
+    },
+    "research-self-test": {
+      "command": [
+        "uv",
+        "run",
+        "--project",
+        "backend",
+        "--frozen",
+        "--offline",
+        "--no-sync",
+        "python",
+        "tools/qualification/research_campaign.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "seconds": 1.65,
+      "log_sha256": "08eee7924298df9232a8ae703d06d236f75883fabd857fd0e6c3ff89a31d2b8f"
+    },
+    "vision-self-test": {
+      "command": [
+        "uv",
+        "run",
+        "--project",
+        "backend",
+        "--frozen",
+        "--offline",
+        "--no-sync",
+        "python",
+        "tools/qualification/vision_campaign.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "seconds": 0.42,
+      "log_sha256": "bf1e48f6d01489b7ae3fbc97d010671a9a25bb7aa8f239f5d0913b7b7b7e3df9"
+    }
+  },
+  "backend_summary": {
+    "passed": 13643,
+    "failed": 0,
+    "warnings": 1,
+    "warning": "Dependency deprecation: Starlette references anyio.abc.BlockingPortal."
+  },
+  "credentials_removed_from_test_environment": true,
+  "paid_provider_calls": 0,
+  "frontend_and_deployment_files_changed": false,
+  "live_beta_decision": "NO_GO",
+  "latest_prompts_live_qualified": false,
+  "historical_live_receipt": "deepseek-corrected-live-2026-11-16.json",
+  "exclusions": [
+    "credentials and local environment files",
+    "databases and dependencies",
+    "private Ops evidence and UI captures",
+    "phone camera image",
+    "six original synthetic images and separate answer key",
+    "legacy backups"
+  ],
+  "deployment": false,
+  "customer_charge_or_mail": false
+}

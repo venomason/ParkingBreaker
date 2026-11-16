@@ -1,0 +1,100 @@
+{
+  "as_of": "2026-11-16T10:40:10.182286+00:00",
+  "decision": "NO_GO_LIVE_BETA",
+  "current_branch": "beta/controlled-readiness-2026-11-15",
+  "current_head": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+  "current_application_fingerprint": "20eed44a059e83b616bb741741c669f5e4cb08c462992fe3318b89c0e9cd8df4",
+  "latest_live_test_fingerprint": "2f881ba92a1e182cb573a380c5d6727d36707c9ff6d330cac7842100e0314bea",
+  "local_head_signature_valid": true,
+  "first_trial": {
+    "calls": 3,
+    "reserved_cents": 15,
+    "local_usage_estimate_cents": 3,
+    "source_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c",
+    "receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/live-six-074814/result.json"
+  },
+  "corrected_trial": {
+    "calls": 12,
+    "reserved_cents": 36,
+    "local_usage_estimate_cents": 12,
+    "all_12_unique_planned_calls_completed": true,
+    "failed_request_retried": false,
+    "strict_qualification_passed": false,
+    "case_results": [
+      {
+        "case": "A",
+        "extraction": [],
+        "comparison": []
+      },
+      {
+        "case": "B",
+        "extraction": [],
+        "comparison": []
+      },
+      {
+        "case": "C",
+        "extraction": [
+          "reader_refused"
+        ],
+        "comparison": []
+      },
+      {
+        "case": "D",
+        "extraction": [
+          "reader_refused"
+        ],
+        "comparison": [
+          "comparison_license_plate"
+        ]
+      },
+      {
+        "case": "E",
+        "extraction": [],
+        "comparison": []
+      },
+      {
+        "case": "F",
+        "extraction": [],
+        "comparison": [
+          "comparison_citation_number"
+        ]
+      }
+    ],
+    "receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/live-six-v2-101513/combined-diagnostic-result.json",
+    "receipt_sha256": "042c886492dbf3479ed59efe7a208b074cfb0be5e6b3f5fea908a53ee9ca63fd",
+    "continuation": "After reviewing the initial safe refusal on C, only the seven unrun frozen requests were executed; the failed C extraction and its failed strict score were retained unchanged."
+  },
+  "spending": {
+    "unique_calls_total": 15,
+    "combined_reservations_cents": 51,
+    "combined_local_usage_estimate_cents": 15,
+    "cost_caveat": "Upward-rounded application estimates from reported tokens at peak snapshot, not a provider invoice or an inferred balance debit",
+    "latest_balance_check_http": 200,
+    "account_remains_funded": true,
+    "actual_balance_kept_only_in_private_Ops_receipt": true
+  },
+  "production_scope": {
+    "verified": "TicketFactBinding.review_fields returns only non-null literal fields; adopted-only values never enter that payload. Replayed actual F extraction verifies its unreadable citation is omitted.",
+    "diagnostic_limit": "The qualification harness called TicketVisionReader directly with synthetic assertions. C/D comparisons after extraction refusal and F unknown-citation comparison are stress probes, not normal full-coordinator requests.",
+    "no_evidence_of_production_fact_adoption": "No payment, dispatch, or customer submission occurred; API/confirmation boundaries were separately tested with fake providers.",
+    "scope_replay": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/production-review-scope-replay.json"
+  },
+  "new_local_changes": {
+    "source": "backend/src/parkingbreaker/ticket_vision.py",
+    "serialization": "Instruct a single visible line; join printed wraps with one space without changing other characters. Existing strict parser still rejects control characters.",
+    "uncertainty": "Whole field remains unreadable/null if any character is missing or ambiguous; do not join fragments or infer from customer assertions/patterns.",
+    "offline_validation": "141 focused tests plus Ruff lint/format and mypy pass; captured D/F boundary replays pass",
+    "new_live_validation": "NOT RUN"
+  },
+  "interpretation": {
+    "A_B_E": "Both operations pass on the v2 tested source.",
+    "C": "Extraction response refused by strict reader; original raw response was not saved, so exact cause is unknown. Independent comparison diagnostic correctly marks the plate unreadable.",
+    "D": "Extraction raw issuer text contains a newline, causing strict refusal. Comparison reads DEM0926 while the owner key says DEMO926; keep the discrepancy unresolved.",
+    "F": "Extraction correctly returns citation unreadable/null. Extra diagnostic comparison produces partial TH-48271 as a conflict. That field would be omitted by normal production review; do not present this as demonstrated production auto-adoption."
+  },
+  "next_step": "Gemini CARBON should review the real coordinator/binding path and qualification criteria before further paid prompt trials. The prepared C/F-only v3 probe plan remains unapproved and should not run unchanged as a production qualification.",
+  "deployment": false,
+  "customer_charges": false,
+  "mail": false,
+  "new_commits_or_pushes": false
+}

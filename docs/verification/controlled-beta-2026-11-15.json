@@ -1,0 +1,121 @@
+{
+  "as_of": "2026-11-16T01:54:07.695293+00:00",
+  "classification": "VERIFIED except explicitly unqualified gates",
+  "decision": "NO_GO_LIVE_BETA",
+  "repository": "https://github.com/venomason/ParkingBreaker",
+  "application_commit": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+  "github_main_observed": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+  "preparation_branch": "beta/controlled-readiness-2026-11-15",
+  "preparation_committed": false,
+  "application_fingerprint": "05bade16c9f8408ea2d64602245ba9a658ff974d52076064d5687c0e318daacf",
+  "application_changed": false,
+  "checks": [
+    {
+      "name": "focused_operations",
+      "passed": 272,
+      "receipt": "focused-operations.json",
+      "receipt_sha256": "2b9aa49136c2e37b20450ec0aacc1310250d20e870ad2ea604686f105f97c672"
+    },
+    {
+      "name": "delivery_and_intake_stop",
+      "passed": 186,
+      "receipt": "delivery-stop.json",
+      "receipt_sha256": "01c03268e81b4bcab79efa9f7bd0903444066eeed67b22e12a4731e9c486e928"
+    },
+    {
+      "name": "chromium_mobile_synthetic",
+      "passed": 49,
+      "receipt": "browser-mobile/rehearsal.json",
+      "receipt_sha256": "ab37faeb9cd7b2918a4de230ea10fc414cec2d203d091b822f6fa3f271beb28a"
+    },
+    {
+      "name": "quarantined_recovery",
+      "passed": true,
+      "receipt": "recovery-rehearsal/rehearsal-report.json",
+      "receipt_sha256": "9dc5c36df8816bc2b2fd68669b197f4a0ef38b2256fccffc0c53b45a2ef5c521"
+    },
+    {
+      "name": "example_configuration",
+      "passed": true,
+      "receipt": "configuration-check.json",
+      "receipt_sha256": "9d0342276b2af917327062ea3a4d3fcf4abf793ca8b69e03c5daf39a0575da85"
+    },
+    {
+      "name": "private_scope",
+      "passed": true,
+      "receipt": "private-scope-check.json",
+      "receipt_sha256": "0f2a0542311df686ed1bdffaae12b41bc76c9d1cd9188a040fb02850a08fc750"
+    }
+  ],
+  "prior_full_validation_receipt_hashes_verified": true,
+  "provider_checks": [
+    {
+      "provider": "gemini",
+      "method": "GET",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models",
+      "at": "2026-11-16T01:44:42.866379+00:00",
+      "generation_or_search_called": false,
+      "http_status": 200,
+      "model_count": 50,
+      "configured_models_available": {
+        "gemini-3.8-flash": true,
+        "gemini-3.5-flash-lite": true
+      }
+    },
+    {
+      "provider": "deepseek",
+      "method": "GET",
+      "endpoint": "https://api.deepseek.com/models",
+      "at": "2026-11-16T01:44:51.949877+00:00",
+      "generation_or_search_called": false,
+      "http_status": 401
+    },
+    {
+      "provider": "deepseek_balance",
+      "method": "GET",
+      "endpoint": "https://api.deepseek.com/user/balance",
+      "at": "2026-11-16T01:44:52.846506+00:00",
+      "generation_or_search_called": false,
+      "http_status": 401
+    },
+    {
+      "provider": "brave",
+      "status": "missing_runtime_credential",
+      "search_called": false
+    }
+  ],
+  "benchmark": {
+    "rows": 23,
+    "unsigned": 23,
+    "saved_quotes_verified": 109,
+    "no_live_adjudication": true
+  },
+  "cloud": {
+    "backend_compute_vms": 0,
+    "persistent_disks": 0,
+    "existing_service_revision": "parkingbreaker-frontend-ui-1109-copy",
+    "existing_service_phase": "paid",
+    "existing_provider_mode": "fake",
+    "production_qualification": false
+  },
+  "devices": {
+    "iphone": "NOT_RUN",
+    "android": "NOT_RUN",
+    "browser_viewport_is_not_physical_device": true
+  },
+  "external_mutations": {
+    "push": false,
+    "deploy": false,
+    "account_security_changes": false,
+    "provider_generation_or_search": false,
+    "charges": false,
+    "mail_or_notifications": false
+  },
+  "limitations": [
+    "Provider metadata does not establish funding or generation quality",
+    "No target recovery, ingress stop, physical print, delivered notification or human support coverage qualified",
+    "23 signatures remain absent and unknown facts remain unknown",
+    "Application code unchanged; local public example and operational documentation await review",
+    "Shell/desktop/Playwright usable; browser connector host unavailable"
+  ]
+}

@@ -1,0 +1,235 @@
+{
+  "as_of": "2026-11-16T08:06:40.922206+00:00",
+  "decision": "NO_GO_LIVE_BETA",
+  "repository": "https://github.com/venomason/ParkingBreaker",
+  "github": {
+    "visibility": "public",
+    "main": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+    "signature_present": true,
+    "signature_verified_by_github": false,
+    "signature_reason": "unknown_key",
+    "signature_verified_locally": true
+  },
+  "local": {
+    "branch": "beta/controlled-readiness-2026-11-15",
+    "head": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+    "application_fingerprint": "20eed44a059e83b616bb741741c669f5e4cb08c462992fe3318b89c0e9cd8df4",
+    "uncommitted_changes": true,
+    "new_commit_created": false,
+    "new_push_performed": false
+  },
+  "change": {
+    "selected_model": "DeepSeek V4.1 Flash",
+    "api_model": "deepseek-flash",
+    "roles_changed": [
+      "intake reading, including shared issuer/link assessment client"
+    ],
+    "vision": "inline validated JPEG/PNG, original detail, no remote image URLs",
+    "request_output_parameter": "max_tokens",
+    "single_attempt": true,
+    "automatic_fallback": false,
+    "packet_check_default": "gemini-3.8-flash (unchanged, not constructed by current customer-authored service)",
+    "research_default": "deepseek-v4-pro (unchanged)",
+    "qualification_profile_updated": true,
+    "fixture_repair": "Test-only source URL loader reads existing reviewed committed dossier instead of absent mutable JSONL logs"
+  },
+  "checks": [
+    {
+      "name": "full_backend",
+      "result": "13642 passed, 1 failed: uncommitted capture-index dependency in test fixture loader",
+      "local_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/make-check-final.log",
+      "sha256": "07757ff2287ccb5cbd1efec463a9945c67777c7fa77f274bd54d6ec86dfa2c6d",
+      "application_fingerprint": "e8901c43a404847c71fc452e17c67be50a5fc81731cd000a66535e41152b48a0"
+    },
+    {
+      "name": "focused_after_fixture_repair",
+      "result": "301 passed",
+      "local_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/focused-final.log",
+      "sha256": "c3e73faf82f2ce6fd2d755db940d3dcda76eb40e9ee445a4641e3d0dd0ebba57",
+      "application_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c"
+    },
+    {
+      "name": "strict_types_final",
+      "result": "476 source files pass",
+      "local_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/mypy-final.log",
+      "sha256": "a728079fcae0ffaf45406a239fada3cd6def99769fad96d053259b592d5d10e2",
+      "application_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c"
+    },
+    {
+      "name": "adapter_fixture_campaign",
+      "result": "16 scenarios, 32 fake transport calls pass",
+      "local_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/adapter-fixtures-result.json",
+      "sha256": "046db8a438710e4589d3ed5ef4754a4e5dbbcdc2a5476461e70966044f04c0a1",
+      "application_fingerprint": "e8901c43a404847c71fc452e17c67be50a5fc81731cd000a66535e41152b48a0"
+    },
+    {
+      "name": "sdk_wire",
+      "result": "2 SDK serialized mock HTTP requests pass",
+      "local_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/sdk-wire-result.json",
+      "sha256": "1b7c1b284186bda44ef8bee5b922526e553f4f64495d0973a4d3da84ea928719",
+      "application_fingerprint": "e8901c43a404847c71fc452e17c67be50a5fc81731cd000a66535e41152b48a0"
+    }
+  ],
+  "validation_limits": [
+    "Complete backend run had one fixture-loader failure; only that test helper then changed; the 301 focused tests including the repaired hunter/wiring suite passed",
+    "Full backend suite was not rerun after the test-only helper repair",
+    "No frontend application source changed; previous frontend validation applies to those unchanged bytes",
+    "All DeepSeek adapter checks used mock responses; OCR accuracy is unqualified"
+  ],
+  "provider_auth_retry": {
+    "requested_retry": true,
+    "results": [
+      {
+        "at": "2026-11-16T06:07:48.996710+00:00",
+        "credential_reference": "process DEEPSEEK_API_KEY",
+        "request": "GET https://api.deepseek.com/models",
+        "inference_called": false,
+        "http_status": 401
+      }
+    ],
+    "credentials_printed": false,
+    "paid_calls": 0
+  },
+  "android": {
+    "device": "revoview A56",
+    "android": "13",
+    "chrome": "157.0.8103.78",
+    "application_commit": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+    "application_fingerprint": "05bade16c9f8408ea2d64602245ba9a658ff974d52076064d5687c0e318daacf",
+    "passed": [
+      "native Files JPEG and PNG upload",
+      "photo picker cancel",
+      "missing facts block confirmation",
+      "correction and confirmation",
+      "reload exact binding",
+      "changed fact invalidates confirmation",
+      "injected upload failure and recovery",
+      "background and return preserves incomplete facts without duplicate upload"
+    ],
+    "remaining": [
+      "native camera capture",
+      "library selection of known synthetic file",
+      "physical rotation",
+      "actual iPhone Safari qualification"
+    ],
+    "providers": "fake",
+    "production_origin_security_qualified": false,
+    "owned_test_services_stopped": true,
+    "owned_usb_mappings_removed": true
+  },
+  "owner_damaged_image": {
+    "review": "Visual only; readable baseline recorded; complete plate, time and street location remain uncertain",
+    "original_attachment_processed_by_deepseek": false,
+    "manual_partial_entry_blocked_confirmation": true,
+    "credential_or_payment_data": false
+  },
+  "remaining_gates": [
+    {
+      "gate": "DeepSeek real image qualification",
+      "next_action": "Gemini CARBON reviews real binding/coordinator and correction path before a new finite production-aligned qualification; no extra paid run approved"
+    },
+    {
+      "gate": "Brave",
+      "next_action": "Identify approved secure runtime credential and limits"
+    },
+    {
+      "gate": "23 unsigned research fixtures",
+      "next_action": "Owner reviews retained uncertainties; do not turn unknown facts into signed assertions"
+    },
+    {
+      "gate": "Target security, recovery, intake stop",
+      "next_action": "Finalize named target and cost proposal, then obtain exact provisioning/drill approval"
+    },
+    {
+      "gate": "Printing and notifications",
+      "next_action": "Prepare named test-account proof and operator-alert approval; no mail or message authorized"
+    },
+    {
+      "gate": "Human support",
+      "next_action": "Name primary, backup, hours and acknowledgement target"
+    },
+    {
+      "gate": "Physical devices",
+      "next_action": "Actual Android camera/gallery/upload/reload passed; finish physical landscape rotation and iPhone/Safari checks"
+    },
+    {
+      "gate": "Publication",
+      "next_action": "Review exact local delta and authorize new signed commit/push; main currently remains the previously approved commit"
+    }
+  ],
+  "deployment_performed": false,
+  "paid_inference_calls": 15,
+  "customer_charges": 0,
+  "mail_sent": 0,
+  "provider_authentication_current": {
+    "models_http": 200,
+    "balance_http": 200,
+    "deepseek_flash_available": true,
+    "funding_available": true,
+    "credential_reference": "Owner-supplied local file; private reference retained in Ops, no key copied to Git"
+  },
+  "android_current_source_smoke": {
+    "as_of": "2026-11-16T07:07:08.835619+00:00",
+    "application_commit": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+    "application_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c",
+    "device": {
+      "model": "revoview A56",
+      "android": "13",
+      "chrome": "157.0.8103.78",
+      "viewport": {
+        "width": 384,
+        "height": 640,
+        "horizontalOverflow": false
+      }
+    },
+    "passed": true,
+    "provider_mode": "fake",
+    "native_front": [
+      {
+        "name": "A-skew-shadow.png",
+        "type": "image/png",
+        "size": 2900140
+      }
+    ],
+    "native_back": [
+      {
+        "name": "back.png",
+        "type": "image/png",
+        "size": 12910
+      }
+    ],
+    "checks": {
+      "picker_cancel": true,
+      "missing_facts_block_confirmation": true,
+      "reload_preserves_exact_photo_fact_binding": true,
+      "fact_edit_invalidates_confirmation": true,
+      "invalid_file_recovery": true,
+      "connection_failure_refuses_and_recovers": true,
+      "background_return_no_duplicate_upload": true
+    },
+    "page_errors": [],
+    "charge_or_dispatch_requests": 0,
+    "evidence_sha256": "d6ba69ccd50a713451fa34cc3d6d601df2fafb734bfbf0bf4a82fe321d160a92",
+    "evidence_path": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-controlled-beta-20261115/android-ready-065047/smoke-result.json",
+    "limitations": [
+      "Providers are fake; no real OCR inference or quality claim",
+      "Invalid-file and connection-error inputs were injected via CDP on actual Android Chrome",
+      "Native Files selection tested; camera capture, physical rotation and actual library selection remain open",
+      "USB localhost adapter does not qualify production origin/TLS/DNS security",
+      "iPhone remains untested"
+    ],
+    "deployment_performed": false,
+    "real_ocr_calls": 0
+  },
+  "owner_six_images": {
+    "originals_verified": true,
+    "files": 6,
+    "answer_key_separate": true,
+    "paid_test_plan": "12 calls maximum; five-cent reservation each; $0.60 maximum reservation; no automatic retry; exact owner approval pending",
+    "provider_called": false
+  },
+  "latest_followup": "deepseek-corrected-live-2026-11-16.json",
+  "current_source_fingerprint": "20eed44a059e83b616bb741741c669f5e4cb08c462992fe3318b89c0e9cd8df4",
+  "current_paid_qualification_status": "Two approved envelopes completed, strict component failures retained; production scope reviewed; latest prompt fixes offline-tested only",
+  "latest_camera_status": "Actual capture/gallery/upload/reload passed with pixel equality and privacy metadata rewriting"
+}

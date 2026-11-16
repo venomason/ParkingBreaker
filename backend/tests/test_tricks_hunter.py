@@ -1,7 +1,6 @@
 """The Book of Tricks hunter runs on real saved official pages only, never invented text."""
 
 import ast
-import json
 import re
 from pathlib import Path
 
@@ -16,12 +15,18 @@ CATALOG = parse_catalog((Path(__file__).parents[1] / "data/book_of_tricks.json")
 
 
 def _page(sha: str) -> SavedPage:
-    urls = {}
-    for index in PAGES.glob("*.jsonl"):
-        for line in index.read_text().splitlines():
-            row = json.loads(line)
-            urls[row["sha256"]] = row["final_url"]
-    return SavedPage(urls.get(sha, ""), sha, (PAGES / f"{sha}.txt").read_text(errors="replace"))
+    # The consolidated checkout preserves source bindings in this reviewed dossier;
+    # mutable local capture ledgers are not publication inputs.
+    dossier = ROOT / "docs/bench/deep-city-dossiers-2026-10-27.md"
+    urls = {
+        digest: url
+        for url, digest in re.findall(
+            r"Source: \[saved source URL\]\((https://[^)]+)\)\. "
+            r"Full HTTP-body SHA-256: `([0-9a-f]{64})`",
+            dossier.read_text(),
+        )
+    }
+    return SavedPage(urls[sha], sha, (PAGES / f"{sha}.txt").read_text(errors="replace"))
 
 
 def _flat(text: str) -> str:

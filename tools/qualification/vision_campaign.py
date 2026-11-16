@@ -37,7 +37,7 @@ def generate():
   confirmed=dict(fields)
   if name=='wrong_confirmation':confirmed['citation_number']='PB-SYN-9999'
   cases.append({'id':name,'files':[{'path':f.name,'sha256':digest(f),'media_type':'image/jpeg' if f.suffix=='.jpg' else 'image/png'} for f in files], 'visible_fields':fields,'confirmed_fields':confirmed})
- manifest={'synthetic_only':True,'created_at':datetime.now(UTC).isoformat(),'model':'gemini-3.8-flash','repeats':2,'per_call_cap_cents':25,'maximum_calls':32,'maximum_reserved_cents':800,'cases':cases,'limits':['Synthetic fixtures are not physical phone-camera qualification.','Direct PDF input is unsupported by the ticket reader; official procedure PDFs have a separate existing regression.','Customer confirmation/dispatch durability is covered by local assembled tests; this probe only qualifies real adapter reading/review behavior.']}
+ manifest={'synthetic_only':True,'created_at':datetime.now(UTC).isoformat(),'model':'deepseek-flash','repeats':2,'per_call_cap_cents':25,'maximum_calls':32,'maximum_reserved_cents':800,'cases':cases,'limits':['Synthetic fixtures are not physical phone-camera qualification.','Direct PDF input is unsupported by the ticket reader; official procedure PDFs have a separate existing regression.','Customer confirmation/dispatch durability is covered by local assembled tests; this probe only qualifies real adapter reading/review behavior.']}
  (d/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');return manifest
 
 def evaluate(case,reading,review):
@@ -70,6 +70,7 @@ def main():
  if a.prepare:manifest=generate()
  else:manifest=json.loads((HERE/'vision-data/manifest.json').read_text())
  assert manifest['maximum_reserved_cents']==800 and manifest['repeats']==2 and len(manifest['cases'])==8
+ assert manifest['model']=='deepseek-flash', 'Re-review the campaign before changing its provider'
  for c in manifest['cases']:
   for f in c['files']:assert digest(HERE/'vision-data'/f['path'])==f['sha256']
  if not (a.self_test or a.execute):
@@ -80,7 +81,7 @@ def main():
   # The operator must already have exact chat authorization in a fresh acting stage.
   # A command-line flag or a JSON file is not itself authority.
   from parkingbreaker.llm_config import build_llm_client
-  client=build_llm_client('gemini-3.8-flash',os.environ)
+  client=build_llm_client(manifest['model'],os.environ)
   a.out.mkdir(parents=True,exist_ok=False)
   ledger=(a.out/'calls.jsonl').open('x');results=[];reserved=0
  else:ledger=None;results=[];reserved=0

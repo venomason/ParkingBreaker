@@ -1,0 +1,107 @@
+{
+  "as_of": "2026-11-16T08:04:55.614299+00:00",
+  "decision": "NO_GO_LIVE_BETA",
+  "first_live_trial": {
+    "application_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c",
+    "model": "deepseek-flash",
+    "approved_max_calls": 12,
+    "approved_max_reservation_cents": 60,
+    "calls_attempted": 3,
+    "reserved_cents": 15,
+    "local_accounting_cost_cents": 3,
+    "cost_note": "Conservative application estimate from reported tokens at peak snapshot, rounded upward per call; not a provider billing receipt",
+    "passed": false,
+    "stopped": "Qualification mismatch; stop for supervisor review",
+    "results": [
+      {
+        "case": "A",
+        "operation": "extract",
+        "errors": [],
+        "usage": {
+          "input_tokens": 2121,
+          "output_tokens": 661,
+          "cost_cents": 1
+        }
+      },
+      {
+        "case": "A",
+        "operation": "review",
+        "errors": [],
+        "usage": {
+          "input_tokens": 1846,
+          "output_tokens": 238,
+          "cost_cents": 1
+        }
+      },
+      {
+        "case": "B",
+        "operation": "extract",
+        "errors": [
+          "extraction_issued_city",
+          "extraction_stage_text"
+        ],
+        "usage": {
+          "input_tokens": 2121,
+          "output_tokens": 178,
+          "cost_cents": 1
+        }
+      }
+    ],
+    "actual_bad_fields": {
+      "issued_city": "CITY OF TESTHAVEN",
+      "stage_text": "TEST CASE B"
+    },
+    "recorded_result": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/live-six-074814/result.json",
+    "recorded_result_sha256": "170168996e31756be4ac193267c13b2b05ee8b2c0546ddbfa1c1c5fcb4bcb7c9",
+    "automatic_retries": 0,
+    "answer_key_sent_to_model": false
+  },
+  "corrective_change": {
+    "path": "backend/src/parkingbreaker/ticket_vision.py",
+    "change": "Define explicit place-of-issuance and procedural-stage fields; issuer/plate state and fixture/test labels do not establish those facts; apply the same semantics in fresh comparison",
+    "application_fingerprint": "2f881ba92a1e182cb573a380c5d6727d36707c9ff6d330cac7842100e0314bea",
+    "offline_checks": "131 focused tests pass, Ruff lint/format and mypy pass",
+    "tests_log_sha256": "c5505404d4e198938890f0d7b9bccbcd3b05d1d9a853633a1ddb8c83b656e9a2",
+    "live_retest_performed": false
+  },
+  "physical_camera": {
+    "passed": true,
+    "device": "revoview A56, Android 13, Chrome 157.0.8103.78",
+    "tested_application_fingerprint": "2270ee89f5c9f41502841c27800103e4e599c5d2be5b1471144c1adbaebe0a5c",
+    "physical_capture": true,
+    "native_gallery_selection": true,
+    "upload_http_status": 201,
+    "reload_preserves_upload": true,
+    "dimensions": [
+      1200,
+      1600
+    ],
+    "decoded_pixels_preserved": true,
+    "stored_bytes_match_privacy_filter_output": true,
+    "raw_file_hashes_identical": false,
+    "raw_hash_difference_explained_by": "Photo metadata privacy rewriting; decoded pixels preserved",
+    "receipt_path": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-controlled-beta-20261115/camera-capture-074539/camera-gallery-upload-result.json",
+    "receipt_sha256": "ff9bbdf7bf5a3133062d38532b94ecf8b1d97e4ea7e1a236270b347df574c5d9",
+    "camera_image_sent_to_real_provider": false,
+    "remaining": [
+      "Physical landscape rotation",
+      "Actual iPhone/Safari qualification"
+    ],
+    "source_note": "Subsequent source change only adds OCR prompt field semantics; camera/upload paths remain unchanged"
+  },
+  "revised_live_plan": {
+    "model": "deepseek-flash",
+    "source_fingerprint": "2f881ba92a1e182cb573a380c5d6727d36707c9ff6d330cac7842100e0314bea",
+    "maximum_calls": 12,
+    "per_call_reservation_cents": 3,
+    "maximum_total_reservation_cents": 36,
+    "first_plus_revised_maximum_reservations_cents": 51,
+    "original_images_only": true,
+    "answer_key_grader_only": true,
+    "automatic_retries": 0,
+    "approval": "PENDING: revised requests and a new 12-call run after failed qualification",
+    "path": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-deepseek-vision-20261115/six-case-inference-plan-v2.json",
+    "sha256": "7606809937611f51c7140222cd464918b1754eb6c9be81233596bf0c6d19e31f"
+  },
+  "no_deploy_customer_charge_or_mail": true
+}

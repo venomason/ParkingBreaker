@@ -1,0 +1,97 @@
+{
+  "as_of": "2026-11-16T02:37:59.972Z",
+  "decision": "NO_GO_LIVE_BETA",
+  "source": {
+    "checked_at": "2026-11-16T02:37:59.967Z",
+    "head": "e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b",
+    "branch": "beta/controlled-readiness-2026-11-15",
+    "commit_object_hash_valid": true,
+    "index_tree_matches_commit": true,
+    "tracked_files": 863,
+    "changed_tracked": [
+      ".env.example",
+      "docs/BETA-READINESS.md",
+      "docs/CONSOLIDATION.md"
+    ],
+    "unmerged": [],
+    "method": "Direct filesystem/Git-object inspection; no git status command executed in this session"
+  },
+  "own_change": {
+    "path": "docs/operations/service-mode.md",
+    "sha256": "7e85601a7def71327066fa80d2b036efe99fed138acd11475089ee8dff4cae7b",
+    "kind": "Restored archived operating instructions plus explicit intake-stop limits",
+    "validation": "Readback equality; CLI argument names and behavior checked against source; linked controlled-beta.md exists; documentation only"
+  },
+  "concurrent_work": {
+    "receipt": "docs/verification/controlled-beta-2026-11-15.json",
+    "receipt_sha256": "dacd7eb9e748fadaec2ab4bb3255c4fc1e090bdab2297ddc472bc536c5111928",
+    "six_check_receipt_hashes_verified": [
+      {
+        "name": "focused_operations",
+        "hashMatches": true
+      },
+      {
+        "name": "delivery_and_intake_stop",
+        "hashMatches": true
+      },
+      {
+        "name": "chromium_mobile_synthetic",
+        "hashMatches": true
+      },
+      {
+        "name": "quarantined_recovery",
+        "hashMatches": true
+      },
+      {
+        "name": "example_configuration",
+        "hashMatches": true
+      },
+      {
+        "name": "private_scope",
+        "hashMatches": true
+      }
+    ],
+    "publication_files_verified": [
+      {
+        "path": ".env.example",
+        "sha256": "84b8e7f9d7e2dd7c878c40dd63b7f9c7d610754c48c58ea64f4b7099ac554223"
+      },
+      {
+        "path": "docs/BETA-READINESS.md",
+        "sha256": "4cbc85e1dbc805918db55390be39dbe1bb161cc6bd3fb77f015cf529f52e25d4"
+      },
+      {
+        "path": "docs/CONSOLIDATION.md",
+        "sha256": "f835334bdba072bf15601a3a70cda2eab1b902143c0cd4c1299b46df4298e7a7"
+      },
+      {
+        "path": "docs/operations/controlled-beta.md",
+        "sha256": "6fcf8bacabfba05897986adbc902d6bc94320ee9e5c170dfa56b817d37fdc406"
+      },
+      {
+        "path": "docs/verification/controlled-beta-2026-11-15.json",
+        "sha256": "dacd7eb9e748fadaec2ab4bb3255c4fc1e090bdab2297ddc472bc536c5111928"
+      }
+    ],
+    "attribution": "Executed by another session; independently read and hash-checked here. Existing files preserved."
+  },
+  "this_session": {
+    "application_tests_executed": false,
+    "shell": "bwrap: Can't mkdir /workspace/.git: Permission denied",
+    "browser": "Initialization failed twice",
+    "app_task_enumeration": "Unavailable; direct coordination not delivered",
+    "new_commits": false,
+    "push": false,
+    "deployment": false,
+    "paid_calls": false,
+    "charges": false,
+    "mail": false
+  },
+  "qualification": {
+    "rows": 23,
+    "unsigned": 23,
+    "uncertain": 20,
+    "full_quote_verification": "109/109 recorded by the concurrent session; its receipt retained. This session directly checked 52 sidecar quotations and hashes of 17 raw HTML captures, without executing the Python HTML parser."
+  },
+  "publication_note": "Prior five-file publication inventory predates service-mode.md and this supplement. Include both new documentation/evidence files in the next reviewed diff; no existing publication manifest was overwritten."
+}
