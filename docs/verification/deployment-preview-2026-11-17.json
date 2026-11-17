@@ -1,0 +1,135 @@
+{
+  "as_of": "2026-11-17T12:52:33.715Z",
+  "purpose": "Owner-requested visual/application preview; not paid customer activation",
+  "url": "https://parkingbreaker.com",
+  "project": "neuraldraft-parkingbreaker",
+  "region": "us-west1",
+  "service": "parkingbreaker-frontend",
+  "source_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58",
+  "cloud_build_id": "8f5b720b-8d9c-4118-9de4-11f0a1750425",
+  "cloud_build_status": "SUCCESS",
+  "images": {
+    "backend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:dcda57c126fd458c15313db18014640fd80448f81ac7723cad6ac65d92450d48",
+    "frontend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend@sha256:adacd79a40c82d2247839e9610ca1023386322a393117ecafeb1e27097dab5f4"
+  },
+  "revision": "parkingbreaker-frontend-preview-0bf011b",
+  "previous_revision": "parkingbreaker-frontend-ui-1109-copy",
+  "observed_traffic": [
+    {
+      "percent": 100,
+      "revisionName": "parkingbreaker-frontend-preview-0bf011b"
+    }
+  ],
+  "runtime": {
+    "provider_mode": "fake",
+    "service_phase": "paid",
+    "ticket_reading_preview": true,
+    "canary": "baseline default",
+    "storage": "Existing 256 MiB in-memory temporary volume",
+    "max_service_instances": 1,
+    "container_concurrency": 20,
+    "ingress": "internal-and-cloud-load-balancing",
+    "domain_routing": "Existing HTTPS load balancer and serverless NEG retained"
+  },
+  "checks": {
+    "health": {
+      "status": "ok",
+      "mode": "fake",
+      "customer_authored_mode": true,
+      "customer_authored_mode_version": "customer-authored-v1",
+      "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58",
+      "policy_hashes": {}
+    },
+    "page": {
+      "status": 200,
+      "title": "ParkingBreaker · Appeal your parking ticket in your own words",
+      "same_origin_script_assets": [
+        {
+          "path": "/_next/static/chunks/4bd1b696-215e5051988c3dde.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/794-3bbf792b9526214d.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/main-app-42ecb8d4420b2866.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/app/layout-8afa2b2a828f9962.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/500-c99b8dfd3de17c86.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/772-87663e7f8f2b1dc6.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/563-4aabc5aad7e64963.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/app/page-b4b6fd649fa46f56.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+          "status": 200
+        },
+        {
+          "path": "/_next/static/chunks/webpack-c5e7e0f943b22e0b.js",
+          "status": 200
+        }
+      ],
+      "security_headers": {
+        "content_security_policy": true,
+        "x_frame_options": "DENY",
+        "x_content_type_options": "nosniff"
+      }
+    },
+    "synthetic_smoke": {
+      "health": 200,
+      "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58",
+      "mode": "fake",
+      "anonymous_session": 201,
+      "workspace": 201,
+      "ticket_reading_required": true,
+      "synthetic": true,
+      "photo_upload": 201,
+      "form_save": 200,
+      "ocr": {
+        "http": 200,
+        "status": "success",
+        "synthetic": true
+      },
+      "observability": 200,
+      "review_session": 200,
+      "logout": 200,
+      "paid_authorizations": 0,
+      "mailings": 0,
+      "emails_requested": 0
+    }
+  },
+  "rollout": {
+    "deployed_without_traffic": true,
+    "revision_ready_observed_before_promotion": true,
+    "expected_commit_verified_at_public_health": true,
+    "all_traffic_on_expected_revision": true,
+    "rollback_command": "gcloud run services update-traffic parkingbreaker-frontend --project=neuraldraft-parkingbreaker --region=us-west1 --to-revisions=parkingbreaker-frontend-ui-1109-copy=100"
+  },
+  "corrections_during_execution": [
+    "gcloud multi-container deploy required explicit ingress --port=3000; corrected before revision creation.",
+    "Initial synthetic form probe omitted an expected revision when a new workspace returned no draft revision; HTTP 422 was refused. Corrected probe used initial revision 1 and completed. No source change or application suppression."
+  ],
+  "limits": [
+    "Synthetic OCR/provider responses; not real ticket-reading or research qualification.",
+    "No real payment authorization, charge, mail or email requested by the smoke test.",
+    "Temporary preview storage can reset on restart/replacement; not the qualified production single-writer deployment.",
+    "Live paid-beta readiness remains NO-GO pending the canonical launch gates.",
+    "Live domain checked through HTTP/API probes; prior production-build browser acceptance is in publication-2026-11-17.json."
+  ]
+}

@@ -1,6 +1,8 @@
 # Controlled-beta readiness
 
-Updated November 17, 2026 (Pacific). **NO-GO for live beta.**
+Updated November 17, 2026 (Pacific). **NO-GO for live paid beta.**
+
+**Preview deployed:** [parkingbreaker.com](https://parkingbreaker.com) serves application commit `0bf011b7c243bed1b864bdb1739438469fdacb58` on `parkingbreaker-frontend-preview-0bf011b`. Both container digests, 100% traffic, page/assets and ticket-upload/synthetic-OCR checks are recorded in [the deployment receipt](verification/deployment-preview-2026-11-17.json). It uses fake providers, the paid product flow and temporary preview storage; no real payments or mailing were activated.
 
 The [execution roadmap](ROADMAP.md) owns remaining tasks and acceptance criteria. This page owns the evidence summary and release decision. The [controlled-beta operating packet](operations/controlled-beta.md) owns the activation/recovery procedure. No source export, test run, GitHub publication or roadmap is itself deployment authority.
 
@@ -16,7 +18,7 @@ OCR selection is configurable. [OCR routing](OCR-ROUTING.md) documents the prima
 
 | Evidence | What it supports | What it does not establish |
 | --- | --- | --- |
-| [November 17 publication candidate](verification/publication-2026-11-17.json) | 13,754 backend tests across the full disk-backed run and separate short-path socket check; strict types/lint/format, frontend build/lint/types, 152 paid browser checks, 53 OCR mobile checks and 3 telemetry tests | Google Cloud deployment blocked by expired interactive login; no paid activation or live-provider qualification |
+| [November 17 publication candidate](verification/publication-2026-11-17.json) | 13,754 backend tests across the full disk-backed run and separate short-path socket check; strict types/lint/format, frontend build/lint/types, 152 paid browser checks, 53 OCR mobile checks and 3 telemetry tests | Preview later deployed under its separate receipt; no paid activation or live-provider qualification |
 | [November 16 publication receipt](verification/publication-2026-11-16.json) | 13,643 backend tests, global Ruff lint/format, strict source types and offline qualification self-tests on the recorded input digest | Full regression of subsequent journey changes; current deployed health |
 | [Later polish verification](verification/polish-2026-11-16.json) | 13,690 backend tests, 152 paid browser checks, 50 beta mobile-viewport checks, lint/types/build on its recorded fingerprint | Physical-device qualification, live providers, or a full run after the journey-ledger slice |
 | [Browser rehearsal index](verification/browser-rehearsals-2026-11-16.json) | Two passing historical rehearsals (49 and 50 checks), plus preserved interrupted/failed attempts and recovery hashes | A claim that every attempt passed or that those fingerprints equal current source |
