@@ -1,7 +1,8 @@
-# Astra → DeepSeek bounded delegation
+# Optional DeepSeek delegation helper
 
-Verified November 15, 2026 UTC. This is a separate engineering helper, under
-`/home/ghostmonday/Projects/ParkingBreaker/tools/deepseek-delegate/`.
+This retained helper is not the current coding-worker default. Follow [AGENTS.md](../../AGENTS.md) for worker selection and supervision. The provider/installation observations below are historical and do not authorize a call or imply current availability.
+
+Verified November 15, 2026 UTC. This is a separate engineering helper, in `tools/deepseek-delegate/` in this checkout.
 It does not modify the installed `deepseek-arm`, `dsh`, their profiles, credentials,
 OS-maintenance services or the ParkingBreaker application. No automatic integration.
 

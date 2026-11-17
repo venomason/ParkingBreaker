@@ -906,3 +906,169 @@ class TicketConfirmationReceipt(Model):
     review_request_id: str
     discrepancy_status: Literal["none", "resolved", "unresolved"]
     synthetic: bool = False
+
+
+TicketReviewOpaqueKey = Annotated[
+    str, Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
+]
+
+
+class TicketReviewSessionRequest(Model):
+    """Start or idempotently resume a pinned TicketFactReview canary/baseline session."""
+
+    client_session_id: Annotated[str, Field(pattern=r"^[0-9a-f]{32}$")]
+
+
+class TicketReviewSession(Model):
+    """Pinned TicketFactReview session assignment; never exposes owner or workspace token."""
+
+    session_id: str
+    client_session_key: str
+    variant: Literal["baseline", "manual_guidance_v1"]
+    policy_mode: Literal["baseline", "canary"]
+    canary_version: str
+    effective_treatment_version: str
+    assigned_at: AwareDatetime
+    observation_limit: Annotated[int, Field(ge=1)] = 64
+
+
+class TicketReviewObservationRequest(Model):
+    """Closed, bounded client review observation; never carries raw fields or tokens."""
+
+    client_observation_id: Annotated[str, Field(pattern=r"^[0-9a-f]{32}$")]
+    event_kind: Literal[
+        "exposure", "validation_failed", "save_attempt", "confirm_attempt", "timing_checkpoint"
+    ]
+    treatment_variant: Literal["baseline", "manual_guidance_v1"]
+    rendered_variant: Literal["baseline", "manual_guidance_v1"]
+    treatment_version: Annotated[
+        str, Field(min_length=1, max_length=96, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,95}$")
+    ]
+    outcome: Literal[
+        "observed",
+        "client_invalid",
+        "submitted_to_server",
+        "client_reported_success",
+        "client_reported_failure",
+        "unknown",
+    ]
+    visible_elapsed_ms: Annotated[int, Field(ge=0, le=86_400_000, strict=True)] | None = None
+    busy_elapsed_ms: Annotated[int, Field(ge=0, le=86_400_000, strict=True)] | None = None
+    hidden_elapsed_ms: Annotated[int, Field(ge=0, le=86_400_000, strict=True)] | None = None
+    visibility_changes: Annotated[int, Field(ge=0, le=10_000, strict=True)] = 0
+    timing_state: Literal["closed", "open_or_missing_unknown"]
+    invalid_field_count: Annotated[int, Field(ge=0, le=13, strict=True)] = 0
+    customer_supplied: StrictBool = False
+    reading_status: Literal["missing", "pending", "success", "refused", "unknown"]
+    review_status: Literal["missing", "pending", "success", "refused", "unknown"]
+
+    @model_validator(mode="after")
+    def validate_semantics(self) -> Self:
+        if self.event_kind == "exposure" and self.outcome != "observed":
+            raise ValueError("exposure requires observed outcome")
+        if self.event_kind == "validation_failed" and (
+            self.outcome != "client_invalid" or self.invalid_field_count < 1
+        ):
+            raise ValueError("validation_failed requires client_invalid and invalid_field_count>=1")
+        if (
+            self.event_kind == "confirm_attempt"
+            and self.outcome == "client_reported_success"
+            and self.review_status != "success"
+        ):
+            raise ValueError("client_reported_success requires successful review_status")
+        if self.timing_state == "closed" and (
+            self.visible_elapsed_ms is None
+            or self.busy_elapsed_ms is None
+            or self.hidden_elapsed_ms is None
+        ):
+            raise ValueError("closed timing_state requires visible, busy, and hidden timings")
+        return self
+
+
+class TicketReviewObservationReceipt(Model):
+    """Persisted client review observation explicitly labeled non-authoritative."""
+
+    observation_id: str
+    session_id: str
+    client_observation_id: str
+    seq: Annotated[int, Field(ge=1, le=64)]
+    source: Literal["client_observation"] = "client_observation"
+    measurement_label: Literal["elapsed_and_visibility_activity_not_human_attention"] = (
+        "elapsed_and_visibility_activity_not_human_attention"
+    )
+    event_kind: Literal[
+        "exposure", "validation_failed", "save_attempt", "confirm_attempt", "timing_checkpoint"
+    ]
+    treatment_variant: Literal["baseline", "manual_guidance_v1"]
+    rendered_variant: Literal["baseline", "manual_guidance_v1"]
+    treatment_version: str
+    outcome: Literal[
+        "observed",
+        "client_invalid",
+        "submitted_to_server",
+        "client_reported_success",
+        "client_reported_failure",
+        "unknown",
+    ]
+    visible_elapsed_ms: Annotated[int, Field(ge=0, le=86_400_000)] | None
+    busy_elapsed_ms: Annotated[int, Field(ge=0, le=86_400_000)] | None
+    hidden_elapsed_ms: Annotated[int, Field(ge=0, le=86_400_000)] | None
+    visibility_changes: Annotated[int, Field(ge=0, le=10_000)]
+    timing_state: Literal["closed", "open_or_missing_unknown"]
+    invalid_field_count: Annotated[int, Field(ge=0, le=13)]
+    customer_supplied: bool
+    reading_status: Literal["missing", "pending", "success", "refused", "unknown"]
+    review_status: Literal["missing", "pending", "success", "refused", "unknown"]
+    recorded_at: AwareDatetime
+
+
+class TicketOcrObservationDetail(Model):
+    """Safe closed OCR routing reasons/counts and separated monotonic spans."""
+
+    observation_id: str
+    journey_id: str
+    routing_mode: Literal["routed", "single_stage"]
+    primary_model: str | None
+    secondary_model: str | None
+    primary_status: Literal[
+        "completed", "refused", "budget_refused", "input_error", "provider_error"
+    ]
+    escalation_status: Literal[
+        "not_needed",
+        "not_applicable",
+        "unavailable",
+        "budget_exhausted",
+        "failed",
+        "refused",
+        "completed",
+    ]
+    coordinator_duration_ms: Annotated[int, Field(ge=0)] | None
+    primary_duration_ms: Annotated[int, Field(ge=0)] | None
+    primary_start_offset_ms: Annotated[int, Field(ge=0)] | None
+    primary_end_offset_ms: Annotated[int, Field(ge=0)] | None
+    escalation_duration_ms: Annotated[int, Field(ge=0)] | None
+    escalation_start_offset_ms: Annotated[int, Field(ge=0)] | None
+    escalation_end_offset_ms: Annotated[int, Field(ge=0)] | None
+    shown_suggestion_count: Annotated[int, Field(ge=0, le=11)]
+    manual_entry_field_count: Annotated[int, Field(ge=0, le=11)]
+    reason_counts: dict[str, int]
+    decision_policy: str
+    recorded_at: AwareDatetime
+
+
+class TicketOcrObservationReadView(Model):
+    """Coverage-explicit OCR observation record; legacy rows lack coverage explicitly."""
+
+    request_id: str
+    operation_status: Literal["pending", "success", "refused", "unknown"]
+    coverage: Literal["recorded", "pending", "missing"]
+    observation: TicketOcrObservationDetail | None = None
+
+
+class TicketObservabilitySnapshot(Model):
+    """Owner-safe OCR routing and review session observability for one workspace."""
+
+    journey_id: str | None = None
+    ocr_observations: list[TicketOcrObservationReadView] = Field(default_factory=list)
+    review_sessions: list[TicketReviewSession] = Field(default_factory=list)
+    review_observations: list[TicketReviewObservationReceipt] = Field(default_factory=list)

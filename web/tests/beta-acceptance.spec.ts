@@ -226,6 +226,12 @@ async function intakeCase(page: Page): Promise<string> {
         },
       },
     }) as { draft_revision?: number };
+    // Reading is mandatory even when all adopted values are customer-supplied.
+    const reading = await call(page, "POST", `/workspaces/${workspace.workspace_id}/ticket-reading`, {
+      request_id: `extract-${workspace.workspace_id}`, expected_revision: saved.draft_revision ?? 2,
+    }) as { status: string; fields: Array<{ state: string; value: string | null }> };
+    expect(reading.status).toBe("success");
+    expect(reading.fields.every(field => field.state === "not_shown" && field.value === null)).toBe(true);
     const reviewRequestId = `req-${workspace.workspace_id}`;
     const review = await call(page, "POST", `/workspaces/${workspace.workspace_id}/ticket-review`, {
       request_id: reviewRequestId, expected_revision: saved.draft_revision ?? 2, customer_supplied: true,

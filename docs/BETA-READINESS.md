@@ -1,127 +1,64 @@
-# ParkingBreaker controlled-beta readiness — current handoff
+# Controlled-beta readiness
 
-**NO-GO for live beta.** Local source/smoke progress is verified, but this is not a
-release or deployment approval. Customer intake remains clerical: readable ticket or
-customer corrections; unresolved essential facts stop charge/dispatch. Do not guess
-legal conclusions or introduce an issuer-by-issuer launch database or city allowlist.
+Updated November 17, 2026 (Pacific). **NO-GO for live beta.**
 
-## Source and publication
+The [execution roadmap](ROADMAP.md) owns remaining tasks and acceptance criteria. This page owns the evidence summary and release decision. The [controlled-beta operating packet](operations/controlled-beta.md) owns the activation/recovery procedure. No source export, test run, GitHub publication or roadmap is itself deployment authority.
 
-- Canonical writable checkout: `/home/ghostmonday/Desktop/ParkingBreaker-Codebase`.
-- Public repository: https://github.com/venomason/ParkingBreaker ; default branch `main`.
-- Consolidated parent: `e4e4a28a912c84c34e66044f9e47ae7aba3d6b4b`.
-- The owner approved committing and pushing this revision on November 16. Publication
-  targets `main`; the local review branch `beta/controlled-readiness-2026-11-15` is
-  retained. The exact signed commit and remote verification belong in the publication
-  receipt, discoverable through `~/Vault/Ops/runs/parkingbreaker-push-active.json`.
-- Current candidate fingerprint: `20eed44a059e83b616bb741741c669f5e4cb08c462992fe3318b89c0e9cd8df4`.
-- Latest paid-test fingerprint: `2f881ba92a1e182cb573a380c5d6727d36707c9ff6d330cac7842100e0314bea`.
-- The parent's signature verifies locally; GitHub reports `unknown_key`. This revision
-  requires an explicit signed commit and fast-forward publication with no history rewrite.
+## Current source status
 
-Consolidation history, recovery and legacy paths are recorded in
-[CONSOLIDATION.md](CONSOLIDATION.md). No new legacy-folder moves occurred in this follow-up.
+The November 17 publication candidate extends commit a717d5ab08dbed349406e0171bc29eddec3419c8 with journey-ledger, OCR/manual-review observability, T01 reconstruction, mandatory OCR and documentation work. Its exact source manifest and checks are in [the publication receipt](verification/publication-2026-11-17.json). The ledger, OCR/manual-review slice, T01 read-only reconstruction and required OCR-attempt gate are implemented and locally tested; see [Telemetry Foundation](TELEMETRY-FOUNDATION.md) for scope, atomicity, replay guarantees and limitations. No persistent analyzer, exporter or autonomous repair is live. Owner direction is paid beta: the example uses fake providers with the paid flow. Launch requires both BETA and PAID admission gates; no free entitlement batch is planned.
 
-## Implemented and checked
+The product remains clerical. Essential unknown facts block charge/dispatch; the customer supplies and confirms their own facts and reasoning. Do not infer legal conclusions, silently substitute providers, reopen retired unverified-address overrides or create a city-by-city launch allowlist.
 
-The intake role now uses DeepSeek V4.1 Flash (`deepseek-flash`), including the shared
-issuer/link-assessment client. Research stays on DeepSeek V4 Pro. Optional Gemini
-packet-check configuration remains but is not constructed by the current customer-authored
-service. The adapter supports validated inline JPEG/PNG, original detail, model-specific
-image allocation, body limits and documented `max_tokens`; Pro rejects image input.
-There is no silent provider fallback or automatic request retry.
+OCR selection is configurable. [OCR routing](OCR-ROUTING.md) documents the primary and optional secondary routes; a selectable model does not establish that it is configured or qualified in production. [Customer Choice Rules](CUSTOMER-CHOICE-RULES.md) owns guarantee/causation semantics.
 
-The example selects fake providers and controlled free beta with explicit roles.
-No credential file was copied into the checkout and no deployed service mode changed.
-The inherited process DeepSeek key was rejected; the owner-supplied local reference
-passed metadata/balance GETs and real inference. Brave access remains unqualified.
+## Evidence and its limits
 
-- November 16 publication checks: **13,643 backend tests passed**, with no failures
-  and one dependency deprecation warning. Global Ruff lint/format, mypy across 476
-  source files, and both offline qualification self-tests passed. See the
-  [publication validation receipt](verification/publication-2026-11-16.json) for
-  the tested input digest and commands. No paid provider call was made in these checks.
-- This full run includes the latest prompt/intake changes and the repaired portable
-  source-fixture loader. It supersedes the earlier full run with one fixture failure
-  and the subsequent focused-only checks. The newest prompts remain unqualified live.
-- Earlier frontend/release receipts remain source-specific evidence, not claims that
-  every broad check was rerun on the newest candidate.
-- Captured-provider replays confirm strict multiline refusal without repair and that
-  the F comparison conflict never mutates the supplied assertion or becomes a match.
-
-## Actual Android and camera
-
-A56 / Android 13 / Chrome 157.0.8103.78 passed native front/back Files upload, cancel,
-missing-fact blocking, confirmation/reload, edit invalidation, bad-file refusal,
-injected connection failure/recovery and HOME/return. Actual camera capture of fictional
-E, native gallery selection, JPEG upload (201) and reload also passed. Decoded pixels
-and 1200x1600 dimensions are identical. Stored bytes match the existing metadata-stripping
-filter; raw hashes are not identical. The camera photo contains monitor UI, stays private,
-and was not sent to DeepSeek. These tests used fake providers and the recorded
-`2270ee89...` application fingerprint. Subsequent source edits only change OCR prompts.
-
-The localhost USB adapter does not qualify production TLS/DNS/origin security.
-Landscape rotation and actual iPhone/Safari remain open. Owned test services, mappings
-and tabs were stopped/closed; original phone files were retained.
-
-## Real DeepSeek trials
-
-First approved trial: three calls, stopped at B's fixture-title/stage error.
-Second approved envelope: all 12 unique frozen requests completed; C extraction was not
-retried. After its initial refusal, supervisor review allowed only the seven unused
-independent requests to finish evidence collection. The original strict failed score
-was retained. Across both envelopes, 15 unique calls used $0.51 in reservations and a
-$0.15 conservative upward-rounded application usage estimate. This is not a provider
-invoice or an inferred account debit. No more inference is running.
-
-| Case | Extraction | Direct-reader comparison diagnostic |
+| Evidence | What it supports | What it does not establish |
 | --- | --- | --- |
-| A | Pass | Pass |
-| B | Pass | Pass |
-| C | Entire reply refused; original raw response not retained, cause unknown | Pass; plate unreadable |
-| D | Refused: issuer value contains a newline | Model reads `DEM0926`; owner key says `DEMO926` |
-| E | Pass | Pass |
-| F | Citation correctly unreadable/null | Partial `TH-48271` returned as conflict in an extra probe |
+| [November 17 publication candidate](verification/publication-2026-11-17.json) | 13,754 backend tests across the full disk-backed run and separate short-path socket check; strict types/lint/format, frontend build/lint/types, 152 paid browser checks, 53 OCR mobile checks and 3 telemetry tests | Google Cloud deployment blocked by expired interactive login; no paid activation or live-provider qualification |
+| [November 16 publication receipt](verification/publication-2026-11-16.json) | 13,643 backend tests, global Ruff lint/format, strict source types and offline qualification self-tests on the recorded input digest | Full regression of subsequent journey changes; current deployed health |
+| [Later polish verification](verification/polish-2026-11-16.json) | 13,690 backend tests, 152 paid browser checks, 50 beta mobile-viewport checks, lint/types/build on its recorded fingerprint | Physical-device qualification, live providers, or a full run after the journey-ledger slice |
+| [Browser rehearsal index](verification/browser-rehearsals-2026-11-16.json) | Two passing historical rehearsals (49 and 50 checks), plus preserved interrupted/failed attempts and recovery hashes | A claim that every attempt passed or that those fingerprints equal current source |
+| [November 17 OCR/manual-review acceptance](verification/ocr-manual-review-2026-11-17.json) | 13,722 backend tests, lint/format/types, frontend checks/build and 53 synthetic mobile browser checks; frozen-commitment invariance and pinned guidance rollback verified | Production activation, real provider/device qualification, complete journey reconstruction or autonomous repair |
+| Journey foundation acceptance | 946 existing checks across 34 relevant modules plus 10 new journey tests; targeted lint/types | Complete journey capture, external analytics or production activation |
+| [Cleanup follow-up](verification/repo-cleanup-2026-11-16.json) | 10 journey tests, 43 retained-fixture/contract tests and 3 tooling tests; lint/format/strict mypy on seven touched files; local documentation links checked | A new full-suite release qualification |
+| [November 17 journey reconstruction and OCR gate](verification/journey-reconstruction-2026-11-17.json) | Read-only timeline, route-aware gap classification, snapshot pagination, frozen-state isolation and mandatory current-photo OCR attempt tests; backend/frontend lint and types | Full attempt history, live provider delivery or paid-beta activation |
+| [Android smoke receipt](verification/android-smoke-2026-11-15.json) and retained local phone receipts | Source-specific actual-device/fake-provider flows | Current iPhone/Safari, landscape, production TLS or live OCR |
+| [Corrected live reader assessment](verification/deepseek-corrected-live-2026-11-16.json) and [earlier checkpoint](verification/deepseek-first-live-2026-11-15.json) | Bounded real-provider component evidence and known failures | Newest prompt/provider combination or entire live customer path |
 
-**Scope matters:** the harness tested the adapter/reader directly. Production
-`TicketFactBinding.review_fields()` returns only non-null literal fields, excluding
-adopted-only values; `TicketIntakeCoordinator.request_review()` uses that method.
-Actual F replay confirms its unreadable citation is omitted from the production
-comparison payload. The extra unknown-citation assertion is not an ordinary production
-request. C/D comparisons after refused extraction are likewise component diagnostics.
-No wrong fact was shown to be automatically adopted into a production case.
+Historical publication input digest: 20eed44a059e83b616bb741741c669f5e4cb08c462992fe3318b89c0e9cd8df4. Do not relabel it as the current candidate. Exact commands and fingerprints belong in their receipts. New release acceptance must identify its own source, configuration and immutable artifact.
 
-Retain separate measures for field/format accuracy, correct safe refusal, customer
-correction usability and fulfillment eligibility. The strict component run did not
-fully pass; that does not establish that every negative-case refusal is a production
-safety defect. Time, street location, violation code, fine and currency are not fields
-in this reader's 11-field schema and were not qualified by these paid calls.
+### Preserved provider findings
 
-The latest prompts clarify single-line output and whole-field uncertainty, without
-weakening the parser or forcing the expected O/0 value. These changes pass the focused
-checks but are unqualified live. The unapproved four-call C/F probe plan is on hold
-until the next test reflects production binding/coordinator behavior.
+Two completed DeepSeek trial envelopes made 15 unique calls. Reservations totaled $0.51; the conservative upward-rounded application usage estimate was $0.15. These are historical budget figures, not provider invoices or ongoing spending authority. Brave runtime access remains unqualified.
 
-Detailed receipts: [corrected live assessment](verification/deepseek-corrected-live-2026-11-16.json),
-[earlier live checkpoint](verification/deepseek-first-live-2026-11-15.json),
-[Android smoke](verification/android-smoke-2026-11-15.json).
-The current private operational report and Gemini CARBON review brief are discoverable
-through `~/Vault/Ops/runs/parkingbreaker-current-handoff.json`.
+A/B/E extraction passed in the retained assessment; C was refused with original cause unknown; D was refused for a multiline issuer and also exposed an O/0 key ambiguity; F correctly left the citation unreadable. Additional comparison probes were component diagnostics. In production, TicketFactBinding.review_fields excludes adopted-only/null literal fields from comparison; no wrong fact was demonstrated to be automatically adopted into a production case. Do not force a fixture's ambiguous character or log raw customer OCR to make a test pass.
 
-## Go/no-go scorecard and next actions
+Measure field accuracy, safe refusal, customer-correction completion and fulfillment eligibility separately. New prompts and the current complete coordinator path still need a finite production-aligned qualification. An unused or unapproved probe plan is not authorization.
 
-| Gate | Status | Smallest next action |
+### Preserved device findings
+
+Historical A56/Android fake-provider tests exercised front/back file selection, cancel, missing-fact blocking, confirmation/reload, edit invalidation, bad-file refusal, injected connection failure, background/return, actual camera and native gallery. The camera image was fictional; stored pixels and dimensions survived the metadata-stripping filter. Raw-byte identity was not claimed.
+
+Those results used older recorded fingerprints and a local transport bridge. Actual iPhone/Safari and landscape remain open. Reinspect devices, processes and ports; obsolete handoff PIDs are not current runtime facts.
+
+## Release gates
+
+Task IDs resolve to the authoritative roadmap.
+
+| Gate | Current state | Next evidence |
 | --- | --- | --- |
-| Source/publication | Owner approved signed publication to main; beta remains NO-GO | Verify the publication receipt's commit against GitHub main; CARBON review remains a separate follow-up |
-| Shell/browser | Local shell/Android route works; connector host unavailable | Use the working local route; connector repair is not a beta prerequisite |
-| DeepSeek | Auth/funding and readable component examples pass; newest prompt/live customer path unqualified | Review actual null-field filtering, response contract and correction UX; prepare one finite production-aligned test |
-| Brave | Runtime credential/access not qualified | Identify approved secure reference and verify access/limits before authorized search |
-| 23 qualification rows | Unsigned; saved quote checks previously passed | Review retained uncertainties; never invent source facts or make these an issuer-lookup launch project |
-| Target/security/recovery/intake stop | Local synthetic checks pass; target acceptance missing | Finalize named target/cost/IAM/TLS/storage/restore/stop proposal and exact provisioning/drill approval |
-| Printing/webhooks | Local contracts pass; actual provider proof missing | Specific TEST-account proof/webhook approval and page inspection; no live letter |
-| Alerts/human support | Local tests pass; real receipt and staffing unqualified | Name primary/backup/coverage; authorize a specific alert/acknowledgement drill |
-| Physical devices | Exercised Android/camera paths pass; rotation/iPhone open | Complete actual landscape and iPhone/Safari handling on candidate |
-| Release | NO-GO | Exact artifact, dates, cap and bounded entitlement batch after gates pass |
+| Current candidate / CI | November 17 full backend suite and synthetic frontend rehearsal passed on recorded application inputs | R01: qualify remaining CI/release checks, build configuration and immutable candidate artifacts |
+| OCR / research | Component evidence exists; latest end-to-end path unqualified | P01/P04: production-aligned manual/correction/refusal/provider trials with actual access and finite budget |
+| Official evidence | 23 qualification rows retain uncertainties; 109 saved quotes historically checked | P04: resolve relevant procedure/evidence gaps; no fabricated source facts |
+| Physical devices / access | Android evidence is source-specific; remaining device/email gates open | P02/P05: current iPhone, landscape, access-recovery and real delivery receipts |
+| Target / security / recovery | Local contracts exist; named target acceptance missing | R02–R04: cost/IAM/TLS/storage/fencing, off-host restore, independent monitoring and all-intake stop |
+| Printing / webhooks / money | Local controls exist; actual provider proof incomplete | P06: correct test accounts, PDF inspection, webhook/replay/expiry proof; live actions separately scoped |
+| Outcomes / support | Local mechanisms exist; coverage and real operation unqualified | J05/P07: all-appeal follow-up, primary/backup support, real alert receipt and acknowledgment |
+| Privacy / telemetry | Journey ledger is restricted; full coverage/retention/export policies open | J01/J06/R05: coverage reconciliation and governed data lifecycle |
+| Activation | NO-GO | R06/R07: exact target, artifact, dates, funded cap, stop rules and enforced paid-cohort cap |
+| Paid beta | Required launch offering; not activated | R07: paid gates, configured price/disclosures/reserves and bounded paid cohort; R08: reconcile actual costs/remedies |
+| Unattended improvement | Ledger, OCR/manual-review observations and T01 reconstruction tested; queue not implemented | T01–T07 local proof, then T08/R09 for qualified production release |
 
-Historical cloud inventory is not a refreshed production-health claim. A GitHub push
-is not deployment. No deployment, customer charge, real mail or outreach occurred.
+Historical cloud inventories do not establish current service health. No new deployment, charge, mail, outreach, ad spend or provider trial is authorized by this page. Consolidation and recovery provenance remain in [CONSOLIDATION.md](CONSOLIDATION.md).

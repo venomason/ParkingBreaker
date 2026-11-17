@@ -17,3 +17,9 @@ __pycache__/
 build-kit/
 docs/
 artifacts/
+output/
+.pb-data/
+.pb-demo/
+.vscode/
+web/test-results/
+web/playwright-report/

@@ -27,6 +27,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -55,6 +56,22 @@ from parkingbreaker.ticket_intake_store import (
     TicketIntakeStore,
     review_confirmation_binding,
 )
+from parkingbreaker.ticket_observability import (
+    MAX_OBSERVATIONS_PER_SESSION,
+    OcrObservationInput,
+    ReviewCanaryConfig,
+    ReviewObservation,
+    ReviewObservationEventKind,
+    ReviewObservationInput,
+    ReviewObservationOutcome,
+    ReviewSession,
+    ReviewTimingState,
+    ReviewVariant,
+    TicketObservabilityAccessError,
+    TicketObservabilityConflict,
+    build_ocr_observation_from_reader,
+)
+from parkingbreaker.ticket_ocr import OcrPolicy
 from parkingbreaker.ticket_vision import (
     EXTRACT_OPERATION,
     FieldReading,
@@ -98,6 +115,9 @@ class TicketIntakeDeps:
     synthetic: bool = False
     extraction_ceiling_cents: int = DEFAULT_EXTRACTION_CEILING_CENTS
     review_ceiling_cents: int = DEFAULT_REVIEW_CEILING_CENTS
+    monotonic: Callable[[], float] = time.monotonic
+    ocr_policy: OcrPolicy | None = None
+    review_canary: ReviewCanaryConfig | None = None
 
 
 @dataclass(frozen=True)
@@ -506,6 +526,8 @@ class TicketIntakeCoordinator:
         status: ClaimStatus,
         result_json: str | None,
         usage_json: str | None,
+        *,
+        ocr_observation: OcrObservationInput | None = None,
     ) -> OperationClaim:
         token = claim.claim_token
         if token is None:
@@ -521,6 +543,7 @@ class TicketIntakeCoordinator:
                 intake_id=claim.intake_id,
                 operation=claim.operation,
                 binding_sha256=claim.binding_sha256,
+                ocr_observation=ocr_observation,
             )
         except TicketIntakeConflict as exc:
             raise _error(str(exc)) from None
@@ -552,20 +575,65 @@ class TicketIntakeCoordinator:
         )
         if not claim.should_call:
             return self._reading_snapshot(claim, current)
+        coord_start = self._deps.monotonic()
         reader = self._deps.reader_for_subject(intake_id)
         try:
             reading = reader.extract(
                 list(current.images), max_cost_cents=self._deps.extraction_ceiling_cents
             )
         except LlmBudgetExceeded:
-            self._finish(claim, ClaimStatus.REFUSED, None, _usage_json(Usage()))
+            coord_end = self._deps.monotonic()
+            obs = build_ocr_observation_from_reader(
+                reader,
+                coord_start=coord_start,
+                coord_end=coord_end,
+                exception_kind="budget_refused",
+                policy=self._deps.ocr_policy,
+            )
+            self._finish(
+                claim,
+                ClaimStatus.REFUSED,
+                None,
+                _usage_json(Usage()),
+                ocr_observation=obs,
+            )
             raise _error("ticket_reading_budget_exhausted") from None
         except TicketVisionInputError:
-            self._finish(claim, ClaimStatus.REFUSED, None, _usage_json(Usage()))
+            coord_end = self._deps.monotonic()
+            obs = build_ocr_observation_from_reader(
+                reader,
+                coord_start=coord_start,
+                coord_end=coord_end,
+                exception_kind="input_error",
+                policy=self._deps.ocr_policy,
+            )
+            self._finish(
+                claim,
+                ClaimStatus.REFUSED,
+                None,
+                _usage_json(Usage()),
+                ocr_observation=obs,
+            )
             raise _error("ticket_photo_not_supported") from None
         except Exception:
-            self._finish(claim, ClaimStatus.UNKNOWN, None, None)
+            coord_end = self._deps.monotonic()
+            obs = build_ocr_observation_from_reader(
+                reader,
+                coord_start=coord_start,
+                coord_end=coord_end,
+                exception_kind="provider_error",
+                policy=self._deps.ocr_policy,
+            )
+            self._finish(claim, ClaimStatus.UNKNOWN, None, None, ocr_observation=obs)
             raise _error("ticket_reading_provider_unavailable") from None
+        coord_end = self._deps.monotonic()
+        obs = build_ocr_observation_from_reader(
+            reader,
+            reading=reading,
+            coord_start=coord_start,
+            coord_end=coord_end,
+            policy=self._deps.ocr_policy,
+        )
         if reading.refused:
             completed = self._finish(
                 claim,
@@ -576,6 +644,7 @@ class TicketIntakeCoordinator:
                     input_hash=reading.input_hash,
                 ),
                 _usage_json(reading.usage),
+                ocr_observation=obs,
             )
         else:
             completed = self._finish(
@@ -590,6 +659,7 @@ class TicketIntakeCoordinator:
                     escalation=reading.escalation,
                 ),
                 _usage_json(reading.usage),
+                ocr_observation=obs,
             )
         return self._reading_snapshot(completed, current)
 
@@ -637,6 +707,28 @@ class TicketIntakeCoordinator:
                 "escalation": metadata.get("escalation"),
             }
         )
+
+    def _require_completed_reading(
+        self, workspace_id: str, images: Sequence[ImageAttachment]
+    ) -> None:
+        """New intake must attempt OCR on these exact photos before confirming facts.
+
+        Refused/unknown readings remain explicit failures and may lead to customer
+        correction; they never become successful OCR or verified research evidence.
+        Existing saved commitment revalidation does not retroactively use this gate.
+        """
+        reservation = self._deps.intake.reservation_for(workspace_id)
+        extraction_hash = input_binding_hash(EXTRACT_OPERATION, images)
+        if reservation is not None:
+            for claim in self._deps.intake.claims_for(reservation.intake_id):
+                if (
+                    claim.operation is IntakeOperation.EXTRACT
+                    and claim.binding_sha256 == extraction_hash
+                ):
+                    if claim.status is ClaimStatus.PENDING:
+                        raise _error("ticket_reading_not_completed")
+                    return
+        raise _error("ticket_reading_required")
 
     def _validate_literal_provenance(
         self, workspace_id: str, images: Sequence[ImageAttachment], binding: TicketFactBinding
@@ -688,6 +780,7 @@ class TicketIntakeCoordinator:
                 existing, current.owner, workspace_id, IntakeOperation.REVIEW, binding_sha256
             )
             return self._review_snapshot(existing, current)
+        self._require_completed_reading(workspace_id, current.images)
         if self._deps.store.intake_for_workspace(workspace_id) is not None:
             raise _error("intake_already_submitted")
         intake_id = self._reserve(workspace_id, current)
@@ -894,6 +987,7 @@ class TicketIntakeCoordinator:
         expected_generation = 0 if latest is None else latest.generation
         if command.expected_confirmation_generation != expected_generation:
             raise _error("confirmation_generation_stale")
+        self._require_completed_reading(workspace_id, current.images)
         try:
             recorded = self._deps.intake.record_confirmation(
                 command.command_id,
@@ -1008,6 +1102,7 @@ class TicketIntakeCoordinator:
     # Submit and initial-mail revalidation -------------------------------------------
     def require_submission_confirmation(self, workspace_id: str, body: s.SubmitIntake) -> None:
         current = self._load_current(workspace_id, require_binding=True)
+        self._require_completed_reading(workspace_id, current.images)
         binding = current.binding
         assert binding is not None
         self._validate_literal_provenance(workspace_id, current.images, binding)
@@ -1096,3 +1191,168 @@ class TicketIntakeCoordinator:
         )
         if not read.current:
             raise _error("ticket_confirmation_stale")
+
+    # OCR routing observability and TicketFactReview canary --------------------------
+    @staticmethod
+    def _session_view(session: ReviewSession) -> s.TicketReviewSession:
+        return s.TicketReviewSession(
+            session_id=session.session_id,
+            client_session_key=session.client_session_key,
+            variant=session.variant.value,
+            policy_mode=session.policy_mode.value,
+            canary_version=session.canary_version,
+            effective_treatment_version=session.effective_treatment_version,
+            assigned_at=session.assigned_at,
+            observation_limit=MAX_OBSERVATIONS_PER_SESSION,
+        )
+
+    @staticmethod
+    def _review_observation_view(obs: ReviewObservation) -> s.TicketReviewObservationReceipt:
+        return s.TicketReviewObservationReceipt(
+            observation_id=obs.observation_id,
+            session_id=obs.session_id,
+            client_observation_id=obs.client_observation_id,
+            seq=obs.seq,
+            source="client_observation",
+            measurement_label="elapsed_and_visibility_activity_not_human_attention",
+            event_kind=obs.event_kind.value,
+            treatment_variant=obs.treatment_variant.value,
+            treatment_version=obs.treatment_version,
+            rendered_variant=obs.rendered_variant.value,
+            outcome=obs.outcome.value,
+            visible_elapsed_ms=obs.visible_elapsed_ms,
+            busy_elapsed_ms=obs.busy_elapsed_ms,
+            hidden_elapsed_ms=obs.hidden_elapsed_ms,
+            visibility_changes=obs.visibility_changes,
+            timing_state=obs.timing_state.value,
+            invalid_field_count=obs.invalid_field_count,
+            customer_supplied=obs.customer_supplied,
+            reading_status=obs.reading_status,  # type: ignore[arg-type]
+            review_status=obs.review_status,  # type: ignore[arg-type]
+            recorded_at=obs.recorded_at,
+        )
+
+    def start_review_session(
+        self, workspace_id: str, body: s.TicketReviewSessionRequest
+    ) -> s.TicketReviewSession:
+        owner = self._deps.store.workspace_owner(workspace_id)
+        if owner is None:
+            raise _error("not_found")
+        current = self._deps.store.get_workspace(workspace_id)
+        if current is None:
+            raise _error("not_found")
+        reservation = self._deps.intake.reservation_for(workspace_id)
+        extracts = (
+            []
+            if reservation is None
+            else [
+                claim
+                for claim in self._deps.intake.claims_for(reservation.intake_id)
+                if claim.operation is IntakeOperation.EXTRACT
+            ]
+        )
+        config = self._deps.review_canary or ReviewCanaryConfig()
+        try:
+            session = self._deps.store.start_or_resume_review_session(
+                workspace_token=workspace_id,
+                owner=owner,
+                client_session_key=body.client_session_id,
+                config=config,
+                now=self._deps.clock(),
+                workspace_revision=current.revision,
+                reading_request_id=extracts[-1].request_id if extracts else None,
+            )
+        except (TicketObservabilityConflict, TicketObservabilityAccessError) as exc:
+            raise _error(str(exc)) from None
+        return self._session_view(session)
+
+    def record_review_observation(
+        self,
+        workspace_id: str,
+        session_id: str,
+        body: s.TicketReviewObservationRequest,
+    ) -> s.TicketReviewObservationReceipt:
+        owner = self._deps.store.workspace_owner(workspace_id)
+        if owner is None:
+            raise _error("not_found")
+        try:
+            obs_input = ReviewObservationInput(
+                client_observation_id=body.client_observation_id,
+                event_kind=ReviewObservationEventKind(body.event_kind),
+                treatment_variant=ReviewVariant(body.treatment_variant),
+                treatment_version=body.treatment_version,
+                rendered_variant=ReviewVariant(body.rendered_variant),
+                outcome=ReviewObservationOutcome(body.outcome),
+                visible_elapsed_ms=body.visible_elapsed_ms,
+                busy_elapsed_ms=body.busy_elapsed_ms,
+                hidden_elapsed_ms=body.hidden_elapsed_ms,
+                visibility_changes=body.visibility_changes,
+                timing_state=ReviewTimingState(body.timing_state),
+                invalid_field_count=body.invalid_field_count,
+                customer_supplied=body.customer_supplied,
+                reading_status=body.reading_status,
+                review_status=body.review_status,
+            )
+            recorded = self._deps.store.record_review_observation(
+                workspace_token=workspace_id,
+                owner=owner,
+                session_id=session_id,
+                observation=obs_input,
+                now=self._deps.clock(),
+            )
+        except (TicketObservabilityConflict, TicketObservabilityAccessError, ValueError) as exc:
+            raise _error(str(exc)) from None
+        return self._review_observation_view(recorded)
+
+    def ticket_observability(self, workspace_id: str) -> s.TicketObservabilitySnapshot:
+        owner = self._deps.store.workspace_owner(workspace_id)
+        if owner is None:
+            raise _error("not_found")
+        try:
+            snapshot = self._deps.store.ticket_observability(
+                workspace_token=workspace_id, owner=owner
+            )
+        except TicketObservabilityAccessError as exc:
+            raise _error(str(exc)) from None
+        ocr_views: list[s.TicketOcrObservationReadView] = []
+        for entry in snapshot.ocr_observations:
+            detail: s.TicketOcrObservationDetail | None = None
+            if entry.observation is not None:
+                obs = entry.observation
+                detail = s.TicketOcrObservationDetail(
+                    observation_id=obs.observation_id,
+                    journey_id=obs.journey_id,
+                    routing_mode=obs.routing_mode.value,
+                    primary_model=obs.primary_model,
+                    secondary_model=obs.secondary_model,
+                    primary_status=obs.primary_status.value,
+                    escalation_status=obs.escalation_status.value,
+                    coordinator_duration_ms=obs.coordinator_duration_ms,
+                    primary_duration_ms=obs.primary_duration_ms,
+                    primary_start_offset_ms=obs.primary_start_offset_ms,
+                    primary_end_offset_ms=obs.primary_end_offset_ms,
+                    escalation_duration_ms=obs.escalation_duration_ms,
+                    escalation_start_offset_ms=obs.escalation_start_offset_ms,
+                    escalation_end_offset_ms=obs.escalation_end_offset_ms,
+                    shown_suggestion_count=obs.shown_suggestion_count,
+                    manual_entry_field_count=obs.manual_entry_field_count,
+                    reason_counts={k.value: v for k, v in obs.reason_counts.items()},
+                    decision_policy=obs.decision_policy,
+                    recorded_at=obs.recorded_at,
+                )
+            ocr_views.append(
+                s.TicketOcrObservationReadView(
+                    request_id=entry.request_id,
+                    operation_status=entry.operation_status,  # type: ignore[arg-type]
+                    coverage=entry.coverage.value,
+                    observation=detail,
+                )
+            )
+        return s.TicketObservabilitySnapshot(
+            journey_id=snapshot.journey_id,
+            ocr_observations=ocr_views,
+            review_sessions=[self._session_view(item) for item in snapshot.review_sessions],
+            review_observations=[
+                self._review_observation_view(item) for item in snapshot.review_observations
+            ],
+        )

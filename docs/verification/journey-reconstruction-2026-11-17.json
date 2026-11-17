@@ -1,0 +1,104 @@
+{
+  "date": "2026-11-17",
+  "timezone": "America/Los_Angeles",
+  "implementation": "direct by active model; no sub-agents",
+  "scope": [
+    "T01 read-only journey reconstruction",
+    "Mandatory OCR attempt for new review/confirmation/submission",
+    "Paid-beta example configuration and canonical plan"
+  ],
+  "state": {
+    "implemented": true,
+    "locally_tested": true,
+    "production_configured": false,
+    "live": false,
+    "measured_business_outcomes": false
+  },
+  "git_head": "a717d5ab08dbed349406e0171bc29eddec3419c8",
+  "worktree": "Pre-existing uncommitted work preserved; no commit or push",
+  "input_sha256_by_path": {
+    ".env.example": "d0ef60fdcc63bb52b0d5cccf2a9efe2863223c9f4a43dca18575078bded807d3",
+    "backend/src/parkingbreaker/journey_timeline.py": "5487b5c3ba54abeeca89505bf8158e13984df1560f0103984d2388b0c76221ee",
+    "backend/src/parkingbreaker/transaction_store.py": "14cf65670a1614da80d4ec119e6978307376154c00600b9fc9f278eb47025d0e",
+    "backend/src/parkingbreaker/ticket_intake_service.py": "2cb5f83f6355b9a81ca27c9b6efce9f391a89bd9dc646fa0f8a04f317978bc6b",
+    "backend/tests/test_journey_timeline.py": "3f90747cd7794085ea8e9a31867301561e1a41734aad34f6635ffee33f15c423",
+    "backend/tests/test_journey_events.py": "c965c77f7da1cc20537c9bf0121ed4409e8a45ee4ccddda8ccdb5bd155de84b9",
+    "backend/tests/test_ticket_recovery.py": "0bcdc98efa4057a0d71f8a1287dc12d6cc60965d197bffc5eefe76a2e701a4ba",
+    "web/app/page.tsx": "4464bcbdcae752a26d8c6d8faa643d0cb1b4cc6581a24f5d1071b9453ba0ca47"
+  },
+  "backend_inputs": {
+    "count": 496,
+    "sha256": "71b06454b6dbec5838ea421be2b3a3d8f662644a173a6ff0b7c6fe54e9529e8d",
+    "recipe": "Sorted rg --files backend/src backend/tests plus backend/pyproject.toml and backend/uv.lock; hash UTF-8 path + NUL + file SHA-256 hex + LF for each file."
+  },
+  "checks": [
+    {
+      "cwd": "backend",
+      "command": "PB_PROVIDER_MODE=preview .venv/bin/python -m pytest tests/test_journey_timeline.py tests/test_journey_events.py tests/test_ticket_observability.py tests/test_ticket_intake_store.py tests/test_ticket_intake_service.py tests/test_ticket_intake_api.py tests/test_transaction_store.py tests/test_transaction_lifecycle.py tests/test_t14_intake_atomicity.py tests/test_t14_authorization_atomicity.py tests/test_t14_authorization_recovery.py tests/test_ticket_recovery.py tests/test_beta_admission.py tests/test_beta_recovery.py tests/test_retention_inventory.py tests/test_retention_plan.py tests/test_manifest_integrity_acceptance.py tests/test_config.py tests/test_service_phase.py tests/test_runtime_service_phase.py tests/test_mail_config.py --basetemp=/tmp/pbt -x --tb=short",
+      "result": "410 passed in 14.10s",
+      "exit_code": 0
+    },
+    {
+      "cwd": "backend",
+      "command": ".venv/bin/mypy",
+      "result": "Success: no issues found in 485 source files",
+      "exit_code": 0
+    },
+    {
+      "cwd": "backend",
+      "command": ".venv/bin/ruff check src tests",
+      "result": "All checks passed",
+      "exit_code": 0
+    },
+    {
+      "cwd": "backend",
+      "command": ".venv/bin/ruff format --check src tests",
+      "result": "485 files already formatted",
+      "exit_code": 0
+    },
+    {
+      "cwd": "web",
+      "command": "npm run type-check",
+      "result": "passed",
+      "exit_code": 0
+    },
+    {
+      "cwd": "web",
+      "command": "npm run lint",
+      "result": "passed; max warnings 0",
+      "exit_code": 0
+    },
+    {
+      "cwd": ".",
+      "command": "git diff --check",
+      "result": "passed",
+      "exit_code": 0
+    }
+  ],
+  "failed_runs": [
+    {
+      "command": "Expanded 410-test suite with --basetemp=/tmp/pb-journey-accepted",
+      "result": "180 failed, 192 passed, 38 errors in 15.69s",
+      "diagnostic": "SQLite disk I/O errors in temporary fixture storage; not counted as successful acceptance",
+      "resolution": "Removed only temporary test directories created by this task; reran the same expanded suite on fresh /tmp/pbt storage; 410 passed. No application fix or suppressed tests."
+    }
+  ],
+  "acceptance": [
+    "Deterministic source-sequence-preserving receipt-time merge and snapshot-bound pages",
+    "Exact replay deduplicates; conflicting/mixed evidence rejected",
+    "Missing, late, limited, legacy, route-unknown and legitimate skip classifications",
+    "Server/client evidence separated; raw customer content and bearer/provider identities omitted",
+    "Single read snapshot, owner check, query-only mode, bounded inputs and restart equivalence",
+    "Frozen paid and no-charge records unchanged by timeline reads",
+    "New review/submission cannot skip OCR; pending and replaced-photo attempts blocked",
+    "Existing correction after failed OCR remains tested; frozen commitments preserved"
+  ],
+  "limits": [
+    "Version-one capture provenance is LIMITED; not a complete attempt history",
+    "No persistent analyzer, queue, exporter or live autonomous repair",
+    "Full 13,722+ backend release suite and browser rehearsal not repeated for this slice",
+    "Paid beta and correct-office/on-time promise need remaining live admission/fulfillment qualification",
+    "No deployment, paid provider calls, charge, mailing or external publication"
+  ],
+  "next": "T02 versioned capture provenance and earlier journey identity; continue paid-beta qualification"
+}

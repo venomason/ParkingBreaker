@@ -1,0 +1,191 @@
+{
+  "date": "2026-11-17",
+  "scope": "OCR and TicketFactReview observability plus guidance canary",
+  "worker": {
+    "tool": "AGY",
+    "model": "gemini-4-hydrogen-high",
+    "effort": "high",
+    "conversation": "8cd2b1c6-11a1-4f00-887e-d1488a8fa1c9",
+    "status": "partial; headless command permission denied; supervisor completed and independently verified"
+  },
+  "implemented": true,
+  "productionActivated": false,
+  "defaultCanary": "baseline / 0%",
+  "rollbackBoundary": "new review sessions; existing assignments remain pinned",
+  "changedFiles": [
+    {
+      "path": ".env.example",
+      "sha256": "fc83f6bfa37cae527018909b9cd8cbb7c6f1361d291036abaeb35f5cc19f335e"
+    },
+    {
+      "path": "backend/src/parkingbreaker/api/app.py",
+      "sha256": "029d73284999afcc370fe7413471136a81b6967adba52181c76f051ccf9d2756"
+    },
+    {
+      "path": "backend/src/parkingbreaker/api/fakes.py",
+      "sha256": "def8a93456a8450453857c38790480bd53f6c1f8993ca0d1b06b6fe2fb063bc4"
+    },
+    {
+      "path": "backend/src/parkingbreaker/api/schemas.py",
+      "sha256": "2742575b5ccd49336558069e919ff61894ae01920f37ff8ae29f8de601f678d1"
+    },
+    {
+      "path": "backend/src/parkingbreaker/api/service.py",
+      "sha256": "1e661f66a12eb2c1b0f71e508b864080181b14cee2e95ddaab65cc85d45f0290"
+    },
+    {
+      "path": "backend/src/parkingbreaker/case_service.py",
+      "sha256": "8dd42c79f8f7beedc935b853f3c165efa2ceda8bea40a5a56943f06a124fbad8"
+    },
+    {
+      "path": "backend/src/parkingbreaker/config.py",
+      "sha256": "81536381cb7cebe74a76a3e3aa392a522552b49dbdbfcb5e5befffa4b0055e86"
+    },
+    {
+      "path": "backend/src/parkingbreaker/retention_inventory.py",
+      "sha256": "b8c62025bbd404249e5d5c631d0c4c9ae0308c119a9b3aa4f9a4f9a190cca9ad"
+    },
+    {
+      "path": "backend/src/parkingbreaker/retention_plan.py",
+      "sha256": "988d498f5809b99a8de1d2853331864077926d1bb277eebea4c74b66da5e030e"
+    },
+    {
+      "path": "backend/src/parkingbreaker/ticket_intake_service.py",
+      "sha256": "26b868ebd8a449ec5d2b9d1e71856d8d252ea2f34517c4b974ef4aca963cbf2e"
+    },
+    {
+      "path": "backend/src/parkingbreaker/ticket_intake_store.py",
+      "sha256": "ad7934133ec601533447d91b1cf83cedb1226a0551c119498cf2b35508b998d5"
+    },
+    {
+      "path": "backend/src/parkingbreaker/ticket_ocr.py",
+      "sha256": "a27037da16f5e5aeca75a3ef2437b128034dfe82ce7546349f2973d81bf4b813"
+    },
+    {
+      "path": "backend/src/parkingbreaker/ticket_vision.py",
+      "sha256": "504ab9382f82ef031ae3f0e232e3b3119c75af15e6b0b1f773205f47a1e57c89"
+    },
+    {
+      "path": "backend/src/parkingbreaker/transaction_store.py",
+      "sha256": "38a6736ed0ad7b71ca38eeeb42ac6e49ffcb94d45e40a88174b299a322c6c551"
+    },
+    {
+      "path": "backend/tests/fixtures/api-contract-launch1.json",
+      "sha256": "a218e02b9d9401f9942f904c7a91848ee4e27092a6a2de5648372d6c21bc0a2c"
+    },
+    {
+      "path": "backend/tests/test_api.py",
+      "sha256": "c06961534f2384d5987f8fbe3f0bf2bb3712ffce00459a03dd5190f41d09e7f6"
+    },
+    {
+      "path": "web/app/page.tsx",
+      "sha256": "057261c12ae6b180dc384e60f5da9aeca179727982a119fec4a458747e3425a7"
+    },
+    {
+      "path": "web/components/Step1Ticket.tsx",
+      "sha256": "528e91e4058fbc37c4025759d29907f2d5cf36481fbd4cdcfe262ac6fdb986d0"
+    },
+    {
+      "path": "web/components/TicketFactReview.tsx",
+      "sha256": "c3b05bb0b1054c7ecc08a98f33091b942b6065da0616420ceba937e328eb37cf"
+    },
+    {
+      "path": "web/lib/api-types.ts",
+      "sha256": "09bc3ea94fd20314e294f2120f3041a0c4e5a5a92eb35dc5de9d133760a5a6e0"
+    },
+    {
+      "path": "web/lib/api.ts",
+      "sha256": "db3071558d2318d49c42f3e2d64eb59d2e3b8791f5892044879f965348c7f678"
+    },
+    {
+      "path": "web/lib/openapi.json",
+      "sha256": "b02feaf30c71f8c49f75c689566f5acbca513e85f03da254fd498b9402f0569c"
+    },
+    {
+      "path": "web/tests/beta-full-journey.spec.ts",
+      "sha256": "a2f8b8a3e21b2dce14ad1070274e5fcd3c060a6f064cee6f972622aa02ba97b2"
+    },
+    {
+      "path": "backend/tests/test_journey_events.py",
+      "sha256": "54e2774d7befef04602f4c3c737697a03c044381e225dcc6041f20b25cdb00d5"
+    },
+    {
+      "path": "docs/TELEMETRY-FOUNDATION.md",
+      "sha256": "65cf00d5a9c383eb469c033c9ad20bf34131eb558147fa5f1ed36e7904e1d710"
+    },
+    {
+      "path": "backend/src/parkingbreaker/ticket_observability.py",
+      "sha256": "88f9d34b875507c87ec4f023a80347c9f6a78569162e37a3be7e2c41c9b41c1a"
+    },
+    {
+      "path": "backend/tests/test_ticket_observability.py",
+      "sha256": "e3ba8e87beaa3d4fb189a93821858494b0c437305cc410db5a3bba4186a12fc1"
+    },
+    {
+      "path": "web/lib/ticket-observability.ts",
+      "sha256": "caa263da9c5dd42af12ec7ab60dff1a8e9f9fb034c872e6abc92c1d60ee0a417"
+    },
+    {
+      "path": "web/tests/ticket-observability.spec.ts",
+      "sha256": "763d0efe9b2d3eb2592018edced3e0417843bdd514c875ed6788d9378da92069"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "sha256": "5e0f782dff8a922cbed6ad06c0588046b9c1333593eaff80ceae0be7f11ffc63"
+    }
+  ],
+  "frozenCommitmentsProof": "A real paid case reaches FROZEN; snapshot every business table; allocate canary, write/replay observations, switch to baseline with a new version; compare all business rows and case status exactly.",
+  "checks": {
+    "integratedPytest": {
+      "passed": 250,
+      "exitCode": 0,
+      "log": "output/ocr-slice-validation-20261117/logs/integrated-pytest.log"
+    },
+    "mypy": "483 files clean",
+    "ruff": "lint and format clean",
+    "frontend": "type-check and ESLint passed",
+    "clientTimingAndRetry": "3 passed",
+    "browser": {
+      "productionBuild": true,
+      "syntheticProviders": true,
+      "project": "chromium-mobile375x812",
+      "passed": 53,
+      "skipped": 0,
+      "flaky": 0,
+      "applicationFingerprint": "c5ecfa274a73edb6a6e750a8ab663717969557805ebb83f17eb5c218d6436535",
+      "ownedServicesStopped": true,
+      "report": "output/ocr-slice-validation-20261117/browser-final/playwright-report.json",
+      "integratedApplicationFingerprint": "c5ecfa274a73edb6a6e750a8ab663717969557805ebb83f17eb5c218d6436535",
+      "integratedSourceMatchesRehearsal": true
+    },
+    "fullPytest": {
+      "passed": 13722,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 1126.62,
+      "exitCode": 0,
+      "warning": "Existing Starlette/AnyIO BlockingPortal deprecation",
+      "log": "output/ocr-slice-validation-20261117/logs/pytest-final.log",
+      "location": "isolated checkout; integrated source fingerprint matches"
+    }
+  },
+  "limitations": [
+    "No production deployment or configured Slack/GA4 export",
+    "No automatic statistical rollout/rollback controller",
+    "Client timing is an activity observation, never attention or confirmed facts",
+    "Browser loss/closed-tab activity and delivery exhaustion remain unknown",
+    "Application-wide reconstruction, telemetry health and persistent repair queue remain roadmap work"
+  ],
+  "nextTask": "Pure journey reconstruction and telemetry coverage reconciliation; feed bounded diagnostic evidence into the durable analyzer queue.",
+  "sourceSnapshot": {
+    "path": "output/source-export/ParkingBreaker-entire-project-source.md",
+    "files": 706,
+    "manifestSha256": "03af2509523268f277b8aa4ca5e67c0575953f0270ebbaf1c5bf8f77463b2e0a"
+  },
+  "environmentNotes": [
+    "Initial full run aborted after temporary-filesystem quota exhaustion; not acceptance evidence.",
+    "A longer temporary path exceeded Unix socket limits; final runs used short local paths.",
+    "AGY command permission was not bypassed or changed; supervisor used authorized local execution."
+  ],
+  "verifiedAt": "2026-11-17T09:56:14.743Z"
+}

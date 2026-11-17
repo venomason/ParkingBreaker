@@ -74,6 +74,19 @@ class CaseServices(Protocol):
         self, workspace_id: str, body: s.TicketConfirmationRequest
     ) -> s.TicketConfirmationReceipt: ...
 
+    def ticket_observability(self, workspace_id: str) -> s.TicketObservabilitySnapshot: ...
+
+    def start_ticket_review_session(
+        self, workspace_id: str, body: s.TicketReviewSessionRequest
+    ) -> s.TicketReviewSession: ...
+
+    def record_ticket_review_observation(
+        self,
+        workspace_id: str,
+        session_id: str,
+        body: s.TicketReviewObservationRequest,
+    ) -> s.TicketReviewObservationReceipt: ...
+
     def submit(self, workspace_id: str, body: s.SubmitIntake) -> s.IntakeReceipt: ...
 
     def pre_hold(self, case_id: str) -> s.PreHoldResult: ...

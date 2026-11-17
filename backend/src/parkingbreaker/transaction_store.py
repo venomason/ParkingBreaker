@@ -75,6 +75,16 @@ from parkingbreaker.draft_ownership_store import (
 )
 from parkingbreaker.identity_store import IdentityStoreMixin, initialize_identity
 from parkingbreaker.intake_store import IntakeConflict, IntakeStoreMixin, initialize_intake
+from parkingbreaker.journey_events import (
+    CostStatus,
+    JourneyEventInput,
+    JourneyEventKind,
+    JourneyEventOutcome,
+    JourneyEventsStoreMixin,
+    append_journey_event_in_transaction,
+    initialize_journey_events,
+)
+from parkingbreaker.journey_timeline import JourneyTimelineStoreMixin
 from parkingbreaker.lob_submission import (
     FALLBACK_LEAD,
     LOCAL_REFUSAL_REASON,
@@ -157,6 +167,10 @@ from parkingbreaker.settings_store import SettingsStoreMixin, initialize_setting
 from parkingbreaker.submission_records import SubmissionCursor, decode_outcome, outcome_json
 from parkingbreaker.sweep_run_store import SweepRunStoreMixin, initialize_sweep_runs
 from parkingbreaker.ticket_intake_store import initialize_ticket_intake
+from parkingbreaker.ticket_observability import (
+    TicketObservabilityStoreMixin,
+    initialize_ticket_observability,
+)
 from parkingbreaker.tracking_email_store import (
     TrackingEmailStoreMixin,
     initialize_tracking_email,
@@ -966,6 +980,9 @@ class SqliteTransactionStore(
     SettingsStoreMixin,
     NotificationStoreMixin,
     IdentityStoreMixin,
+    JourneyEventsStoreMixin,
+    JourneyTimelineStoreMixin,
+    TicketObservabilityStoreMixin,
     PricingStoreMixin,
     IntakeStoreMixin,
     WebhookBacklogStoreMixin,
@@ -1024,6 +1041,8 @@ class SqliteTransactionStore(
             initialize_tracking_email(self._require_open())
             initialize_settings(self._require_open())
             initialize_runtime_service_phase(self._require_open())
+            initialize_journey_events(self._require_open())
+            initialize_ticket_observability(self._require_open())
         except Exception:
             self.close()
             raise
@@ -1866,6 +1885,18 @@ class SqliteTransactionStore(
             if row is None:
                 raise StorageCorruption("authorized case disappeared inside transaction")
             result = _case_record(row)
+            if result.payment_state is not PaymentState.NO_CHARGE and result.amount_cents > 0:
+                append_journey_event_in_transaction(
+                    database,
+                    workspace_token=result.workspace_token,
+                    occurrence_key=f"hold_authorized:{result.case_token}",
+                    event=JourneyEventInput(
+                        kind=JourneyEventKind.HOLD_AUTHORIZED,
+                        outcome=JourneyEventOutcome.SUCCEEDED,
+                        occurred_at=result.authorized_at,
+                        cost_status=CostStatus.NOT_APPLICABLE,
+                    ),
+                )
             database.execute("COMMIT")
         except Exception:
             if database.in_transaction:
@@ -2254,6 +2285,18 @@ class SqliteTransactionStore(
                         occurred_at,
                         outcome=stop_family(event.reason),
                     )
+            if letter and result.letter_state is CaseState.FROZEN:
+                append_journey_event_in_transaction(
+                    database,
+                    workspace_token=current.workspace_token,
+                    occurrence_key=f"packet_approved:{case_id}:{result.revision}:{result.attempt}",
+                    event=JourneyEventInput(
+                        kind=JourneyEventKind.PACKET_APPROVED,
+                        outcome=JourneyEventOutcome.SUCCEEDED,
+                        occurred_at=occurred_at,
+                        cost_status=CostStatus.NOT_APPLICABLE,
+                    ),
+                )
             if owns_transaction:
                 database.execute("COMMIT")
             return result

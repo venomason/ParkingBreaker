@@ -1,5 +1,7 @@
 # November 15, 2026 consolidation
 
+Historical provenance and recovery record. Current work is governed by [ROADMAP.md](ROADMAP.md), [BETA-READINESS.md](BETA-READINESS.md) and [AGENTS.md](../AGENTS.md). Instructions and runtime observations below describe the recorded consolidation, not current authority.
+
 The active checkout is `Desktop/ParkingBreaker-Codebase`, backed by
 `https://github.com/venomason/ParkingBreaker`. With the owner's explicit approval,
 `main` was fast-forwarded and pushed to signed commit

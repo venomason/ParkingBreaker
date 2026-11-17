@@ -1,8 +1,28 @@
 # Customer choices and the correct-office guarantee
 
-Owner direction: November 16, 2026. Full detail belongs in Rules and refund terms;
+Owner direction: November 17, 2026; prior November 16 causation rules remain in force. Full detail belongs in Rules and refund terms;
 the customer journey gets one short notice linking to those rules. This concerns
 clerical accuracy and entry into the agency's process, never argument quality.
+
+## Paid beta and required ticket reading
+
+Beta describes service maturity, not free pricing. The launch offering uses the existing
+paid flow; no free-beta entitlement batch is part of the current launch plan. Existing
+no-charge records retain their original commitments and recovery behavior.
+
+New intake requires a front ticket image, any necessary back image, and a completed OCR
+attempt bound to those exact images before a new fact review, confirmation or submission.
+A pending or absent attempt blocks progress. Customers may correct unreadable or refused
+results; failed OCR stays failed, and customer facts do not become extracted facts.
+OCR, customer confirmation, official-source research and exact-packet approval serve
+different purposes. None substitutes for the other.
+
+The intended service commitment is correct-office, on-time filing or refusal of service.
+Admission must establish the official receiving office, applicable filing deadline and
+filing rule, and a supported mailing path within that window. The same checks must remain
+valid at dispatch. Qualification must establish the provider evidence and remedy backing
+that promise before publication; local tests alone do not establish physical delivery.
+Beta disclosures must state supported limitations without waiving existing commitments.
 
 ## Admission and choice
 

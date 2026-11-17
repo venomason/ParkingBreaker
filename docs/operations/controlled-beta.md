@@ -6,6 +6,15 @@ See [current readiness](../BETA-READINESS.md) for source-specific results.
 Status: **NO-GO for live intake**. This is a preparation and acceptance packet,
 not permission to provision, deploy, use paid providers, send notifications or mail.
 
+## Current owner direction (November 17)
+
+The planned beta is paid. Use the existing paid authorization, exact-packet approval,
+mailing and capture controls; do not select a free entitlement batch for launch. Historical
+free-beta qualification below remains historical evidence only. New intake requires ticket
+images and an OCR attempt before fact confirmation; correction does not replace reading.
+The intended correct-office/on-time commitment requires verified official procedure and
+provider qualification before customer admission. See [Customer Choice Rules](../CUSTOMER-CHOICE-RULES.md).
+
 ## Customer boundary
 
 Ask for a readable ticket and any required back page. Accept JPEG/PNG, at most
@@ -19,7 +28,7 @@ prerequisite. Existing per-request source checks and safe refusals remain in for
 ## Configuration and provider access
 
 Use the reviewed `.env.example` as a **nonsecret template**, not the archived `.env`.
-The example selects `fake`, `controlled_free_beta`, DeepSeek V4.1 Flash intake
+The example selects `fake`, `paid`, DeepSeek V4.1 Flash intake
 (`deepseek-flash`) and the existing DeepSeek research/drafting roles. The optional
 Gemini packet-check preset is retained; the current customer-authored service does
 not construct a packet-check model. `PB_LLM_PRESET` must be absent:
@@ -29,7 +38,7 @@ Changing the example does not change the running service or grant beta entitleme
 
 Before any real-provider startup, record secure credential references, account/mode,
 approved privacy/retention terms, available funding and the exact allowed calls.
-Do not copy the archived credential file wholesale: it contains `PB_SERVICE_PHASE=paid`.
+Do not copy the archived credential file wholesale: its credentials and settings are not current qualification evidence.
 The canonical checkout has no credential file. Never put secrets in receipts or Git.
 
 Owner requested the ticket-reader switch on November 15. DeepSeek's current

@@ -369,6 +369,29 @@ async def _contract_examples(
             },
             expected_status=409,
         )
+        await call("GET", f"/workspaces/{workspace}/ticket-observability", expected_status=409)
+        await call(
+            "POST",
+            f"/workspaces/{workspace}/ticket-review-sessions",
+            {"client_session_id": "1" * 32},
+            expected_status=409,
+        )
+        await call(
+            "POST",
+            f"/workspaces/{workspace}/ticket-review-sessions/rvs_{'1' * 32}/observations",
+            {
+                "client_observation_id": "2" * 32,
+                "event_kind": "exposure",
+                "outcome": "observed",
+                "treatment_variant": "baseline",
+                "rendered_variant": "baseline",
+                "treatment_version": "baseline:review-guidance-v1",
+                "timing_state": "open_or_missing_unknown",
+                "reading_status": "missing",
+                "review_status": "missing",
+            },
+            expected_status=409,
+        )
     return examples
 
 
@@ -389,7 +412,11 @@ async def test_documented_examples_match_live_routes() -> None:
                     re.sub(
                         r"/notices/[a-f0-9]{32}/pages/\d+$",
                         "/notices/{notice_id}/pages/{page_number}",
-                        re.sub(r"case_[a-f0-9]+", "{case_id}", example["path"]),
+                        re.sub(
+                            r"case_[a-f0-9]+",
+                            "{case_id}",
+                            re.sub(r"rvs_[a-f0-9]{32}", "{session_id}", example["path"]),
+                        ),
                     ),
                 ),
             ),

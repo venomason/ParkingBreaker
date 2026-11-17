@@ -14,6 +14,13 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from typing import Protocol
 
+from parkingbreaker.journey_events import (
+    CostStatus,
+    JourneyEventInput,
+    JourneyEventKind,
+    JourneyEventOutcome,
+    append_journey_event_in_transaction,
+)
 from parkingbreaker.mail_attempt_store import StorageCorruption, rollback_preserving_error
 from parkingbreaker.payment_records import mutation_key
 from parkingbreaker.service_phase import ServicePhase
@@ -575,12 +582,24 @@ class IntakeStoreMixin:
                 ),
             )
             row = database.execute(_SELECT + "WHERE r.intake_id=?", (intake_id,)).fetchone()
+            record = _record(row)
+            append_journey_event_in_transaction(
+                database,
+                workspace_token=record.workspace_token,
+                occurrence_key=f"intake_submitted:{record.intake_id}",
+                event=JourneyEventInput(
+                    kind=JourneyEventKind.INTAKE_SUBMITTED,
+                    outcome=JourneyEventOutcome.SUCCEEDED,
+                    occurred_at=record.created_at,
+                    cost_status=CostStatus.NOT_APPLICABLE,
+                ),
+            )
             database.execute("COMMIT")
         except Exception:
             if database.in_transaction:
                 rollback_preserving_error(database)
             raise
-        return _record(row)
+        return record
 
     def begin_authorization_attempt(
         self: _Connected,

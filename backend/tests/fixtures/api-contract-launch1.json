@@ -774,6 +774,45 @@
   },
   {
     "method": "GET",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-observability",
+    "request": null,
+    "status": 409,
+    "response": {
+      "detail": "ticket_reading_disabled"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-review-sessions",
+    "request": {
+      "client_session_id": "11111111111111111111111111111111"
+    },
+    "status": 409,
+    "response": {
+      "detail": "ticket_reading_disabled"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/workspaces/ws_00000000000000000000000000000001/ticket-review-sessions/rvs_11111111111111111111111111111111/observations",
+    "request": {
+      "client_observation_id": "22222222222222222222222222222222",
+      "event_kind": "exposure",
+      "outcome": "observed",
+      "treatment_variant": "baseline",
+      "rendered_variant": "baseline",
+      "treatment_version": "baseline:review-guidance-v1",
+      "timing_state": "open_or_missing_unknown",
+      "reading_status": "missing",
+      "review_status": "missing"
+    },
+    "status": 409,
+    "response": {
+      "detail": "ticket_reading_disabled"
+    }
+  },
+  {
+    "method": "GET",
     "path": "/cases/case_00000000000000000000000000000001/pre-hold",
     "request": null,
     "status": 200,

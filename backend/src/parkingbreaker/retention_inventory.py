@@ -182,6 +182,11 @@ _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
         "pb_beta_candidates",
         "pb_beta_batches",
         "pb_beta_entitlements",
+        "pb_journey_links",
+        "pb_journey_events",
+        "pb_ticket_ocr_observations",
+        "pb_ticket_review_sessions",
+        "pb_ticket_review_observations",
     }
 )
 _STRUCTURAL_METADATA: Final = frozenset({"pb_store_versions"})

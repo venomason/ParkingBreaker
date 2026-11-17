@@ -13,6 +13,8 @@ export type IntakeForm = Schemas["IntakeForm"];
 export type TicketFacts = Schemas["TicketFacts"];
 export type TicketFactBindingPayload = Schemas["TicketFactBindingPayload"];
 export type WorkspaceView = Schemas["WorkspaceView"];
+export type TicketReviewSession = Schemas["TicketReviewSession"];
+export type TicketReviewObservationRequest = Schemas["TicketReviewObservationRequest"];
 export type IntakeReceipt = Schemas["IntakeReceipt"];
 export type PhotoRef = Schemas["PhotoRef"];
 export type Offer = Schemas["Offer"];
@@ -163,7 +165,7 @@ function csrfToken(): string {
   return document.cookie.split("; ").find((part) => part.startsWith("__Host-pb-csrf="))?.slice("__Host-pb-csrf=".length) ?? "";
 }
 
-async function call<T>(method: string, path: string, body?: unknown, publicAuth = false, timeoutMs?: number): Promise<T> {
+async function call<T>(method: string, path: string, body?: unknown, publicAuth = false, timeoutMs?: number, quiet = false): Promise<T> {
   const controller = timeoutMs === undefined ? undefined : new AbortController();
   const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
   try {
@@ -180,7 +182,7 @@ async function call<T>(method: string, path: string, body?: unknown, publicAuth 
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     if (!response.ok) {
-      if (response.status === 401 && !publicAuth && typeof window !== "undefined") {
+      if (response.status === 401 && !publicAuth && !quiet && typeof window !== "undefined") {
         window.dispatchEvent(new Event("pb:session-required"));
       }
       let detail = "request_failed";
@@ -257,6 +259,8 @@ function refreshedPricingAssignment(): Promise<PricingAssignment> {
 }
 
 export const api = {
+  startTicketReviewSession: (w: string, nonce: string) => call<TicketReviewSession>("POST", `/workspaces/${w}/ticket-review-sessions`, { client_session_id: nonce }, false, 1500, true),
+  observeTicketReview: (w: string, session: string, body: TicketReviewObservationRequest) => call<unknown>("POST", `/workspaces/${w}/ticket-review-sessions/${session}/observations`, body, false, 1500, true),
   pricing: cachedPricingAssignment,
   // Existing endpoint, no cache: used only for an explicit server-phase refresh.
   refreshPricing: refreshedPricingAssignment,

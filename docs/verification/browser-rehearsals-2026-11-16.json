@@ -1,0 +1,230 @@
+{
+  "kind": "historical_browser_rehearsal_index",
+  "consolidated_on": "2026-11-16 America/Los_Angeles",
+  "source_commit": "a717d5ab08dbed349406e0171bc29eddec3419c8",
+  "scope": "Summary of original synthetic-only receipts, including failed and interrupted runs. No checks rerun by this consolidation.",
+  "recovery": "git show <source_commit>:<archived_files.path>",
+  "limitations": [
+    "Source-specific historical evidence; not current release acceptance.",
+    "Mobile viewport emulation is not a physical camera or device test.",
+    "Detailed reports and exact web source manifests remain in the source commit.",
+    "Stopped historical process IDs are intentionally omitted; they are not current runtime facts."
+  ],
+  "runs": [
+    {
+      "run": "customer-choice-rules-20261116-mobile",
+      "synthetic_only": true,
+      "production_web": true,
+      "service_phase": "controlled_free_beta",
+      "ticket_reading_preview": true,
+      "application_fingerprint": "8cbd221407ebfd582a0502cf4bc3489568ecf5e1d3edb89d24a4f3cb8a4f405f",
+      "passed": true,
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance",
+      "browser_project": "chromium-mobile375x812",
+      "browser_config": "web/playwright.beta.config.ts",
+      "physical_camera": false,
+      "mobile_viewport_emulation_only": true,
+      "private_web_build": true,
+      "web_source_manifest_sha256": "753d80b9964731774c800beb6a7b3c78e6b9ec1b6454cf1ac68105b407e77fad",
+      "browser_check_sha256": "c75ee2e2eaabf2383fca8577fff66583bb23c440c1a39bb76a3b189c58e14c63",
+      "browser_report_validation": {
+        "valid": true,
+        "tests": 50,
+        "results": 50
+      },
+      "code_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "harness_sha256": {
+        "build-kit/scripts/synthetic_rehearsal.py": "2266d69948a06c9f6712c810ab35373af42fa8b9f40541c373ec5a7d29a122b4",
+        "build-kit/scripts/synthetic_api.py": "238cad8f908a8e91dc8037add14db584a42e2239bfd78a4be7083952ebf02f9a",
+        "build-kit/scripts/kit.py": "259aa54ead2589419c7bf2737b3cd8b1a6b57feb26669a2d4b896256170b0c1e",
+        "web/tests/synthetic-fixtures.ts": "0593542da5608f22abc17b18e560219b6db9c54e205011b1422d1f3ca411c94d",
+        "build-kit/scripts/synthetic_browser_matrix.py": "7cf8aa7bf7f21acb200de9fbd59fe261565a1684ebeb055bbee738f816c869c3",
+        "web/playwright.beta.config.ts": "6ad9d7256765428e92e873caaf7411a4e29498e53afc87935f777b2d41be3728",
+        "web/package.json": "2efada773abc607f1f91babd1cf554a4b92aec2c972de0ac0de13b656688dfd9",
+        "web/package-lock.json": "a949ad922b8c43a4069f2ebe6b910e5679ebe000da344513e4ad43c37943a020"
+      },
+      "harness_unchanged_during_rehearsal": true
+    },
+    {
+      "run": "ocr-routing-20261116-mobile",
+      "synthetic_only": true,
+      "production_web": true,
+      "service_phase": "controlled_free_beta",
+      "ticket_reading_preview": true,
+      "application_fingerprint": "45c71d67002e821fa0a940219f9c69a3cd5cb78828e162a313ccc5a0aa67ae19",
+      "passed": false,
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance",
+      "browser_project": "chromium-mobile375x812",
+      "browser_config": "web/playwright.beta.config.ts",
+      "physical_camera": false,
+      "mobile_viewport_emulation_only": true,
+      "private_web_build": true,
+      "web_source_manifest_sha256": "e2907339c3a3f4eec07ead568e63014b6d72695783c12f165d966552b2515382",
+      "error": "Synthetic rehearsal interrupted",
+      "owned_services_stopped": true,
+      "harness_sha256": {
+        "build-kit/scripts/synthetic_rehearsal.py": "2266d69948a06c9f6712c810ab35373af42fa8b9f40541c373ec5a7d29a122b4",
+        "build-kit/scripts/synthetic_api.py": "238cad8f908a8e91dc8037add14db584a42e2239bfd78a4be7083952ebf02f9a",
+        "build-kit/scripts/kit.py": "259aa54ead2589419c7bf2737b3cd8b1a6b57feb26669a2d4b896256170b0c1e",
+        "web/tests/synthetic-fixtures.ts": "0593542da5608f22abc17b18e560219b6db9c54e205011b1422d1f3ca411c94d",
+        "build-kit/scripts/synthetic_browser_matrix.py": "7cf8aa7bf7f21acb200de9fbd59fe261565a1684ebeb055bbee738f816c869c3",
+        "web/playwright.beta.config.ts": "6ad9d7256765428e92e873caaf7411a4e29498e53afc87935f777b2d41be3728",
+        "web/package.json": "2efada773abc607f1f91babd1cf554a4b92aec2c972de0ac0de13b656688dfd9",
+        "web/package-lock.json": "a949ad922b8c43a4069f2ebe6b910e5679ebe000da344513e4ad43c37943a020"
+      },
+      "harness_unchanged_during_rehearsal": true
+    },
+    {
+      "run": "ocr-routing-20261116-mobile-2",
+      "synthetic_only": true,
+      "production_web": true,
+      "service_phase": "controlled_free_beta",
+      "ticket_reading_preview": true,
+      "application_fingerprint": "1a139110d3ab2a8fbc3290c2edabe5ac6690a86ae72314f0a7ec8cf588e0b7b9",
+      "passed": false,
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance",
+      "browser_project": "chromium-mobile375x812",
+      "browser_config": "web/playwright.beta.config.ts",
+      "physical_camera": false,
+      "mobile_viewport_emulation_only": true,
+      "private_web_build": true,
+      "web_source_manifest_sha256": "b209744a85e2038aec6e7b506fade0d3acc778a08d25a1a4ef1bf98c236892bf",
+      "browser_check_sha256": "1c7f46ccdc02aab3c06d979ccce54cbe1e73d25b3d12054d66cb053a784fad70",
+      "browser_report_validation": {
+        "valid": false,
+        "reason": "Missing or invalid complete passing Playwright report"
+      },
+      "code_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "harness_sha256": {
+        "build-kit/scripts/synthetic_rehearsal.py": "2266d69948a06c9f6712c810ab35373af42fa8b9f40541c373ec5a7d29a122b4",
+        "build-kit/scripts/synthetic_api.py": "238cad8f908a8e91dc8037add14db584a42e2239bfd78a4be7083952ebf02f9a",
+        "build-kit/scripts/kit.py": "259aa54ead2589419c7bf2737b3cd8b1a6b57feb26669a2d4b896256170b0c1e",
+        "web/tests/synthetic-fixtures.ts": "0593542da5608f22abc17b18e560219b6db9c54e205011b1422d1f3ca411c94d",
+        "build-kit/scripts/synthetic_browser_matrix.py": "7cf8aa7bf7f21acb200de9fbd59fe261565a1684ebeb055bbee738f816c869c3",
+        "web/playwright.beta.config.ts": "6ad9d7256765428e92e873caaf7411a4e29498e53afc87935f777b2d41be3728",
+        "web/package.json": "2efada773abc607f1f91babd1cf554a4b92aec2c972de0ac0de13b656688dfd9",
+        "web/package-lock.json": "a949ad922b8c43a4069f2ebe6b910e5679ebe000da344513e4ad43c37943a020"
+      },
+      "harness_unchanged_during_rehearsal": true
+    },
+    {
+      "run": "ocr-routing-20261116-mobile-3",
+      "synthetic_only": true,
+      "production_web": true,
+      "service_phase": "controlled_free_beta",
+      "ticket_reading_preview": true,
+      "application_fingerprint": "0e53802682be1a24edcf172aabba92f0841f299da87eabed7fe81016ed53bb9e",
+      "passed": true,
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance",
+      "browser_project": "chromium-mobile375x812",
+      "browser_config": "web/playwright.beta.config.ts",
+      "physical_camera": false,
+      "mobile_viewport_emulation_only": true,
+      "private_web_build": true,
+      "web_source_manifest_sha256": "87fffe58f68ac6931477cfbe237bab8fcb78dd179a87cc06be845f52417d25e7",
+      "browser_check_sha256": "9add5cd31836017f8a323e658b5a06e5e3f0804af5326c9526954eece968d220",
+      "browser_report_validation": {
+        "valid": true,
+        "tests": 49,
+        "results": 49
+      },
+      "code_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "harness_sha256": {
+        "build-kit/scripts/synthetic_rehearsal.py": "2266d69948a06c9f6712c810ab35373af42fa8b9f40541c373ec5a7d29a122b4",
+        "build-kit/scripts/synthetic_api.py": "238cad8f908a8e91dc8037add14db584a42e2239bfd78a4be7083952ebf02f9a",
+        "build-kit/scripts/kit.py": "259aa54ead2589419c7bf2737b3cd8b1a6b57feb26669a2d4b896256170b0c1e",
+        "web/tests/synthetic-fixtures.ts": "0593542da5608f22abc17b18e560219b6db9c54e205011b1422d1f3ca411c94d",
+        "build-kit/scripts/synthetic_browser_matrix.py": "7cf8aa7bf7f21acb200de9fbd59fe261565a1684ebeb055bbee738f816c869c3",
+        "web/playwright.beta.config.ts": "6ad9d7256765428e92e873caaf7411a4e29498e53afc87935f777b2d41be3728",
+        "web/package.json": "2efada773abc607f1f91babd1cf554a4b92aec2c972de0ac0de13b656688dfd9",
+        "web/package-lock.json": "a949ad922b8c43a4069f2ebe6b910e5679ebe000da344513e4ad43c37943a020"
+      },
+      "harness_unchanged_during_rehearsal": true
+    }
+  ],
+  "archived_files": [
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/browser/full-beta-exact-packet-axe.json",
+      "bytes": 99,
+      "sha256": "53099e10074469b52f8df98aa319af96e4f8bbe410999a7731bc3360f129ed0c"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/browser/full-beta-mailing-record-axe.json",
+      "bytes": 99,
+      "sha256": "327df5c6c20eb1c12e7db37a7aa95ec2ecd0c53280500a9f55354d91bede3e85"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/browser/full-beta-offer-axe.json",
+      "bytes": 99,
+      "sha256": "4414c43ccaeca48576b32a5476f8a5fac97c0b4ee2fcdbc3f7e463cae5f73d9b"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/rehearsal.json",
+      "bytes": 3336,
+      "sha256": "56855dd8f309dabf7f0887f540c508a103137b641530feee4a0f989e8d5cb012"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/web-source.json",
+      "bytes": 16590,
+      "sha256": "753d80b9964731774c800beb6a7b3c78e6b9ec1b6454cf1ac68105b407e77fad"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/browser/full-beta-exact-packet-axe.json",
+      "bytes": 99,
+      "sha256": "53099e10074469b52f8df98aa319af96e4f8bbe410999a7731bc3360f129ed0c"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/browser/full-beta-offer-axe.json",
+      "bytes": 99,
+      "sha256": "4414c43ccaeca48576b32a5476f8a5fac97c0b4ee2fcdbc3f7e463cae5f73d9b"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/rehearsal.json",
+      "bytes": 3373,
+      "sha256": "04c7b56afef58532be4d2d6b6b952250740549e45e654223fb50991bc4b330c4"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/web-source.json",
+      "bytes": 16478,
+      "sha256": "b209744a85e2038aec6e7b506fade0d3acc778a08d25a1a4ef1bf98c236892bf"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/browser/full-beta-exact-packet-axe.json",
+      "bytes": 99,
+      "sha256": "53099e10074469b52f8df98aa319af96e4f8bbe410999a7731bc3360f129ed0c"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/browser/full-beta-mailing-record-axe.json",
+      "bytes": 99,
+      "sha256": "327df5c6c20eb1c12e7db37a7aa95ec2ecd0c53280500a9f55354d91bede3e85"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/browser/full-beta-offer-axe.json",
+      "bytes": 99,
+      "sha256": "4414c43ccaeca48576b32a5476f8a5fac97c0b4ee2fcdbc3f7e463cae5f73d9b"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/rehearsal.json",
+      "bytes": 3336,
+      "sha256": "69f893582a7f5bba142fbc36a8ae9ee52e5e89c133b974c9deda2f5a42563e00"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/web-source.json",
+      "bytes": 16478,
+      "sha256": "87fffe58f68ac6931477cfbe237bab8fcb78dd179a87cc06be845f52417d25e7"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile/rehearsal.json",
+      "bytes": 3034,
+      "sha256": "6aab151d64cda66d3ede9008192bf74f112c432c3b9a7de1082905f550f4b27a"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile/web-source.json",
+      "bytes": 16478,
+      "sha256": "e2907339c3a3f4eec07ead568e63014b6d72695783c12f165d966552b2515382"
+    }
+  ]
+}

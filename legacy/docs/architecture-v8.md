@@ -1,9 +1,11 @@
 # ParkingBreaker: Production Deployment and Operations Architecture (v8)
 
-**Status: ACCEPTED 2026-10-13 under the owner's delegation of the open decisions to the
-supervisor; [business-strategy.md](business-strategy.md) amends §6, §7, §10, §11 and §14.** v6 and v7 remain binding for every section this document does not change.
+Historical contract reference retained for regression tests. Current work and authority are in [ROADMAP.md](../../docs/ROADMAP.md), [BETA-READINESS.md](../../docs/BETA-READINESS.md) and [AGENTS.md](../../AGENTS.md). The original dated decisions below are not a fresh release approval. References to companion historical documents absent from this checkout are archival names, not working links.
 
-v6 ([architecture-v6.md](architecture-v6.md)) and v7 ([architecture-v7.md](architecture-v7.md))
+**Status: ACCEPTED 2026-10-13 under the owner's delegation of the open decisions to the
+supervisor; business-strategy.md (historical companion; not included) amends §6, §7, §10, §11 and §14.** v6 and v7 remain binding for every section this document does not change.
+
+v6 (architecture-v6.md (historical companion; not included)) and v7 (architecture-v7.md (historical companion; not included))
 define what the system decides. Neither says where it runs, how it is deployed, how it survives
 restarts and repeats in production, or how it is operated without the owner. v8 is that
 chapter. It states only what is new. **Where v8 is silent, v6 and v7 are unchanged and
@@ -296,7 +298,7 @@ phase plan.
 ## 7. Research and AI
 
 - **Phase 0 bench (DECIDED (owner), correction 1):** 17 cases, 16 from the 2.x city records (trap
-  and clean cities) plus DC, the three models and Brave search ([bench-plan.md](bench-plan.md)). It measures wrong SERVICEABLE on traps
+  and clean cities) plus DC, the three models and Brave search (bench-plan.md (historical companion; not included)). It measures wrong SERVICEABLE on traps
   (**must be zero**), wrongly refused clean cities, the veto code that stopped each case,
   research accuracy, catching unsupported claims, correct ladder and stops, letter fidelity,
   latency, and cost per ticket. Where a 2.x record and the live official page disagree, that
@@ -501,7 +503,7 @@ lost connections, database restore and rollback, in Stripe and Lob test modes.
 
 ## 14. Open items
 
-All business questions are decided in [business-strategy.md](business-strategy.md) §12.
+All business questions are decided in business-strategy.md (historical companion; not included) §12.
 What remains are owner actions (keys, GitHub sign-in, Google Cloud billing, domain access,
 Lob plan, company and bank, lawyer, live keys), listed in business-strategy §13.
 

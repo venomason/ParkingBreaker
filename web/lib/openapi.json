@@ -729,6 +729,242 @@
         }
       }
     },
+    "/workspaces/{workspace_id}/ticket-observability": {
+      "get": {
+        "summary": "Ticket Observability",
+        "operationId": "ticket_observability_workspaces__workspace_id__ticket_observability_get",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketObservabilitySnapshot"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspace_id}/ticket-review-sessions": {
+      "post": {
+        "summary": "Start Ticket Review Session",
+        "operationId": "start_ticket_review_session_workspaces__workspace_id__ticket_review_sessions_post",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketReviewSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketReviewSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/workspaces/{workspace_id}/ticket-review-sessions/{session_id}/observations": {
+      "post": {
+        "summary": "Record Ticket Review Observation",
+        "operationId": "record_ticket_review_observation_workspaces__workspace_id__ticket_review_sessions__session_id__observations_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketReviewObservationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketReviewObservationReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
     "/workspaces/{workspace_id}/intake": {
       "post": {
         "summary": "Intake",
@@ -5862,6 +6098,295 @@
         "title": "TicketField",
         "description": "The closed field set. No other field is read, sent or returned."
       },
+      "TicketObservabilitySnapshot": {
+        "properties": {
+          "journey_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Journey Id"
+          },
+          "ocr_observations": {
+            "items": {
+              "$ref": "#/components/schemas/TicketOcrObservationReadView"
+            },
+            "type": "array",
+            "title": "Ocr Observations"
+          },
+          "review_sessions": {
+            "items": {
+              "$ref": "#/components/schemas/TicketReviewSession"
+            },
+            "type": "array",
+            "title": "Review Sessions"
+          },
+          "review_observations": {
+            "items": {
+              "$ref": "#/components/schemas/TicketReviewObservationReceipt"
+            },
+            "type": "array",
+            "title": "Review Observations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "TicketObservabilitySnapshot",
+        "description": "Owner-safe OCR routing and review session observability for one workspace."
+      },
+      "TicketOcrObservationDetail": {
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "title": "Observation Id"
+          },
+          "journey_id": {
+            "type": "string",
+            "title": "Journey Id"
+          },
+          "routing_mode": {
+            "type": "string",
+            "enum": [
+              "routed",
+              "single_stage"
+            ],
+            "title": "Routing Mode"
+          },
+          "primary_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Model"
+          },
+          "secondary_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secondary Model"
+          },
+          "primary_status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "refused",
+              "budget_refused",
+              "input_error",
+              "provider_error"
+            ],
+            "title": "Primary Status"
+          },
+          "escalation_status": {
+            "type": "string",
+            "enum": [
+              "not_needed",
+              "not_applicable",
+              "unavailable",
+              "budget_exhausted",
+              "failed",
+              "refused",
+              "completed"
+            ],
+            "title": "Escalation Status"
+          },
+          "coordinator_duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coordinator Duration Ms"
+          },
+          "primary_duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Duration Ms"
+          },
+          "primary_start_offset_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Start Offset Ms"
+          },
+          "primary_end_offset_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary End Offset Ms"
+          },
+          "escalation_duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Duration Ms"
+          },
+          "escalation_start_offset_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Start Offset Ms"
+          },
+          "escalation_end_offset_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation End Offset Ms"
+          },
+          "shown_suggestion_count": {
+            "type": "integer",
+            "maximum": 11.0,
+            "minimum": 0.0,
+            "title": "Shown Suggestion Count"
+          },
+          "manual_entry_field_count": {
+            "type": "integer",
+            "maximum": 11.0,
+            "minimum": 0.0,
+            "title": "Manual Entry Field Count"
+          },
+          "reason_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Reason Counts"
+          },
+          "decision_policy": {
+            "type": "string",
+            "title": "Decision Policy"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "observation_id",
+          "journey_id",
+          "routing_mode",
+          "primary_model",
+          "secondary_model",
+          "primary_status",
+          "escalation_status",
+          "coordinator_duration_ms",
+          "primary_duration_ms",
+          "primary_start_offset_ms",
+          "primary_end_offset_ms",
+          "escalation_duration_ms",
+          "escalation_start_offset_ms",
+          "escalation_end_offset_ms",
+          "shown_suggestion_count",
+          "manual_entry_field_count",
+          "reason_counts",
+          "decision_policy",
+          "recorded_at"
+        ],
+        "title": "TicketOcrObservationDetail",
+        "description": "Safe closed OCR routing reasons/counts and separated monotonic spans."
+      },
+      "TicketOcrObservationReadView": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "operation_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "success",
+              "refused",
+              "unknown"
+            ],
+            "title": "Operation Status"
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "recorded",
+              "pending",
+              "missing"
+            ],
+            "title": "Coverage"
+          },
+          "observation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TicketOcrObservationDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "operation_status",
+          "coverage"
+        ],
+        "title": "TicketOcrObservationReadView",
+        "description": "Coverage-explicit OCR observation record; legacy rows lack coverage explicitly."
+      },
       "TicketOperationRequest": {
         "properties": {
           "request_id": {
@@ -6097,6 +6622,356 @@
         "title": "TicketReviewField",
         "description": "One model comparison and the literal visible text; never adoption or verification."
       },
+      "TicketReviewObservationReceipt": {
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "title": "Observation Id"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "client_observation_id": {
+            "type": "string",
+            "title": "Client Observation Id"
+          },
+          "seq": {
+            "type": "integer",
+            "maximum": 64.0,
+            "minimum": 1.0,
+            "title": "Seq"
+          },
+          "source": {
+            "type": "string",
+            "const": "client_observation",
+            "title": "Source",
+            "default": "client_observation"
+          },
+          "measurement_label": {
+            "type": "string",
+            "const": "elapsed_and_visibility_activity_not_human_attention",
+            "title": "Measurement Label",
+            "default": "elapsed_and_visibility_activity_not_human_attention"
+          },
+          "event_kind": {
+            "type": "string",
+            "enum": [
+              "exposure",
+              "validation_failed",
+              "save_attempt",
+              "confirm_attempt",
+              "timing_checkpoint"
+            ],
+            "title": "Event Kind"
+          },
+          "treatment_variant": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "manual_guidance_v1"
+            ],
+            "title": "Treatment Variant"
+          },
+          "rendered_variant": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "manual_guidance_v1"
+            ],
+            "title": "Rendered Variant"
+          },
+          "treatment_version": {
+            "type": "string",
+            "title": "Treatment Version"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "client_invalid",
+              "submitted_to_server",
+              "client_reported_success",
+              "client_reported_failure",
+              "unknown"
+            ],
+            "title": "Outcome"
+          },
+          "visible_elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86400000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visible Elapsed Ms"
+          },
+          "busy_elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86400000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Busy Elapsed Ms"
+          },
+          "hidden_elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86400000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hidden Elapsed Ms"
+          },
+          "visibility_changes": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Visibility Changes"
+          },
+          "timing_state": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "open_or_missing_unknown"
+            ],
+            "title": "Timing State"
+          },
+          "invalid_field_count": {
+            "type": "integer",
+            "maximum": 13.0,
+            "minimum": 0.0,
+            "title": "Invalid Field Count"
+          },
+          "customer_supplied": {
+            "type": "boolean",
+            "title": "Customer Supplied"
+          },
+          "reading_status": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "pending",
+              "success",
+              "refused",
+              "unknown"
+            ],
+            "title": "Reading Status"
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "pending",
+              "success",
+              "refused",
+              "unknown"
+            ],
+            "title": "Review Status"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "observation_id",
+          "session_id",
+          "client_observation_id",
+          "seq",
+          "event_kind",
+          "treatment_variant",
+          "rendered_variant",
+          "treatment_version",
+          "outcome",
+          "visible_elapsed_ms",
+          "busy_elapsed_ms",
+          "hidden_elapsed_ms",
+          "visibility_changes",
+          "timing_state",
+          "invalid_field_count",
+          "customer_supplied",
+          "reading_status",
+          "review_status",
+          "recorded_at"
+        ],
+        "title": "TicketReviewObservationReceipt",
+        "description": "Persisted client review observation explicitly labeled non-authoritative."
+      },
+      "TicketReviewObservationRequest": {
+        "properties": {
+          "client_observation_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Client Observation Id"
+          },
+          "event_kind": {
+            "type": "string",
+            "enum": [
+              "exposure",
+              "validation_failed",
+              "save_attempt",
+              "confirm_attempt",
+              "timing_checkpoint"
+            ],
+            "title": "Event Kind"
+          },
+          "treatment_variant": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "manual_guidance_v1"
+            ],
+            "title": "Treatment Variant"
+          },
+          "rendered_variant": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "manual_guidance_v1"
+            ],
+            "title": "Rendered Variant"
+          },
+          "treatment_version": {
+            "type": "string",
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,95}$",
+            "title": "Treatment Version"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "client_invalid",
+              "submitted_to_server",
+              "client_reported_success",
+              "client_reported_failure",
+              "unknown"
+            ],
+            "title": "Outcome"
+          },
+          "visible_elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86400000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visible Elapsed Ms"
+          },
+          "busy_elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86400000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Busy Elapsed Ms"
+          },
+          "hidden_elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86400000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hidden Elapsed Ms"
+          },
+          "visibility_changes": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Visibility Changes",
+            "default": 0
+          },
+          "timing_state": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "open_or_missing_unknown"
+            ],
+            "title": "Timing State"
+          },
+          "invalid_field_count": {
+            "type": "integer",
+            "maximum": 13.0,
+            "minimum": 0.0,
+            "title": "Invalid Field Count",
+            "default": 0
+          },
+          "customer_supplied": {
+            "type": "boolean",
+            "title": "Customer Supplied",
+            "default": false
+          },
+          "reading_status": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "pending",
+              "success",
+              "refused",
+              "unknown"
+            ],
+            "title": "Reading Status"
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "pending",
+              "success",
+              "refused",
+              "unknown"
+            ],
+            "title": "Review Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "client_observation_id",
+          "event_kind",
+          "treatment_variant",
+          "rendered_variant",
+          "treatment_version",
+          "outcome",
+          "timing_state",
+          "reading_status",
+          "review_status"
+        ],
+        "title": "TicketReviewObservationRequest",
+        "description": "Closed, bounded client review observation; never carries raw fields or tokens."
+      },
       "TicketReviewRequest": {
         "properties": {
           "request_id": {
@@ -6125,6 +7000,82 @@
         ],
         "title": "TicketReviewRequest",
         "description": "Explicit customer-only confirmation preparation; never a model result."
+      },
+      "TicketReviewSession": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "client_session_key": {
+            "type": "string",
+            "title": "Client Session Key"
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "manual_guidance_v1"
+            ],
+            "title": "Variant"
+          },
+          "policy_mode": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "canary"
+            ],
+            "title": "Policy Mode"
+          },
+          "canary_version": {
+            "type": "string",
+            "title": "Canary Version"
+          },
+          "effective_treatment_version": {
+            "type": "string",
+            "title": "Effective Treatment Version"
+          },
+          "assigned_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Assigned At"
+          },
+          "observation_limit": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Observation Limit",
+            "default": 64
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "client_session_key",
+          "variant",
+          "policy_mode",
+          "canary_version",
+          "effective_treatment_version",
+          "assigned_at"
+        ],
+        "title": "TicketReviewSession",
+        "description": "Pinned TicketFactReview session assignment; never exposes owner or workspace token."
+      },
+      "TicketReviewSessionRequest": {
+        "properties": {
+          "client_session_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Client Session Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "client_session_id"
+        ],
+        "title": "TicketReviewSessionRequest",
+        "description": "Start or idempotently resume a pinned TicketFactReview canary/baseline session."
       },
       "TicketReviewSnapshot": {
         "properties": {

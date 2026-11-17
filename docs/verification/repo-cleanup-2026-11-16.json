@@ -1,0 +1,249 @@
+{
+  "date": "2026-11-16 America/Los_Angeles",
+  "base_commit": "a717d5ab08dbed349406e0171bc29eddec3419c8",
+  "scope": "Repository/document cleanup, canonical roadmap, source compilation and mechanical formatting follow-up. Existing uncommitted telemetry and editor work preserved.",
+  "implementation": "Supervisor performed cleanup and documentation directly. No new runtime product behavior added by this cleanup.",
+  "delegated_review": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "task": "read-only cleanup audit",
+    "result": "blocked by execution environment; no independent evidence returned; not counted as validation"
+  },
+  "roadmap": {
+    "path": "docs/ROADMAP.md",
+    "tasks": 48,
+    "next_task": "T01: pure journey reconstruction with branch-aware gap and capture-coverage semantics"
+  },
+  "removed_files": [
+    {
+      "path": "isituseful.md",
+      "bytes": 86815,
+      "sha256": "6b42d2268fdf71eae008589d0921410fee5c774c40e8a49ace8c50272e401750",
+      "recovery": "git show a717d5ab08dbed349406e0171bc29eddec3419c8:isituseful.md"
+    },
+    {
+      "path": "docs/HANDOFF-2026-11-16-FIGMA.md",
+      "bytes": 16237,
+      "sha256": "5f65e8b2f382f60659cd4c1a6a678b58e27dc7bddb989ccb52e72d1b06956018",
+      "recovery": "git show a717d5ab08dbed349406e0171bc29eddec3419c8:docs/HANDOFF-2026-11-16-FIGMA.md"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/browser/full-beta-exact-packet-axe.json",
+      "bytes": 99,
+      "sha256": "53099e10074469b52f8df98aa319af96e4f8bbe410999a7731bc3360f129ed0c"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/browser/full-beta-mailing-record-axe.json",
+      "bytes": 99,
+      "sha256": "327df5c6c20eb1c12e7db37a7aa95ec2ecd0c53280500a9f55354d91bede3e85"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/browser/full-beta-offer-axe.json",
+      "bytes": 99,
+      "sha256": "4414c43ccaeca48576b32a5476f8a5fac97c0b4ee2fcdbc3f7e463cae5f73d9b"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/rehearsal.json",
+      "bytes": 3336,
+      "sha256": "56855dd8f309dabf7f0887f540c508a103137b641530feee4a0f989e8d5cb012"
+    },
+    {
+      "path": "build-kit/evidence/customer-choice-rules-20261116-mobile/web-source.json",
+      "bytes": 16590,
+      "sha256": "753d80b9964731774c800beb6a7b3c78e6b9ec1b6454cf1ac68105b407e77fad"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/browser/full-beta-exact-packet-axe.json",
+      "bytes": 99,
+      "sha256": "53099e10074469b52f8df98aa319af96e4f8bbe410999a7731bc3360f129ed0c"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/browser/full-beta-offer-axe.json",
+      "bytes": 99,
+      "sha256": "4414c43ccaeca48576b32a5476f8a5fac97c0b4ee2fcdbc3f7e463cae5f73d9b"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/rehearsal.json",
+      "bytes": 3373,
+      "sha256": "04c7b56afef58532be4d2d6b6b952250740549e45e654223fb50991bc4b330c4"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-2/web-source.json",
+      "bytes": 16478,
+      "sha256": "b209744a85e2038aec6e7b506fade0d3acc778a08d25a1a4ef1bf98c236892bf"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/browser/full-beta-exact-packet-axe.json",
+      "bytes": 99,
+      "sha256": "53099e10074469b52f8df98aa319af96e4f8bbe410999a7731bc3360f129ed0c"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/browser/full-beta-mailing-record-axe.json",
+      "bytes": 99,
+      "sha256": "327df5c6c20eb1c12e7db37a7aa95ec2ecd0c53280500a9f55354d91bede3e85"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/browser/full-beta-offer-axe.json",
+      "bytes": 99,
+      "sha256": "4414c43ccaeca48576b32a5476f8a5fac97c0b4ee2fcdbc3f7e463cae5f73d9b"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/rehearsal.json",
+      "bytes": 3336,
+      "sha256": "69f893582a7f5bba142fbc36a8ae9ee52e5e89c133b974c9deda2f5a42563e00"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile-3/web-source.json",
+      "bytes": 16478,
+      "sha256": "87fffe58f68ac6931477cfbe237bab8fcb78dd179a87cc06be845f52417d25e7"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile/rehearsal.json",
+      "bytes": 3034,
+      "sha256": "6aab151d64cda66d3ede9008192bf74f112c432c3b9a7de1082905f550f4b27a"
+    },
+    {
+      "path": "build-kit/evidence/ocr-routing-20261116-mobile/web-source.json",
+      "bytes": 16478,
+      "sha256": "e2907339c3a3f4eec07ead568e63014b6d72695783c12f165d966552b2515382"
+    }
+  ],
+  "recovery_commit": "a717d5ab08dbed349406e0171bc29eddec3419c8",
+  "relocated_receipt": {
+    "from": "build-kit/evidence/polish-verification-20261116.json",
+    "to": "docs/verification/polish-2026-11-16.json",
+    "byte_identical": true
+  },
+  "checks": [
+    {
+      "name": "journey ledger",
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/test_journey_events.py -q",
+      "cwd": "backend",
+      "passed": 10
+    },
+    {
+      "name": "retained reference/fixture contracts",
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/test_t17_low_fixes.py tests/test_tricks_hunter.py tests/test_unserviceable.py tests/test_bench_source_gaps.py tests/test_official_form_lines.py -q",
+      "cwd": "backend",
+      "passed": 43
+    },
+    {
+      "name": "clean-checkout tooling",
+      "command": "python3 -m unittest discover -s tools/tests -v",
+      "passed": 3
+    },
+    {
+      "name": "Ruff lint and format",
+      "scope": [
+        "src/parkingbreaker/journey_events.py",
+        "src/parkingbreaker/intake_store.py",
+        "src/parkingbreaker/ticket_intake_store.py",
+        "src/parkingbreaker/transaction_store.py",
+        "src/parkingbreaker/retention_inventory.py",
+        "src/parkingbreaker/retention_plan.py",
+        "tests/test_journey_events.py"
+      ],
+      "result": "passed"
+    },
+    {
+      "name": "strict mypy",
+      "scope": [
+        "src/parkingbreaker/journey_events.py",
+        "src/parkingbreaker/intake_store.py",
+        "src/parkingbreaker/ticket_intake_store.py",
+        "src/parkingbreaker/transaction_store.py",
+        "src/parkingbreaker/retention_inventory.py",
+        "src/parkingbreaker/retention_plan.py",
+        "tests/test_journey_events.py"
+      ],
+      "result": "passed"
+    },
+    {
+      "name": "local Markdown links",
+      "result": "no missing targets after historical-link clarification"
+    },
+    {
+      "name": "git diff --check",
+      "result": "passed"
+    },
+    {
+      "name": "source export",
+      "files": 702,
+      "bytes": 9159315,
+      "sha256": "fce9366ed92c58d337dc7761bca22ce90427985f7a48bcbf9c4acc470abed489",
+      "manifest_sha256": "2a09f0f172f45bad23eb389a4da51cd78a24aaa8faeb7d3a7fa715ce4af238d7",
+      "result": "all included source hashes reread and verified"
+    }
+  ],
+  "source_export": {
+    "ready_path": "output/source-export/ParkingBreaker-entire-project-source.md",
+    "requested_desktop_path": "/home/ghostmonday/Desktop/ParkingBreaker-entire-project-source.md",
+    "desktop_replaced": false,
+    "blocker": "Automatic approval rejected escalated copy because sandbox approvals are disabled; Desktop target is outside writable roots."
+  },
+  "changed_file_hashes": [
+    {
+      "path": ".gitignore",
+      "sha256": "6e0d9a8cd61cc75ee5d4b32b770d953d856bfa7ae1eaf787a385774122bf0f06"
+    },
+    {
+      "path": "README.md",
+      "sha256": "72bbae491f2bfa16a5b39711fb59d3b008fb9ad09aa198cdcdc9f68cf686a731"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "sha256": "ea65902ea89f954c34f592565148c7fc01654839b46a907282b28422b2ca61aa"
+    },
+    {
+      "path": "docs/BETA-READINESS.md",
+      "sha256": "ada689a7e7b3ac236f7fdd81636aebf160a14a0c7a195c9cad8d6a0f792206ff"
+    },
+    {
+      "path": "docs/CONSOLIDATION.md",
+      "sha256": "03572c01f340c17f701f80df08da8533b0abfab118ed2ca41f119607a30eadef"
+    },
+    {
+      "path": "docs/TELEMETRY-FOUNDATION.md",
+      "sha256": "d770b911653cb157dba0fd02911199e5f4b2ae0e61295500fabf6ee53fce6f8f"
+    },
+    {
+      "path": "docs/bench/deep-city-dossiers-2026-10-27.md",
+      "sha256": "69bd6ef0466d0ee706a233627e8c94a791897d8a0a5114e9ff35886bb8a4ecd2"
+    },
+    {
+      "path": "legacy/backend/docs/api-contract.md",
+      "sha256": "2edcf437186ab7f489c1007b818af39d0c6e9f01c94593d9e840b95d3af7c050"
+    },
+    {
+      "path": "legacy/docs/architecture-v8.md",
+      "sha256": "86bb375c615fe89c037886dbc2fb1ef1728db4d9a849f0e6cefb3766b425d5b6"
+    },
+    {
+      "path": "tools/deepseek-delegate/README.md",
+      "sha256": "12e29ac29e38694094ef4d0482b4e159eb5e0ad742785c41690998ae95decf88"
+    },
+    {
+      "path": "docs/verification/browser-rehearsals-2026-11-16.json",
+      "sha256": "79f8eb0614178769a79d17f2ca78626be4547e3d3dcf35866d74c6486d012b10"
+    },
+    {
+      "path": "docs/verification/polish-2026-11-16.json",
+      "sha256": "448275954d33b122e47b9663437e492e5fe5ea901d1f8371e077dbc317195b3d"
+    },
+    {
+      "path": "backend/src/parkingbreaker/journey_events.py",
+      "sha256": "46be8f76e32a76e399ea781cc30c433eb46c2420794913d1b83ce57e3a15a6b0"
+    },
+    {
+      "path": "backend/tests/test_journey_events.py",
+      "sha256": "5218095d2550d4f052a393fa0d2b28b7a9b162630fb999d77524d04f231a162f"
+    }
+  ],
+  "limitations": [
+    "No fresh full backend suite or frontend build required/run for this documentation cleanup; prior source-specific receipts are retained.",
+    "No production activation, provider trial, Slack/GA4 export, ad spending, commit or push.",
+    "Large brand assets, official-source captures, benchmark keys and contract fixtures are retained because they have live references or provenance value.",
+    "Current worktree remains uncommitted; clean organization does not mean a clean Git status.",
+    "Autonomous advertising/repair capabilities are specified in the roadmap, not implemented by this cleanup."
+  ]
+}

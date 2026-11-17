@@ -86,6 +86,8 @@ function plainError(error: unknown): string {
     beta_qualification_changed: "This appeal changed since the beta offer was made. Review the current offer before accepting.",
     invalid_beta_receipt: "The free beta acceptance could not be verified from the server. Nothing was charged. Check the saved status.",
     paid_orders_paused: "The server refused a new paid authorization in this controlled beta. No new card was charged and your saved appeal is unchanged. Check the saved status before continuing.",
+    ticket_reading_required: "Read your current ticket photos before saving or confirming the facts.",
+    ticket_reading_not_completed: "The reading of your current ticket photos has not finished. Check its saved status before continuing.",
     ticket_reading_disabled: "Ticket reading is not available for this appeal. Your saved work is unchanged.",
     ticket_form_required: "Add and save your ticket photos before this step.",
     ticket_photo_required: "Add a front photo of your ticket before reading it.",
@@ -1695,6 +1697,7 @@ function Journey() {
   }, [fields, showToast]);
 
   const step1Vision = useMemo<Step1VisionProps>(() => ({
+    workspaceId,
     mode: visionMode,
     enabled: Boolean(visionStatus?.enabled),
     required: visionRequired,
@@ -1725,7 +1728,7 @@ function Journey() {
     onConfirm: () => { void confirmTicketVision(); },
     onContinue: handleVisionContinue,
     onOpenRules: openTerms,
-  }), [visionMode, visionStatus, visionRequired, visionChecking, visionError, ticketUploadError, visionReview, visionLiteral, visionDraft, updateVisionDraft, visionResolutions, visionBusy, visionConfirmed, visionDirty, photoRefs, discoverVision, selectPhoto, readTicketVision, refreshVisionStatusOnly, saveAndReviewVision, confirmTicketVision, handleVisionContinue, openTerms]);
+  }), [workspaceId, visionMode, visionStatus, visionRequired, visionChecking, visionError, ticketUploadError, visionReview, visionLiteral, visionDraft, updateVisionDraft, visionResolutions, visionBusy, visionConfirmed, visionDirty, photoRefs, discoverVision, selectPhoto, readTicketVision, refreshVisionStatusOnly, saveAndReviewVision, confirmTicketVision, handleVisionContinue, openTerms]);
 
   const visionAdoptedFacts = useMemo(() => validateFactDraft(visionDraft).facts, [visionDraft]);
 

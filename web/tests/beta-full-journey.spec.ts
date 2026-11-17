@@ -304,6 +304,16 @@ async function visionTicket(page: Page) {
   await expect(page.locator("#visionConfirmBtn")).toBeEnabled();
   await page.locator("#visionConfirmBtn").click();
   await expect(page.locator("#visionConfirmed")).toBeVisible();
+  const observedWorkspace = (await call(page, "GET", "/auth/appeal")).workspace_id;
+  const observationPath = "/workspaces/" + observedWorkspace + "/ticket-observability";
+  await expect.poll(async () => {
+    const timeline = await call(page, "GET", observationPath);
+    return timeline.review_observations.map((row: { event_kind: string }) => row.event_kind);
+  }).toEqual(expect.arrayContaining(["exposure", "save_attempt", "confirm_attempt"]));
+  const telemetry = await call(page, "GET", observationPath);
+  expect(telemetry.ocr_observations[0].coverage).toBe("recorded");
+  expect(JSON.stringify(telemetry)).not.toContain("SYN-BETA-JOURNEY");
+  expect(telemetry.review_observations.every((row: { source: string }) => row.source === "client_observation")).toBe(true);
   await page.locator("#actContinueTicket").click();
   await expect.poll(async () => (await call(page, "GET", "/auth/appeal"))?.intake_form?.step).toBe(2);
   const saved = await call(page, "GET", "/auth/appeal");
@@ -561,4 +571,64 @@ for (const recovery of [false, true]) {
     expect(forbidden, "free customer journey touched a payment route").toEqual([]);
     await testInfo.attach("durable-free-journey-proof", { body: JSON.stringify({ synthetic: true, recovery, packet_sha256: preview.packet_sha256, ...durable }, null, 2), contentType: "application/json" });
   });
+}
+
+
+// Assignment-boundary stubs test rendering; the journeys above test real durable delivery.
+if (process.env.PB_TICKET_READING_PREVIEW === "1") {
+for (const delayed of [false, true]) {
+  test("review guidance preserves an edit; delayed=" + delayed, async ({ page }) => {
+    const bodies: Record<string, unknown>[] = [];
+    let release: () => void = () => undefined;
+    const blocked = new Promise<void>(resolve => { release = resolve; });
+    await page.route("**/api/workspaces/*/ticket-review-sessions", async route => {
+      if (delayed) await blocked;
+      await route.fulfill({ json: {
+        session_id: "rvs_" + "1".repeat(32), client_session_key: route.request().postDataJSON().client_session_id,
+        variant: "manual_guidance_v1", policy_mode: "canary", canary_version: "browser-v1",
+        effective_treatment_version: "manual_guidance_v1:browser-v1", assigned_at: "2026-11-17T00:00:00Z", observation_limit: 64,
+      } });
+    });
+    await page.route("**/api/workspaces/*/ticket-review-sessions/*/observations", async route => {
+      bodies.push(route.request().postDataJSON());
+      await route.fulfill({ json: { accepted: true } });
+    });
+    await page.goto(base!);
+    await page.locator("#actSnap").click();
+    await page.locator("#visionFrontPhoto").setInputFiles({ name: "synthetic.png", mimeType: "image/png", buffer: syntheticPng(200) });
+    await expect(page.locator("#fact-citation_number")).toBeEnabled();
+    if (delayed) {
+      await page.locator("#fact-citation_number").fill("PRIVATE-EDIT");
+      release();
+    }
+    await expect.poll(() => bodies.some(body => body.event_kind === "exposure")).toBe(true);
+    await expect(page.locator("#visionFactReview")).toHaveAttribute("data-review-variant", delayed ? "baseline" : "manual_guidance_v1");
+    await expect(page.locator("#manualReviewGuidance")).toHaveCount(delayed ? 0 : 1);
+    if (!delayed) await page.locator("#fact-citation_number").fill("PRIVATE-EDIT");
+    await page.locator("#visionReviewBtn").click();
+    await expect.poll(() => bodies.some(body => body.event_kind === "validation_failed")).toBe(true);
+    await expect(page.locator("#fact-citation_number")).toHaveValue("PRIVATE-EDIT");
+    const exposure = bodies.find(body => body.event_kind === "exposure")!;
+    expect(exposure.rendered_variant).toBe(delayed ? "baseline" : "manual_guidance_v1");
+    expect(JSON.stringify(bodies)).not.toContain("PRIVATE-EDIT");
+  });
+}
+
+test("unavailable observation service leaves manual review editable", async ({ page }) => {
+  let attempts = 0;
+  await page.route("**/api/workspaces/*/ticket-review-sessions", route => {
+    attempts += 1;
+    return route.fulfill({ status: 503, json: { detail: "synthetic unavailable" } });
+  });
+  await page.goto(base!);
+  await page.locator("#actSnap").click();
+  await page.locator("#visionFrontPhoto").setInputFiles({ name: "synthetic.png", mimeType: "image/png", buffer: syntheticPng(200) });
+  await page.locator("#fact-citation_number").fill("EDIT-KEPT");
+  await page.locator("#visionReviewBtn").click();
+  await expect.poll(() => attempts).toBe(2);
+  await expect(page.locator("#fact-citation_number")).toHaveValue("EDIT-KEPT");
+  await expect(page.locator("#visionReviewBtn")).toBeEnabled();
+  await expect(page.locator("#visionFactReview")).toHaveAttribute("data-review-variant", "baseline");
+});
+
 }

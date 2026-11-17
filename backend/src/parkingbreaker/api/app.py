@@ -331,6 +331,41 @@ def create_app(
     ) -> s.TicketConfirmationReceipt:
         return services.confirm_ticket_reading(workspace, body)
 
+    @api.get(
+        "/workspaces/{workspace_id}/ticket-observability",
+        response_model=s.TicketObservabilitySnapshot,
+    )
+    async def ticket_observability(
+        workspace: Annotated[str, Depends(owned_workspace)],
+    ) -> s.TicketObservabilitySnapshot:
+        return services.ticket_observability(workspace)
+
+    @api.post(
+        "/workspaces/{workspace_id}/ticket-review-sessions",
+        response_model=s.TicketReviewSession,
+    )
+    async def start_ticket_review_session(
+        body: s.TicketReviewSessionRequest,
+        workspace: Annotated[str, Depends(owned_workspace)],
+    ) -> s.TicketReviewSession:
+        return services.start_ticket_review_session(workspace, body)
+
+    @api.post(
+        "/workspaces/{workspace_id}/ticket-review-sessions/{session_id}/observations",
+        response_model=s.TicketReviewObservationReceipt,
+    )
+    async def record_ticket_review_observation(
+        session_id: str,
+        body: s.TicketReviewObservationRequest,
+        workspace: Annotated[str, Depends(owned_workspace)],
+    ) -> s.TicketReviewObservationReceipt:
+        try:
+            return services.record_ticket_review_observation(workspace, session_id, body)
+        except ServiceConflict as exc:
+            if str(exc) == "not_found":
+                raise HTTPException(404, "not_found") from None
+            raise
+
     @api.post("/workspaces/{workspace_id}/intake", response_model=s.IntakeReceipt)
     async def intake(
         body: s.SubmitIntake, workspace: Annotated[str, Depends(owned_workspace)]

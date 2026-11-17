@@ -58,6 +58,7 @@ from parkingbreaker.smoke import LOB_API_VERSION, load_environment
 from parkingbreaker.stripe_payment import STRIPE_API_VERSION, StripePaymentClient
 from parkingbreaker.ticket_intake_service import TicketIntakeCoordinator, TicketIntakeDeps
 from parkingbreaker.ticket_intake_store import TicketIntakeStore
+from parkingbreaker.ticket_observability import load_review_canary_config
 from parkingbreaker.ticket_ocr import OcrPolicy, RoutedTicketReader
 from parkingbreaker.ticket_vision import TicketVisionReader
 from parkingbreaker.transaction_store import SqliteTransactionStore
@@ -186,6 +187,10 @@ def load_settings(
             raise ConfigError(_PHASE_ERROR) from None
     if mode is ProviderMode.LIVE and phase is None:
         raise ConfigError(f"{_PHASE_ERROR} in live mode")
+    try:
+        load_review_canary_config(values)
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from None
     data_dir = Path(values.get("PB_DATA_DIR", str(REPO_ROOT / ".pb-data")))
     return Settings(mode, data_dir, secret, values, phase)
 
@@ -242,6 +247,10 @@ def build_services(
     require_recovery_gates(settings)
     # Resolve and validate the frozen phase before any data directory or adapter exists.
     service_phase = resolve_service_phase(settings)
+    try:
+        review_canary = load_review_canary_config(settings.values)
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from None
     if settings.mode is ProviderMode.PREVIEW:
         return None
     settings.data_dir.mkdir(parents=True, exist_ok=True)
@@ -388,7 +397,11 @@ def build_services(
             )
             secondary = TicketVisionReader(secondary_gateway, confidence=True)
         return RoutedTicketReader(
-            TicketVisionReader(gateway, confidence=True), vision_preset, secondary, policy
+            TicketVisionReader(gateway, confidence=True),
+            vision_preset,
+            secondary,
+            policy,
+            secondary_model=secondary_preset if secondary is not None else None,
         )
 
     ticket_intake: TicketIntakeCoordinator | None = None
@@ -403,6 +416,8 @@ def build_services(
                 reader_for_subject=vision_reader_for_subject,
                 required=required_ticket_reading,
                 synthetic=settings.mode is ProviderMode.FAKE,
+                ocr_policy=policy,
+                review_canary=review_canary,
             )
         )
 

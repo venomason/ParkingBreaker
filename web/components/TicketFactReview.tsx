@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
+import { useTicketReviewObservation } from "../lib/ticket-observability";
 import { CustomerChoiceNotice } from "./CustomerChoiceRules";
 import type {
   TicketDiscrepancyResolution,
@@ -19,6 +20,7 @@ import {
 } from "../lib/intake";
 
 export interface TicketFactReviewProps {
+  workspaceId?: string | null;
   draft: FactDraft;
   onDraftChange: (next: FactDraft) => void;
   reading: TicketReadingSnapshot | null;
@@ -55,6 +57,7 @@ function literalText(value: string | null | undefined) {
 
 /** Suggestions, the closed 13-field customer facts, and the independent per-field comparison. */
 export function TicketFactReview({
+  workspaceId,
   draft,
   onDraftChange,
   reading,
@@ -69,12 +72,14 @@ export function TicketFactReview({
   onConfirm,
   onOpenRules,
 }: TicketFactReviewProps) {
+  const telemetry = useTicketReviewObservation({ workspaceId, busy, readingStatus: reading?.status ?? "missing", reviewStatus: review?.status ?? "missing" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [acknowledgedFor, setAcknowledgedFor] = useState<string | null>(null);
   const reviewKey = JSON.stringify([review?.request_id, draft, resolutions]);
   const accuracyAcknowledged = acknowledgedFor === reviewKey;
   const formRef = useRef<HTMLFormElement>(null);
   const changeDraft = (next: FactDraft) => {
+    telemetry.interact();
     setAcknowledgedFor(null);
     onDraftChange(next);
   };
@@ -103,12 +108,14 @@ export function TicketFactReview({
     const result = validateFactDraft(draft);
     setErrors(result.errors);
     if (!result.facts) {
+      telemetry.observe("validation_failed", "client_invalid", Object.keys(result.errors).length);
       requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
       return;
     }
     const customerSupplied = (event.nativeEvent as SubmitEvent).submitter?.id === "visionCustomerReviewBtn";
+    telemetry.observe("save_attempt", "submitted_to_server", 0, customerSupplied);
     onSaveFacts(result.facts, customerSupplied);
-  }, [draft, locked, busy, onSaveFacts]);
+  }, [draft, locked, busy, onSaveFacts, telemetry]);
 
   const literalEntries = TICKET_LITERAL_FIELD_ORDER.map((field) => {
     const found = reading?.fields.find((entry) => entry.field === field);
@@ -123,7 +130,7 @@ export function TicketFactReview({
   const hasReading = reading?.current && reading.status === "success" && reading.fields.some((field) => field.state === "shown");
 
   return (
-    <div id="visionFactReview" className="stack">
+    <div id="visionFactReview" className="stack" data-review-variant={telemetry.variant} onFocusCapture={telemetry.interact}>
       <section aria-labelledby="visionReadingsTitle" className="card" id="visionReadings">
         <p className="eyebrow">Unverified reading</p>
         <h3 id="visionReadingsTitle" style={{ marginBottom: "6px" }}>What the reading suggests</h3>
@@ -161,6 +168,9 @@ export function TicketFactReview({
           Printed dates stay as they appear on the ticket above. Below, choose the calendar dates, stage and issuer
           yourself. Suggestions may be prefilled; your corrections are recorded as customer-supplied facts, never as AI-extracted text. Do not guess an uncertain character. Supply every required fact before continuing.
         </p>
+        {telemetry.variant === "manual_guidance_v1" && <p id="manualReviewGuidance" className="small">
+          Compare one field at a time with your ticket. If a character is unclear, check a clearer photo before continuing. Your entries stay here if you need to correct a field.
+        </p>}
         <div className="local-ids single">
           {textField("citation_number", "Citation number")}
           {textField("license_plate", "License plate")}
@@ -348,7 +358,7 @@ export function TicketFactReview({
                     type="button"
                     id="visionConfirmBtn"
                     disabled={locked || busy || dirty || unresolved || !hasReview || !accuracyAcknowledged}
-                    onClick={() => { if (accuracyAcknowledged && !dirty) onConfirm(); }}
+                    onClick={() => { if (accuracyAcknowledged && !dirty) { telemetry.observe("confirm_attempt", "submitted_to_server"); onConfirm(); } }}
                   >
                     {busy ? <><span className="spinner" /> Confirming…</> : "Confirm these ticket facts"}
                   </button>

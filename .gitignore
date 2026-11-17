@@ -39,3 +39,7 @@ output/
 *.db
 *.db-wal
 *.db-shm
+
+# Mutable browser run output; durable summaries belong in docs/verification.
+/build-kit/evidence/ocr-routing-*/
+/build-kit/evidence/customer-choice-rules-*/

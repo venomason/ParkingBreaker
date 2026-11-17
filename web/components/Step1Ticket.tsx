@@ -19,6 +19,7 @@ import type { TicketField } from "../lib/api";
 export type Step1VisionMode = "unknown" | "legacy" | "vision";
 
 export interface Step1VisionProps {
+  workspaceId?: string | null;
   mode: Step1VisionMode;
   enabled: boolean;
   required: boolean;
@@ -399,6 +400,8 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
 
           {vision.frontRef ? (
             <TicketFactReview
+              key={vision.workspaceId ?? "no-workspace"}
+              workspaceId={vision.workspaceId}
               draft={vision.draft}
               onDraftChange={(next) => vision.setDraft(next)}
               reading={vision.reading}

@@ -1,5 +1,7 @@
 # ParkingBreaker customer API contract (fake preview)
 
+Historical contract reference retained for regression tests. Current work and authority are in [ROADMAP.md](../../../docs/ROADMAP.md), [BETA-READINESS.md](../../../docs/BETA-READINESS.md) and [AGENTS.md](../../../AGENTS.md). The original dated decisions below are not a fresh release approval. References to companion historical documents absent from this checkout are archival names, not working links.
+
 This is the task 1.1/1.12 skeleton, with task 1.13 route shapes. All services are
 in-memory fixtures: no research, external authentication, uploads, payments, mail,
 notifications or persistence. Restarting the process loses everything. Never use real

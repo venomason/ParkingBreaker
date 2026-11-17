@@ -962,6 +962,27 @@ class CaseService:
         coordinator = self._ticket_intake()
         return self._ticket_path(lambda: coordinator.confirm(workspace_id, body))
 
+    def ticket_observability(self, workspace_id: str) -> s.TicketObservabilitySnapshot:
+        coordinator = self._ticket_intake()
+        return self._ticket_path(lambda: coordinator.ticket_observability(workspace_id))
+
+    def start_ticket_review_session(
+        self, workspace_id: str, body: s.TicketReviewSessionRequest
+    ) -> s.TicketReviewSession:
+        coordinator = self._ticket_intake()
+        return self._ticket_path(lambda: coordinator.start_review_session(workspace_id, body))
+
+    def record_ticket_review_observation(
+        self,
+        workspace_id: str,
+        session_id: str,
+        body: s.TicketReviewObservationRequest,
+    ) -> s.TicketReviewObservationReceipt:
+        coordinator = self._ticket_intake()
+        return self._ticket_path(
+            lambda: coordinator.record_review_observation(workspace_id, session_id, body)
+        )
+
     # Intake ------------------------------------------------------------------------------
     def submit(self, workspace_id: str, body: s.SubmitIntake) -> s.IntakeReceipt:
         intake_json = body.model_dump_json()

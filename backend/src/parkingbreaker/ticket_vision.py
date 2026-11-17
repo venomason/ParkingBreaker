@@ -27,7 +27,8 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from collections.abc import Mapping, Sequence
+import time
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Final
@@ -36,6 +37,7 @@ from parkingbreaker.json_types import JsonValue
 from parkingbreaker.llm import (
     DATA_DELIMITER,
     ImageAttachment,
+    LlmBudgetExceeded,
     MultimodalLlmClient,
     Usage,
     neutralise,
@@ -585,29 +587,86 @@ def _preflight_confirmed(
     return ordered
 
 
+@dataclass(frozen=True)
+class ExtractTrace:
+    """Monotonic timing and outcome recorded for one TicketVisionReader.extract call."""
+
+    started_monotonic: float
+    ended_monotonic: float
+    status: str
+    reading: TicketReading | None = None
+    exception_kind: str | None = None
+
+
 class TicketVisionReader:
     """Injected-client boundary: at most one call per method and never a retry."""
 
-    def __init__(self, client: MultimodalLlmClient, *, confidence: bool = False) -> None:
+    def __init__(
+        self,
+        client: MultimodalLlmClient,
+        *,
+        confidence: bool = False,
+        monotonic: Callable[[], float] | None = None,
+    ) -> None:
         self._client = client
         self._confidence = confidence
+        self._monotonic = time.monotonic if monotonic is None else monotonic
+        self._last_extract_trace: ExtractTrace | None = None
+
+    @property
+    def last_extract_trace(self) -> ExtractTrace | None:
+        return self._last_extract_trace
 
     def extract(self, images: Sequence[ImageAttachment], *, max_cost_cents: int) -> TicketReading:
         """Make one multimodal call and return bounded suggestions or a refusal."""
-        ceiling = _require_ceiling(max_cost_cents)
-        validated = _preflight_images(images)
-        binding = input_binding_hash(EXTRACT_OPERATION, validated)
-        data, usage = self._client.complete_json(
-            EXTRACT_SYSTEM + (CONFIDENCE_INSTRUCTION if self._confidence else ""),
-            extract_user_prompt(),
-            CONFIDENCE_READING_SCHEMA if self._confidence else READING_SCHEMA,
-            max_cost_cents=ceiling,
-            images=validated,
-        )
+        self._last_extract_trace = None
+        started = self._monotonic()
+        try:
+            ceiling = _require_ceiling(max_cost_cents)
+            validated = _preflight_images(images)
+            binding = input_binding_hash(EXTRACT_OPERATION, validated)
+            data, usage = self._client.complete_json(
+                EXTRACT_SYSTEM + (CONFIDENCE_INSTRUCTION if self._confidence else ""),
+                extract_user_prompt(),
+                CONFIDENCE_READING_SCHEMA if self._confidence else READING_SCHEMA,
+                max_cost_cents=ceiling,
+                images=validated,
+            )
+        except Exception as exc:
+            ended = self._monotonic()
+            if isinstance(exc, LlmBudgetExceeded):
+                kind = "budget_refused"
+            elif isinstance(exc, TicketVisionInputError):
+                kind = "input_error"
+            else:
+                kind = "provider_error"
+            self._last_extract_trace = ExtractTrace(
+                started_monotonic=started,
+                ended_monotonic=ended,
+                status="error",
+                reading=None,
+                exception_kind=kind,
+            )
+            raise
+        ended = self._monotonic()
         parsed = parse_reading(data)
         if parsed is None:
-            return TicketReading((), usage, binding, refused=True)
-        return TicketReading(parsed, usage, binding)
+            result = TicketReading((), usage, binding, refused=True)
+            self._last_extract_trace = ExtractTrace(
+                started_monotonic=started,
+                ended_monotonic=ended,
+                status="refused",
+                reading=result,
+            )
+            return result
+        result = TicketReading(parsed, usage, binding)
+        self._last_extract_trace = ExtractTrace(
+            started_monotonic=started,
+            ended_monotonic=ended,
+            status="completed",
+            reading=result,
+        )
+        return result
 
     def review(
         self,

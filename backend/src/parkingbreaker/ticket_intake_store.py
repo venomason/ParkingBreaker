@@ -19,11 +19,23 @@ import re
 import secrets
 import sqlite3
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import NoReturn, Protocol, runtime_checkable
 
+from parkingbreaker.journey_events import (
+    CostStatus,
+    JourneyEventInput,
+    JourneyEventKind,
+    JourneyEventOutcome,
+    append_journey_event_in_transaction,
+    extract_usage_cost,
+)
 from parkingbreaker.mail_attempt_store import StorageCorruption, rollback_preserving_error
+from parkingbreaker.ticket_observability import (
+    OcrObservationInput,
+    record_ocr_observation_in_transaction,
+)
 
 COMPONENT = "ticket_intake"
 MAX_ID_LENGTH = 128
@@ -1091,6 +1103,7 @@ def complete_ticket_intake_operation(
     intake_id: str | None = None,
     operation: IntakeOperation | str | None = None,
     binding_sha256: str | None = None,
+    ocr_observation: OcrObservationInput | None = None,
 ) -> OperationClaim:
     """Complete exactly one pending claim once, replaying an identical completion.
 
@@ -1168,6 +1181,23 @@ def complete_ticket_intake_operation(
                 and claim.result_json == stored_result
                 and claim.usage_json == stored_usage
             ):
+                if ocr_observation is not None:
+                    evidence = database.execute(
+                        "SELECT journey_id FROM pb_ticket_ocr_observations WHERE request_id=?",
+                        (claim.request_id,),
+                    ).fetchone()
+                    if evidence is None:
+                        raise TicketIntakeConflict("completed_observation_cannot_be_backfilled")
+                    record_ocr_observation_in_transaction(
+                        database,
+                        request_id=claim.request_id,
+                        intake_id=claim.intake_id,
+                        workspace_token=claim.workspace_token,
+                        journey_id=evidence[0],
+                        operation_status=claim.status.value,
+                        observation=ocr_observation,
+                        recorded_at=at,
+                    )
                 database.execute("COMMIT")
                 return claim
             raise TicketIntakeConflict("claim_already_completed_differently")
@@ -1199,6 +1229,45 @@ def complete_ticket_intake_operation(
             or completed.usage_json != stored_usage
         ):
             raise StorageCorruption("ticket intake completion did not persist")
+        if completed.operation is IntakeOperation.EXTRACT:
+            assert completed.completed_at is not None
+            if completed.status is ClaimStatus.SUCCESS:
+                kind, outcome = JourneyEventKind.TICKET_READ, JourneyEventOutcome.SUCCEEDED
+            elif completed.status is ClaimStatus.REFUSED:
+                kind, outcome = JourneyEventKind.TICKET_READ_REFUSED, JourneyEventOutcome.REFUSED
+            else:
+                kind, outcome = JourneyEventKind.TICKET_READ_UNKNOWN, JourneyEventOutcome.UNKNOWN
+            cost_cents, cost_status = extract_usage_cost(
+                completed.usage_json,
+                force_unknown=completed.status is ClaimStatus.UNKNOWN,
+            )
+            duration_ms = (completed.completed_at - completed.claimed_at) // timedelta(
+                milliseconds=1
+            )
+            journey_event = append_journey_event_in_transaction(
+                database,
+                workspace_token=completed.workspace_token,
+                occurrence_key=f"ticket_read:{completed.request_id}",
+                event=JourneyEventInput(
+                    kind=kind,
+                    outcome=outcome,
+                    occurred_at=completed.completed_at,
+                    duration_ms=duration_ms,
+                    cost_cents=cost_cents,
+                    cost_status=cost_status,
+                ),
+            )
+            if ocr_observation is not None:
+                record_ocr_observation_in_transaction(
+                    database,
+                    request_id=completed.request_id,
+                    intake_id=completed.intake_id,
+                    workspace_token=completed.workspace_token,
+                    journey_id=journey_event.journey_id,
+                    operation_status=completed.status.value,
+                    observation=ocr_observation,
+                    recorded_at=journey_event.recorded_at,
+                )
         database.execute("COMMIT")
         return completed
     except Exception:
@@ -1347,6 +1416,17 @@ def record_ticket_intake_confirmation(
         if row is None:
             raise StorageCorruption("ticket intake confirmation was not stored")
         confirmation = _confirmation(row)
+        append_journey_event_in_transaction(
+            database,
+            workspace_token=confirmation.workspace_token,
+            occurrence_key=f"facts_confirmed:{confirmation.intake_id}:{confirmation.generation}",
+            event=JourneyEventInput(
+                kind=JourneyEventKind.FACTS_CONFIRMED,
+                outcome=JourneyEventOutcome.SUCCEEDED,
+                occurred_at=confirmation.confirmed_at,
+                cost_status=CostStatus.NOT_APPLICABLE,
+            ),
+        )
         database.execute("COMMIT")
         return confirmation
     except Exception:
@@ -1514,6 +1594,7 @@ class TicketIntakeStore:
         intake_id: str | None = None,
         operation: IntakeOperation | str | None = None,
         binding_sha256: str | None = None,
+        ocr_observation: OcrObservationInput | None = None,
     ) -> OperationClaim:
         return complete_ticket_intake_operation(
             self._database(),
@@ -1526,6 +1607,7 @@ class TicketIntakeStore:
             intake_id=intake_id,
             operation=operation,
             binding_sha256=binding_sha256,
+            ocr_observation=ocr_observation,
         )
 
     def finish_operation(
@@ -1540,6 +1622,7 @@ class TicketIntakeStore:
         intake_id: str | None = None,
         operation: IntakeOperation | str | None = None,
         binding_sha256: str | None = None,
+        ocr_observation: OcrObservationInput | None = None,
     ) -> OperationClaim:
         return self.complete_operation(
             request_id,
@@ -1551,6 +1634,7 @@ class TicketIntakeStore:
             intake_id=intake_id,
             operation=operation,
             binding_sha256=binding_sha256,
+            ocr_observation=ocr_observation,
         )
 
     def record_confirmation(
@@ -1679,6 +1763,7 @@ class TicketIntakeStoreMixin:
         intake_id: str | None = None,
         operation: IntakeOperation | str | None = None,
         binding_sha256: str | None = None,
+        ocr_observation: OcrObservationInput | None = None,
     ) -> OperationClaim:
         return complete_ticket_intake_operation(
             self._require_open(),
@@ -1691,6 +1776,7 @@ class TicketIntakeStoreMixin:
             intake_id=intake_id,
             operation=operation,
             binding_sha256=binding_sha256,
+            ocr_observation=ocr_observation,
         )
 
     def record_ticket_intake_confirmation(

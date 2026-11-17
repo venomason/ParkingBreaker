@@ -1,5 +1,7 @@
 # Deep city dossiers — 2026-10-27
 
+Historical qualification input used by tests, not a live destination directory or current work queue. See [the roadmap](../ROADMAP.md) for remaining qualification. The dated adjudication/change-log filenames below refer to historical operational records not included in this checkout; do not assume those files are locally available.
+
 Research for owner review; no key has been signed or scored. “BLOCKED” below means the
 core mailing route, applicable deadline or trigger remains unconfirmed; it is a research
 hold, not a new application state or a change to any key outcome. A verified quotation
@@ -13,7 +15,7 @@ differ from the original HTTP-body digest used in the filename. Do not rename ex
 text by its own digest or represent an old missing page as recovered. The accompanying
 `research-review-2026-10-27.json` records failed GETs, unadmitted leads, drift and scope checks.
 
-## Owner-decision follow-up — current disposition
+## Owner-decision follow-up — disposition at October 27, 2026
 
 Amir's 2026-10-27 counting rule is applied: where an admitted, applicable deadline
 source is silent on postmark versus receipt, the key uses **received**. This is
@@ -29,14 +31,14 @@ B17 keeps official receipt. Unavailable/wrong-stage deadline evidence is unchang
 row retains a separate factual or source block below. B13 specifically retains its
 unconfirmed obsolete-Roxbury-address purpose. “Ready” in raw verifier output is
 mechanical quote readiness, not factual approval. No signatures/statuses/reviewer
-fields were changed. The [received-by change log](../../build-kit/evidence/bench-pages/key-decisions-received-by-2026-10-27.json)
+fields were changed. The received-by change log (historical key-decisions-received-by-2026-10-27.json; not included)
 records every edit and the fresh offline checks.
 
 All 26 final-report HASH_MISMATCH references were re-adjudicated; six FETCH_FAILED
 references (three LADOT, three Seattle) remain unchanged. Historical citations in the
 original research/appendix below retain their original body identities; current key
 identities and every field-level change are recorded in
-[key-decisions-2026-10-27.json](../../build-kit/evidence/bench-pages/key-decisions-2026-10-27.json).
+key-decisions-2026-10-27.json (historical record; not included).
 The new adjudicator ledger is `key-decisions-adjudicated-2026-10-27.jsonl` in that folder.
 
 | Row(s) | Applied decision / remaining block |

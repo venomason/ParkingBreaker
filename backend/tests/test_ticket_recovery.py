@@ -185,3 +185,83 @@ def test_incomplete_customer_facts_cannot_form_confirmable_envelope() -> None:
         incomplete[key] = ""
         with pytest.raises(TicketFactBindingError):
             h.binding_for(empty_literal(), incomplete)
+
+
+@pytest.mark.parametrize("manual", [False, True])
+def test_new_review_and_submission_require_an_ocr_attempt(
+    tmp_path: Path,
+    manual: bool,
+) -> None:
+    fixture = h.harness(tmp_path / "required.sqlite", h.ScriptedVisionClient())
+    workspace, binding, front, back = h.ready(fixture, binding=h.binding_for(empty_literal()))
+    try:
+        before = tuple(fixture.store._require_open().iterdump())
+        with pytest.raises(ServiceConflict, match="ticket_reading_required"):
+            fixture.service.request_ticket_review(
+                workspace,
+                s.TicketReviewRequest(
+                    request_id="review-bypass", expected_revision=2, customer_supplied=manual
+                ),
+            )
+        with pytest.raises(ServiceConflict, match="ticket_reading_required"):
+            fixture.service.submit(workspace, h.submit_body(binding, front, back))
+        assert tuple(fixture.store._require_open().iterdump()) == before
+        assert fixture.client.calls == []
+    finally:
+        fixture.store.close()
+
+
+def test_pending_reading_cannot_be_bypassed_by_customer_supplied_facts(tmp_path: Path) -> None:
+    import sqlite3
+
+    fixture = h.harness(tmp_path / "pending.sqlite", h.ScriptedVisionClient(({}, Usage())))
+    workspace, _, _, _ = h.ready(fixture, binding=h.binding_for(empty_literal()))
+    try:
+        db = fixture.store._require_open()
+        db.execute(
+            "CREATE TRIGGER fail_ocr_completion BEFORE INSERT ON pb_journey_events "
+            "BEGIN SELECT RAISE(ABORT, 'injected completion failure'); END"
+        )
+        with pytest.raises(sqlite3.IntegrityError, match="injected completion failure"):
+            fixture.coordinator.request_reading(workspace, "extract", 2)
+        assert fixture.coordinator.status(workspace).extraction.status == "pending"
+        before = tuple(db.iterdump())
+        with pytest.raises(TicketIntakeServiceError, match="ticket_reading_not_completed"):
+            fixture.coordinator.request_review(
+                workspace, "bypass-pending", 2, customer_supplied=True
+            )
+        assert tuple(db.iterdump()) == before
+        assert isinstance(fixture.client, h.ScriptedVisionClient)
+        assert len(fixture.client.calls) == 1
+    finally:
+        fixture.store.close()
+
+
+def test_replaced_photos_require_their_own_ocr_attempt(tmp_path: Path) -> None:
+    fixture = h.harness(tmp_path / "changed-photo.sqlite", h.ScriptedVisionClient(({}, Usage())))
+    workspace, _, _, _ = h.ready(fixture, binding=h.binding_for(empty_literal()))
+    try:
+        fixture.coordinator.request_reading(workspace, "original-reading", 2)
+        replacement = fixture.service.upload_photo(workspace, h.photo(h.BACK))
+        view = fixture.service.workspace_view(workspace)
+        assert view.intake_form is not None
+        fixture.service.save_intake_form(
+            workspace,
+            s.SaveIntakeForm(
+                expected_revision=h.revision(fixture, workspace),
+                form=view.intake_form.model_copy(
+                    update={"ticket_photo_ref": replacement.photo_ref}
+                ),
+            ),
+        )
+        with pytest.raises(TicketIntakeServiceError, match="ticket_reading_required"):
+            fixture.coordinator.request_review(
+                workspace,
+                "old-photo-bypass",
+                h.revision(fixture, workspace),
+                customer_supplied=True,
+            )
+        assert isinstance(fixture.client, h.ScriptedVisionClient)
+        assert len(fixture.client.calls) == 1
+    finally:
+        fixture.store.close()

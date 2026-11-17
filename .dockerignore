@@ -10,3 +10,5 @@
 .pb-demo
 web/test-results
 web/playwright-report
+output
+.vscode

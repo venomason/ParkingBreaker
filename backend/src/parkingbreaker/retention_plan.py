@@ -336,6 +336,8 @@ _KNOWN_TABLES: Final[frozenset[str]] = frozenset(
         "pb_intake_owners",
         "pb_intake_records",
         "pb_intake_research",
+        "pb_journey_events",
+        "pb_journey_links",
         "pb_mail_attempts",
         "pb_mail_destination_bindings",
         "pb_notices",
@@ -370,6 +372,9 @@ _KNOWN_TABLES: Final[frozenset[str]] = frozenset(
         "pb_ticket_intake_operation_aliases",
         "pb_ticket_intake_operations",
         "pb_ticket_intake_reservations",
+        "pb_ticket_ocr_observations",
+        "pb_ticket_review_observations",
+        "pb_ticket_review_sessions",
         "pb_tracking_email_mark",
         "pb_tracking_emails",
         "pb_trick_sightings",
@@ -400,6 +405,11 @@ _RESTRICTED_SCOPES: Final[tuple[tuple[str, str, str | None], ...]] = (
     ("tracking_email", "pb_tracking_emails", "case_token"),
     ("notification_access_links", "pb_notification_access_links", None),
     ("identity_accounts", "pb_identity_accounts", None),
+    ("journey_links", "pb_journey_links", None),
+    ("journey_events", "pb_journey_events", None),
+    ("ticket_ocr_observations", "pb_ticket_ocr_observations", "intake_id"),
+    ("ticket_review_sessions", "pb_ticket_review_sessions", None),
+    ("ticket_review_observations", "pb_ticket_review_observations", None),
 )
 
 

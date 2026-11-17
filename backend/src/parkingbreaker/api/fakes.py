@@ -582,6 +582,24 @@ class FakeServices:
     ) -> s.TicketConfirmationReceipt:
         return self._ticket_path(lambda: self._ticket().confirm(workspace_id, body))
 
+    def ticket_observability(self, workspace_id: str) -> s.TicketObservabilitySnapshot:
+        return self._ticket_path(lambda: self._ticket().ticket_observability(workspace_id))
+
+    def start_ticket_review_session(
+        self, workspace_id: str, body: s.TicketReviewSessionRequest
+    ) -> s.TicketReviewSession:
+        return self._ticket_path(lambda: self._ticket().start_review_session(workspace_id, body))
+
+    def record_ticket_review_observation(
+        self,
+        workspace_id: str,
+        session_id: str,
+        body: s.TicketReviewObservationRequest,
+    ) -> s.TicketReviewObservationReceipt:
+        return self._ticket_path(
+            lambda: self._ticket().record_review_observation(workspace_id, session_id, body)
+        )
+
     def save_required_copies(self, case_id: str, body: s.SaveRequiredCopies) -> s.CaseStatus:
         raise ServiceConflict("required_copies_not_available")
 

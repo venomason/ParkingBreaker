@@ -158,6 +158,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workspaces/{workspace_id}/ticket-observability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ticket Observability */
+        get: operations["ticket_observability_workspaces__workspace_id__ticket_observability_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspace_id}/ticket-review-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start Ticket Review Session */
+        post: operations["start_ticket_review_session_workspaces__workspace_id__ticket_review_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspace_id}/ticket-review-sessions/{session_id}/observations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Ticket Review Observation */
+        post: operations["record_ticket_review_observation_workspaces__workspace_id__ticket_review_sessions__session_id__observations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspaces/{workspace_id}/intake": {
         parameters: {
             query?: never;
@@ -1724,6 +1775,97 @@ export interface components {
          */
         TicketField: "citation_number" | "license_plate" | "license_plate_state" | "issuer_name" | "issue_date" | "notice_date" | "printed_deadline" | "violation_text" | "issued_city" | "issued_state" | "stage_text";
         /**
+         * TicketObservabilitySnapshot
+         * @description Owner-safe OCR routing and review session observability for one workspace.
+         */
+        TicketObservabilitySnapshot: {
+            /** Journey Id */
+            journey_id?: string | null;
+            /** Ocr Observations */
+            ocr_observations?: components["schemas"]["TicketOcrObservationReadView"][];
+            /** Review Sessions */
+            review_sessions?: components["schemas"]["TicketReviewSession"][];
+            /** Review Observations */
+            review_observations?: components["schemas"]["TicketReviewObservationReceipt"][];
+        };
+        /**
+         * TicketOcrObservationDetail
+         * @description Safe closed OCR routing reasons/counts and separated monotonic spans.
+         */
+        TicketOcrObservationDetail: {
+            /** Observation Id */
+            observation_id: string;
+            /** Journey Id */
+            journey_id: string;
+            /**
+             * Routing Mode
+             * @enum {string}
+             */
+            routing_mode: "routed" | "single_stage";
+            /** Primary Model */
+            primary_model: string | null;
+            /** Secondary Model */
+            secondary_model: string | null;
+            /**
+             * Primary Status
+             * @enum {string}
+             */
+            primary_status: "completed" | "refused" | "budget_refused" | "input_error" | "provider_error";
+            /**
+             * Escalation Status
+             * @enum {string}
+             */
+            escalation_status: "not_needed" | "not_applicable" | "unavailable" | "budget_exhausted" | "failed" | "refused" | "completed";
+            /** Coordinator Duration Ms */
+            coordinator_duration_ms: number | null;
+            /** Primary Duration Ms */
+            primary_duration_ms: number | null;
+            /** Primary Start Offset Ms */
+            primary_start_offset_ms: number | null;
+            /** Primary End Offset Ms */
+            primary_end_offset_ms: number | null;
+            /** Escalation Duration Ms */
+            escalation_duration_ms: number | null;
+            /** Escalation Start Offset Ms */
+            escalation_start_offset_ms: number | null;
+            /** Escalation End Offset Ms */
+            escalation_end_offset_ms: number | null;
+            /** Shown Suggestion Count */
+            shown_suggestion_count: number;
+            /** Manual Entry Field Count */
+            manual_entry_field_count: number;
+            /** Reason Counts */
+            reason_counts: {
+                [key: string]: number;
+            };
+            /** Decision Policy */
+            decision_policy: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+        };
+        /**
+         * TicketOcrObservationReadView
+         * @description Coverage-explicit OCR observation record; legacy rows lack coverage explicitly.
+         */
+        TicketOcrObservationReadView: {
+            /** Request Id */
+            request_id: string;
+            /**
+             * Operation Status
+             * @enum {string}
+             */
+            operation_status: "pending" | "success" | "refused" | "unknown";
+            /**
+             * Coverage
+             * @enum {string}
+             */
+            coverage: "recorded" | "pending" | "missing";
+            observation?: components["schemas"]["TicketOcrObservationDetail"] | null;
+        };
+        /**
          * TicketOperationRequest
          * @description One idempotent vision request; the caller's request id is the replay key.
          */
@@ -1823,6 +1965,152 @@ export interface components {
             visible_text: string | null;
         };
         /**
+         * TicketReviewObservationReceipt
+         * @description Persisted client review observation explicitly labeled non-authoritative.
+         */
+        TicketReviewObservationReceipt: {
+            /** Observation Id */
+            observation_id: string;
+            /** Session Id */
+            session_id: string;
+            /** Client Observation Id */
+            client_observation_id: string;
+            /** Seq */
+            seq: number;
+            /**
+             * Source
+             * @default client_observation
+             * @constant
+             */
+            source: "client_observation";
+            /**
+             * Measurement Label
+             * @default elapsed_and_visibility_activity_not_human_attention
+             * @constant
+             */
+            measurement_label: "elapsed_and_visibility_activity_not_human_attention";
+            /**
+             * Event Kind
+             * @enum {string}
+             */
+            event_kind: "exposure" | "validation_failed" | "save_attempt" | "confirm_attempt" | "timing_checkpoint";
+            /**
+             * Treatment Variant
+             * @enum {string}
+             */
+            treatment_variant: "baseline" | "manual_guidance_v1";
+            /**
+             * Rendered Variant
+             * @enum {string}
+             */
+            rendered_variant: "baseline" | "manual_guidance_v1";
+            /** Treatment Version */
+            treatment_version: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "observed" | "client_invalid" | "submitted_to_server" | "client_reported_success" | "client_reported_failure" | "unknown";
+            /** Visible Elapsed Ms */
+            visible_elapsed_ms: number | null;
+            /** Busy Elapsed Ms */
+            busy_elapsed_ms: number | null;
+            /** Hidden Elapsed Ms */
+            hidden_elapsed_ms: number | null;
+            /** Visibility Changes */
+            visibility_changes: number;
+            /**
+             * Timing State
+             * @enum {string}
+             */
+            timing_state: "closed" | "open_or_missing_unknown";
+            /** Invalid Field Count */
+            invalid_field_count: number;
+            /** Customer Supplied */
+            customer_supplied: boolean;
+            /**
+             * Reading Status
+             * @enum {string}
+             */
+            reading_status: "missing" | "pending" | "success" | "refused" | "unknown";
+            /**
+             * Review Status
+             * @enum {string}
+             */
+            review_status: "missing" | "pending" | "success" | "refused" | "unknown";
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+        };
+        /**
+         * TicketReviewObservationRequest
+         * @description Closed, bounded client review observation; never carries raw fields or tokens.
+         */
+        TicketReviewObservationRequest: {
+            /** Client Observation Id */
+            client_observation_id: string;
+            /**
+             * Event Kind
+             * @enum {string}
+             */
+            event_kind: "exposure" | "validation_failed" | "save_attempt" | "confirm_attempt" | "timing_checkpoint";
+            /**
+             * Treatment Variant
+             * @enum {string}
+             */
+            treatment_variant: "baseline" | "manual_guidance_v1";
+            /**
+             * Rendered Variant
+             * @enum {string}
+             */
+            rendered_variant: "baseline" | "manual_guidance_v1";
+            /** Treatment Version */
+            treatment_version: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "observed" | "client_invalid" | "submitted_to_server" | "client_reported_success" | "client_reported_failure" | "unknown";
+            /** Visible Elapsed Ms */
+            visible_elapsed_ms?: number | null;
+            /** Busy Elapsed Ms */
+            busy_elapsed_ms?: number | null;
+            /** Hidden Elapsed Ms */
+            hidden_elapsed_ms?: number | null;
+            /**
+             * Visibility Changes
+             * @default 0
+             */
+            visibility_changes: number;
+            /**
+             * Timing State
+             * @enum {string}
+             */
+            timing_state: "closed" | "open_or_missing_unknown";
+            /**
+             * Invalid Field Count
+             * @default 0
+             */
+            invalid_field_count: number;
+            /**
+             * Customer Supplied
+             * @default false
+             */
+            customer_supplied: boolean;
+            /**
+             * Reading Status
+             * @enum {string}
+             */
+            reading_status: "missing" | "pending" | "success" | "refused" | "unknown";
+            /**
+             * Review Status
+             * @enum {string}
+             */
+            review_status: "missing" | "pending" | "success" | "refused" | "unknown";
+        };
+        /**
          * TicketReviewRequest
          * @description Explicit customer-only confirmation preparation; never a model result.
          */
@@ -1836,6 +2124,48 @@ export interface components {
              * @default false
              */
             customer_supplied: boolean;
+        };
+        /**
+         * TicketReviewSession
+         * @description Pinned TicketFactReview session assignment; never exposes owner or workspace token.
+         */
+        TicketReviewSession: {
+            /** Session Id */
+            session_id: string;
+            /** Client Session Key */
+            client_session_key: string;
+            /**
+             * Variant
+             * @enum {string}
+             */
+            variant: "baseline" | "manual_guidance_v1";
+            /**
+             * Policy Mode
+             * @enum {string}
+             */
+            policy_mode: "baseline" | "canary";
+            /** Canary Version */
+            canary_version: string;
+            /** Effective Treatment Version */
+            effective_treatment_version: string;
+            /**
+             * Assigned At
+             * Format: date-time
+             */
+            assigned_at: string;
+            /**
+             * Observation Limit
+             * @default 64
+             */
+            observation_limit: number;
+        };
+        /**
+         * TicketReviewSessionRequest
+         * @description Start or idempotently resume a pinned TicketFactReview canary/baseline session.
+         */
+        TicketReviewSessionRequest: {
+            /** Client Session Id */
+            client_session_id: string;
         };
         /**
          * TicketReviewSnapshot
@@ -2526,6 +2856,189 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TicketConfirmationReceipt"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    ticket_observability_workspaces__workspace_id__ticket_observability_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketObservabilitySnapshot"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    start_ticket_review_session_workspaces__workspace_id__ticket_review_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TicketReviewSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketReviewSession"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    record_ticket_review_observation_workspaces__workspace_id__ticket_review_sessions__session_id__observations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TicketReviewObservationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketReviewObservationReceipt"];
                 };
             };
             /** @description Unauthorized */
