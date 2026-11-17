@@ -1,0 +1,56 @@
+{
+  "scope": "Local synthetic verification; fake providers only",
+  "application_fingerprint": "fe3291d10a7b2bc8932b7d4ed361be84c5ea724c1514b01e279e7ae9aca29d21",
+  "checks": {
+    "backend_tests": {
+      "passed": 13690,
+      "failed": 0,
+      "dependency_deprecation_warnings": 1
+    },
+    "paid_browser": {
+      "passed": 152,
+      "skipped": 0,
+      "report_validated": true
+    },
+    "beta_mobile_chromium_375x812": {
+      "passed": 50,
+      "skipped": 0,
+      "report_validated": true,
+      "ticket_reading_preview": true
+    },
+    "web_lint": "passed; zero warnings",
+    "web_types": "passed",
+    "production_build": "passed",
+    "backend_lint": "passed",
+    "backend_format": "passed",
+    "backend_types": "passed; 479 source files",
+    "tooling_regressions": "3 passed",
+    "offline_research_and_vision_self_tests": "passed"
+  },
+  "rules_control": {
+    "tested_viewport_widths": [
+      320,
+      375,
+      768,
+      1440
+    ],
+    "tap_target_css_pixels": [
+      44,
+      44
+    ],
+    "visible_height_css_pixels": 24,
+    "overlaps_next_control": false
+  },
+  "limitations": [
+    "Mobile coverage is Chromium viewport emulation, not physical-device or real-provider qualification."
+  ],
+  "corrections": [
+    "Restore preview session state asynchronously with unmount cleanup.",
+    "Import backend recovery-test types and constants from their defining modules.",
+    "Apply schema formatting required by the formatter.",
+    "Keep the compact Rules control accessible with a 44px tap target."
+  ],
+  "backend_test_invocation": "PB_PROVIDER_MODE=preview python -m pytest -x --tb=short --basetemp=<owned temporary directory> -o tmp_path_retention_policy=failed",
+  "paid_rehearsal_invocation": "python3 build-kit/scripts/synthetic_rehearsal.py --service-phase paid --out <fresh evidence directory>",
+  "beta_rehearsal_invocation": "python3 build-kit/scripts/synthetic_rehearsal.py --service-phase controlled_free_beta --ticket-reading-preview --browser-project chromium-mobile375x812 --out <fresh evidence directory>"
+}

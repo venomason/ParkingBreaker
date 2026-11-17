@@ -806,9 +806,18 @@ class TicketReadingSnapshot(Model):
     synthetic: bool = False
     fields: list[TicketReadingField] = Field(default_factory=list)
     primary_model: str | None = None
-    escalation: Literal[
-        "not_needed", "manual", "unavailable", "budget_exhausted", "failed", "refused", "completed"
-    ] | None = None
+    escalation: (
+        Literal[
+            "not_needed",
+            "manual",
+            "unavailable",
+            "budget_exhausted",
+            "failed",
+            "refused",
+            "completed",
+        ]
+        | None
+    ) = None
     confidence_basis: Literal["uncalibrated model estimate"] = "uncalibrated model estimate"
 
 

@@ -472,6 +472,18 @@ for (const recovery of [false, true]) {
       await expect(page.locator("#livePacketReviewed")).not.toBeChecked();
       await page.locator("#livePacketReviewed").check();
     }
+    if (!recovery) {
+      const liveNotice = page.locator("#livePacketPreview [data-customer-choice-notice]");
+      await expect(liveNotice).toBeVisible();
+      await expect(liveNotice).toContainText("Your chosen details aren’t covered by our correct-office refund guarantee if they cause the rejection.");
+      await liveNotice.locator(".notice-rules-btn").click();
+      const termsDlg = page.locator("#termsDlg");
+      await expect(termsDlg).toBeVisible();
+      await expect(termsDlg.locator('[data-policy-version="2026-11-16"]')).toContainText("Customer choices and our correct-office guarantee");
+      await termsDlg.locator('button[aria-label="Close"]').click();
+      await expect(termsDlg).not.toBeVisible();
+      await expect(page.locator("#livePacketReviewed")).toBeChecked();
+    }
     const approvalBodies: string[] = [];
     let lost = false;
     await page.route("**/api/cases/*/approval", async route => {

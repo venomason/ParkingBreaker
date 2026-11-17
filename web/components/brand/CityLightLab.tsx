@@ -27,8 +27,13 @@ export function CityLightLab() {
  const [ready,setReady]=useState(false);
  const [error,setError]=useState("");
  useEffect(()=>{
-   try{const saved=JSON.parse(sessionStorage.getItem(key)??"null");if(saved&&Number.isInteger(saved.step)&&saved.step>=0&&saved.step<=3&&typeof saved.citation==="string"&&saved.citation.length<=40&&typeof saved.confirmed==="boolean"&&typeof saved.story==="string"&&saved.story.length<=500&&(saved.step<2||(saved.citation.trim()&&saved.confirmed))&&(saved.step<3||saved.story.trim()))setProgress(saved);}catch{}
-   setReady(true);
+   let active=true;
+   queueMicrotask(()=>{
+     if(!active)return;
+     try{const saved=JSON.parse(sessionStorage.getItem(key)??"null");if(saved&&Number.isInteger(saved.step)&&saved.step>=0&&saved.step<=3&&typeof saved.citation==="string"&&saved.citation.length<=40&&typeof saved.confirmed==="boolean"&&typeof saved.story==="string"&&saved.story.length<=500&&(saved.step<2||(saved.citation.trim()&&saved.confirmed))&&(saved.step<3||saved.story.trim()))setProgress(saved);}catch{}
+     setReady(true);
+   });
+   return ()=>{active=false;};
  },[]);
  useEffect(()=>{if(ready)try{sessionStorage.setItem(key,JSON.stringify(progress));}catch{}},[ready,progress]);
  const advance=()=>{setError("");setProgress(p=>({...p,step:p.step+1}));};

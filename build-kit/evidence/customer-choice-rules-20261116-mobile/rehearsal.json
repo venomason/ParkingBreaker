@@ -1,0 +1,65 @@
+{
+  "synthetic_only": true,
+  "production_web": true,
+  "service_phase": "controlled_free_beta",
+  "ticket_reading_preview": true,
+  "runtime": "/tmp/pb-synthetic-pt5shp3n",
+  "application_fingerprint": "8cbd221407ebfd582a0502cf4bc3489568ecf5e1d3edb89d24a4f3cb8a4f405f",
+  "passed": true,
+  "qualification": "Local synthetic rehearsal only; not task or launch acceptance",
+  "browser_project": "chromium-mobile375x812",
+  "browser_config": "web/playwright.beta.config.ts",
+  "physical_camera": false,
+  "mobile_viewport_emulation_only": true,
+  "private_web_build": true,
+  "web_source_manifest_sha256": "753d80b9964731774c800beb6a7b3c78e6b9ec1b6454cf1ac68105b407e77fad",
+  "connect_proxy": {
+    "mode": "http-connect-loopback",
+    "allowed_destination": "portal.example.test:443",
+    "tunnel_target": "127.0.0.1:36165",
+    "origin": "http://127.0.0.1:39599",
+    "pid": 1487552,
+    "log": "connect-proxy.log",
+    "stopped": true,
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "browser_check_receipt": "build-kit/evidence/checks/1794871632489928556-synthetic-browser-controlled-free-beta.json",
+  "browser_check_sha256": "c75ee2e2eaabf2383fca8577fff66583bb23c440c1a39bb76a3b189c58e14c63",
+  "browser_report_validation": {
+    "valid": true,
+    "tests": 50,
+    "results": 50
+  },
+  "code_unchanged_during_rehearsal": true,
+  "owned_services_stopped": true,
+  "owned_process_groups": [
+    1487191,
+    1487518,
+    1487519,
+    1487520,
+    1487550,
+    1487552,
+    1487554
+  ],
+  "harness_sha256": {
+    "build-kit/scripts/synthetic_rehearsal.py": "2266d69948a06c9f6712c810ab35373af42fa8b9f40541c373ec5a7d29a122b4",
+    "build-kit/scripts/synthetic_api.py": "238cad8f908a8e91dc8037add14db584a42e2239bfd78a4be7083952ebf02f9a",
+    "build-kit/scripts/kit.py": "259aa54ead2589419c7bf2737b3cd8b1a6b57feb26669a2d4b896256170b0c1e",
+    "web/tests/synthetic-fixtures.ts": "0593542da5608f22abc17b18e560219b6db9c54e205011b1422d1f3ca411c94d",
+    "build-kit/scripts/synthetic_browser_matrix.py": "7cf8aa7bf7f21acb200de9fbd59fe261565a1684ebeb055bbee738f816c869c3",
+    "web/playwright.beta.config.ts": "6ad9d7256765428e92e873caaf7411a4e29498e53afc87935f777b2d41be3728",
+    "web/package.json": "2efada773abc607f1f91babd1cf554a4b92aec2c972de0ac0de13b656688dfd9",
+    "web/package-lock.json": "a949ad922b8c43a4069f2ebe6b910e5679ebe000da344513e4ad43c37943a020"
+  },
+  "initial_harness_sha256": {
+    "build-kit/scripts/synthetic_rehearsal.py": "2266d69948a06c9f6712c810ab35373af42fa8b9f40541c373ec5a7d29a122b4",
+    "build-kit/scripts/synthetic_api.py": "238cad8f908a8e91dc8037add14db584a42e2239bfd78a4be7083952ebf02f9a",
+    "build-kit/scripts/kit.py": "259aa54ead2589419c7bf2737b3cd8b1a6b57feb26669a2d4b896256170b0c1e",
+    "web/tests/synthetic-fixtures.ts": "0593542da5608f22abc17b18e560219b6db9c54e205011b1422d1f3ca411c94d",
+    "build-kit/scripts/synthetic_browser_matrix.py": "7cf8aa7bf7f21acb200de9fbd59fe261565a1684ebeb055bbee738f816c869c3",
+    "web/playwright.beta.config.ts": "6ad9d7256765428e92e873caaf7411a4e29498e53afc87935f777b2d41be3728",
+    "web/package.json": "2efada773abc607f1f91babd1cf554a4b92aec2c972de0ac0de13b656688dfd9",
+    "web/package-lock.json": "a949ad922b8c43a4069f2ebe6b910e5679ebe000da344513e4ad43c37943a020"
+  },
+  "harness_unchanged_during_rehearsal": true
+}

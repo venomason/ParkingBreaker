@@ -16,14 +16,19 @@ export function IntakeMotionPreview() {
  const heading=useRef<HTMLHeadingElement>(null);
  const previousStep=useRef<number|null>(null);
  useEffect(()=>{
-   try {
-     const saved=JSON.parse(sessionStorage.getItem(storageKey)??"null");
-     if(saved && [0,1,2,3].includes(saved.step) && typeof saved.citation==="string" && saved.citation.length<=40 && typeof saved.checked==="boolean" && typeof saved.story==="string" && saved.story.length<=2000) {
-       const valid = saved.step<2 || (saved.citation.trim().length>0 && saved.checked && (saved.step<3 || saved.story.trim().length>0));
-       if(valid)setState(saved);
-     }
-   } catch { /* Storage is optional for this local design preview. */ }
-   setReady(true);
+   let active=true;
+   queueMicrotask(()=>{
+     if(!active)return;
+     try {
+       const saved=JSON.parse(sessionStorage.getItem(storageKey)??"null");
+       if(saved && [0,1,2,3].includes(saved.step) && typeof saved.citation==="string" && saved.citation.length<=40 && typeof saved.checked==="boolean" && typeof saved.story==="string" && saved.story.length<=2000) {
+         const valid = saved.step<2 || (saved.citation.trim().length>0 && saved.checked && (saved.step<3 || saved.story.trim().length>0));
+         if(valid)setState(saved);
+       }
+     } catch { /* Storage is optional for this local design preview. */ }
+     setReady(true);
+   });
+   return ()=>{active=false;};
  },[]);
  useEffect(()=>{
    if(!ready)return;

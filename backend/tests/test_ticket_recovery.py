@@ -6,10 +6,15 @@ from typing import Any
 import pytest
 
 import test_ticket_intake_service as h
+from parkingbreaker import prehold
 from parkingbreaker.api import schemas as s
+from parkingbreaker.api.service import ServiceConflict
+from parkingbreaker.json_types import JsonValue
 from parkingbreaker.llm import Usage
 from parkingbreaker.ticket_fact_binding import TicketFactBinding, TicketFactBindingError
 from parkingbreaker.ticket_intake_service import TicketIntakeServiceError
+from parkingbreaker.ticket_vision import FIELD_ORDER, TicketField
+from samples import SAN_FRANCISCO
 
 
 @pytest.fixture
@@ -18,14 +23,14 @@ def fake_resolution(monkeypatch: pytest.MonkeyPatch) -> list[str]:
 
     def resolve(query: Any, *_args: object, **_kwargs: object) -> h.Resolved:
         seen.append(query.printed_issuer)
-        return h.Resolved(h.SAN_FRANCISCO)
+        return h.Resolved(SAN_FRANCISCO)
 
-    monkeypatch.setattr(h.prehold, "resolve_ticket_issuer", resolve)
+    monkeypatch.setattr(prehold, "resolve_ticket_issuer", resolve)
     return seen
 
 
 def empty_literal() -> dict[str, None]:
-    return {field.value: None for field in h.FIELD_ORDER}
+    return {field.value: None for field in FIELD_ORDER}
 
 
 def save_binding(harnessed: h.Harness, workspace: str, binding: TicketFactBinding) -> None:
@@ -44,7 +49,7 @@ def save_binding(harnessed: h.Harness, workspace: str, binding: TicketFactBindin
 def test_customer_recovers_without_another_provider_call(
     tmp_path: Path, fake_resolution: list[str], failure: str
 ) -> None:
-    data: h.JsonValue = (
+    data: JsonValue = (
         {}
         if failure == "refused"
         else {
@@ -52,7 +57,7 @@ def test_customer_recovers_without_another_provider_call(
                 "state": "unreadable" if failure == "unreadable" else "not_shown",
                 "value": None,
             }
-            for field in h.FIELD_ORDER
+            for field in FIELD_ORDER
         }
     )
     client = (
@@ -77,7 +82,7 @@ def test_customer_recovers_without_another_provider_call(
     alias = fixture.coordinator.request_review(workspace, "review-alias", 2)
     assert alias.status == "success"
     assert fake_resolution == []
-    with pytest.raises(h.ServiceConflict, match="ticket_confirmation_required"):
+    with pytest.raises(ServiceConflict, match="ticket_confirmation_required"):
         fixture.service.submit(
             workspace,
             h.submit_body(binding, front, back).model_copy(
@@ -115,7 +120,7 @@ def test_partial_O_zero_correction_keeps_both_provenances(tmp_path: Path) -> Non
     adopted["license_plate"] = "DEMO926"
     binding = h.binding_for(literal, adopted)
     data = h.reading_payload()
-    h.shown(data, h.TicketField.LICENSE_PLATE, "DEM0926")
+    h.shown(data, TicketField.LICENSE_PLATE, "DEM0926")
     client = h.ScriptedVisionClient(
         (data, Usage()), (h.review_payload(binding.review_fields()), Usage())
     )
@@ -127,7 +132,8 @@ def test_partial_O_zero_correction_keeps_both_provenances(tmp_path: Path) -> Non
     assert "DEMO926" not in client.calls[-1].user
     fixture.coordinator.confirm(workspace, h.confirm_command(fixture, workspace))
     saved = fixture.service.workspace_view(workspace).intake_form
-    assert saved is not None and saved.ticket_fact_binding is not None
+    assert saved is not None
+    assert saved.ticket_fact_binding is not None
     assert saved.ticket_fact_binding.literal["license_plate"] == "DEM0926"
     assert saved.ticket_fact_binding.adopted["license_plate"] == "DEMO926"
     fixture.store.close()

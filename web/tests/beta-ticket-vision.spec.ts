@@ -583,4 +583,39 @@ test("required saved Step 2 stays at ticket confirmation when status discovery f
   await expect(page.locator("#story")).toHaveValue(story);
   expect(processingCalls).toEqual([]);
 });
+
+test("short pipeline notice opens full rules without submitting or losing entered facts", async ({ page }) => {
+  await beginVision(page);
+  await uploadAndRead(page);
+  await fillFacts(page);
+  await reviewFacts(page);
+
+  const notice = page.locator("#visionReview [data-customer-choice-notice]");
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("Your chosen details aren’t covered by our correct-office refund guarantee if they cause the rejection.");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+
+  const mutationsDuringRules: string[] = [];
+  const track = (request: { method: () => string; url: () => string }) => {
+    if (request.method() === "POST" || request.method() === "PUT") {
+      mutationsDuringRules.push(`${request.method()} ${new URL(request.url()).pathname}`);
+    }
+  };
+  page.on("request", track);
+  await notice.locator(".notice-rules-btn").click();
+  const termsDlg = page.locator("#termsDlg");
+  await expect(termsDlg).toBeVisible();
+  await expect(termsDlg.locator('[data-policy-version="2026-11-16"]')).toContainText("Customer choices and our correct-office guarantee");
+  await expect(termsDlg).toContainText("If a destination we verified proves wrong, you receive a full refund.");
+  await termsDlg.locator('button[aria-label="Close"]').click();
+  await expect(termsDlg).not.toBeVisible();
+  page.off("request", track);
+
+  expect(mutationsDuringRules).toEqual([]);
+  await expect(page.locator("#fact-citation_number")).toHaveValue(FACTS.citation_number);
+  await expect(page.locator("#fact-stage")).toHaveValue(FACTS.stage);
+  await expect(page.locator("#fact-issuer_kind-government")).toBeChecked();
+  await confirmFacts(page);
+});
 });
