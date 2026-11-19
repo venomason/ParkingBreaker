@@ -1,2 +1,3 @@
 # Captured reference bytes are hash-addressed evidence, not normalized source text.
 build-kit/evidence/bench-pages/* -text -diff
+backend/tests/fixtures/unfamiliar_issuers/* -text -diff

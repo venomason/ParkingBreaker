@@ -367,6 +367,7 @@ def test_alias_cooccurrence_without_relationship_is_not_directory_identity() -> 
     [
         "SFMTA Payment Office collects payments for parking citations.",
         "SFMTA Payment Office does not decide parking citation appeals.",
+        "SFMTA Payment Office does not handle parking citation disputes.",
     ],
 )
 def test_payment_or_explicit_nondeciding_role_cannot_become_adjudicator(text: str) -> None:

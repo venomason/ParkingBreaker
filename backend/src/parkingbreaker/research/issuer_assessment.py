@@ -481,7 +481,7 @@ def resolve_issuer(
     assert assessment.deciding_body_evidence is not None
     body_quote = assessment.deciding_body_evidence.verbatim_quote or ""
     if not re.search(
-        r"\b(?:contests?|appeals?|reviews?|hearings?|protests?|challenges?)\b",
+        r"\b(?:contests?|disputes?|appeals?|reviews?|hearings?|protests?|challenges?)\b",
         body_quote.casefold(),
     ):
         return veto(
@@ -490,7 +490,8 @@ def resolve_issuer(
         )
     if re.search(
         r"\b(?:does|do|will|can)\s+not\s+(?:decide|handle|accept|hear|process|review)\s+"
-        r"(?:(?:any|the|these|parking|citation)\s+)*(?:contests?|appeals?|reviews?|hearings?)\b",
+        r"(?:(?:any|the|these|parking|citation)\s+)*"
+        r"(?:contests?|disputes?|appeals?|reviews?|hearings?)\b",
         " ".join(body_quote.casefold().split()),
     ):
         return veto(
