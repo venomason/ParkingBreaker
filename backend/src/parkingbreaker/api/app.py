@@ -618,6 +618,7 @@ def app_from_environment() -> FastAPI:
     from parkingbreaker.case_service import CaseService
     from parkingbreaker.config import (
         build_services,
+        journey_identity_from_settings,
         load_settings,
         require_recovery_gates,
         resolve_service_phase,
@@ -646,7 +647,10 @@ def app_from_environment() -> FastAPI:
     auth_settings = load_auth_settings(settings)
     if auth_settings is not None:
         settings.data_dir.mkdir(parents=True, exist_ok=True)
-        store = SqliteTransactionStore(settings.data_dir / "parkingbreaker.sqlite")
+        store = SqliteTransactionStore(
+            settings.data_dir / "parkingbreaker.sqlite",
+            journey_identity=journey_identity_from_settings(settings),
+        )
         try:
             services = build_services(settings, store=store)
             if services is None:

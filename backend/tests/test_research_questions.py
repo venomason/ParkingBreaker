@@ -43,7 +43,8 @@ def test_one_question_per_key_in_order() -> None:
 
 def test_questions_mention_the_ticket() -> None:
     by_key = {q.key: q for q in build_questions(TICKET)}
-    assert "TC 7.2.22 (Street cleaning)" in by_key[FactKey.GOVERNING_CODE_SECTION].ask
+    assert FactKey.GOVERNING_CODE_SECTION not in by_key
+    assert "TC 7.2.22 (Street cleaning)" in by_key[FactKey.TICKET_SPECIFIC_REQUIREMENTS].ask
     assert "us-ca-san_francisco" in by_key[FactKey.MAILING_ADDRESS].ask
     assert "2026-10-01" in by_key[FactKey.DEADLINE_DAYS].ask
 
@@ -61,10 +62,9 @@ def test_exhaustive_default_tier_registry_and_stage_scoped_questions() -> None:
     assert all(isinstance(tier, FactTier) for tier in DEFAULT_TIERS.values())
     assert {k for k, tier in DEFAULT_TIERS.items() if tier is FactTier.MUST_HAVE} == CRITICAL_KEYS
     # Retired defence key: present so historical records decode, never researched.
-    assert {k for k, tier in DEFAULT_TIERS.items() if tier is FactTier.IMPORTANT} == {
-        FactKey.GOVERNING_CODE_SECTION,
-    }
+    assert {k for k, tier in DEFAULT_TIERS.items() if tier is FactTier.IMPORTANT} == set()
     assert {k for k, tier in DEFAULT_TIERS.items() if tier is FactTier.NICE_TO_HAVE} == {
+        FactKey.GOVERNING_CODE_SECTION,
         FactKey.FINE_AMOUNT,
         FactKey.CODE_EXCEPTIONS,
     }

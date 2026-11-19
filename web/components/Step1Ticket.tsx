@@ -1,7 +1,8 @@
 "use client";
 
+import { HurtleGuide } from "./HurtleGuide";
+import { PhotoPicker } from "./CurbsidePhotos";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ConciergeMark } from "./ConciergeMark";
 import { Icon } from "./Icons";
 import { TicketFactReview } from "./TicketFactReview";
 import { PHOTO_UPLOAD_GUIDANCE } from "../lib/api";
@@ -64,6 +65,7 @@ interface Step1TicketProps {
   live?: boolean;
   // Real owner-scoped ticket reading/review/confirmation path, discovered after workspace restore/creation.
   vision?: Step1VisionProps;
+  scenePhotos?: React.ReactNode;
 }
 
 function readingStateText(reading: TicketReadingSnapshot | null) {
@@ -76,7 +78,7 @@ function readingStateText(reading: TicketReadingSnapshot | null) {
   return "Reading complete. These are unverified suggestions; check them below.";
 }
 
-export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, setPlateState, backPhoto, setBackPhoto, onComplete, setActionBar, live = false, vision }: Step1TicketProps) {
+export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, setPlateState, backPhoto, setBackPhoto, onComplete, setActionBar, live = false, vision, scenePhotos }: Step1TicketProps) {
   const savedCount = live ? fields.findIndex(field => !field.v.trim()) : 0;
   const initialIndex = savedCount === -1 ? fields.length : savedCount;
   const hasSaved = live && fields.some(field => field.v.trim());
@@ -89,30 +91,22 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
   const [compact, setCompact] = useState<boolean>(true);
   const [fieldErr, setFieldErr] = useState(false);
   const [plateErr, setPlateErr] = useState<boolean>(false);
-  const [markState, setMarkState] = useState<"idle" | "thinking" | "done">("idle");
   const [thought, setThought] = useState<string>("");
 
-  const activeLineRef = useRef<HTMLDivElement>(null);
-  const loupeWrapRef = useRef<HTMLDivElement>(null);
+  const reviewCard = useRef<HTMLDivElement>(null);
 
   const visionActive = live && Boolean(vision) && (vision?.mode === "vision" || (started && vision?.mode !== "legacy"));
 
-  // Auto-scroll the active ticket line into the optical loupe viewport (Fix 6)
   useEffect(() => {
-    if (hasScanned && fieldIdx < fields.length && activeLineRef.current && loupeWrapRef.current) {
-      activeLineRef.current.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
-        block: "nearest",
-      });
-    }
-  }, [fieldIdx, hasScanned, compact, fields.length]);
+    if (!hasScanned || isScanning || visionActive) return;
+    reviewCard.current?.scrollIntoView({ block: "center", behavior: "instant" });
+  }, [hasScanned, isScanning, visionActive, fieldIdx, editingField]);
 
   useEffect(() => {
     if (!isScanning) return;
     const timer = setTimeout(() => {
       setIsScanning(false); setHasScanned(true);
       setThought("We found five details. Let’s check them together, one at a time.");
-      setMarkState("idle");
     }, 1200);
     return () => clearTimeout(timer);
   }, [isScanning]);
@@ -138,7 +132,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
       beginLegacyEntry();
       return;
     }
-    setHasScanned(true); setIsScanning(true); setMarkState("thinking"); setThought("Reading your ticket…");
+    setHasScanned(true); setIsScanning(true); setThought("Reading your ticket…");
   }, [live, vision, beginLegacyEntry]);
 
   const handleSaveField = useCallback(() => {
@@ -207,7 +201,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
           id="actSnap"
           onClick={handleStartScan}
         >
-          {live ? "Start my appeal →" : "Use sample front photo →"}
+          {live ? (vision ? "Add ticket photo →" : "Enter ticket details →") : "Use sample front photo →"}
         </button>
       );
       return;
@@ -308,18 +302,18 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
   return (
     <section className="screen on" id="s1" aria-labelledby="h-s1">
       <div className="voice">
-        <ConciergeMark size={46} state={markState} />
+        <HurtleGuide pose="ticket" />
         <div>
           <p className="eyebrow">Step 1 · Your ticket</p>
           <h2 id="h-s1" tabIndex={-1}>
-            Let’s start with your ticket.
+            Start with your ticket.
           </h2>
           <p className="lead">
             {visionActive
               ? "Upload your ticket photos, check the unverified reading suggestions, and confirm the facts we will use for your letter."
               : live
-                ? "Enter each detail as printed on your ticket. You’ll add readable ticket photos with your account on the next step."
-                : "Take a photo of your parking ticket. We’ll read it, then you’ll check each detail before anything else happens."}
+                ? (vision ? "Start with the front. Check the issuing agency and ticket details before you continue." : "Enter each detail as printed on your ticket. Keep the front and back handy.")
+                : "Try the sample ticket. You’ll check the details one at a time."}
           </p>
           <p className="thought" aria-live="polite">
             {thought}
@@ -341,30 +335,22 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             {vision.error && <p className="err" role="alert">{vision.error}</p>}
             {vision.checking && <p className="small" role="status">Checking how your ticket is read…</p>}
             <div className="local-ids single">
-              <label>
-                Front of ticket (required, JPEG or PNG)
-                <input
-                  id="visionFrontPhoto"
-                  type="file"
-                  aria-describedby="ticketPhotoFormats"
-                  accept="image/jpeg,image/png"
-                  disabled={Boolean(vision.busy) || vision.checking}
-                  onChange={(event) => vision.onPickPhoto("ticket", event.target.files?.[0] ?? null)}
-                />
+              <div>
+                <strong>Front of ticket · Required</strong>
+                <div className="picker-row">
+                  <PhotoPicker id="visionFrontCamera" label="Take front photo" camera disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("ticket", files[0])} />
+                  <PhotoPicker id="visionFrontPhoto" label="Choose front photo" disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("ticket", files[0])} />
+                </div>
                 {vision.frontRef && <span className="small" id="visionFrontSaved">Front photo saved for this appeal.</span>}
-              </label>
-              <label>
-                Back of ticket (optional, JPEG or PNG)
-                <input
-                  id="visionBackPhoto"
-                  type="file"
-                  aria-describedby="ticketPhotoFormats"
-                  accept="image/jpeg,image/png"
-                  disabled={Boolean(vision.busy) || vision.checking}
-                  onChange={(event) => vision.onPickPhoto("back", event.target.files?.[0] ?? null)}
-                />
+              </div>
+              <div>
+                <strong>Back of ticket</strong>
+                <div className="picker-row">
+                  <PhotoPicker id="visionBackCamera" label="Take back photo" camera disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("back", files[0])} />
+                  <PhotoPicker id="visionBackPhoto" label="Choose back photo" disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("back", files[0])} />
+                </div>
                 {vision.backRef && <span className="small" id="visionBackSaved">Back photo saved for this appeal.</span>}
-              </label>
+              </div>
               {vision.backRef && (
                 <button className="btn" type="button" disabled={Boolean(vision.busy)} onClick={() => vision.onPickPhoto("back", null)}>Remove back of ticket</button>
               )}
@@ -398,6 +384,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             )}
           </section>
 
+          {scenePhotos}
           {vision.frontRef ? (
             <TicketFactReview
               key={vision.workspaceId ?? "no-workspace"}
@@ -422,49 +409,16 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
 
       {!hasScanned && !visionActive && (
         <div id="capture" className="card capture">
-          <div className="capture-top">
-            <div className="cam" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24">
-                <path
-                  d="M4 8.5A2.5 2.5 0 016.5 6h1.7l1.3-2h5l1.3 2h1.7A2.5 2.5 0 0120 8.5v8a2.5 2.5 0 01-2.5 2.5h-11A2.5 2.5 0 014 16.5z"
-                  fill="none"
-                  stroke="#b3122b"
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                />
-                <circle cx="12" cy="12.5" r="3.6" fill="none" stroke="#b3122b" strokeWidth="1.8" />
-              </svg>
-            </div>
-            <div>
-              <h3>Start with your ticket</h3>
-              <p className="muted small">{live ? "Your front photo is read by an AI service. You confirm every fact yourself." : "Flat surface, good light. You confirm every detail we read."}</p>
-            </div>
-          </div>
-          <div className="capture-grid">
-            <div className="capture-item">
-              <div className="req-row">
-                <span className="req">Required · Front photo</span>
-              </div>
-              <p className="muted small">Shows citation number, date, location and violation.</p>
-            </div>
-            <div className="capture-item">
-              <div className="req-row">
-                <span className="req rec">Recommended · Back photo</span>
-              </div>
-              <p className="muted small">
-                Often prints mailing instructions or a deadline that differs from the website.
-              </p>
-              {!live && <button
-                className="chip"
-                type="button"
-                id="backCapture"
-                aria-pressed={backPhoto}
-                style={{ marginTop: "6px" }}
-                onClick={() => setBackPhoto(!backPhoto)}
-              >
+          <div className="ticket-prep">
+            <p><strong>Front of your ticket</strong><span>Keep the citation number, date and issuing agency readable.</span></p>
+            <details className="guide-notes">
+              <summary>Photo tips and the back of the ticket</summary>
+              <p>Photograph both sides in good light. Keep all four corners in frame so dates, the issuing agency and any instructions stay readable.</p>
+              {!live && <button className="chip" type="button" id="backCapture" aria-pressed={backPhoto}
+                onClick={() => setBackPhoto(!backPhoto)}>
                 {backPhoto ? "✓ Back photo added" : "Add sample back photo"}
               </button>}
-            </div>
+            </details>
           </div>
           <div className="privacy-line">
             <Icon id="lock" size={18} style={{ flex: "none" }} />
@@ -480,9 +434,11 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
         </div>
       )}
 
+      {!visionActive && scenePhotos}
+
       {hasScanned && !visionActive && (
         <div id="s1grid">
-          {!live && <div className="vf" id="ticketWrap" ref={loupeWrapRef}>
+          {!live && <div className="vf" id="ticketWrap">
             <div className="vf-bar">
               <span>Sample Citation Optical Loupe</span>
               <span className="vf-badge" id="loupeBadge">
@@ -509,7 +465,6 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
                 return (
                   <div
                     key={f.k}
-                    ref={isHl ? activeLineRef : undefined}
                     className={`tr ${isHl ? "hl" : ""} ${isOk ? "ok" : ""}`}
                     data-f={f.k}
                   >
@@ -581,7 +536,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             </ol>
 
             {fieldIdx < fields.length && (
-              <div id="fcur">
+              <div key={fieldIdx} id="fcur" ref={reviewCard}>
                 {editingField ? (
                   <div className="card fcur" aria-live="polite">
                     <p className="k">
@@ -621,7 +576,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             )}
 
             {fieldIdx >= fields.length && (
-              <div id="s1done" className="card fcur">
+              <div id="s1done" className="card fcur" ref={reviewCard}>
                 <p className="k" style={{ color: "var(--sage)" }}>
                   {live ? "✓ Ticket details entered" : "✓ All five read details confirmed"}
                 </p>

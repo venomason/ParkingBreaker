@@ -39,13 +39,13 @@ const contact = {issuedCity:"San Francisco",issuedState:"CA",issuerKind:"GOVERNM
 const details = {busy:false,submitting:false,error:null,values:contact,ticketPhoto:null,ticketBackPhoto:null,evidencePhotos:[],ticketPhotoRef:"photo-ticket",ticketBackPhotoRef:null};
 
 test.describe("M1 optional photos and intake", () => {
-  test("guide allows zero photos, separates citation capture and describes safe chosen enclosures", () => {
+  test("photo selection allows zero enclosures and keeps citation capture separate", () => {
     const html = render("LiveDetails",details);
-    for (const phrase of ["Ticket in place (optional)","Surroundings (optional)","A detail from your statement (optional)","From a safe place","continue without","photos you choose will be mailed"]) expect(html).toContain(phrase);
+    for (const phrase of ["continue without","photos you choose will be mailed","Only take photos when it is safe","unrelated personal details"]) expect(html).toContain(phrase);
     expect(html).toContain('id="liveTicketPhoto"');
     expect(html).toContain('id="liveEvidencePhoto"');
     expect(html).not.toMatch(/(?:need|require|must have) (?:exactly )?three photos/i);
-    expect(html).not.toMatch(/prove (?:your|a) (?:case|defen[cs]e)/i);
+    expect(html).not.toMatch(/prove (?:your|a) (?:case|defen[cs]e)|sign or meter display|nearby signs/i);
   });
   test("existing selected photos expose accessible ordering and removal with escaped names", () => {
     const html = render("LiveDetails",{...details,evidencePhotos:[{id:"one",ref:"photo-one",file:{name:"<private>.png"}},{id:"two",ref:"photo-two",file:null}]});

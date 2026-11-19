@@ -1,0 +1,204 @@
+{
+  "date": "2026-11-17T21:26:14.258954+00:00",
+  "implementation": "Direct by assigned GPT-6.1 Sol at high reasoning; one checkout writer; no nested coding workers",
+  "scope": "T02 first bounded slice: durable journey identity and immutable capture-start provenance",
+  "state": {
+    "implemented": true,
+    "locally_tested": true,
+    "production_configured": false,
+    "live": false,
+    "measured_business_outcomes": false,
+    "entire_T02_complete": false
+  },
+  "git_head": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+  "worktree": "Initially clean; changes remain uncommitted and unpushed. No deployment, provider calls, customer contact or spending.",
+  "sha256_by_path": {
+    "backend/src/parkingbreaker/journey_events.py": "55900e742d24513be1fa3fc4f3ea0db94339593608b441cdfa429ec7b5810cb7",
+    "backend/src/parkingbreaker/transaction_store.py": "279e05ee9cbfee6c6c3e047b5cd6e0d6b89575275062292ca3da38ece3cc6f28",
+    "backend/src/parkingbreaker/ticket_intake_store.py": "e1c0431313f28be3bbd9b865fea9dd517cb94f6263a0933c4194113def6c6266",
+    "backend/src/parkingbreaker/retention_inventory.py": "3aa43bb861544e5d5b0acc7715cbaa634075a2c7c0b25f9e6bc1c0a733a82d04",
+    "backend/src/parkingbreaker/retention_plan.py": "bfd83a37aaaef9a421c6eedbcf253d2887ffb4b877adf54dff69188ff17d25e6",
+    "backend/tests/test_journey_capture.py": "2b9a8f82f85bc603d79cb2d0d7a9becc2f9e1f5b52c6687c0840c17fdc1bbba0",
+    "backend/tests/test_journey_events.py": "b7db70ab00d6a0460e5617aeed20ccaf15d435408e042402c1fc0b80ce7d1896",
+    "backend/tests/test_retention_inventory.py": "7f63c6748b7740da92879eca9920412df4f630da24106ff273007bf27b506027",
+    "backend/tests/test_retention_plan.py": "917f1e7123096929c60d67e70df2c370a74736d9e5735ba450cc6031a78aede2",
+    "docs/operations/controlled-beta.md": "6970da42df93554f42044963415802f773a0c8dc7c9fe91eededed2ae4f2471c",
+    "docs/ROADMAP.md": "83c8750cc6d97e09f8c53f8d4430d3b9cf065a8ade5531df39ba6dbd1324d28a",
+    "docs/BETA-READINESS.md": "e4391aeeba15db1b1beb8b395c59ef87a422bd292f6fc5893093d760e05358ec",
+    "docs/TELEMETRY-FOUNDATION.md": "353f4722bf7cd201a7406017050a96497c98814456a374bf3cf6a1881f971fd1"
+  },
+  "contract": [
+    "New workspace, history, owner when applicable, restricted journey link and capture provenance commit or roll back together.",
+    "Identity for an uninstrumented legacy workspace begins at a newly committed pending OCR/review claim, not inferred from old attempt timestamps.",
+    "Legacy existing journey links receive only legacy_unknown provenance during the atomic migration; historical links and event rows are not rewritten.",
+    "Build/config digests may be explicitly supplied through the store constructor; absence remains unknown. Runtime identity derivation/configuration is not yet wired.",
+    "All current timeline coverage remains LIMITED. Capture-start evidence does not assert complete attempt/event coverage.",
+    "Reads retain existing internal owner/snapshot boundaries and expose no workspace tokens, request identifiers, customer content or credentials.",
+    "Capture provenance is inventoried as restricted operational data and retained separately by the retention planner; no purge policy is activated."
+  ],
+  "checks": [
+    {
+      "cwd": "backend",
+      "command": ".venv/bin/ruff check src tests",
+      "result": "All checks passed",
+      "exit_code": 0
+    },
+    {
+      "cwd": "backend",
+      "command": ".venv/bin/ruff format --check src tests",
+      "result": "486 files already formatted",
+      "exit_code": 0
+    },
+    {
+      "cwd": "backend",
+      "command": ".venv/bin/mypy",
+      "result": "Success: no issues found in 486 source files",
+      "exit_code": 0
+    },
+    {
+      "cwd": "backend",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PB_PROVIDER_MODE=preview .venv/bin/pytest tests/test_journey_capture.py tests/test_journey_events.py tests/test_journey_timeline.py tests/test_ticket_intake_store.py tests/test_transaction_store.py tests/test_transaction_lifecycle.py tests/test_t14_intake_atomicity.py tests/test_t14_authorization_recovery.py tests/test_ticket_recovery.py tests/test_retention_inventory.py tests/test_retention_plan.py --basetemp=../output/t02-verification-20261117/focused -p no:cacheprovider --junitxml=../output/t02-verification-20261117/focused.xml",
+      "result": "227 passed in 78.69s; one Unix-socket fixture failed before its assertions because the disk-backed path exceeded AF_UNIX path length. The unchanged fixture passed separately under a short path.",
+      "exit_code": 1,
+      "junit_totals": {
+        "tests": 228,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "cwd": "backend",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PB_PROVIDER_MODE=preview .venv/bin/pytest tests/test_retention_inventory.py::test_fifo_and_socket_refused --basetemp=/tmp/pb2 -p no:cacheprovider --junitxml=../output/t02-verification-20261117/socket.xml",
+      "result": "1 passed in 0.17s",
+      "exit_code": 0,
+      "junit_totals": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "cwd": "backend",
+      "command": "PYTHONDONTWRITEBYTECODE=1 PB_PROVIDER_MODE=preview .venv/bin/pytest tests/test_t18_storage.py tests/test_t18_storage_gaps.py tests/test_t18_partial_recovery.py tests/test_t14_authorization_atomicity.py tests/test_manifest_integrity_acceptance.py tests/test_t15_recovery.py tests/test_t20_webhook_recovery.py tests/test_t23_recovery.py tests/test_beta_recovery.py tests/test_retention_purge.py --basetemp=../output/t02-verification-20261117/integrity -p no:cacheprovider --junitxml=../output/t02-verification-20261117/integrity.xml",
+      "result": "225 passed in 74.98s",
+      "exit_code": 0,
+      "junit_totals": {
+        "tests": 225,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "cwd": "backend",
+      "command": "TMPDIR=\"$PWD/../output/t02-verification-20261117/runtime-tmp\" PYTHONDONTWRITEBYTECODE=1 PB_PROVIDER_MODE=preview .venv/bin/pytest -k \"not test_fifo_and_socket_refused\" --basetemp=../output/t02-verification-20261117/full -p no:cacheprovider --junitxml=../output/t02-verification-20261117/backend-full.xml",
+      "result": "13767 passed, 1 deselected, 1 Starlette/AnyIO deprecation warning in 1072.90s. The unchanged deselected Unix-socket fixture passed separately; 13768 total backend tests passed. No failing test omitted.",
+      "exit_code": 0,
+      "junit_totals": {
+        "tests": 13767,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": "output/t02-verification-20261117/backend-full.log"
+    },
+    {
+      "cwd": "web",
+      "command": "npm run lint && npm run type-check && npm run build",
+      "result": "ESLint passed; tsc --noEmit passed; production Next.js build compiled, checked types and generated pages successfully. Commands sequential, not concurrent.",
+      "exit_code": 0
+    },
+    {
+      "cwd": ".",
+      "command": "TMPDIR=\"$PWD/output/t02-verification-20261117/runtime-tmp\" PB_PROVIDER_MODE=preview backend/.venv/bin/python tools/qualification/research_campaign.py --self-test",
+      "result": {
+        "routing_self_test_passed": true,
+        "provider_called": false
+      },
+      "exit_code": 0
+    },
+    {
+      "cwd": ".",
+      "command": "TMPDIR=\"$PWD/output/t02-verification-20261117/runtime-tmp\" PB_PROVIDER_MODE=preview backend/.venv/bin/python tools/qualification/vision_campaign.py --self-test",
+      "result": {
+        "passed": true,
+        "provider_called": false,
+        "reserved_cents": 800,
+        "manifest_sha256": "e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6",
+        "model": "deepseek-flash"
+      },
+      "exit_code": 0,
+      "qualification": "Offline self-test reservation only, no actual provider spend."
+    },
+    {
+      "cwd": ".",
+      "command": "TMPDIR=\"$PWD/output/t02-verification-20261117/runtime-tmp\" backend/.venv/bin/python build-kit/scripts/synthetic_rehearsal.py --service-phase paid --out output/t02-browser-paid-20261117",
+      "result": "Failed gate: 36 passed and 116 Chrome launch failures; no skips/flakes. Inspected errors identify Socket path too long for Chrome SingletonSocket under the long TMPDIR. Services stopped and code/harness unchanged. Preserved receipt; retry uses a short disk-backed TMPDIR without source/test changes.",
+      "exit_code": 1,
+      "evidence": "output/t02-browser-paid-20261117/rehearsal.json",
+      "browser_report": "build-kit/evidence/checks/1794951761757960818-synthetic-browser.playwright.json"
+    },
+    {
+      "cwd": ".",
+      "command": "TMPDIR=/home/ghostmonday/.cache/pb-t02-browser backend/.venv/bin/python build-kit/scripts/synthetic_rehearsal.py --service-phase paid --out output/t02-browser-paid-20261117-retry",
+      "result": {
+        "startTime": "2026-11-17T21:46:00.746Z",
+        "duration": 253467.621,
+        "expected": 152,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "exit_code": 0,
+      "evidence": "output/t02-browser-paid-20261117-retry/rehearsal.json",
+      "browser_check_receipt": "build-kit/evidence/checks/1794951959936500510-synthetic-browser.json",
+      "application_fingerprint": "f39aaa2777a1a6bb415f6c1849ab9e1c07899f860f77290a5934f9c22e41e02e",
+      "code_unchanged": true,
+      "owned_services_stopped": true
+    },
+    {
+      "cwd": ".",
+      "command": "TMPDIR=/home/ghostmonday/.cache/pb-t02-browser backend/.venv/bin/python build-kit/scripts/synthetic_rehearsal.py --service-phase controlled_free_beta --browser-project chromium-mobile375x812 --ticket-reading-preview --out output/t02-browser-ocr-mobile-20261117",
+      "result": {
+        "startTime": "2026-11-17T21:50:38.647Z",
+        "duration": 76896.331,
+        "expected": 53,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "exit_code": 0,
+      "evidence": "output/t02-browser-ocr-mobile-20261117/rehearsal.json",
+      "browser_check_receipt": "build-kit/evidence/checks/1794952237836100696-synthetic-browser-controlled-free-beta.json",
+      "application_fingerprint": "f39aaa2777a1a6bb415f6c1849ab9e1c07899f860f77290a5934f9c22e41e02e",
+      "required_ocr": true,
+      "qualification": "Historical no-charge regression fixture with synthetic providers; not the current paid launch offer or physical-device evidence.",
+      "code_unchanged": true,
+      "harness_unchanged": true,
+      "owned_services_stopped": true
+    }
+  ],
+  "earlier_failed_checks": [
+    "Initial focus run: 36 passed and two failures. An existing clock test asserted lazy identity allocation; updated to assert durable workspace creation time. The pre-journey migration fixture needed removal of the new child capture component as well as the ledger to represent the historical schema. No business assertion was weakened.",
+    "New migration test initially used an unowned workspace; timeline correctly refused it. The fixture now creates an owned workspace.",
+    "Fault-injection proxy test initially placed a type-ignore comment on the wrong multiline-call line; replaced it with the established explicit Connection cast. Mypy subsequently passed.",
+    "Expanded /tmp run aborted with Disk quota exceeded. No aborted run is counted as passing. Retried on disk, then separately reran the long-path Unix-socket fixture. Only this task's generated /tmp artifacts were removed."
+  ],
+  "limits": [
+    "T02 remains open for full versioned event context: route/funding, closed status/reason, operation/attempt/causation and duration basis; runtime build/config identity wiring remains open.",
+    "No T03 complete transition history, outbox, analyzer, autonomous repair or external exporter is established by this slice.",
+    "Paid beta remains NO-GO; fake-provider preview deployment and historical Android evidence are unchanged.",
+    "Full backend, frontend, offline qualification self-tests, 152 paid browser checks and 53 required-OCR mobile-emulation checks passed on this bounded milestone. These results do not test unimplemented roadmap capabilities or qualify live providers, devices or paid activation. Full final-candidate verification must be repeated when relevant later code changes invalidate this snapshot."
+  ],
+  "next_ready_work": "Finish bounded T02 event-context/runtime-identity work and advance independent paid-beta readiness code as evidence permits. External provider/device/target/budget/staffing gates remain explicit dependencies.",
+  "documentation_correction": "Corrected the controlled-beta operating packet final paragraph to require an authorized enforced paid-cohort cap and R07 activation details, not a new free entitlement batch. Historical no-charge obligations remain unchanged.",
+  "backend_inputs": {
+    "count": 497,
+    "sha256": "238b779681d5d6e9a5293b011aba2949c252140f1285c6e360bedd03f8f13c5c",
+    "recipe": "Sorted rg --files backend/src backend/tests plus backend/pyproject.toml and backend/uv.lock; hash UTF-8 path + NUL + file SHA-256 hex + LF for each file."
+  },
+  "application_fingerprint": "f39aaa2777a1a6bb415f6c1849ab9e1c07899f860f77290a5934f9c22e41e02e",
+  "independent_review": "Requested by coordinator from GPT-6.1 high read-only reviewer; pending. Code frozen for review."
+}

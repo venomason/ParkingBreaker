@@ -1,22 +1,23 @@
 import { Icon } from "./Icons";
 
 const workflow = [
-  ["Add your ticket", "Photograph the front, and the back if it has one. We read it, and you check every detail."],
+  ["Photograph your ticket", "Start at the windshield. Photograph the ticket and any surroundings you want to keep. Check the ticket details and issuing agency we read."],
   ["Tell your side", "Tell us what happened in your own words. We ask neutral questions about the facts."],
   ["Choose your mailing", "Review the offer for your appeal. Nothing is pre-selected."],
   ["Check the requirements", "We check the agency’s official pages and show you the sources and exact wording."],
   ["Approve your packet", "Review and edit the letter, inspect the exact PDF, and approve it before anything is sent."],
-  ["Track your mailing", "Keep the available postal updates and a copy of your exact mailed packet in your appeal."],
+  ["Track your mailing", "After you approve the packet, ParkingBreaker sends it through Lob. Your appeal keeps a copy and the available postal updates."],
 ];
 
 export function IntakeTrust() {
   return (
-    <div className="intake-support">
+    <details className="intake-support guide-notes">
+      <summary>How the appeal and mailing work</summary>
       <section className="intake-workflow" aria-labelledby="workflow-title">
         <p className="eyebrow">From your ticket to the mail</p>
         <h2 id="workflow-title">Less paperwork on your to-do list.</h2>
         <p className="intake-workflow-lead">
-          Six clear steps. You stay in control of your words and approve the exact packet before anything is mailed.
+          Clerical assistance · No legal advice or promised outcome. You stay in control of your words and approve the exact packet before anything is mailed.
         </p>
         <ol className="workflow-list">
           {workflow.map(([title, description], index) => (
@@ -38,6 +39,6 @@ export function IntakeTrust() {
           <div><Icon id="globe" size={22} /><h3>An address you can check.</h3><p>We look for the appeal address on the agency’s official pages and show you the sources. If we cannot establish the required submission details, we pause or stop without charging for mailing. You approve the exact destination before mailing.</p></div>
         </div>
       </section>
-    </div>
+    </details>
   );
 }

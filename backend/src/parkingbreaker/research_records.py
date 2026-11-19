@@ -11,6 +11,7 @@ import math
 import re
 from datetime import date, datetime
 from enum import Enum
+from types import MappingProxyType
 from typing import cast
 
 from parkingbreaker.agencies import IssuerType, ResolvedAgency, SourceScope
@@ -52,7 +53,9 @@ from parkingbreaker.research.questions import (
     CustomerPosition,
     EffectiveTiers,
     FactKey,
+    FactTier,
     PacketPlan,
+    Promotion,
     Question,
     RequirementEvidence,
     Ticket,
@@ -747,13 +750,42 @@ def _evaluation_data(evaluation: EffectiveTiers) -> dict[str, object]:
     }
 
 
+def _stored_evaluation(
+    version: int,
+    ticket: Ticket,
+    requirements: VerifiedRequirements,
+    position: CustomerPosition,
+    plan: PacketPlan,
+) -> EffectiveTiers:
+    current = effective_tiers(ticket, requirements, position, plan)
+    if version >= 5:
+        return current
+    # Versions 2-4 saved the previous policy in signed evidence. Reproduce its
+    # exact evaluation for validation and encoding only. Reassessment uses v5.
+    code = FactKey.GOVERNING_CODE_SECTION
+    scope = f"{ticket.jurisdiction or ticket.city_id}/{ticket.stage or 'first-level review'}"
+    historic = tuple(
+        Promotion(code, f"{scope}: required form or packet needs provision", evidence)
+        for evidence in (requirements.code_required, plan.code_required)
+        if evidence is not None
+    )
+    tiers = {**current.tiers, code: FactTier.MUST_HAVE if historic else FactTier.IMPORTANT}
+    return EffectiveTiers(
+        MappingProxyType(tiers),
+        (*historic, *current.promotions),
+        requirements.compulsory_conditions,
+    )
+
+
 def _tier_context_data(result: ResearchResult) -> dict[str, object]:
     requirements, position, plan = (
         result.verified_requirements,
         result.customer_position,
         result.packet_plan,
     )
-    evaluation = effective_tiers(result.ticket, requirements, position, plan)
+    evaluation = _stored_evaluation(
+        result.record_version, result.ticket, requirements, position, plan
+    )
     return {
         "requirements": {
             "code_required": _evidence_data(requirements.code_required),
@@ -801,7 +833,7 @@ def _customer_field(value: object) -> tuple[str, str]:
 
 
 def _tier_context(
-    value: object, ticket: Ticket
+    value: object, ticket: Ticket, version: int
 ) -> tuple[VerifiedRequirements, CustomerPosition, PacketPlan, EffectiveTiers]:
     data = _object(value, {"requirements", "position", "packet", "evaluation"}, "tier_context")
     req = _object(
@@ -845,7 +877,7 @@ def _tier_context(
             _customer_field(v) for v in _array(packet.get("customer_fields", []), "customer_fields")
         ),
     )
-    evaluation = effective_tiers(ticket, requirements, position, plan)
+    evaluation = _stored_evaluation(version, ticket, requirements, position, plan)
     if data["evaluation"] != _evaluation_data(evaluation):
         raise ValueError("saved tier evaluation does not match saved inputs")
     return requirements, position, plan, evaluation
@@ -880,7 +912,7 @@ def _decode(text: str, kind: str) -> object:
     data = _object(value, {"version", "kind", "payload"}, "envelope")
     if (
         type(data["version"]) is not int
-        or data["version"] not in ({1, 2, 3, 4} if kind == "research" else {1})
+        or data["version"] not in ({1, 2, 3, 4, 5} if kind == "research" else {1})
         or data["kind"] != kind
     ):
         raise ValueError("unsupported research record version or kind")
@@ -927,8 +959,15 @@ def research_json(result: ResearchResult) -> str:
         # Complete over the answerable keys plus any retired key this record actually
         # stored. A retired finding is never invented, but one that was genuinely
         # recorded survives re-encoding instead of being dropped as history.
-        retired_stored = [f.key for f in result.findings if f.key not in ANSWERABLE_KEYS]
-        keys = (*ANSWERABLE_KEYS, *dict.fromkeys(retired_stored))
+        # The governing-code key used to occur in enum order, ahead of the
+        # procedure findings. Keep that order in the historical wire format.
+        active = tuple(
+            key
+            for key in FactKey
+            if key in ANSWERABLE_KEYS
+            or (result.record_version < 5 and key is FactKey.GOVERNING_CODE_SECTION)
+        )
+        keys = (*active, *dict.fromkeys(f.key for f in result.findings if f.key not in active))
         payload["findings"] = [_finding_data(f) for f in complete_findings(result.findings, keys)]
     if result.record_version >= 4:
         payload["manifest"] = _manifest_data(result.manifest)
@@ -1026,7 +1065,7 @@ def decode_research(text: str) -> ResearchResult:
         raise ValueError("research times are out of order")
     ticket = _ticket(data["ticket"])
     requirements, position, plan, evaluation = (
-        _tier_context(data["tier_context"], ticket)
+        _tier_context(data["tier_context"], ticket, version)
         if version >= 2
         else (VerifiedRequirements(), CustomerPosition(), PacketPlan(), None)
     )

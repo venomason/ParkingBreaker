@@ -30,7 +30,7 @@ for (const phase of ["paid", "controlled_free_beta"] as const) {
       await visitor(page, phase);
       await page.goto("/");
       await expect(page.locator("#actSnap")).toBeVisible();
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Appeal your parking ticket in your own words. We handle the mail.");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("As soon as you spot a ticket, start taking photos.");
       await expect(page.locator(".workflow-list > li")).toHaveCount(6);
       await expect(page.locator(".intake-trust")).toContainText("Delivery is not guaranteed");
       await expect(page.locator(".intake-trust")).toContainText("without evaluating the merits");
@@ -89,3 +89,32 @@ for (const pending of ["appeal", "pricing"] as const) {
     await expect(page.locator("#actSnap")).toBeVisible();
   });
 }
+
+test("the five photo illustrations use the owner's exact statement and keep ticket intake available", async ({ page }) => {
+  await visitor(page, "paid");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const intro = page.locator(".intake-introduction");
+  await expect(intro.locator("h1")).toHaveText("As soon as you spot a ticket, start taking photos.");
+  await expect(intro.locator("p")).toHaveText("Get both sides of the ticket and photos of the area around your car. You can review them later and choose which ones accurately support what you’re saying.");
+  const pictures = intro.getByRole("img");
+  await expect(pictures).toHaveCount(5);
+  await expect(intro.locator("figcaption")).toHaveCount(0);
+  const fixedBackgrounds = await intro.locator(".curbside-frame:has(.curbside-position) img:first-child").evaluateAll(images => images.map(image => (image as HTMLImageElement).src));
+  expect(fixedBackgrounds).toHaveLength(3);
+  expect(new Set(fixedBackgrounds).size).toBe(1);
+  const next = intro.getByRole("button", { name: "Next illustration" });
+  const previous = intro.getByRole("button", { name: "Previous illustration" });
+  await expect(previous).toBeDisabled();
+  for (const index of [0, 1, 2, 3, 4]) {
+    if (index > 0) await next.click();
+    await expect(pictures.nth(index)).toBeInViewport({ ratio: 0.9 });
+    await expect.poll(() => pictures.nth(index).evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  }
+  await expect(next).toBeDisabled();
+  await previous.click();
+  await expect(pictures.nth(3)).toBeInViewport({ ratio: 0.9 });
+  await expect(page.locator("#sceneCamera")).toHaveAttribute("capture", "environment");
+  await expect(page.locator("#sceneLibrary")).toHaveAttribute("multiple", "");
+  await expect(page.locator("#actSnap")).toBeEnabled();
+});

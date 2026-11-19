@@ -225,7 +225,7 @@ async def test_failed_remail_refund_is_orchestrated_after_durable_capture(
             assert "no charge has been made yet" in waiting.message.lower()
             assert "refund" not in waiting.message.lower()
             settle_original_capture(mailing)
-        mailing.real._resolve_return(mailing.case_id)
+        mailing.approve_remail()
         if failure == "gate":
             latest = mailing.store.latest_destination_decision(
                 mailing.case_id, mailing.original.owner
@@ -295,9 +295,10 @@ async def test_failed_unpaid_remail_status_never_promises_a_refund(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, state: PaymentState
 ) -> None:
     async with pending_capture_case(tmp_path, monkeypatch) as mailing:
+        settle_original_capture(mailing)
         mailing.confirm_return()
         mailing.correct_destination()
-        mailing.real._resolve_return(mailing.case_id)
+        mailing.approve_remail()
         mailing.lob.script = [LobResponse(422, error="synthetic refusal")]
         mailing.real._dispatch(mailing.token)
         mailing.restart()
@@ -362,6 +363,7 @@ async def test_failed_remail_provider_rejection_refunds_the_captured_amount(
     async with mailed_case(tmp_path, monkeypatch, lost_refund_response=lost_response) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
+        mailing.approve_remail()
         mailing.lob.script = [LobResponse(422, error="synthetic invalid mail request")]
         mailing.sweep(12)
         assert mailing.case.attempt == 2
@@ -387,7 +389,7 @@ async def test_failed_remail_gate_refusal_is_our_service_failure_with_full_refun
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
-        mailing.real._resolve_return(mailing.case_id)
+        mailing.approve_remail()
         latest = mailing.store.latest_destination_decision(mailing.case_id, mailing.original.owner)
         assert latest is not None
         address = replace(latest.decision.address, line1="1000 Newer Verified Correction")
@@ -424,7 +426,7 @@ async def test_uncertain_remail_waits_until_resolved_then_refunds_when_never_sen
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
-        mailing.real._resolve_return(mailing.case_id)
+        mailing.approve_remail()
         assert letter_state(mailing) is cs.CaseState.SUBMITTING
         mailing.lob.script = [LobResponse(500, error="synthetic 5xx")]
         mailing.real._dispatch(mailing.token)
@@ -627,6 +629,7 @@ async def test_attempt2_cost_window_starts_at_the_second_return(
         first_return = mailing.clock()
         mailing.confirm_return()
         mailing.correct_destination()
+        mailing.approve_remail()
         mailing.sweep()
         assert mailing.case.attempt == 2
         mailing.clock.now = first_return + timedelta(days=10)
@@ -660,8 +663,8 @@ async def test_attempt2_status_copy_reports_each_actual_outcome(
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
+        mailing.approve_remail()
         if outcome == "uncertain":
-            mailing.real._resolve_return(mailing.case_id)
             mailing.lob.script = [LobResponse(500, error="synthetic 5xx")]
             mailing.real._dispatch(mailing.token)
             mailing.restart()
@@ -684,7 +687,6 @@ async def test_attempt2_status_copy_reports_each_actual_outcome(
             expected = "Delivery proof for the free re-mail has been recorded"
             active = False
         else:
-            mailing.real._resolve_return(mailing.case_id)
             mailing.lob.script = [LobResponse(500, error="synthetic 5xx")]
             mailing.real._dispatch(mailing.token)
             mailing.restart()

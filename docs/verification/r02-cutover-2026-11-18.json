@@ -1,0 +1,139 @@
+{
+  "date_pacific": "2026-11-18",
+  "purpose": "Private target cutover and intake stop qualification",
+  "paid_activation": false,
+  "source_base_commit": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+  "working_tree_application_fingerprint": "78103dce83f9a82d15b3300c2793f214442b1414e40fd8673b50d72840baff0b",
+  "changed_build_deploy_test_file_sha256": {
+    "backend/Dockerfile": "28e1d6373d77f867b391c3458dc88f8027ec228a156a00aa4060ad37494f15e8",
+    "backend/tests/test_t22_cloudrun_overlay.py": "c9ee10d5c7b56f618cd5531612c439ffcedd64a1b7f5e19407de9b2d0dedcdef",
+    "backend/tests/test_t22_lifecycle.py": "f153e6a23bc1023bbbd331a6e5fd1564e2f9a6c5403e3ec3220d665e47fd3e33",
+    "backend/tests/test_t22_replication.py": "b55864d7ff710b27c1ae5e4a123174a8bb529373f93b3fa2fe89a44bf5025db6",
+    "cloudbuild-backend.yaml": "5bec585a4f863d1edb7d11e13b62662aedcbf1a8cc400c0a59a5f341f73e7cb7",
+    "cloudbuild.yaml": "b0e2dd4fa9d5a4ead5a9fd2704c383ba7596fe3f62da6a63e60e31526eb49b79",
+    "deploy/backup.sh": "51ab69b75c7d97bccbfc9967d5d5bb53e56aff4b789e8128747382bf19e8272c",
+    "deploy/compose.private-vm.yaml": "1b03e7d9bb10141676cc6cd96b985419952685c425fe989263cba4ebfec6d793",
+    "deploy/lifecycle.sh": "d157276e52b2254ee69a61c217bdea449dfae7133152b8c940b37e7b94d3cc50",
+    "deploy/private-images.py": "a90005f05ffad750d2f851aa2abd9839151f93865185adb1f9030eab3bed5f1d",
+    "deploy/validate.sh": "d38ed891ad130b10f283a04b5fd284a4f5b979546b1b82450831961513c08761"
+  },
+  "private_ops_run": "parkingbreaker-launch-20261118-jkh7vR",
+  "verified_public_preview": {
+    "observed_utc": "2026-11-18T18:51:34Z",
+    "home_http": 200,
+    "api_health_http": 200,
+    "mode": "fake",
+    "status": "ok",
+    "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58"
+  },
+  "cloud_inventory": {
+    "utc": "2026-11-18T19:10:40.220845+00:00",
+    "command": [
+      "gcloud",
+      "projects",
+      "describe",
+      "neuraldraft-parkingbreaker",
+      "--project=neuraldraft-parkingbreaker",
+      "--format=value(projectId,lifecycleState)",
+      "--quiet"
+    ],
+    "exit": 1,
+    "state": "AUTH_REQUIRED"
+  },
+  "new_cloud_spend_authorized_usd": 0,
+  "separate_deepseek_authorization": "One synthetic OCR call up to USD 0.25, with no retry, separately recorded in p04-deepseek-single-2026-11-18.json",
+  "new_cloud_resources_created": false,
+  "local_gate": {
+    "command": "make check",
+    "environment": "pytest-xdist 3.8.0, eight workers, loadfile distribution, fresh short disk-backed basetemp",
+    "tests_passed": 13827,
+    "warnings": 8,
+    "test_seconds": 238.87,
+    "lint_format_types": "passed",
+    "log_sha256": "55d70c41674b9c63f333cde9f2632450e902e7ab91b0c5387988bbae795dfed3",
+    "frontend": "npm run lint, npm run type-check and npm run build on a separate copy of the current web source, with a loopback private HTTPS build origin",
+    "offline_qualification": "Vision and research self-tests both passed without external provider calls.",
+    "browser": {
+      "paid-ocr": {
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0,
+        "service_phase": "paid",
+        "ticket_reading": true,
+        "receipt": "output/launch-r02-20261118-jkh7vR/paid-ocr/rehearsal.json",
+        "report_sha256": "cd1034108c2861734c6e4ab88a5e2cacd1ea311cad8d2bc365ed10282130c24e"
+      },
+      "paid": {
+        "passed": 152,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0,
+        "service_phase": "paid",
+        "ticket_reading": false,
+        "receipt": "output/launch-r02-20261118-jkh7vR/paid/rehearsal.json",
+        "report_sha256": "45bf8f4dad621e2c2106d15c6d75e39feb9b2d7db4d509177aa16ba2065e4c1d"
+      },
+      "mobile-ocr": {
+        "passed": 53,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0,
+        "service_phase": "controlled_free_beta",
+        "ticket_reading": true,
+        "receipt": "output/launch-r02-20261118-jkh7vR/mobile-ocr/rehearsal.json",
+        "report_sha256": "1d632337343f802d0063394acc111ffb968c090bbb53128fffa24dd8723c2a26"
+      }
+    }
+  },
+  "cutover": {
+    "locally_tested": [
+      "Only the five locked service images survive actual Compose rendering. API, worker and monitor resolve to the same immutable image.",
+      "Both deploy and rollback use the per-release lock. Missing or mutable references, extra mounts, source label mismatch and pull failure stop before the running stack is stopped.",
+      "Unavailable API/worker/scheduler ownership enumeration stops before snapshot and migration. A wrong local/public build, mode or HTTP response cannot start the scheduler.",
+      "The backup timer selects the released images. A locked outgoing private release supplies snapshot code before rollback compatibility is checked."
+    ],
+    "scope": "Actual Docker Compose CLI rendered the current base and overlays. Lifecycle command bodies used recording Docker and Cloud shims. Cloud Build YAML substitutions and Dockerfile argument wiring checked offline."
+  },
+  "loopback_gateway": {
+    "command": "PB_PROVIDER_MODE=preview backend/.venv/bin/python <private_ops_run>/gateway_rehearsal.py",
+    "fixture": "Real customer API in fake split measurement mode, isolated SQLite, production Next.js, two Caddy processes, temporary local certificate trusted by this Next.js process. Local ports, names, cert and upstream address substituted. Synthetic backend identity used only as a fixture.",
+    "caddy_release": "https://github.com/caddyserver/caddy/releases/tag/v2.10.2",
+    "linux_amd64_archive_sha256": "5c218bc34c9197369263da7e9317a83acdbd80ef45d94dca5eff76e727c67cdd",
+    "procedure_sha256": "b2a528b0c0c27f93b270587abb2b5091f9d1295511996b0e341d6d4784047edd",
+    "report_sha256": "f39c9159849840ec0a2b1f7e2b3da2fd67a3ac2cf47cf0d43953354613198ade",
+    "checks": 26,
+    "findings": [
+      "Homepage and proxied health returned 200. Loss of the private gateway returned 500 through the frontend. Restoring it restored health.",
+      "The pause refused creation of appeal sessions and workspaces and final intake submissions with 503. An existing authenticated workspace remained readable.",
+      "Synthetic signed Stripe and Lob callbacks on an existing seeded case returned 200 while paused. A second delivery was classified as a duplicate for each.",
+      "The private worker route returned 404. The gateway returned to the open state and every local child process was stopped."
+    ]
+  },
+  "local_recovery": {
+    "restore": {
+      "elapsed_seconds": 0.03571258200008742,
+      "records_match": true,
+      "artifacts_match": true
+    },
+    "reconciliation": {
+      "status": "READY_FAKE",
+      "checked": 1,
+      "issues": []
+    },
+    "letters": 1,
+    "captures": 1
+  },
+  "failed_attempts_and_resolution": [
+    "Ten regression cases initially cut over with unknown ownership or incorrect health. All pass on the final tree.",
+    "An intermediate full run had one outdated intake matcher assertion loaded during a route edit: 13,826 passed, one failed. The final full gate used the same fingerprint throughout.",
+    "The first loopback run reached the intentional fake split startup guard. The isolated HTTP rehearsal used PB_FAKE_SPLIT_FOR_MEASUREMENT=1. Fake payment state is process-local. A subsequent error in the local probe helper was corrected.",
+    "A privileged local Docker inventory was blocked by automatic approval review, which requested an owner-run script. A read-only check-local-images.sh is in the private run directory. No actual container image pull, build or registry publication was verified here."
+  ],
+  "remaining": [
+    "Reauthenticate the existing Google Cloud account; inventory target resources, IAM, network, backup destination, candidate and rollback registry digests. Issue a fresh window and price for approval.",
+    "Verify actual target TLS and writer fencing, an independently hosted alert and responder acknowledgment, and off-host recovery using original provider records.",
+    "Qualify real OCR, official-source research, payment and printing test accounts, customer email/recovery, remaining physical devices and support coverage.",
+    "Fund and enforce the paid-cohort cap, rehearse the deployed candidate, and obtain exact activation approval."
+  ]
+}

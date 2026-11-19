@@ -1,0 +1,194 @@
+{
+  "at": "2026-11-19T00:48:39.106457+00:00",
+  "scope": "Local customer journey and offline synthetic provider verification",
+  "public_rollout": false,
+  "preview_path": "/try-hurtle",
+  "local_preview_gate": "PB_DESIGN_PREVIEW=local and NEXT_PUBLIC_LIVE_API other than 1; ordinary production returned 404",
+  "campaigns": [
+    {
+      "receipt": "output/hurtle-verified-paid/rehearsal.json",
+      "sha256": "b869daa563362aeb4ced4e46f05213b2c31e7a922783a949eefd374120ee1022",
+      "fingerprint": "5c34e9586dc295c50a42d22987596d9f32f381b8507bfc82ae2773818113c4ef",
+      "phase": "paid",
+      "ticket_reading_preview": false,
+      "tests": 152
+    },
+    {
+      "receipt": "output/hurtle-verified-paid-ocr/rehearsal.json",
+      "sha256": "e9519c48f7859fb3559658b7543cfa5b0df194f76339b73257450738eccf75b6",
+      "fingerprint": "5c34e9586dc295c50a42d22987596d9f32f381b8507bfc82ae2773818113c4ef",
+      "phase": "paid",
+      "ticket_reading_preview": true,
+      "tests": 14
+    },
+    {
+      "receipt": "output/hurtle-verified-mobile/rehearsal.json",
+      "sha256": "5aaf286d63839dc35ed4e738328ee234934649f3a448553cc860cb828ebaa4a1",
+      "fingerprint": "5c34e9586dc295c50a42d22987596d9f32f381b8507bfc82ae2773818113c4ef",
+      "phase": "controlled_free_beta",
+      "ticket_reading_preview": true,
+      "tests": 54
+    }
+  ],
+  "checked": [
+    "ESLint",
+    "TypeScript",
+    "Next production build",
+    "mobile sample ticket through all five field confirmations and keyboard focus on the story heading",
+    "opposite direction animations forward/back and zero scripted card animations under reduced motion",
+    "PNG alpha on all four corners of all four originals and visual inspection against dark and cream",
+    "local-only review route returns 404 without opt-in"
+  ],
+  "visual_evidence": "output/playwright/hurtle-journey",
+  "hardware": "Chromium mobile emulation. No new physical phone qualification.",
+  "identity_and_artwork": {
+    "verified_at": "2026-11-18T17:17:45-08:00",
+    "local_review_url": "http://127.0.0.1:3083/try-hurtle",
+    "public_rollout": false,
+    "mascot_assets_sha256": {
+      "welcome-transparent": "5dc9c952040cbc5906f8574fc494a70493fc8cb37700955321d86dab4094a75f",
+      "photographing-a-ticket": "8cc0cf95b2cdb9549046eb030cd2c2177b9e990f57505c1a857a5bf1aa8a2060",
+      "listening": "e5ce2a00de06580c048a497f0542a5164ea81e530cb6395df4ebb5963d2be54e",
+      "offering-a-letter": "dd596d88d751f60e3a0bd004c7eb6ba11cc461320d34f5705d7ca4600b4866e3"
+    },
+    "prior_mascot_manifest": "output/hurtle-identity-paid-01/web-source.json",
+    "style": "Warm paper, hand-drawn pine task frame and heading underline, sketched sage guide replies, PB shell and full ParkingBreaker wordmark.",
+    "layout": [
+      {
+        "viewport_css_px": 320,
+        "welcome_css_px": 173,
+        "task_css_px": 136
+      },
+      {
+        "viewport_css_px": 375,
+        "welcome_css_px": 209,
+        "task_css_px": 165
+      },
+      {
+        "viewport_css_px": 390,
+        "welcome_css_px": 219,
+        "task_css_px": 173
+      },
+      {
+        "viewport_css_px": 600,
+        "welcome_css_px": 253,
+        "task_css_px": 261
+      },
+      {
+        "viewport_css_px": 768,
+        "welcome_css_px": 321,
+        "task_css_px": 272
+      },
+      {
+        "viewport_css_px": 1024,
+        "welcome_css_px": 399,
+        "task_css_px": 213
+      },
+      {
+        "viewport_css_px": 1440,
+        "welcome_css_px": 400,
+        "task_css_px": 250
+      }
+    ],
+    "previous_task_width_css_px": {
+      "390px_phone": 54,
+      "1440px_desktop": 76
+    },
+    "checked": [
+      "Visible first action and no horizontal overflow at all seven widths",
+      "18 rendered color assignments, including driver and guide messages and a real validation error",
+      "Proofreader displayed warning and success fill and ink after an unsupported sentence was removed",
+      "Pine hover, visible keyboard ring with white offset and reduced motion",
+      "Sample ticket through all five field confirmations, then the driver account",
+      "ESLint, TypeScript, and local optimized web build"
+    ],
+    "artifacts": [
+      "output/playwright/hurtle-identity/phone.png",
+      "output/playwright/hurtle-identity/desktop.png",
+      "output/playwright/hurtle-identity/phone-story.png",
+      "output/playwright/hurtle-identity/mobile-walkthrough.mp4",
+      "output/playwright/hurtle-identity/palette.json",
+      "output/playwright/hurtle-identity/layout.json",
+      "output/playwright/hurtle-identity/validation-states.json"
+    ],
+    "logo_exports": "output/brand/parkingbreaker-logo",
+    "campaigns": [
+      {
+        "receipt": "output/hurtle-identity-paid-final/rehearsal.json",
+        "sha256": "2bc70cbad9180be86fc80b99731efbce70946cba88fd89660b37a21999d31d6d",
+        "fingerprint": "ac0bfd64caef009a8108af3fb0eb7412a434a07aecaee0c55ccaefe03ac4b47f",
+        "tests": 152
+      },
+      {
+        "receipt": "output/hurtle-identity-paid-ocr-final/rehearsal.json",
+        "sha256": "47917a64a2417c9c4b4a26941edeb72f52d6ebf3db58960817f564a9b2aaeef7",
+        "fingerprint": "ac0bfd64caef009a8108af3fb0eb7412a434a07aecaee0c55ccaefe03ac4b47f",
+        "tests": 14
+      },
+      {
+        "receipt": "output/hurtle-identity-mobile-final/rehearsal.json",
+        "sha256": "7b88a7de7316afee4e5e47554e32b7eb26ff25991d429876bb35a870220d45b2",
+        "fingerprint": "ac0bfd64caef009a8108af3fb0eb7412a434a07aecaee0c55ccaefe03ac4b47f",
+        "tests": 54
+      }
+    ],
+    "phone_testing": "Chromium viewport and touch emulation"
+  },
+  "street_guide": {
+    "verified_at": "2026-11-18T17:48:34-08:00",
+    "scope": "Local website preview and synthetic connected customer paths",
+    "public_rollout": false,
+    "inspiration": [
+      "https://bruno-simon.com/",
+      "https://github.com/brunosimon/folio-2025",
+      "https://github.com/brunosimon/my-room-in-3d"
+    ],
+    "implementation": "Original miniature streetscape, on-demand illustrated guide, and directional paper card transitions",
+    "artwork": {
+      "path": "web/public/images/street/hurtles-block.webp",
+      "bytes": 138960,
+      "approved_mascot_hashes_match": true
+    },
+    "browser_checks": [
+      "Five responsive sizes, zero WCAG A/AA findings in the open guide",
+      "Text-only step status at all five widths; no connected circles or mobile segments",
+      "Camera focus, hotspot selection, keyboard and drag navigation, Escape and focus return, reopen resets to overview",
+      "Reduced-motion view changes and the standard motion path with three object animations",
+      "Emulated mobile touch through tour and all five sample ticket confirmations",
+      "Firefox desktop and compact widths with keyboard, focus return and reduced motion",
+      "ESLint, TypeScript, optimized build"
+    ],
+    "artifacts": [
+      "output/playwright/hurtles-block/landing-390.png",
+      "output/playwright/hurtles-block/landing-1440.png",
+      "output/playwright/hurtles-block/block-390.png",
+      "output/playwright/hurtles-block/block-1440.png",
+      "output/playwright/hurtles-block/desk-phone.png",
+      "output/playwright/hurtles-block/block-to-intake.mp4",
+      "output/playwright/hurtles-block/browser-checks.json",
+      "output/playwright/hurtles-block/firefox.json",
+      "output/playwright/hurtles-block/header-657.png",
+      "output/playwright/hurtles-block/header-states.json"
+    ],
+    "campaigns": [
+      {
+        "receipt": "output/hurtles-block-text-paid/rehearsal.json",
+        "sha256": "2bdddd4e0e17fc894f4834158a749fbb0b06813b2657e385c29d81caf9c5564d",
+        "tests": 153,
+        "fingerprint": "bdbbc76199cbd6848827961e1c6498f141ceb883351fafac16b0dc1a8eab0a81"
+      },
+      {
+        "receipt": "output/hurtles-block-text-paid-ocr/rehearsal.json",
+        "sha256": "c43bd2e14596ec8f8f239cd0fde07c6a7a694e7229c7f15b594a90cc03dc0c02",
+        "tests": 14,
+        "fingerprint": "bdbbc76199cbd6848827961e1c6498f141ceb883351fafac16b0dc1a8eab0a81"
+      },
+      {
+        "receipt": "output/hurtles-block-text-mobile/rehearsal.json",
+        "sha256": "07be700cf4659962e79116acead728dfd30591b6fde35d4c5b296c2db3b39bd6",
+        "tests": 54,
+        "fingerprint": "bdbbc76199cbd6848827961e1c6498f141ceb883351fafac16b0dc1a8eab0a81"
+      }
+    ]
+  }
+}

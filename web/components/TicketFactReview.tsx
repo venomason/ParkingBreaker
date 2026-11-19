@@ -1,5 +1,6 @@
 "use client";
 
+import { TicketFactCards } from "./TicketFactCards";
 import React, { useCallback, useRef, useState } from "react";
 import { useTicketReviewObservation } from "../lib/ticket-observability";
 import { CustomerChoiceNotice } from "./CustomerChoiceRules";
@@ -109,7 +110,12 @@ export function TicketFactReview({
     setErrors(result.errors);
     if (!result.facts) {
       telemetry.observe("validation_failed", "client_invalid", Object.keys(result.errors).length);
-      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      requestAnimationFrame(() => {
+        const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+        const target = invalid instanceof HTMLFieldSetElement ? invalid.querySelector("input") : invalid;
+        target?.scrollIntoView({ block: "nearest", inline: "center", behavior: "instant" });
+        target?.focus({ preventScroll: true });
+      });
       return;
     }
     const customerSupplied = (event.nativeEvent as SubmitEvent).submitter?.id === "visionCustomerReviewBtn";
@@ -145,7 +151,8 @@ export function TicketFactReview({
           These are suggestions from an AI reading of your uploaded photos, not confirmed facts. The reading can see
           everything printed on the photo, which may include your name, plate or address. Check every value yourself.
         </p>
-        <ul id="visionSuggestions" className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {reading && reading.status !== "missing" && <details id="visionSuggestions" className="guide-notes"><summary>See the printed fields</summary>
+        <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {literalEntries.map(({ field, value, state }) => (
             <li key={field} data-vision-field={field} style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
               <b className="small">{TICKET_LITERAL_LABELS[field]}</b>{" "}
@@ -158,7 +165,7 @@ export function TicketFactReview({
               )}
             </li>
           ))}
-        </ul>
+        </ul></details>}
       </section>
 
       <form ref={formRef} id="visionFactsForm" className="card" onSubmit={submit} noValidate aria-busy={busy}>
@@ -171,104 +178,112 @@ export function TicketFactReview({
         {telemetry.variant === "manual_guidance_v1" && <p id="manualReviewGuidance" className="small">
           Compare one field at a time with your ticket. If a character is unclear, check a clearer photo before continuing. Your entries stay here if you need to correct a field.
         </p>}
-        <div className="local-ids single">
-          {textField("citation_number", "Citation number")}
-          {textField("license_plate", "License plate")}
-          {textField("license_plate_state", "Plate state (two letters)")}
-          {textField("issuer_hint", "Who issued the ticket, as printed")}
-          {textField("issued_city", "City where the ticket was issued")}
-          {textField("issued_state", "State where issued (two letters)")}
-        </div>
-        <fieldset id="fact-issuer_kind" className="local-ids single" style={{ border: 0, padding: 0 }} aria-invalid={Boolean(errors["fact-issuer_kind"])} aria-describedby={errors["fact-issuer_kind"] ? "fact-issuer_kind-error" : undefined}>
-          <legend className="small" style={{ fontWeight: 750 }}>Who issued it?</legend>
-          {([["GOVERNMENT", "A city or public agency"], ["PRIVATE", "A private parking lot or company"]] as const).map(([value, label]) => (
-            <label key={value} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              <input
-                type="radio"
-                name="fact-issuer_kind"
-                id={`fact-issuer_kind-${value.toLowerCase()}`}
-                value={value}
-                checked={draft.issuer_kind === value}
-                disabled={locked || busy}
-                onChange={() => set("issuer_kind")(value)}
-                style={{ width: "auto", minHeight: 0 }}
-              />
-              {label}
-            </label>
-          ))}
-          {errors["fact-issuer_kind"] && <span className="field-error" id="fact-issuer_kind-error">{errors["fact-issuer_kind"]}</span>}
-        </fieldset>
-        <div className="local-ids single">
-          {textField("violation_code", "Violation code")}
-          {textField("violation_description", "Violation description")}
-          <label>
-            Issue date (calendar date)
-            <input
-              id="fact-issue_date"
-              type="date"
-              value={draft.issue_date}
-              disabled={locked || busy}
-              aria-invalid={Boolean(errors["fact-issue_date"])}
-              aria-describedby={errors["fact-issue_date"] ? "fact-issue_date-error" : undefined}
-              onChange={(event) => set("issue_date")(event.target.value)}
-            />
-            <span className="muted small">Printed on the ticket: {literalText(printed("issue_date"))}</span>
-            {errors["fact-issue_date"] && <span className="field-error" id="fact-issue_date-error">{errors["fact-issue_date"]}</span>}
-          </label>
-          {textField("stage", "Stage printed on the ticket")}
-        </div>
-        <div className="local-ids single">
-          <label>
-            Notice date (calendar date)
-            <input
-              id="fact-notice_date"
-              type="date"
-              value={draft.notice_date}
-              disabled={locked || busy || draft.notice_date_absent}
-              aria-invalid={Boolean(errors["fact-notice_date"])}
-              aria-describedby={errors["fact-notice_date"] ? "fact-notice_date-error" : undefined}
-              onChange={(event) => set("notice_date")(event.target.value)}
-            />
-            <span className="muted small">Printed on the ticket: {literalText(printed("notice_date"))}</span>
-            <span style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "4px" }}>
-              <input
-                id="fact-notice_date-absent"
-                type="checkbox"
-                checked={draft.notice_date_absent}
-                disabled={locked || busy}
-                onChange={(event) => changeDraft({ ...draft, notice_date_absent: event.target.checked, notice_date: event.target.checked ? "" : draft.notice_date })}
-                style={{ width: "auto", minHeight: 0 }}
-              />
-              This ticket does not print a notice date
-            </span>
-            {errors["fact-notice_date"] && <span className="field-error" id="fact-notice_date-error">{errors["fact-notice_date"]}</span>}
-          </label>
-          <label>
-            Printed deadline (calendar date)
-            <input
-              id="fact-printed_deadline"
-              type="date"
-              value={draft.printed_deadline}
-              disabled={locked || busy || draft.printed_deadline_absent}
-              aria-invalid={Boolean(errors["fact-printed_deadline"])}
-              aria-describedby={errors["fact-printed_deadline"] ? "fact-printed_deadline-error" : undefined}
-              onChange={(event) => set("printed_deadline")(event.target.value)}
-            />
-            <span className="muted small">Printed on the ticket: {literalText(printed("printed_deadline"))}</span>
-            <span style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "4px" }}>
-              <input
-                id="fact-printed_deadline-absent"
-                type="checkbox"
-                checked={draft.printed_deadline_absent}
-                disabled={locked || busy}
-                onChange={(event) => changeDraft({ ...draft, printed_deadline_absent: event.target.checked, printed_deadline: event.target.checked ? "" : draft.printed_deadline })}
-                style={{ width: "auto", minHeight: 0 }}
-              />
-              This ticket does not print a deadline
-            </span>
-            {errors["fact-printed_deadline"] && <span className="field-error" id="fact-printed_deadline-error">{errors["fact-printed_deadline"]}</span>}
-          </label>
-        </div>
+        <TicketFactCards>
+          <div className="local-ids single">
+            {textField("citation_number", "Citation number")}
+            {textField("license_plate", "License plate")}
+            {textField("license_plate_state", "Plate state (two letters)")}
+            {textField("violation_code", "Violation code")}
+            {textField("violation_description", "Violation description")}
+          </div>
+          <div>
+            <div className="local-ids single">
+              {textField("issuer_hint", "Who issued the ticket, as printed")}
+              {textField("issued_city", "City where the ticket was issued")}
+              {textField("issued_state", "State where issued (two letters)")}
+            </div>
+            <fieldset id="fact-issuer_kind" className="local-ids single" style={{ border: 0, padding: 0 }} aria-invalid={Boolean(errors["fact-issuer_kind"])} aria-describedby={errors["fact-issuer_kind"] ? "fact-issuer_kind-error" : undefined}>
+              <legend className="small" style={{ fontWeight: 750 }}>Who issued it?</legend>
+              {([["GOVERNMENT", "A city or public agency"], ["PRIVATE", "A private parking lot or company"]] as const).map(([value, label]) => (
+                <label key={value} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <input
+                    type="radio"
+                    name="fact-issuer_kind"
+                    id={`fact-issuer_kind-${value.toLowerCase()}`}
+                    value={value}
+                    checked={draft.issuer_kind === value}
+                    disabled={locked || busy}
+                    onChange={() => set("issuer_kind")(value)}
+                    style={{ width: "auto", minHeight: 0 }}
+                  />
+                  {label}
+                </label>
+              ))}
+              {errors["fact-issuer_kind"] && <span className="field-error" id="fact-issuer_kind-error">{errors["fact-issuer_kind"]}</span>}
+            </fieldset>
+          </div>
+          <div>
+            <div className="local-ids single">
+              <label>
+                Issue date (calendar date)
+                <input
+                  id="fact-issue_date"
+                  type="date"
+                  value={draft.issue_date}
+                  disabled={locked || busy}
+                  aria-invalid={Boolean(errors["fact-issue_date"])}
+                  aria-describedby={errors["fact-issue_date"] ? "fact-issue_date-error" : undefined}
+                  onChange={(event) => set("issue_date")(event.target.value)}
+                />
+                <span className="muted small">Printed on the ticket: {literalText(printed("issue_date"))}</span>
+                {errors["fact-issue_date"] && <span className="field-error" id="fact-issue_date-error">{errors["fact-issue_date"]}</span>}
+              </label>
+              {textField("stage", "Stage printed on the ticket")}
+            </div>
+            <div className="local-ids single">
+              <label>
+                Notice date (calendar date)
+                <input
+                  id="fact-notice_date"
+                  type="date"
+                  value={draft.notice_date}
+                  disabled={locked || busy || draft.notice_date_absent}
+                  aria-invalid={Boolean(errors["fact-notice_date"])}
+                  aria-describedby={errors["fact-notice_date"] ? "fact-notice_date-error" : undefined}
+                  onChange={(event) => set("notice_date")(event.target.value)}
+                />
+                <span className="muted small">Printed on the ticket: {literalText(printed("notice_date"))}</span>
+                <span style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "4px" }}>
+                  <input
+                    id="fact-notice_date-absent"
+                    type="checkbox"
+                    checked={draft.notice_date_absent}
+                    disabled={locked || busy}
+                    onChange={(event) => changeDraft({ ...draft, notice_date_absent: event.target.checked, notice_date: event.target.checked ? "" : draft.notice_date })}
+                    style={{ width: "auto", minHeight: 0 }}
+                  />
+                  This ticket does not print a notice date
+                </span>
+                {errors["fact-notice_date"] && <span className="field-error" id="fact-notice_date-error">{errors["fact-notice_date"]}</span>}
+              </label>
+              <label>
+                Printed deadline (calendar date)
+                <input
+                  id="fact-printed_deadline"
+                  type="date"
+                  value={draft.printed_deadline}
+                  disabled={locked || busy || draft.printed_deadline_absent}
+                  aria-invalid={Boolean(errors["fact-printed_deadline"])}
+                  aria-describedby={errors["fact-printed_deadline"] ? "fact-printed_deadline-error" : undefined}
+                  onChange={(event) => set("printed_deadline")(event.target.value)}
+                />
+                <span className="muted small">Printed on the ticket: {literalText(printed("printed_deadline"))}</span>
+                <span style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "4px" }}>
+                  <input
+                    id="fact-printed_deadline-absent"
+                    type="checkbox"
+                    checked={draft.printed_deadline_absent}
+                    disabled={locked || busy}
+                    onChange={(event) => changeDraft({ ...draft, printed_deadline_absent: event.target.checked, printed_deadline: event.target.checked ? "" : draft.printed_deadline })}
+                    style={{ width: "auto", minHeight: 0 }}
+                  />
+                  This ticket does not print a deadline
+                </span>
+                {errors["fact-printed_deadline"] && <span className="field-error" id="fact-printed_deadline-error">{errors["fact-printed_deadline"]}</span>}
+              </label>
+            </div>
+          </div>
+        </TicketFactCards>
         {Object.keys(errors).length > 0 && (
           <p className="err" role="alert">Check the marked facts above. Your entries are still here.</p>
         )}

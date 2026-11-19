@@ -214,6 +214,8 @@ class ResearchResult:
         stage = ticket.stage or "first-level review"
         return (
             self.decision.ok
+            and RETIRED_KEYS.isdisjoint(q.key for q in self.questions)
+            and RETIRED_KEYS.isdisjoint(f.key for f in self.findings)
             and issuer == self.manifest.issuer
             and same_stage(stage, self.manifest.stage)
             and _violation_key(ticket.violation_code) == _violation_key(self.ticket.violation_code)
@@ -356,7 +358,7 @@ class ResearchResult:
                 ticket_context=self.ticket,
                 packet_plan=plan,
             ),
-            record_version=max(4 if rules else 3, self.record_version),
+            record_version=5,
             payment_rules=rules,
         )
 
@@ -578,7 +580,7 @@ def run_research(
     agency_scopes = _agency_scopes(agency)
     scopes = agency_scopes + SHARED_CODE_SCOPES
     domains = tuple(scope.host for scope in agency_scopes)
-    pages: list[SeedUrl] = list(seeds)
+    pages = [seed for seed in seeds if not seed.covers or seed.covers - RETIRED_KEYS]
     seen: set[str] = set()
     max_pages = recovery.max_pages if recovery else 20
     if len(pages) > max_pages:
@@ -586,6 +588,8 @@ def run_research(
 
     def discover(broadened: bool, keys: frozenset[FactKey]) -> None:
         request = search_request(ticket, domains, keys=keys, broadened=broadened)
+        if not request.keys:
+            return
         stage = "broadened_search" if broadened else "initial_search"
         if searcher is None:
             attempts.append(ResearchAttempt(stage, error="search provider unavailable"))
@@ -902,7 +906,7 @@ def run_research(
         customer_position=customer_position,
         packet_plan=packet_plan,
         tier_evaluation=tiers,
-        record_version=4,
+        record_version=5,
         attempts=tuple(attempts),
         payment_rules=tuple(payment_rules),
         payment_scope=PaymentScope(

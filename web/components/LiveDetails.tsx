@@ -29,6 +29,7 @@ export interface EvidencePhotoEntry {
   id: string;
   file: File | null;
   ref: string | null;
+  error?: string;
 }
 
 export type LiveContactValues = Omit<LiveDetailsData, "ticketPhoto" | "ticketBackPhoto" | "evidencePhotos" | "ticketPhotoRef" | "ticketBackPhotoRef">;
@@ -234,15 +235,9 @@ export function LiveDetails({ busy, submitting, error, onSubmit, values: v, onCh
           </>
         )}
         <aside id="photoGuide" className="photo-guide" aria-labelledby="photoGuideTitle">
-          <p className="eyebrow">Your choice</p>
-          <h3 id="photoGuideTitle">Optional photo guide</h3>
+          <h3 id="photoGuideTitle">Your selected photos</h3>
           <p className="small">The photos you choose will be mailed with your letter. You can continue without these optional photos; there is no set number to add.</p>
           <p className="small">{PHOTO_UPLOAD_GUIDANCE}</p>
-          <ol>
-            <li><b>Ticket in place (optional)</b><p>If you have one, add a photo of the ticket on your vehicle. A readable ticket photo is collected separately above.</p></li>
-            <li><b>Surroundings (optional)</b><p>From a safe place, photograph your vehicle and nearby signs, meters or curb markings you want included.</p></li>
-            <li><b>A detail from your statement (optional)</b><p>Add a clear close-up of something you describe in your own words, such as a sign or meter display.</p></li>
-          </ol>
           <p className="small">Only take photos when it is safe. Avoid other people’s faces and unrelated personal details. Any specific agency-required item is collected separately.</p>
         </aside>
         <p className="sr" role="status">{announcement}</p>

@@ -71,6 +71,7 @@ from parkingbreaker.appeal.letter import (
     LetterError,
     LetterInput,
     Sender,
+    is_printable,
     redirect_letter_address,
     render_letter,
 )
@@ -93,7 +94,9 @@ from parkingbreaker.approval_manifest import (
     ApprovalIntegrityError,
     ApprovalManifest,
     build_approval_manifest,
+    build_remail_approval_manifest,
     verify_dispatch_integrity,
+    verify_remail_approval,
 )
 from parkingbreaker.beta_feedback_store import (
     BetaFeedbackConflict,
@@ -195,11 +198,12 @@ from parkingbreaker.prehold import (
 )
 from parkingbreaker.prices import CERTIFIED_CENTS, STANDARD_CENTS
 from parkingbreaker.research.extractor import Extractor
+from parkingbreaker.research.findings import FindingStatus, verify_quote
 from parkingbreaker.research.fulfilment import complete_required_forms, verified_findings
 from parkingbreaker.research.jurisdiction import IssuerQuery
 from parkingbreaker.research.known_sources import known_seeds
 from parkingbreaker.research.ladder import CustomerQuestion
-from parkingbreaker.research.questions import FactKey, PacketPlan, Ticket
+from parkingbreaker.research.questions import RETIRED_KEYS, FactKey, PacketPlan, Ticket
 from parkingbreaker.research.resolution import (
     ResearchAnswers,
     ResearchResolution,
@@ -466,7 +470,90 @@ def _merge_ticket_binding(previous: s.IntakeForm, incoming: s.IntakeForm) -> s.I
 
 
 def research_view(result: ResearchResult) -> s.ResearchView:
+    def passages(quote: str | None, hashes: tuple[str, ...]) -> list[s.RulePassage]:
+        if not quote:
+            return []
+        return [
+            s.RulePassage(quote=quote, source_url=src.final_url)
+            for src in result.sources
+            if src.sha256 in hashes
+            and src.authority_class is not AuthorityClass.SECONDARY
+            and verify_quote(quote, src.text)
+        ]
+
+    findings = []
+    for finding in result.findings:
+        if finding.key in RETIRED_KEYS:
+            continue
+        alternatives = list(finding.evidence)
+        if finding.status is FindingStatus.CONFLICTED:
+            alternatives.extend(f for f in result.candidates if f.key == finding.key)
+        quotes = {
+            (ref.quote, ref.source_url): ref
+            for item in (finding, *alternatives)
+            for ref in passages(item.verbatim_quote, item.source_sha256s)
+        }
+        findings.append(
+            s.ResearchFinding(
+                fact=finding.key.value,
+                status=(
+                    FindingStatus.UNKNOWN.value
+                    if finding.status is FindingStatus.CONFIRMED and not quotes
+                    else finding.status.value
+                ),
+                official_quote=next((ref.quote for ref in quotes.values()), None),
+                passages=list(quotes.values()),
+            )
+        )
+
+    # Surface the agency's own instruction, never the provision a driver might enter.
+    for label, evidence in (
+        ("FILING_INSTRUCTION", result.verified_requirements.code_required),
+        ("FILING_INSTRUCTION", result.packet_plan.code_required),
+        ("AMOUNT_OR_DEPOSIT_INSTRUCTION", result.verified_requirements.amount_required),
+        *(
+            ("ADDITIONAL_FILING_RULE", item)
+            for item in result.verified_requirements.compulsory_conditions
+        ),
+    ):
+        if evidence:
+            refs = passages(evidence.verbatim_quote, evidence.source_sha256s)
+            item = s.ResearchFinding(
+                fact=label,
+                status="CONFIRMED" if refs else "UNKNOWN",
+                official_quote=refs[0].quote if refs else None,
+                passages=refs,
+            )
+            if item not in findings:
+                findings.append(item)
+    for rule in result.payment_rules:
+        refs = passages(rule.verbatim_quote, rule.source_sha256s)
+        if not refs and rule.status is FindingStatus.CONFIRMED:
+            status = FindingStatus.UNKNOWN
+        else:
+            status = rule.status
+        if rule.scope_quote and rule.scope_quote != rule.verbatim_quote:
+            refs.extend(passages(rule.scope_quote, rule.source_sha256s))
+        item = s.ResearchFinding(
+            fact="PAYMENT_AND_REVIEW",
+            status=status.value,
+            official_quote=refs[0].quote if refs else None,
+            passages=refs,
+        )
+        if item not in findings:
+            findings.append(item)
+    # Historical ordinance-only sources remain in the case audit record. A
+    # shared source that also supplies a filing instruction still belongs here.
+    retired_hashes = {
+        digest
+        for finding in (*result.findings, *result.candidates)
+        if finding.key in RETIRED_KEYS
+        for digest in finding.source_sha256s
+    }
+    rule_urls = {ref.source_url for row in findings for ref in row.passages}
     return s.ResearchView(
+        jurisdiction=result.ticket.jurisdiction or result.ticket.city_id,
+        stage=result.ticket.stage,
         sources=[
             s.ResearchSource(
                 url=source.final_url,
@@ -474,15 +561,10 @@ def research_view(result: ResearchResult) -> s.ResearchView:
                 retrieved_at=source.retrieved_at,
             )
             for source in result.sources
+            if source.authority_class is not AuthorityClass.SECONDARY
+            and (source.sha256 not in retired_hashes or source.final_url in rule_urls)
         ],
-        findings=[
-            s.ResearchFinding(
-                fact=finding.key.value,
-                status=finding.status.value,
-                official_quote=finding.verbatim_quote,
-            )
-            for finding in result.findings
-        ],
+        findings=findings,
     )
 
 
@@ -514,6 +596,7 @@ class CaseServiceDeps:
     # The actual owner-scoped ticket-reading path; None keeps legacy fixtures unguarded.
     ticket_intake: TicketIntakeCoordinator | None = None
     known_records: tuple[Mapping[str, object], ...] = ()
+    paid_cohort_cap: int | None = None
 
 
 def prehold_view(
@@ -1016,6 +1099,8 @@ class CaseService:
             except IntakeConflict as exc:
                 raise ServiceConflict(str(exc)) from None
             return self._receipt(workspace_id, record.intake_id, record.prehold_json)
+        if not is_printable(body.customer_position.statement):
+            raise ServiceConflict("customer_statement_not_printable")
         if self._deps.ticket_intake is not None and self._deps.ticket_intake.required:
             self._ticket_path(
                 lambda: self._deps.ticket_intake.require_submission_confirmation(  # type: ignore[union-attr]
@@ -1135,8 +1220,23 @@ class CaseService:
                 self._deps.clock().date() if today is None else today,
                 intake.rental_company_paid,
             )
+            stopped = None
             if stop is not None:
                 stopped = intake_stop_view(case_id, stop)
+            elif (
+                self._deps.paid_cohort_cap is not None
+                and self.service_phase is ServicePhase.PAID
+                and self._store.beta_entitlement(case_id) is None
+                and self._store.paid_cohort_full(case_id, self._deps.paid_cohort_cap)
+            ):
+                stopped = s.Stop(
+                    case_id=case_id,
+                    family=StopFamily.BUSINESS_EXCLUSION,
+                    reason_key="paid_cohort_full",
+                    message="The paid beta is full. Your work is saved. "
+                    "Check your ticket for the issuer's filing instructions and deadline.",
+                )
+            if stopped is not None:
                 if record.agency_json is not None:
                     agency = decode_agency(record.agency_json)
                     if agency.official_domains:
@@ -1151,6 +1251,8 @@ class CaseService:
         if record is None:
             raise ServiceConflict("not_found")
         offer = self.pre_hold(case_id)
+        if isinstance(offer, s.Stop) and offer.reason_key == "paid_cohort_full":
+            raise ServiceConflict(offer.reason_key)
         if not isinstance(offer, s.Offer):
             raise ServiceConflict("pre_hold_stopped")
         if record.case_token is not None:
@@ -1178,6 +1280,8 @@ class CaseService:
         # Reuse the existing authorization-start clock read for the intake gate.
         started_at = self._deps.clock() if record.case_token is None else None
         offer = self.pre_hold(case_id, today=None if started_at is None else started_at.date())
+        if isinstance(offer, s.Stop) and offer.reason_key == "paid_cohort_full":
+            raise ServiceConflict(offer.reason_key)
         if not isinstance(offer, s.Offer):
             raise ServiceConflict("case_stopped")
         if record.case_token is not None:
@@ -1224,6 +1328,7 @@ class CaseService:
                 request_json,
                 started_at,
                 allow_new_paid_authorization=self.service_phase is ServicePhase.PAID,
+                paid_cohort_cap=self._deps.paid_cohort_cap,
             )
         except IntakeConflict as exc:
             current = self._store.get_intake(case_id)
@@ -1721,6 +1826,7 @@ class CaseService:
             resolved = self._store.returned_mail_resolution(case.case_token, 1)
         if resolved is None:
             if case.letter_state is CaseState.RETURNED:
+                reason_code = "RETURN_REMEDY_PENDING"
                 if case.payment_state is PaymentState.NO_CHARGE:
                     # Free beta: no payment exists to confirm, so never claim one.
                     message = "Your returned letter is being closed under your free beta appeal."
@@ -1734,10 +1840,24 @@ class CaseService:
                     message = (
                         "Your letter was returned. The returned-mail remedy is being resolved."
                     )
+                    first = self._store.get(case.case_token, 1)
+                    record = self._intake(case_id)
+                    correction = self._store.latest_destination_decision(case_id, record.owner)
+                    if (
+                        first is not None
+                        and correction is not None
+                        and correction.decision.provenance is AddressProvenance.SYSTEM_VERIFIED
+                        and correction.decision.address != first.request.recipient
+                    ):
+                        reason_code = "REMAIL_REVIEW_AVAILABLE"
+                        message = (
+                            "Your letter was returned. Check whether a corrected packet "
+                            "is available to review."
+                        )
                 return s.ReturnedMailRemedy(
                     attempt=1,
                     kind="RETURN_PENDING",
-                    reason_code="RETURN_REMEDY_PENDING",
+                    reason_code=reason_code,
                     message=message,
                     refund_cents=0,
                     refund_status=None,
@@ -2973,6 +3093,8 @@ class CaseService:
             return self.draft(case_id)
         if body.expected_sha256 != text_sha256(saved.letter_text):
             raise ServiceConflict("stale_draft")
+        if not is_printable(body.text):
+            raise ServiceConflict("customer_statement_not_printable")
         spans = edited_spans(
             saved.letter_text,
             body.text,
@@ -3244,6 +3366,11 @@ class CaseService:
             raise ServiceConflict("declaration_unaffirmed")
 
     def packet_preview(self, case_id: str, body: s.PacketPreviewRequest) -> s.PacketPreview:
+        if body.remail:
+            remail_preview = self._resolve_return(case_id, review=body)
+            if remail_preview is None:
+                raise ServiceConflict("remail_not_available")
+            return remail_preview
         record, saved, case = self._adopted_context(case_id, body.adopted_sha256)
         if case.letter_state is not CaseState.AWAITING_ADOPTION:
             raise ServiceConflict("case_not_approvable")
@@ -3270,13 +3397,41 @@ class CaseService:
 
     def approve(self, case_id: str, body: s.Approve) -> s.CaseStatus:
         record, saved, case = self._adopted_context(case_id, body.adopted_sha256)
+        if body.remail:
+            if body.signature_ref is not None:
+                raise ServiceConflict("remail_not_available")
+            if case.attempt == 2:
+                prepared = self._store.get(case.case_token, 2)
+                manifest = self._store.get_approval_manifest(case.case_token, 2)
+                if prepared is None or manifest is None:
+                    raise ServiceConflict("remail_not_available")
+                self._check_inspected_request(body, prepared.request)
+                try:
+                    verify_remail_approval(
+                        self._store.get_approval_manifest(case.case_token, 1),
+                        manifest,
+                        prepared.prepared_at,
+                    )
+                    verify_dispatch_integrity(
+                        manifest,
+                        prepared.request,
+                        tuple(
+                            (item.declaration_id, item.text_sha256) for item in body.affirmations
+                        ),
+                    )
+                except ApprovalIntegrityError:
+                    raise ServiceConflict("frozen_packet_mismatch") from None
+                return self.status(case_id)
+            self._resolve_return(case_id, review=body)
+            return self.status(case_id)
         research = self._current_research(record)
         if unsupported_workflow_requirements(research.ticket, research.findings, research.sources):
             raise ServiceConflict("research_not_ready")
         self._check_affirmations(record, body)
         affirmations = tuple((item.declaration_id, item.text_sha256) for item in body.affirmations)
-        workspace_rec = self._store.get_workspace(record.workspace_token)
-        raw_notes = "" if workspace_rec is None else workspace_rec.workspace.notes
+        statement = s.SubmitIntake.model_validate_json(
+            record.intake_json
+        ).customer_position.statement
 
         def _manifest_for(req: LetterRequest, when: datetime) -> ApprovalManifest:
             persisted = self._store.get_approval_manifest(case.case_token, 1)
@@ -3292,7 +3447,7 @@ class CaseService:
                     if persisted is not None
                     else os.environ.get("PB_BUILD_COMMIT")
                 ),
-                raw_customer_text=raw_notes,
+                raw_customer_text=statement,
                 approved_text=saved.letter_text,
                 request=req,
                 affirmations=affirmations,
@@ -3461,11 +3616,24 @@ class CaseService:
                 return item.occurred_at
         return None
 
-    def _resolve_return(self, case_id: str) -> None:
+    def _resolve_return(
+        self, case_id: str, *, review: s.PacketPreviewRequest | None = None
+    ) -> s.PacketPreview | None:
+        """Sweep existing remedies, or serve an explicit corrected packet decision."""
         record = self._intake(case_id)
         case = None if record.case_token is None else self._store.get_case(record.case_token)
+        if review is not None:
+            _, _, current = self._adopted_context(case_id, review.adopted_sha256)
+            if (
+                current != case
+                or current.attempt != 1
+                or current.letter_state is not CaseState.RETURNED
+                or current.payment_state is not PaymentState.CAPTURED
+                or review.signature_ref is not None
+            ):
+                raise ServiceConflict("remail_not_available")
         if case is None:
-            return
+            return None
         if case.letter_state is CaseState.CLOSED_RETURNED:
             # Definitive failed re-mails use the same returned-mail refund path, on a
             # later sweep after both completion transactions have committed. A pending
@@ -3485,9 +3653,9 @@ class CaseService:
                     case.amount_cents,
                     now=self._deps.clock(),
                 )
-            return
+            return None
         if case.letter_state is not CaseState.RETURNED:
-            return
+            return None
         prepared = self._store.get(case.case_token, case.attempt)
         cursor = self._store.submission_cursor(case.case_token, case.attempt)
         if prepared is None or cursor is None or not isinstance(cursor.outcome, Accepted):
@@ -3516,7 +3684,7 @@ class CaseService:
                 None,
                 now=self._deps.clock(),
             )
-            return
+            return None
         if case.payment_state is not PaymentState.CAPTURED:
             if case.payment_state in {PaymentState.RELEASED, PaymentState.WRITTEN_OFF}:
                 # No original charge exists to refund or fund a free re-mail (H2).
@@ -3530,7 +3698,7 @@ class CaseService:
                     now=self._deps.clock(),
                 )
             # Pending/uncertain collection is reconciled by the existing dispatcher.
-            return
+            return None
         correction = self._store.latest_destination_decision(case_id, record.owner)
         other_address = (
             correction is not None
@@ -3572,6 +3740,8 @@ class CaseService:
             mailing_cost_cents=0,
             remails_used=case.attempt - 1,
         )
+        if review is not None and (remedy is None or not remedy.remails):
+            raise ServiceConflict("remail_not_available")
         if remedy is not None and remedy.kind is RemedyKind.PARTIAL_REFUND:
             if recorded_cost is not None and (type(recorded_cost) is not int or recorded_cost < 0):
                 raise ServiceConflict("return_cost_invalid")
@@ -3589,7 +3759,7 @@ class CaseService:
                 )
             else:
                 # Missing actual cost is not a zero-cost ledger fact. Wait for evidence.
-                return
+                return None
             remedy = remedy_for_responsibility(
                 responsibility,
                 deadline_feasible=feasible and other_address,
@@ -3604,20 +3774,29 @@ class CaseService:
             and case.payment_state is not PaymentState.CAPTURED
         ):
             # The existing dispatcher first reconciles the original capture.
-            return
+            return None
         request = None
+        remail_manifest = None
+        expected_research = None
+        approved_at = None
         if remedy is not None and remedy.remails:
             assert correction is not None
             saved = self._store.get_draft(case_id)
             try:
-                if saved is None:
+                original = self._store.get_approval_manifest(case.case_token, 1)
+                if (
+                    saved is None
+                    or original is None
+                    or original.approved_text_sha256 != saved.adopted_sha256
+                ):
                     raise ServiceConflict("draft_not_ready")
+                verify_dispatch_integrity(original, prepared.request)
                 redirected = redirect_letter_address(
                     saved.letter_text,
                     prepared.request.recipient,
                     correction.decision.address,
                 )
-                packet, _result, _plan, _revision = self._frozen_packet(
+                packet, result, plan, revision = self._frozen_packet(
                     record,
                     saved,
                     frozen_signature_artwork(prepared.request.pdf),
@@ -3627,9 +3806,30 @@ class CaseService:
                     prepared.request,
                     pdf=packet.pdf,
                     recipient=correction.decision.address,
-                    submission_token=f"sub_{self._deps.new_id()}",
                 )
-            except (LetterError, PacketError, ServiceConflict):
+                if not result.evidence_current_at(self._deps.clock()):
+                    raise ServiceConflict("research_not_ready")
+                validate_request(request)
+                assert saved_research is not None
+                if revision != saved_research.revision:
+                    raise ServiceConflict("research_not_ready")
+                if saved.adopted_at is None or saved.adopted_by is None:
+                    raise ServiceConflict("adopt_current_text_first")
+                approval_gate(
+                    Adoption(saved.adopted_by, saved.adopted_at, text_sha256(redirected)),
+                    packet,
+                    research=result,
+                    answers=decode_answers(saved_research.answers_json),
+                    packet_plan=plan,
+                    citation_number=s.SubmitIntake.model_validate_json(
+                        record.intake_json
+                    ).ticket.citation_number,
+                    required_copies=self._required_copy_state(record, saved_research)[1],
+                )
+                expected_research = (case_id, revision)
+            except (LetterError, PacketError, ServiceConflict, ApprovalRefused, ValueError):
+                if review is not None:
+                    raise ServiceConflict("remail_not_available") from None
                 # We cannot safely reproduce the approved packet. This is our service
                 # failure: resolve with a full refund through the same atomic path,
                 # without freezing a second letter or leaving a permanently stuck case.
@@ -3648,17 +3848,56 @@ class CaseService:
                     remails_used=case.attempt - 1,
                 )
                 responsibility = replace(responsibility, reason=failure.reason)
+                request = None
                 if case.payment_state is not PaymentState.CAPTURED:
-                    return
-        self._store.resolve_returned_mail(
-            case.case_token,
-            case.revision,
-            responsibility,
-            remedy,
-            request,
-            now=self._deps.clock(),
-            cost_is_estimate=resolved_cost_is_estimate,
-        )
+                    return None
+            else:
+                if review is None:
+                    # The verified correction is eligible, but the original approval
+                    # cannot authorize a different packet or recipient.
+                    return None
+                if not isinstance(review, s.Approve):
+                    return s.PacketPreview(
+                        pdf_base64=base64.b64encode(packet.pdf).decode("ascii"),
+                        packet_sha256=packet.sha256,
+                        envelope_sha256=envelope_sha256(request),
+                        letter_text_sha256=packet.letter_text_sha256,
+                        page_count=packet.page_count,
+                        mail_to=_address_lines(request.recipient),
+                        return_address=_address_lines(request.sender),
+                        declarations=self._declaration_views(record),
+                    )
+                self._check_inspected_request(review, request)
+                self._check_affirmations(record, review)
+                request = replace(request, submission_token=f"sub_{self._deps.new_id()}")
+                approved_at = self._deps.clock()
+                remail_manifest = build_remail_approval_manifest(
+                    original,
+                    request,
+                    approved_at=approved_at,
+                    approved_text=redirected,
+                    build_commit=os.environ.get("PB_BUILD_COMMIT"),
+                    affirmations=tuple(
+                        (item.declaration_id, item.text_sha256) for item in review.affirmations
+                    ),
+                )
+        try:
+            self._store.resolve_returned_mail(
+                case.case_token,
+                case.revision,
+                responsibility,
+                remedy,
+                request,
+                now=approved_at or self._deps.clock(),
+                cost_is_estimate=resolved_cost_is_estimate,
+                remail_manifest=remail_manifest,
+                expected_research=expected_research,
+            )
+        except (RevisionConflict, PreparationConflict, ApprovalIntegrityError):
+            if review is None:
+                raise
+            raise ServiceConflict("remail_not_available") from None
+        return None
 
     # Incident hold, resume and retry (T74) --------------------------------------------
     def _held(self, case_token: str) -> bool:
@@ -4418,13 +4657,9 @@ class CaseService:
             declarations, affirmed
         ):
             raise ServiceConflict("declaration_unaffirmed")
-        # A free re-mail changes only the destination block. Its manifest retains
-        # the original adoption hash; derive the constrained redirected text here
-        # rather than treating that original hash as the new PDF's text identity.
-        approved_hash = manifest.approved_text_sha256
-        if text_sha256(saved.letter_text) != approved_hash:
+        packet_text_hash = text_sha256(saved.letter_text)
+        if packet_text_hash != saved.adopted_sha256:
             raise ServiceConflict("adopt_current_text_first")
-        packet_text_hash = approved_hash
         if prepared.attempt == 2:
             original = self._store.get(prepared.case_token, 1)
             if original is None:
@@ -4434,6 +4669,8 @@ class CaseService:
                     saved.letter_text, original.request.recipient, prepared.request.recipient
                 )
             )
+        if packet_text_hash != manifest.approved_text_sha256:
+            raise ServiceConflict("adopt_current_text_first")
         packet = Packet(
             prepared.request.pdf,
             manifest.packet_pdf_sha256,

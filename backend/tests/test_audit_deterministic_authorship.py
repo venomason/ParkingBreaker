@@ -179,3 +179,9 @@ def test_one_character_edit_cannot_legitimize_an_earlier_draft() -> None:
     edited = letter.text.replace("broken", "broker")
     assert not is_adopted(adoption, edited)
     assert is_adopted(adoption, letter.text)
+
+
+def test_framing_preserves_the_submitted_statement_between_sections() -> None:
+    statement = "  I did NOT pay.  The sign was covered.\n \nI kept the photo.\n\n"
+    letter = render_letter(dataclasses.replace(INPUT, draft=_draft(statement)))
+    assert f"\n\n{statement}\n\nSincerely," in letter.text

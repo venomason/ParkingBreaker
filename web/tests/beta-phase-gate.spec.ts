@@ -279,6 +279,37 @@ test("stale paid UI 409 refreshes actual phase, removes every paid affordance, a
   expect(await page.evaluate(() => (window as unknown as { __gateStripe: { paymentMethods: number } }).__gateStripe.paymentMethods)).toBe(1);
 });
 
+test("last paid place taken during checkout shows saved work and the issuer link", async ({ page }) => {
+  await instrument(page, true);
+  await mockUnselectedIntake(page, "paid");
+  let full = false;
+  let authorizationRequests = 0;
+  const stop = {
+    case_id: "case_gate", kind: "stop", family: "BUSINESS_EXCLUSION", reason_key: "paid_cohort_full",
+    message: "The paid beta is full. Your work is saved.", official_url: "https://sfmta.com/",
+    work_preserved: true, no_charge: true,
+  };
+  await page.route("**/api/cases/case_gate/status", route => route.fulfill({
+    json: full ? { ...status, state: "STOPPED_NO_CHARGE", payment_state: null, stop } : status,
+  }));
+  await page.route("**/api/cases/case_gate/tier", route => route.fulfill({ json: offer }));
+  await page.route("**/api/cases/case_gate/authorization", route => {
+    full = true;
+    authorizationRequests++;
+    return route.fulfill({ status: 409, json: { detail: "paid_cohort_full" } });
+  });
+  await page.goto("/");
+  await page.locator('input[name="tier"][value="certified"]').check();
+  await page.locator("#actAuthBtn").click();
+  await expect(page.locator("#liveStopMessage")).toHaveText(stop.message);
+  await expect(page.getByRole("link", { name: "Open the issuer's official site" })).toHaveAttribute("href", stop.official_url);
+  await expect(page.getByRole("button", { name: "Start a new appeal" })).toHaveCount(0);
+  await expect(page.locator("#cardField")).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator("#liveStopMessage")).toHaveText(stop.message);
+  expect(authorizationRequests).toBe(1);
+});
+
 // UI-only discovery: authenticated saved status/offer reveal a selected but
 // unaccepted beta after the phase refresh resolves to paid. The shared funding
 // update hides the header/card charge text in place and posts no acceptance.

@@ -1,5 +1,6 @@
 "use client";
 
+import { HurtleGuide } from "./HurtleGuide";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Draft, PacketPreview } from "../lib/api";
 
@@ -235,6 +236,7 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
   return (
     <section className="screen on" id="s6" aria-labelledby="h-s6">
       <div className="voice">
+        <HurtleGuide pose="letter" />
         <div>
           <p className="eyebrow">Your letter</p>
           <h2 id="h-s6" tabIndex={-1}>Read it, change anything, then adopt your exact words.</h2>

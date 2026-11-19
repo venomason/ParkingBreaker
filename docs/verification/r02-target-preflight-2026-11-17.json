@@ -1,0 +1,716 @@
+{
+  "date_pacific": "2026-11-17",
+  "purpose": "R02 preflight plus independent local R03/R04/P04/P06 preparation",
+  "evidence_state": "Locally tested. Cloud target and external provider qualification open.",
+  "base_commit": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+  "application_fingerprint": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+  "fingerprint_algorithm": "build-kit/scripts/kit.py application_fingerprint working-tree sources",
+  "private_ops_run": "parkingbreaker-qualification-20261117-E6eQQg",
+  "paid_activation": false,
+  "authorized_new_spend_usd": 0,
+  "cloud_inventory": {
+    "result": "Unverified. The active CLI account requires interactive reauthentication. No returned resources or absence claims. No account switched or IAM changed.",
+    "read_attempts": {
+      "project": {
+        "command": [
+          "gcloud",
+          "projects",
+          "describe",
+          "neuraldraft-parkingbreaker",
+          "--format=json(projectId,lifecycleState)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.510782+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "instances": {
+        "command": [
+          "gcloud",
+          "compute",
+          "instances",
+          "list",
+          "--format=json(name,zone,status)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.533353+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "disks": {
+        "command": [
+          "gcloud",
+          "compute",
+          "disks",
+          "list",
+          "--format=json(name,zone,region,type,sizeGb,status)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.514513+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "cloudrun": {
+        "command": [
+          "gcloud",
+          "run",
+          "services",
+          "list",
+          "--region=us-west1",
+          "--format=json(metadata.name,status.latestReadyRevisionName,status.traffic)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.841138+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "subnets": {
+        "command": [
+          "gcloud",
+          "compute",
+          "networks",
+          "subnets",
+          "list",
+          "--regions=us-west1",
+          "--format=json(name,network,ipCidrRange)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.491851+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "networks": {
+        "command": [
+          "gcloud",
+          "compute",
+          "networks",
+          "list",
+          "--format=json(name,autoCreateSubnetworks)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.531180+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "routers": {
+        "command": [
+          "gcloud",
+          "compute",
+          "routers",
+          "list",
+          "--format=json(name,region)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.498266+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "forwarding": {
+        "command": [
+          "gcloud",
+          "compute",
+          "forwarding-rules",
+          "list",
+          "--format=json(name,region,loadBalancingScheme)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.515065+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "dns": {
+        "command": [
+          "gcloud",
+          "dns",
+          "managed-zones",
+          "list",
+          "--format=json(name,visibility)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.497181+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "buckets": {
+        "command": [
+          "gcloud",
+          "storage",
+          "buckets",
+          "list",
+          "--format=json(name,location)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.933396+00:00",
+        "error": "AUTH_REQUIRED"
+      },
+      "accounts": {
+        "command": [
+          "gcloud",
+          "iam",
+          "service-accounts",
+          "list",
+          "--format=json(email,disabled)",
+          "--project=neuraldraft-parkingbreaker"
+        ],
+        "exit": 1,
+        "utc": "2026-11-18T06:03:11.491234+00:00",
+        "error": "AUTH_REQUIRED"
+      }
+    },
+    "last_saved_preview": "deployment-preview-2026-11-17.json, revision parkingbreaker-frontend-preview-0bf011b at recorded time only"
+  },
+  "target_design": {
+    "purpose": "Single isolated R02-R04 synthetic drill. All resource names and sizes below are proposed until read-only inventory succeeds.",
+    "project_region": "neuraldraft-parkingbreaker / us-west1",
+    "primary": "pb-qual-backend-01, us-west1-a, e2-standard-2, Ubuntu 24.04, no external IP",
+    "volume": "pb-qual-data-01, 50 GiB regional pd-balanced, replica zones us-west1-a/b, READ_WRITE_SINGLE, ext4 at /srv/parkingbreaker; /data binds the data subdirectory",
+    "backup_restore": "pb-qual-recovery-01, us-west1-b, separate 50 GiB zonal backup disk, separate identity, host-key-pinned private SSHFS mount at /mnt/pb-qual-replica; grant only bundle writes/reads needed. Verify fsync and encrypted data and transport on real target. Restore to a separate, initially empty 50 GiB regional disk. Old owner fenced before processing. Only one active authority writer.",
+    "network": "Dedicated qualification VPC/subnets. Proposed frontend CIDR 10.44.1.0/26, distinct host subnet 10.44.2.0/24, VM 10.44.2.4. Check for collisions. Allow only approved frontend VPC tag/range to private gateway TCP 8443 and scoped IAP administration. Confirm effective published Docker path independently.",
+    "origin": "Isolated pb-qual-frontend-01 service, with its own frontend revision, authenticated synthetic ingress at https://qual.parkingbreaker.com. Build PB_API_ORIGIN=https://pb-qual-api.internal.parkingbreaker.com:8443 with trusted matching certificate/private DNS. No traffic shift for parkingbreaker-frontend. Isolate webhook access separately for P06.",
+    "iam": "Proposed pb-qual-web (no secret/provider/worker grants), pb-qual-backend (scoped image read, approved per-role secret refs and disk metadata read), separate pb-qual-recovery with restricted backup access. Compute, network and IAM changes belong to a named time-bounded operator. Reconcile actual grants, TLS issuer, principals, secrets by reference, previous owner and target image digests before apply.",
+    "images": "Current candidate OCI digests have not been built/qualified on this target. The preview receipt identifies other images. Deployment requires immutable candidate image IDs, build origin and old release identity. Existing lifecycle builds services locally; bind actual built/running IDs. Record the original preview revision read-only before segregated setup.",
+    "operator": "Amir proposed as approval owner. Live drill responder, backup and duty window unconfirmed.",
+    "rollback": "Preserve live preview and unrelated resources. For the drill record service revision/image, disk identity, owner and control revisions before/after. Stop admission, scheduler and old owner, snapshot; check compatibility on a copy. Reconcile uncertain effects before re-enabling."
+  },
+  "local_checks": {
+    "stable-r02": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_t22_disk_policy.py",
+        "tests/test_t22_cloudrun_overlay.py",
+        "tests/test_t22_lifecycle.py",
+        "tests/test_release_readiness.py"
+      ],
+      "cwd": "backend",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:18:18.056330+00:00",
+      "summary": [
+        "92 passed in 16.03s"
+      ],
+      "log_sha256": "9b4f1b893b0bda91dd05e861a4a81e6da73a68c117204cdc98d1e72b126fcca4",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "stable-r02-r03": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_t22_disk_policy.py",
+        "tests/test_t22_cloudrun_overlay.py",
+        "tests/test_t22_lifecycle.py",
+        "tests/test_release_readiness.py",
+        "tests/test_t22_replication.py",
+        "tests/test_t22_parallel_backup.py",
+        "tests/test_t23_recovery.py",
+        "tests/test_t23_cli.py",
+        "tests/test_t23_reconciliation.py",
+        "tests/test_journey_capture_recovery.py"
+      ],
+      "cwd": "backend",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:15:56.302859+00:00",
+      "summary": [
+        "136 passed in 21.33s"
+      ],
+      "log_sha256": "1e031a9925c4ac7af1c7524dc94431585f1d94f914e3d1122b808c4d3e625ae3",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "stable-provision": {
+      "command": [
+        "bash",
+        "deploy/provision-host.sh",
+        "--dry-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:18:01.774803+00:00",
+      "summary": [
+        "ufw allow from 35.235.240.0/20 to any port 22 proto tcp"
+      ],
+      "log_sha256": "ebcf5dfe8415597f335dc946aa6ef544d24c7fc9598d793bb13f0cb7d4c8964e",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "stable-validate": {
+      "command": [
+        "bash",
+        "deploy/validate.sh",
+        "--dry-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:18:01.960291+00:00",
+      "summary": [
+        "offline syntax checks passed; target validation requires env, mounted regional disk and fresh disk describe"
+      ],
+      "log_sha256": "44558d7c67d742048451a634f27aca7b4eb14bc66d33004a4ca8882553b4e9ed",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "stable-deploy": {
+      "command": [
+        "bash",
+        "deploy/lifecycle.sh",
+        "deploy",
+        "--dry-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:18:01.758758+00:00",
+      "summary": [
+        "OWNER PLAN deploy: lock; validate fresh regional disk; config/build; refuse quarantined restore; stop scheduler; down old; assert no API owners; snapshot; migration/compatibility; start API/web/TLS; health; start scheduler; fresh monitor poll and recorded ok sweep (180s maximum wait)"
+      ],
+      "log_sha256": "28a0de49a46a000afb09a29109c0bd6f4a6649a7eb7a7658860f299fbd434506",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "stable-rollback": {
+      "command": [
+        "bash",
+        "deploy/lifecycle.sh",
+        "rollback",
+        "--dry-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:18:01.760345+00:00",
+      "summary": [
+        "OWNER PLAN rollback: lock; validate fresh regional disk; config/build; refuse quarantined restore; stop scheduler; down old; assert no API owners; snapshot; migration/compatibility; start API/web/TLS; health; start scheduler; fresh monitor poll and recorded ok sweep (180s maximum wait)"
+      ],
+      "log_sha256": "7eeb3264d998f663dbf866c347f179c4aaf41ff3d510e8591ee56cac8fdc05bd",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "r03dry": {
+      "command": [
+        "bash",
+        "deploy/backup.sh",
+        "--dry-run"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:09:36.631063+00:00",
+      "summary": [
+        "{\"captures\": 1, \"letters\": 1, \"reconciliation\": {\"checked\": 1, \"issues\": [], \"status\": \"READY_FAKE\"}, \"restore\": {\"artifacts_match\": true, \"elapsed_seconds\": 0.006997495001996867, \"records_match\": true}}"
+      ],
+      "log_sha256": "d87cab5c9fa982e48bded5f91660e873133202419b7aa8ea027cb6ceee466316",
+      "fingerprint_before": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2",
+      "fingerprint_after": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2"
+    },
+    "stored-restore": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "parkingbreaker.recovery_cli",
+        "rehearse",
+        "--output",
+        "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-qualification-20261117-E6eQQg/synthetic-restore"
+      ],
+      "cwd": "backend",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:19:16.124995+00:00",
+      "summary": [
+        "{\"captures\": 1, \"letters\": 1, \"reconciliation\": {\"checked\": 1, \"issues\": [], \"status\": \"READY_FAKE\"}, \"restore\": {\"artifacts_match\": true, \"elapsed_seconds\": 0.04051953699672595, \"records_match\": true}}"
+      ],
+      "log_sha256": "f91cfa15e9bb3420f212141c1b1a17129cc7e906b0cc3738c51bd607cc3ae889",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "reconcile": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "parkingbreaker.recovery_cli",
+        "reconcile"
+      ],
+      "cwd": "backend",
+      "exit": 3,
+      "utc_end": "2026-11-18T06:09:36.549125+00:00",
+      "summary": [
+        "{\"status\": \"NEEDS_EXTERNAL\", \"requires\": \"original account Stripe/Lob objects, account/mode and target qualification\"}"
+      ],
+      "log_sha256": "f7e3dc2d8ef294dcc08ebbc8592b99550de3e9af32ed0c23242540106f8fd683",
+      "fingerprint_before": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2",
+      "fingerprint_after": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2"
+    },
+    "r04": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_t24_health.py",
+        "tests/test_runtime_service_phase.py",
+        "tests/test_release_readiness.py"
+      ],
+      "cwd": "backend",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:09:39.480455+00:00",
+      "summary": [
+        "65 passed in 2.51s"
+      ],
+      "log_sha256": "df77b1dc01c9ee34c6cc10adc971bacfc6fd17aca18b44c1cc6f0848b6463367",
+      "fingerprint_before": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2",
+      "fingerprint_after": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2"
+    },
+    "p04": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_ticket_ocr.py",
+        "tests/test_ticket_intake_service.py",
+        "tests/test_ticket_recovery.py",
+        "tests/test_t21_serviceability_blocks.py"
+      ],
+      "cwd": "backend",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:11:44.544764+00:00",
+      "summary": [
+        "61 passed in 1.48s"
+      ],
+      "log_sha256": "f191e5477618d6987f65309b1d846405d3ddea1949372ff106fcea37858185c9",
+      "fingerprint_before": "3fd385d69ef6d944aec807bd5acb236fc037b8b6563361a6ad073296860af28d",
+      "fingerprint_after": "3fd385d69ef6d944aec807bd5acb236fc037b8b6563361a6ad073296860af28d"
+    },
+    "p06": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_t17_mail_evidence.py",
+        "tests/test_t17_pieceB_review.py",
+        "tests/test_t17_capture_policy.py",
+        "tests/test_t20_webhook_recovery.py",
+        "tests/test_webhook_signatures.py",
+        "tests/test_lob_webhook.py"
+      ],
+      "cwd": "backend",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:09:51.564463+00:00",
+      "summary": [
+        "186 passed in 15.02s"
+      ],
+      "log_sha256": "cc716e874c2093f8490a8ad038ed47836b74b73ac73ce78d7ff9db85cf3b40e7",
+      "fingerprint_before": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2",
+      "fingerprint_after": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2"
+    },
+    "qualvis": {
+      "command": [
+        "backend/.venv/bin/python",
+        "tools/qualification/vision_campaign.py",
+        "--self-test"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:09:36.431790+00:00",
+      "summary": [
+        "{\"provider_called\": false, \"passed\": true, \"reserved_cents\": 800, \"manifest_sha256\": \"e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6\", \"model\": \"deepseek-flash\"}"
+      ],
+      "log_sha256": "bf1e48f6d01489b7ae3fbc97d010671a9a25bb7aa8f239f5d0913b7b7b7e3df9",
+      "fingerprint_before": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2",
+      "fingerprint_after": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2"
+    },
+    "qualresearch": {
+      "command": [
+        "backend/.venv/bin/python",
+        "tools/qualification/research_campaign.py",
+        "--self-test"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:09:37.497364+00:00",
+      "summary": [
+        "{\"routing_self_test_passed\": true, \"provider_called\": false}"
+      ],
+      "log_sha256": "08eee7924298df9232a8ae703d06d236f75883fabd857fd0e6c3ff89a31d2b8f",
+      "fingerprint_before": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2",
+      "fingerprint_after": "bea30149d27307aed4e907bcf8ff0ccba74c00cd03b02a18830da0d24b837ec2"
+    },
+    "full-final": {
+      "command": [
+        "make",
+        "check"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:19:39.451759+00:00",
+      "summary": [
+        "13805 passed, 8 warnings in 232.63s (0:03:52)"
+      ],
+      "log_sha256": "eb733b41721da1a86d180321600d7c31d7b233a1a6e00489e8811b323259503b",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    },
+    "web-check": {
+      "command": [
+        "env",
+        "PB_PROVIDER_MODE=fake",
+        "make",
+        "web-check"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "utc_end": "2026-11-18T06:16:38.277429+00:00",
+      "summary": [
+        "\u0192  (Dynamic)  server-rendered on demand"
+      ],
+      "log_sha256": "0121375c797afe0d4990ebb0283b681616fb0555a003db9ae69130cbfe4a2dc7",
+      "fingerprint_before": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5",
+      "fingerprint_after": "8109debe8034f1ce3ee6693c78803e4dd5da7ede8c9ab0c1324ef9f068320bf5"
+    }
+  },
+  "regressions": [
+    {
+      "before": "7 focused assertions failed on private firewall prep/invalid network refusal and old-release Compose selection.",
+      "evidence": "47107f31d6149f7bf99b520d695e1032e01a946493e18ad04b9321ca5ce4f5ca"
+    },
+    {
+      "before": "2 focused assertions failed on private backup overlay and ordinary-directory fallback.",
+      "evidence": "08090e7fb1c9cdcfe2362eb389015cd6b2df243736bdf3a2ae4ff12106784c8f"
+    },
+    {
+      "before": "Two Ruff findings in test assertions and formatting corrected.",
+      "evidence": "377e1b2c7a7fd4631fe36b06ead3af1fe77049bd5f2c8e2a2701d03a8ff27f5c"
+    },
+    {
+      "before": "First full parallel collection disagreed on a generated PDF timestamp in test IDs. Named fixture cases explicitly with original inputs/assertions preserved.",
+      "evidence": "bb19b40070a71da88186249a34b6baeff2abf0055856329010cf7efce6d54e9d"
+    },
+    {
+      "before": "Next run had 20 failures. The qualification wrapper injected private topology into default-topology fixtures; ShellCheck also flagged a deferred expansion in the inner copy command. Restored ordinary suite environment and clarified the shell command.",
+      "evidence": "f6752c6c962e5a44ece03977c1442833068e38fe44e6991c1d2cee103c929104"
+    }
+  ],
+  "pricing": {
+    "currency": "USD",
+    "basis": "Public on-demand unit rates used as US reference estimates. Recheck Oregon SKUs, project billing, taxes, entitlements and stock before approval. The allowance is an assumption.",
+    "rates": [
+      {
+        "line": "Qualification VM and independent backup/drill host, one E2-standard-2 each",
+        "quantity": 48,
+        "unit": "VM-hour",
+        "unit_rate_usd": "0.06701142",
+        "subtotal_usd": "3.21654816",
+        "basis": "compute"
+      },
+      {
+        "line": "Two zonal 30 GiB boot disks and one zonal 50 GiB backup volume",
+        "quantity": 2640,
+        "unit": "GiB-hour",
+        "unit_rate_usd": "0.000136986",
+        "subtotal_usd": "0.361643040",
+        "basis": "disk"
+      },
+      {
+        "line": "Primary and fresh restore regional balanced disks, 50 GiB each in two zones",
+        "quantity": 2400,
+        "unit": "GiB-hour",
+        "unit_rate_usd": "0.000273973",
+        "subtotal_usd": "0.657535200",
+        "basis": "disk"
+      },
+      {
+        "line": "Cloud Run ingress and web, 1 vCPU each, reserve both configured instances active all day",
+        "quantity": 345600,
+        "unit": "vCPU-second",
+        "unit_rate_usd": "0.000024",
+        "subtotal_usd": "8.294400",
+        "basis": "run"
+      },
+      {
+        "line": "Cloud Run ingress 128 MiB and web 512 MiB, two instances active all day",
+        "quantity": 108000,
+        "unit": "GiB-second",
+        "unit_rate_usd": "0.0000025",
+        "subtotal_usd": "0.2700000",
+        "basis": "run"
+      },
+      {
+        "line": "Synthetic requests only",
+        "quantity": 10000,
+        "unit": "request",
+        "unit_rate_usd": "0.0000004",
+        "subtotal_usd": "0.0040000",
+        "basis": "run"
+      },
+      {
+        "line": "One forwarding rule for isolated load balancer",
+        "quantity": 24,
+        "unit": "rule-hour",
+        "unit_rate_usd": "0.025",
+        "subtotal_usd": "0.600",
+        "basis": "network"
+      },
+      {
+        "line": "Public NAT for two private hosts",
+        "quantity": 48,
+        "unit": "VM-hour",
+        "unit_rate_usd": "0.0014",
+        "subtotal_usd": "0.0672",
+        "basis": "nat"
+      },
+      {
+        "line": "One NAT external address",
+        "quantity": 24,
+        "unit": "address-hour",
+        "unit_rate_usd": "0.005",
+        "subtotal_usd": "0.120",
+        "basis": "nat"
+      },
+      {
+        "line": "NAT processing",
+        "quantity": 2,
+        "unit": "GiB",
+        "unit_rate_usd": "0.045",
+        "subtotal_usd": "0.090",
+        "basis": "nat"
+      },
+      {
+        "line": "Retain only the 50 GiB zonal backup disk for seven days after drill",
+        "quantity": 8400,
+        "unit": "GiB-hour",
+        "unit_rate_usd": "0.000136986",
+        "subtotal_usd": "1.150682400",
+        "basis": "disk"
+      },
+      {
+        "line": "Planning allowance for small-volume network egress/LB processing, DNS, test monitoring, build, registry, logs and billing variance",
+        "quantity": 1,
+        "unit": "combined allowance",
+        "unit_rate_usd": "5.00",
+        "subtotal_usd": "5.00",
+        "basis": "assumption"
+      }
+    ],
+    "modeled_total_usd": "19.83",
+    "proposed_owner_ceiling_usd": 25,
+    "estimated_residual_included": "Seven days for 50 GiB backup disk, about $1.15 after the drill; thereafter about $0.16/day until explicitly disposed of. Other retained resources continue billing and invalidate this estimate.",
+    "sources": {
+      "compute": "https://cloud.google.com/products/compute/pricing/general-purpose",
+      "disk": "https://cloud.google.com/compute/disks-image-pricing",
+      "network": "https://cloud.google.com/vpc/network-pricing",
+      "run": "https://cloud.google.com/run/pricing",
+      "nat": "https://cloud.google.com/nat/pricing",
+      "budget": "https://docs.cloud.google.com/billing/docs/how-to/budgets",
+      "regional_disk": "https://docs.cloud.google.com/compute/docs/disks/regional-persistent-disk"
+    }
+  },
+  "proposed_approval_scope": {
+    "status": "PREPARED; needs authenticated inventory, cost recheck and approval before any external change",
+    "utc_window": [
+      "2026-11-18T18:00:00Z",
+      "2026-11-19T18:00:00Z"
+    ],
+    "expires": "Reissue the window if prerequisites miss it.",
+    "actions": [
+      "Only provision the named isolated qualification resources, scoped IAM, test hostname/TLS and monitoring once reviewed; deploy fake-provider candidate only there.",
+      "Seed synthetic records, run scheduled off-host copy, isolate/fence primary, restore and measure; isolate/recover VM for alerts. One notification to one explicitly named test responder requires exact authorization.",
+      "Use isolated service-level and traffic limits, arm 24h shutdown before load, stop on unexpected resource/traffic, cost uncertainty or cap exhaustion. Budget alerts alone do not enforce the ceiling. Require resource limits/teardown and a verified path to stay under the ceiling or keep blocked.",
+      "Return admission to stopped, stop both qualification VMs and separately remove all named ephemeral resources only under explicit disposition approval. Retain the backup disk for seven days and require exact consent for permanent disposition; remove or extend before retention expiry. Verify final inventory and billing."
+    ],
+    "excluded": "Paid/live provider calls, physical mail, customer data, live charges, customer activation and changes to preview traffic."
+  },
+  "remaining_proof": {
+    "R02": "Current inventory, IAM, signed/enumerated immutable target artifacts, usable origin/TLS, actual single attachment and restart, private network evidence, no unresolved rollback owner.",
+    "R03": "Timer-produced receiver-side verified encrypted copy, failover from the copy, measured RPO <=60 min/RTO <=120 min, original test accounts/objects reconciled before releasing quarantine. Source checks mount class; operator must prove off-host identity.",
+    "R04": "Actual independent alert within 5 min, named responder acknowledgment/clearance, enacted route-level three-stop matrix, existing-case callbacks and recovery.",
+    "P04": "Frozen synthetic scenarios only. Signed source keys, current official evidence, actual access and one exact cost/call approval required. No paid calls from this run.",
+    "P06": "Local test-signature/hold/print evidence only. Need named Stripe/Lob test accounts, fresh original IDs, provider-signed test callbacks, provider print proof. Physical mail and real charges require separate authority."
+  },
+  "provider_fixture_plan": {
+    "local_manifest_sha256": "14cca7a6caf1af6db091d7b018f13dc0967f8349e6751db81d8225730e57962a",
+    "cases": [
+      {
+        "id": "clear",
+        "path": "clear.png",
+        "png_sha256": "d71c299b3762e424e03d91abe64aff80c99bf2edb91e7fdc37ed215c3ab3e511",
+        "benchmark_case": "B13",
+        "key_version": 5,
+        "row_sha256": "6f2118a79ba0c024034a645aeab86bb61c2b77746639dd7748d4554209117645",
+        "owner_signed": false,
+        "expected": "after official source verification, exact Boston office, purpose and deadline may advance to review"
+      },
+      {
+        "id": "ambiguous",
+        "path": "ambiguous.png",
+        "png_sha256": "918a2208c894df969346c7b1dfbef1b935d0fe67222b6dff95c9f9799deca0dc",
+        "benchmark_case": "B13",
+        "key_version": 5,
+        "row_sha256": "6f2118a79ba0c024034a645aeab86bb61c2b77746639dd7748d4554209117645",
+        "owner_signed": false,
+        "expected": "occluded character stays unknown and cannot be auto-confirmed"
+      },
+      {
+        "id": "physical-original",
+        "path": "physical-original.png",
+        "png_sha256": "67a30533e562df97c30b9024913d996383a87ff4b32da7174d2b376e88d6faaf",
+        "benchmark_case": "B09",
+        "key_version": 4,
+        "row_sha256": "a5b62aeeb0a14dad872a14dd6eab5f5870b614878f915267e234d5a5e662a6bf",
+        "owner_signed": false,
+        "expected": "stop if official evidence confirms the required original yellow envelope"
+      },
+      {
+        "id": "corrected",
+        "path": "corrected.png",
+        "png_sha256": "a38f923f048938aab8942ace6b7194ba85655ae36631fdcf35644c935dc5ee35",
+        "benchmark_case": "B13",
+        "key_version": 5,
+        "row_sha256": "6f2118a79ba0c024034a645aeab86bb61c2b77746639dd7748d4554209117645",
+        "owner_signed": false,
+        "expected": "completed reading leaves plate unknown; driver supplies QL014 explicitly and reconfirms"
+      }
+    ],
+    "reference_date": "2026-11-18",
+    "build_inputs": "Private run/freeze_fixtures.py, DejaVuSansMono and benchmark rows. B09 and B13 have no owner signatures. Revalidate dating and official-source keys if the window changes.",
+    "scope": "For the four frozen photos, at most two extraction calls total per photo, within its 25-cent extraction budget, and one review at 25 cents per photo. Reuse existing correction behavior and avoid redundant comparisons. Research planning per selected row uses the existing role limits. No additional automatic retries and stop on unresolved spend; sign a finite combined model/search allowance before external use."
+  },
+  "frontend_origin_evidence": {
+    "provider_mode": "fake",
+    "evidence": "Local production-mode Next build; private DNS, TLS and network still unverified",
+    "rewrites": {
+      "/api/health": "https://pb-qual-api.internal.parkingbreaker.com:8443/health",
+      "/api/auth/:path*": "https://pb-qual-api.internal.parkingbreaker.com:8443/auth/:path*",
+      "/api/workspaces/:path*": "https://pb-qual-api.internal.parkingbreaker.com:8443/workspaces/:path*",
+      "/api/cases/:path*": "https://pb-qual-api.internal.parkingbreaker.com:8443/cases/:path*",
+      "/api/webhooks/:path*": "https://pb-qual-api.internal.parkingbreaker.com:8443/webhooks/:path*"
+    },
+    "manifest_sha256": "50a13f7d364d8962bb471c7ac50a50611aad97f67dd2c11fb94b22f1b2fb953c"
+  },
+  "full_backend_environment": {
+    "workers": 8,
+    "distribution": "loadfile",
+    "parallel_plugin": "pytest-xdist 3.8.0, with execnet from installed uv cache",
+    "temp_storage": "short disk-backed basetemp",
+    "git_diff": "No production PDF parser change; deterministic pytest case IDs only."
+  },
+  "mock_recovery_details": {
+    "records_and_artifacts_matched": true,
+    "record_tables_compared": 77,
+    "artifact_count": 2,
+    "manifest_sha256": "d6dfa89385db7da62fd296ec9ce87fc11af9f46fed4d795e33f9fc939673efee",
+    "originals": "synthetic provider objects only",
+    "network_copy_exercised": false,
+    "replay": "Three post-recovery dispatch passes in recovery_cli.rehearse. One fake letter and one fake capture total."
+  },
+  "trial_setup_p06": {
+    "status": "prepared test-account matrix only",
+    "cases": [
+      "test A: one manual authorization, one approved PDF/envelope, one certified request, original key lookup after a lost response; a digital proof alone leaves the hold uncaptured",
+      "test B: one independent expiring test authorization and release, with no mail request",
+      "repeat one signed original callback and replay events out of order. Verify raw body, signature, original account/mode, one terminal transition and unchanged original IDs"
+    ],
+    "maximum_new_objects": "Propose 2 test-mode authorizations and 1 test-mode certified letter create. Lookup and callback replay reuse original records; stop on unknown mode, object or cost. No test capture without the existing qualifying evidence.",
+    "authorized_now": false
+  },
+  "execution_notes": [
+    "Read-only Google Cloud queries returned no inventory due to interactive reauthentication. Last saved preview evidence predates the proposed target.",
+    "Local host-rule example uses 10.44.1.0/26 and 10.44.2.4. The test runner injects these only for private-topology dry runs. They do not establish actual subnet ownership.",
+    "The provider and recovery check entries retain their individual snapshot hashes. The final make check covers the final application fingerprint. No external test account, deployed user journey or off-host timer was exercised."
+  ]
+}

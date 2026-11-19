@@ -257,7 +257,7 @@ def test_decoder_rejects_duplicate_keys_unknown_version_and_nonfinite_numbers() 
     with pytest.raises(ValueError, match="duplicate"):
         decode_research('{"version":1,"version":1,"kind":"research","payload":{}}')
     with pytest.raises(ValueError, match="version"):
-        decode_research(encoded.replace('"version":4', '"version":5', 1))
+        decode_research(encoded.replace('"version":5', '"version":999', 1))
     with pytest.raises(ValueError, match="invalid JSON number"):
         decode_answers('{"version":1,"kind":"answers","payload":{"notice_issue_date":NaN}}')
 
@@ -426,8 +426,12 @@ def test_saved_promotions_and_inputs_survive_readback_and_still_block(trigger: s
     assert current.tier_evaluation is not None
     assert decoded.tier_evaluation == current.tier_evaluation
     assert decoded.tier_evaluation is not None
-    assert decoded.tier_evaluation.tiers[key] is FactTier.MUST_HAVE
-    if trigger == "condition":
+    if trigger in {"form", "packet"}:
+        assert decoded.tier_evaluation.tiers[key] is FactTier.NICE_TO_HAVE
+        assert not decoded.tier_evaluation.promotions
+    else:
+        assert decoded.tier_evaluation.tiers[key] is FactTier.MUST_HAVE
+    if trigger in {"condition", "form", "packet"}:
         assert decoded.tier_evaluation.compulsory_gaps == (proof,)
     else:
         assert decoded.tier_evaluation.promotions[0].reason

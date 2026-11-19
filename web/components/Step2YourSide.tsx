@@ -1,5 +1,6 @@
 "use client";
 
+import { HurtleGuide } from "./HurtleGuide";
 import React, { useState, useEffect } from "react";
 import { ConciergeMark } from "./ConciergeMark";
 import { Icon } from "./Icons";
@@ -22,7 +23,11 @@ interface Step2YourSideProps {
 
 export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhoto, onComplete, setActionBar, onRulesClick, liveSlot }: Step2YourSideProps) {
   const live = liveSlot !== undefined;
-  const restored = live && Boolean(owner && story.trim());
+  const unsupported = live && Array.from(story).some(character => {
+    const code = character.codePointAt(0) ?? 0;
+    return code > 255 || (code < 32 && ![9, 10, 12].includes(code));
+  });
+  const restored = live && !unsupported && Boolean(owner && story.trim());
   const [messages, setMessages] = useState<Array<{ sender: "c" | "u" | "g"; text?: string; html?: React.ReactNode }>>([
     { sender: "c", text: live ? "Your ticket details are recorded. You can check them before continuing." : "Thanks. All five details on your ticket are confirmed." },
     {
@@ -33,7 +38,6 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
   ]);
   const [stage, setStage] = useState<"story" | "owner" | "photo" | "done">(restored ? "done" : "story");
   const [storyErr, setStoryErr] = useState<boolean>(false);
-  const [markState, setMarkState] = useState<"idle" | "thinking" | "done">("idle");
 
   useEffect(() => {
     if (stage === "story") {
@@ -45,7 +49,7 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
           id="actSendStory"
           onClick={() => {
             const val = story.trim();
-            if (!val) {
+            if (!val || unsupported) {
               setStoryErr(true);
               document.getElementById("story")?.focus();
               return;
@@ -87,7 +91,7 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
         </button>
       );
     }
-  }, [stage, story, owner, photo, onComplete, setActionBar, live]);
+  }, [stage, story, owner, photo, onComplete, setActionBar, live, unsupported]);
 
   const handleAskGuardrail = () => {
     setMessages((prev) => [
@@ -132,7 +136,12 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
     if (live) {
       nextMsgs.push({ sender: "c", text: "Thanks. Last, a few details the agency asks for." });
       setMessages(nextMsgs);
-      setMarkState("done");
+      setStage("done");
+      return;
+    }
+    if (photo) {
+      nextMsgs.push({ sender: "c", text: "Your sample sign photo is already included. Next, check the agency’s filing rules." });
+      setMessages(nextMsgs);
       setStage("done");
       return;
     }
@@ -186,14 +195,13 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
       text: "That’s everything we need from you. Next we’ll read the City of San Diego’s official pages and show you every fact with its source.",
     });
     setMessages(nextMsgs);
-    setMarkState("done");
     setStage("done");
   };
 
   return (
     <section className="screen on" id="s2" aria-labelledby="h-s2">
       <div className="voice">
-        <ConciergeMark size={44} state={markState} />
+        <HurtleGuide pose="story" />
         <div>
           <p className="eyebrow">Step 2 · Your side</p>
           <h2 id="h-s2" tabIndex={-1}>
@@ -238,7 +246,7 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
             <p className="muted small" id="storyCompletenessPrompt">
               Include any relevant dates, times, locations, or sign details in your own words. We format your exact account without adding arguments or judging your case.
             </p>
-            <p className="err" id="storyErr" role="alert">{storyErr ? live ? "Enter your reason in your own words." : "Write a sentence or two, or tap “Use sample answer”." : ""}</p>
+            <p className="err" id="storyErr" role="alert">{storyErr ? unsupported ? "Replace characters the letter cannot print. Use straight quotes or apostrophes in place of curly ones, and use a plain hyphen in place of a long dash." : live ? "Enter your reason in your own words." : "Write a sentence or two, or tap “Use sample answer”." : ""}</p>
             <div className="crow">
               {!live && (
                 <button

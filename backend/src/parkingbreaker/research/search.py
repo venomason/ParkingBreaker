@@ -13,9 +13,8 @@ from typing import Protocol
 from urllib.parse import urldefrag
 
 from parkingbreaker.agencies import SourceScope
-from parkingbreaker.research.questions import CRITICAL_KEYS, FactKey, Ticket
+from parkingbreaker.research.questions import CRITICAL_KEYS, RETIRED_KEYS, FactKey, Ticket
 from parkingbreaker.research.sources import (
-    CODE_PUBLISHER_DOMAINS,
     AuthorityClass,
     is_allowed,
     is_code_publisher,
@@ -69,9 +68,8 @@ def search_request(
     keys: frozenset[FactKey] = CRITICAL_KEYS,
     broadened: bool = False,
 ) -> SearchRequest:
-    domains = tuple(
-        dict.fromkeys((*official_domains, *SHARED_CODE_DOMAINS, *CODE_PUBLISHER_DOMAINS))
-    )
+    keys = keys - RETIRED_KEYS
+    domains = tuple(dict.fromkeys(official_domains))
     # Only the resolved authority/place identifier and fixed clerical terms leave
     # this boundary. A free-form violation field may contain customer identifiers.
     # Filtering returned URLs in code remains mandatory even if the provider filters.

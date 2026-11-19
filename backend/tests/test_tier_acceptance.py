@@ -260,7 +260,7 @@ def test_each_tier1_gap_blocks_research_resolution_approval_and_submit(
         research = decode_research(research_json(research))
     assert not research.decision.ok
     assert any(key in reason for reason in research.decision.reasons)
-    assert len(searcher.calls) == 1
+    assert len(searcher.calls) == (0 if damage == "secondary" else 1)
     assert_blocked(research)
 
 
@@ -281,8 +281,8 @@ def test_tier2_and_tier3_gaps_pass_all_gates_after_bounded_recovery(
     )
     research, client, searcher = extract_case(findings)
     assert len(client.calls) == 1
-    assert len(searcher.calls) == 1  # Tier 2 gaps share the single remaining search.
-    assert all(DEFAULT_TIERS[k] is FactTier.IMPORTANT for k in searcher.calls[0].keys)
+    assert DEFAULT_TIERS[key] is FactTier.NICE_TO_HAVE
+    assert searcher.calls == []
     assert research.resolve(NOTICE).ready
     assert resolution_event(research.resolve(NOTICE)) == cs.ResearchComplete()
     frozen = packet()
@@ -420,7 +420,8 @@ def test_customer_clarification_promotion_and_frozen_inventory_survive_readback(
     assert promoted.tier_evaluation.tiers[FactKey.CODE_EXCEPTIONS] is FactTier.NICE_TO_HAVE
     assert promoted.tier_evaluation.promotions == ()
     assert research.resolve(answers).ready
-    assert len(client.calls) == len(searcher.calls) == 1  # No new research on edit/readback.
+    assert len(client.calls) == 1
+    assert searcher.calls == []  # No new research on edit/readback.
 
     path = tmp_path / "acceptance.sqlite"
     with SqliteTransactionStore(path) as store:

@@ -980,6 +980,8 @@ def test_real_sqlite_transaction_store_schema_binds_the_case(tmp_path: Path) -> 
         assert plan.summary.eligible is False
         assert PlanBlockedReason.SOURCE_TABLE_MISSING.value in plan.summary.blocked_reasons
         assert plan.summary.unknown_table_count == 0
+        assert ("journey_capture", True, 1) in plan.summary.retained_scopes
+        assert ("journey_event_context", True, 0) in plan.summary.retained_scopes
         assert plan.summary.source_malformed_count == 0
         again = plan_service_data_retention(
             database,

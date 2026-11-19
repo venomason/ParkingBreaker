@@ -14,6 +14,14 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from typing import Protocol
 
+from parkingbreaker.journey_context import (
+    ContextOperation,
+    ContextReason,
+    DurationBasis,
+    JourneyEventContext,
+    opaque_reference,
+    runtime_journey_identity,
+)
 from parkingbreaker.journey_events import (
     CostStatus,
     JourneyEventInput,
@@ -424,6 +432,8 @@ def _authorization_attempt(row: tuple[object, ...]) -> AuthorizationAttempt:
 class _Connected(Protocol):
     def _require_open(self) -> sqlite3.Connection: ...
 
+    def paid_cohort_full(self, intake_id: str, cap: int) -> bool: ...
+
     def _runtime_service_phase_in_transaction(
         self, database: sqlite3.Connection
     ) -> ServicePhase | None: ...
@@ -441,6 +451,27 @@ class _Connected(Protocol):
 
 class IntakeStoreMixin:
     """Intake methods of SqliteTransactionStore; uses its single connection."""
+
+    def paid_cohort_full(self: _Connected, intake_id: str, cap: int) -> bool:
+        """Count each first intent once, including paid cases predating the intent ledger."""
+        if type(cap) is not int or cap < 0:
+            raise ValueError("invalid paid cohort cap")
+        row = (
+            self._require_open()
+            .execute(
+                """SELECT NOT EXISTS (
+                   SELECT 1 FROM pb_intake_authorization_attempts WHERE intake_id=?
+               ) AND (
+                   (SELECT COUNT(*) FROM pb_cases WHERE amount_cents > 0) +
+                   (SELECT COUNT(DISTINCT a.intake_id) FROM pb_intake_authorization_attempts a
+                    JOIN pb_intake_records r ON r.intake_id=a.intake_id
+                    WHERE r.case_token IS NULL)
+               ) >= ?""",
+                (intake_id, cap),
+            )
+            .fetchone()
+        )
+        return bool(row[0])
 
     def set_workspace_owner(
         self: _Connected, workspace_token: str, owner: str, now: datetime
@@ -592,6 +623,19 @@ class IntakeStoreMixin:
                     outcome=JourneyEventOutcome.SUCCEEDED,
                     occurred_at=record.created_at,
                     cost_status=CostStatus.NOT_APPLICABLE,
+                    context=JourneyEventContext(
+                        operation=ContextOperation.INTAKE_SUBMISSION,
+                        build_sha256=runtime_journey_identity(self).build_sha256,
+                        config_sha256=runtime_journey_identity(self).config_sha256,
+                        reason=ContextReason.NOT_APPLICABLE,
+                        duration_basis=DurationBasis.NOT_APPLICABLE,
+                        operation_ref=opaque_reference(
+                            "op", f"intake_submission:{record.workspace_token}"
+                        ),
+                        attempt_ref=opaque_reference(
+                            "att", f"intake_submission:{record.intake_id}"
+                        ),
+                    ),
                 ),
             )
             database.execute("COMMIT")
@@ -612,6 +656,7 @@ class IntakeStoreMixin:
         now: datetime,
         *,
         allow_new_paid_authorization: bool = True,
+        paid_cohort_cap: int | None = None,
     ) -> AuthorizationAttempt:
         """Durably reserve one immutable provider request before calling Stripe.
 
@@ -684,6 +729,9 @@ class IntakeStoreMixin:
             )
             if not allow_new_paid:
                 raise IntakeConflict("paid_orders_paused")
+            # The pending insert below reserves the place in this same write transaction.
+            if paid_cohort_cap is not None and self.paid_cohort_full(intake_id, paid_cohort_cap):
+                raise IntakeConflict("paid_cohort_full")
             attempt_number = int(
                 database.execute(
                     "SELECT COALESCE(MAX(attempt_number), 0) + 1 "

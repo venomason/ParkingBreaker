@@ -102,7 +102,7 @@ def test_refetch_time_budget_abort_researches_again() -> None:
             OTHER,
             TEST_AGENCY,
             fetcher(),
-            JumpingClock(now, timedelta(minutes=7)),
+            JumpingClock(now, timedelta(minutes=13)),
             now,
         )
         is None

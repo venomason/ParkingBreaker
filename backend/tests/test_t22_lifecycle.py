@@ -6,12 +6,15 @@ placed first on PATH, with state in a temp directory. Only the host facts that n
 real root-owned env file and mounted regional disk are left to `validate.sh`.
 """
 
+import json
 import os
 import re
 import subprocess
 from pathlib import Path
 
 import pytest
+
+from test_t22_cloudrun_overlay import write_image_lock
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -21,7 +24,16 @@ printf '%s %s\\n' "$(basename "$0")" "$*" >> "$SHIM_LOG"
 line="$(basename "$0") $*"
 if [[ ${1:-} == ps && -n ${SHIM_PS_OUTPUT:-} ]]; then cat "$SHIM_PS_OUTPUT"; fi
 if [[ $(basename "$0") == gcloud ]]; then printf '{}\\n'; fi
+if [[ $line == "docker image inspect"* ]]; then
+  printf '%s\\n' "${SHIM_IMAGE_COMMIT:-$PB_BUILD_COMMIT}"
+fi
 if [[ -n ${SHIM_FAIL_MATCH:-} && $line == *"$SHIM_FAIL_MATCH"* ]]; then exit 1; fi
+if [[ $(basename "$0") == curl ]]; then
+  printf '%s\\n%s' "$SHIM_PUBLIC_HEALTH" "${SHIM_HTTP_STATUS:-200}"
+fi
+if [[ $line == *"exec -T api"* && $line == *"/health"* ]]; then
+  printf '%s\\n200' "$SHIM_LOCAL_HEALTH"
+fi
 # Readiness can be made to fail a configured number of times, then report real evidence.
 if [[ $line == *release_readiness* && -n ${SHIM_READINESS_FAILS:-} ]]; then
   count=$(cat "$SHIM_STATE/readiness" 2>/dev/null || echo 0)
@@ -59,6 +71,8 @@ def rehearsal(tmp_path: Path, **extra: str) -> tuple[dict[str, str], Path]:
         (shim_dir / name).chmod(0o755)
     for folder in ("data", "tls", "old", "mount", "state"):
         (tmp_path / folder).mkdir()
+    commit = "1" * 40
+    health = json.dumps({"status": "ok", "build_commit": commit, "mode": "fake"})
     env = dict(
         os.environ,
         PATH=f"{shim_dir}:{os.environ['PATH']}",
@@ -75,8 +89,15 @@ def rehearsal(tmp_path: Path, **extra: str) -> tuple[dict[str, str], Path]:
         PB_DISK_MOUNT=str(tmp_path / "mount"),
         PB_DISK_DEVICE="/dev/disk/by-id/google-pb-data",
         PB_DOMAIN="offline.example.invalid",
+        PB_BUILD_COMMIT=commit,
+        PB_PROVIDER_MODE="fake",
+        SHIM_LOCAL_HEALTH=health,
+        SHIM_PUBLIC_HEALTH=health,
     )
     env.update(extra)
+    if env.get("PB_DEPLOY_TOPOLOGY") == "cloudrun-private-vm":
+        env["PB_RELEASE"] = str(tmp_path / "candidate")
+        write_image_lock(Path(env["PB_RELEASE"]) / "deploy/private-images.json")
     return env, tmp_path / "state"
 
 
@@ -105,6 +126,43 @@ def test_every_owner_script_has_offline_mode(name: str, args: tuple[str, ...]) -
     result = run_script(name, *args)
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip()
+
+
+def test_private_host_prepares_only_the_frontend_gateway_and_iap() -> None:
+    env = dict(
+        os.environ,
+        PB_DEPLOY_TOPOLOGY="cloudrun-private-vm",
+        PB_FRONTEND_SUBNET_CIDR="10.44.1.0/26",
+        PB_PRIVATE_VM_IP="10.44.2.4",
+    )
+    result = run_script("provision-host.sh", "--dry-run", env=env)
+    assert result.returncode == 0, result.stderr
+    assert "ufw allow from 10.44.1.0/26 to 10.44.2.4 port 8443 proto tcp" in result.stdout
+    assert "ufw allow from 35.235.240.0/20 to any port 22 proto tcp" in result.stdout
+    assert "allow 80/tcp" not in result.stdout
+    assert "allow 443/tcp" not in result.stdout
+
+
+@pytest.mark.parametrize(
+    ("cidr", "vm"),
+    [
+        ("0.0.0.0/0", "10.44.2.4"),
+        ("10.44.1.2/26", "10.44.2.4"),
+        ("10.44.1.0/26", "0.0.0.0"),
+        ("10.44.1.0/26", "127.0.0.1"),
+        ("", "10.44.2.4"),
+    ],
+)
+def test_private_host_refuses_invalid_gateway_before_preparing_rules(cidr: str, vm: str) -> None:
+    env = dict(
+        os.environ,
+        PB_DEPLOY_TOPOLOGY="cloudrun-private-vm",
+        PB_FRONTEND_SUBNET_CIDR=cidr,
+        PB_PRIVATE_VM_IP=vm,
+    )
+    result = run_script("provision-host.sh", "--dry-run", env=env)
+    assert result.returncode != 0
+    assert "ufw allow" not in result.stdout
 
 
 @pytest.mark.skipif(os.geteuid() == 0, reason="proves the non-root refusal")
@@ -160,7 +218,10 @@ def test_cutover_issues_scheduler_then_old_stack_then_migration_commands(tmp_pat
     result = run_script("lifecycle.sh", "deploy", "--rehearse", str(state), env=env)
     assert result.returncode == 0, result.stderr
     lines = commands(tmp_path)
-    old = f"-p pb-previous -f {tmp_path}/old/compose.yaml"
+    old = (
+        f"-p pb-previous -f {tmp_path}/old/compose.yaml "
+        f"-f {tmp_path}/old/deploy/compose.production.yaml"
+    )
     new = f"-p parkingbreaker -f {ROOT}/compose.yaml -f {ROOT}/deploy/compose.production.yaml"
     build = index(lines, new, "build api worker web monitor")
     stop_scheduler = index(lines, old, "stop scheduler")
@@ -216,6 +277,20 @@ def test_a_running_api_container_blocks_migration_and_start(tmp_path: Path) -> N
     assert not any("run --rm" in line or "up -d" in line for line in lines)
     assert "migrate" not in (state / "events").read_text().splitlines()
     assert (state / "PROCESSING_BLOCKED").exists()
+
+
+@pytest.mark.parametrize("action", ["deploy", "rollback"])
+@pytest.mark.parametrize("role", ["api", "worker", "scheduler"])
+def test_cannot_cut_over_when_docker_cannot_list_old_owners(
+    tmp_path: Path, action: str, role: str
+) -> None:
+    env, state = rehearsal(tmp_path, SHIM_FAIL_MATCH=f"service={role}")
+    (tmp_path / "data/parkingbreaker.sqlite").touch()
+    result = run_script("lifecycle.sh", action, "--rehearse", str(state), env=env)
+    assert result.returncode != 0
+    assert (state / "events").read_text().splitlines()[-1] == "assert exclusive"
+    assert (state / "PROCESSING_BLOCKED").exists()
+    assert not any("run --rm" in line or "up -d" in line for line in commands(tmp_path))
 
 
 @pytest.mark.parametrize("marker", ["RESTORE_QUARANTINE.json"])
@@ -394,6 +469,9 @@ def test_private_vm_lifecycle_uses_overlay_without_local_web(tmp_path: Path, act
     assert compose
     assert all("compose.private-vm.yaml" in line for line in compose)
     assert not any("exec -T web" in line or "build api worker web" in line for line in lines)
+    assert index(lines, "pull api worker monitor caddy scheduler") < index(lines, "stop scheduler")
+    assert index(lines, "docker image inspect") < index(lines, "stop scheduler")
+    assert all(" build " not in line for line in compose)
     assert any("up -d --no-deps api worker caddy monitor" in line for line in lines)
     assert any(line.startswith("curl ") and "/api/health" in line for line in lines)
     assert any("release_readiness" in line for line in lines)
@@ -415,6 +493,63 @@ def test_private_vm_frontend_health_failure_keeps_processing_blocked(tmp_path: P
     lines = commands(tmp_path)
     assert any("stop scheduler api worker caddy monitor" in line for line in lines)
     assert not any("up -d --no-deps scheduler" in line for line in lines)
+
+
+def test_private_rollback_snapshots_with_outgoing_image_before_compatibility(
+    tmp_path: Path,
+) -> None:
+    env, state = rehearsal(
+        tmp_path,
+        PB_DEPLOY_TOPOLOGY="cloudrun-private-vm",
+        PB_PUBLIC_ORIGIN="https://offline.example.invalid",
+        PB_PRIVATE_VM_IP="10.40.0.2",
+        PB_PRIVATE_API_HOST="api.private.invalid",
+        PB_PRIVATE_TLS_PATH=str(tmp_path / "tls"),
+    )
+    old_lock = write_image_lock(tmp_path / "old/deploy/private-images.json", commit="2" * 40)
+    (tmp_path / "data/parkingbreaker.sqlite").touch()
+    result = run_script("lifecycle.sh", "rollback", "--rehearse", str(state), env=env)
+    assert result.returncode == 0, result.stderr
+    lines = commands(tmp_path)
+    snapshot = index(lines, "pb-previous", str(old_lock), "recovery_cli backup")
+    assert "PYTHONPATH=/ops" not in lines[snapshot]
+    assert snapshot < index(
+        lines, str(Path(env["PB_RELEASE"]) / "deploy/private-images.json"), "compat.sqlite"
+    )
+
+
+@pytest.mark.parametrize(
+    ("probe", "payload"),
+    [
+        ("SHIM_PUBLIC_HEALTH", "<html>Sign in</html>"),
+        ("SHIM_HTTP_STATUS", "302"),
+        ("SHIM_PUBLIC_HEALTH", json.dumps({"status": "ok", "mode": "fake"})),
+        (
+            "SHIM_PUBLIC_HEALTH",
+            json.dumps({"status": "ok", "mode": "live", "build_commit": "1" * 40}),
+        ),
+        (
+            "SHIM_LOCAL_HEALTH",
+            json.dumps({"status": "ok", "mode": "fake", "build_commit": "2" * 40}),
+        ),
+    ],
+)
+def test_private_release_health_requires_the_reviewed_build_and_mode(
+    tmp_path: Path, probe: str, payload: str
+) -> None:
+    env, state = rehearsal(
+        tmp_path,
+        PB_DEPLOY_TOPOLOGY="cloudrun-private-vm",
+        PB_PUBLIC_ORIGIN="https://offline.example.invalid",
+        PB_PRIVATE_VM_IP="10.40.0.2",
+        PB_PRIVATE_API_HOST="api.private.invalid",
+        PB_PRIVATE_TLS_PATH=str(tmp_path / "tls"),
+        **{probe: payload},
+    )
+    result = run_script("lifecycle.sh", "deploy", "--rehearse", str(state), env=env)
+    assert result.returncode == 5
+    assert (state / "PROCESSING_BLOCKED").exists()
+    assert not any("up -d --no-deps scheduler" in line for line in commands(tmp_path))
     assert (state / "PROCESSING_BLOCKED").exists()
 
 
@@ -423,6 +558,41 @@ def test_unknown_topology_refuses_before_any_host_command(tmp_path: Path) -> Non
     result = run_script("lifecycle.sh", "deploy", "--rehearse", str(state), env=env)
     assert result.returncode == 2
     assert commands(tmp_path) == []
+
+
+@pytest.mark.parametrize(
+    "failure", ["mutable", "missing", "commit", "split_backend", "mount", "image_label", "pull"]
+)
+def test_invalid_private_release_preserves_running_stack(tmp_path: Path, failure: str) -> None:
+    env, state = rehearsal(
+        tmp_path,
+        PB_DEPLOY_TOPOLOGY="cloudrun-private-vm",
+        PB_PUBLIC_ORIGIN="https://offline.example.invalid",
+        PB_PRIVATE_VM_IP="10.40.0.2",
+        PB_PRIVATE_API_HOST="api.private.invalid",
+        PB_PRIVATE_TLS_PATH=str(tmp_path / "tls"),
+    )
+    lock = Path(env["PB_RELEASE"]) / "deploy/private-images.json"
+    data = json.loads(lock.read_text())
+    if failure == "mutable":
+        data["services"]["api"]["image"] = "registry.invalid/pb/backend:latest"
+    elif failure == "commit":
+        data["x-pb-build-commit"] = "2" * 40
+    elif failure == "split_backend":
+        data["services"]["worker"] = data["services"]["caddy"]
+    elif failure == "mount":
+        data["services"]["scheduler"]["volumes"] = ["/unexpected"]
+    elif failure == "image_label":
+        env["SHIM_IMAGE_COMMIT"] = "3" * 40
+    elif failure == "pull":
+        env["SHIM_FAIL_MATCH"] = "pull api worker monitor caddy scheduler"
+    lock.write_text(json.dumps(data))
+    if failure == "missing":
+        lock.unlink()
+    result = run_script("lifecycle.sh", "rollback", "--rehearse", str(state), env=env)
+    assert result.returncode != 0
+    assert not any("stop scheduler" in line or " down " in line for line in commands(tmp_path))
+    assert not (state / "PROCESSING_BLOCKED").exists()
 
 
 def test_private_topology_requires_the_same_reviewed_public_origin(tmp_path: Path) -> None:

@@ -47,7 +47,8 @@ def test_retired_key_stays_present_and_nice_to_have() -> None:
     # Frozen findings.py indexes DEFAULT_TIERS for every FactKey; the key must exist.
     assert set(DEFAULT_TIERS) == set(FactKey)
     assert DEFAULT_TIERS[FactKey.CODE_EXCEPTIONS] is FactTier.NICE_TO_HAVE
-    assert frozenset({FactKey.CODE_EXCEPTIONS}) == RETIRED_KEYS
+    assert frozenset({FactKey.CODE_EXCEPTIONS, FactKey.GOVERNING_CODE_SECTION}) == RETIRED_KEYS
+    assert RETIRED_KEYS.isdisjoint(ANSWERABLE_KEYS)
     assert FactKey.CODE_EXCEPTIONS not in ANSWERABLE_KEYS
 
 
@@ -135,3 +136,105 @@ def test_customer_statement_stays_apart_from_administrative_facts() -> None:
     assert notes in letter.text[body_start:]
     assert "SF-998877" in letter.text[:body_start]
     assert "SF-998877" not in letter.text[body_start:]
+
+
+def test_rules_view_shows_official_instruction_and_both_sides_of_a_conflict() -> None:
+    from parkingbreaker.case_service import research_view
+    from parkingbreaker.research.questions import (
+        PacketPlan,
+        RequirementEvidence,
+        VerifiedRequirements,
+    )
+    from parkingbreaker.research.sources import AuthorityClass
+    from samples import source
+    from test_research_records import result_fixture
+
+    instruction = "Enter the provision printed on your notice in box four."
+    first = "The deadline is 21 days from issuance."
+    other = "The deadline is 30 days from issuance."
+    page = source(instruction + " " + first)
+    second = source(other, url="https://www.sfmta.com/appeal-form")
+    secondary = source(other, AuthorityClass.SECONDARY, url="https://example.org/guide")
+    proof = RequirementEvidence(instruction, (page.sha256,))
+    ordinance = source(
+        "OLD CODE: substantive provision.",
+        AuthorityClass.STATUTE,
+        url="https://example.gov/old-code",
+    )
+    old_code = Finding(
+        FactKey.GOVERNING_CODE_SECTION,
+        "OLD CODE",
+        FindingStatus.CONFIRMED,
+        ordinance.text,
+        (ordinance.sha256,),
+    )
+    candidate = Finding(FactKey.DEADLINE_DAYS, 21, FindingStatus.CONFIRMED, first, (page.sha256,))
+    conflict = replace(candidate, value=None, status=FindingStatus.CONFLICTED, verbatim_quote=None)
+    result = replace(
+        result_fixture(),
+        sources=(page, second, secondary, ordinance),
+        findings=(conflict, old_code),
+        candidates=(
+            candidate,
+            replace(
+                candidate,
+                value=30,
+                verbatim_quote=other,
+                source_sha256s=(second.sha256, secondary.sha256),
+            ),
+        ),
+        verified_requirements=VerifiedRequirements(code_required=proof),
+        packet_plan=PacketPlan(code_required=proof),
+    )
+    view = research_view(result)
+    assert view.jurisdiction == result.ticket.jurisdiction
+    assert view.stage == result.ticket.stage
+    assert [row.fact for row in view.findings] == ["DEADLINE_DAYS", "FILING_INSTRUCTION"]
+    deadline, rule = view.findings
+    assert deadline.status == "CONFLICTED"
+    assert [(p.quote, p.source_url) for p in deadline.passages] == [
+        (first, page.url),
+        (other, second.url),
+    ]
+    assert rule.status == "CONFIRMED"
+    assert [(p.quote, p.source_url) for p in rule.passages] == [(instruction, page.url)]
+    assert "OLD CODE" not in view.model_dump_json()
+    assert secondary.url not in view.model_dump_json()
+    assert ordinance.url not in view.model_dump_json()
+    missing = research_view(replace(result, sources=(second, secondary)))
+    assert missing.findings[-1].status == "UNKNOWN"
+    assert missing.findings[-1].passages == []
+
+
+def test_older_tier_evaluation_round_trips_and_reassessment_retires_the_lookup() -> None:
+    import json
+
+    from parkingbreaker.research.questions import RequirementEvidence, VerifiedRequirements
+    from parkingbreaker.research_records import decode_research, research_json
+    from test_research_records import result_fixture
+
+    current = result_fixture()
+    instruction = RequirementEvidence(
+        "Enter the provision shown on the notice.", (current.sources[0].sha256,)
+    )
+    legacy = replace(
+        current,
+        record_version=4,
+        verified_requirements=VerifiedRequirements(code_required=instruction),
+    )
+    frozen = research_json(legacy)
+    doc = json.loads(frozen)
+    evaluation = doc["payload"]["tier_context"]["evaluation"]
+    assert evaluation["tiers"]["GOVERNING_CODE_SECTION"] == "MUST_HAVE"
+    assert evaluation["promotions"][0]["evidence"]["verbatim_quote"] == instruction.verbatim_quote
+    saved = decode_research(frozen)
+    assert research_json(saved) == frozen
+    current = saved.reassess()
+    assert current.record_version == 5
+    assert current.tier_evaluation is not None
+    assert not current.tier_evaluation.promotions
+    assert not current.resolve().ready
+    assert FactKey.GOVERNING_CODE_SECTION not in {f.key for f in current.findings}
+    evaluation["promotions"] = []
+    with pytest.raises(ValueError, match="saved tier evaluation"):
+        decode_research(json.dumps(doc))

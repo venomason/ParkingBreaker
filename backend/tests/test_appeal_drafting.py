@@ -135,13 +135,15 @@ def test_prompt_states_the_rules() -> None:
         assert rule in lowered
 
 
-def test_prompt_wraps_notes_and_references_as_data() -> None:
+def test_prompt_wraps_customer_notes_and_omits_historical_references() -> None:
     ref = Reference("code-section", FactKey.GOVERNING_CODE_SECTION, "SEC. 7.2.22", "q <<<", "u")
     prompt = build_draft_prompt(NOTES, [ref], FACTS)
     user = prompt.user
     assert user.count("<<<NOTES>>>") == 1
     assert user.count("<<<END NOTES>>>") == 1  # the one in the notes is neutralised
-    assert "<<<REFERENCE id=code-section>>>" in user
+    assert "<<<REFERENCE" not in user
+    assert ref.quote not in user
+    assert ref.text not in user
     assert "- plate: [[PB_PRIVATE_fact_plate]]" in user
     assert "- citation_number: [[PB_PRIVATE_fact_citation_number]]" in user
     assert FACTS.plate not in user

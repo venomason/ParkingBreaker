@@ -46,7 +46,7 @@ from parkingbreaker.research.payment_effects import (
     unresolved_payment_rule,
 )
 from parkingbreaker.research.procedure import parse_assessment
-from parkingbreaker.research.questions import FactKey, Question
+from parkingbreaker.research.questions import ANSWERABLE_KEYS, FactKey, Question
 from parkingbreaker.research.sources import SourceRecord
 
 
@@ -128,7 +128,7 @@ FINDINGS_SCHEMA: dict[str, JsonValue] = {
                 "required": ["key", "status", "value", "verbatim_quote", "source_sha256s"],
                 "additionalProperties": False,
                 "properties": {
-                    "key": {"type": "string", "enum": [k.value for k in FactKey]},
+                    "key": {"type": "string", "enum": [k.value for k in ANSWERABLE_KEYS]},
                     "status": {"type": "string", "enum": [s.value for s in FindingStatus]},
                     "value": {},
                     "verbatim_quote": {"type": ["string", "null"]},

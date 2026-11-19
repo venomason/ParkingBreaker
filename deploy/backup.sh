@@ -41,11 +41,30 @@ failed() {
   fi
 }
 trap failed EXIT
-compose() { docker compose --env-file "$PB_ENV_FILE" -p parkingbreaker -f "$PB_RELEASE/compose.yaml" -f "$PB_RELEASE/deploy/compose.production.yaml" "$@"; }
+files=(-f "$PB_RELEASE/compose.yaml" -f "$PB_RELEASE/deploy/compose.production.yaml")
+topology=${PB_DEPLOY_TOPOLOGY:-single-vm}
+case $topology in
+  single-vm) ;;
+  cloudrun-private-vm)
+    image_lock="$PB_RELEASE/deploy/private-images.json"
+    python3 "$here/private-images.py" "$image_lock" "${PB_BUILD_COMMIT:?}" >/dev/null
+    files+=(-f "$PB_RELEASE/deploy/compose.private-vm.yaml" -f "$image_lock") ;;
+  *) echo 'unsupported deployment topology' >&2; exit 2 ;;
+esac
+compose() { docker compose --env-file "$PB_ENV_FILE" -p parkingbreaker "${files[@]}" "$@"; }
 name="scheduled-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 compose exec -T api python -m parkingbreaker.recovery_cli backup --data /data --output "/data/recovery/$name"
+copy_command=(python -m parkingbreaker.recovery_cli replicate --data "/data/recovery/$name" --output "/replica/$name")
+if [[ $topology == cloudrun-private-vm ]]; then
+  : "${PB_REPLICA_DIRECTORY:?private backup requires the independent network mount}"
+  # Check the host mount and the filesystem Docker actually bound. An unmounted
+  # directory can still exist (including between the host check and container start).
+  network_types=nfs,nfs4,cifs,fuse.sshfs
+  findmnt --noheadings --mountpoint "$PB_REPLICA_DIRECTORY" --types "$network_types" >/dev/null
+  copy_command=(sh -ec "findmnt --noheadings --mountpoint /replica --types $network_types >/dev/null; exec \"\$@\"" verify-mount "${copy_command[@]}")
+fi
 if [[ -n ${PB_REPLICA_DIRECTORY:-} ]]; then
   # Operator-mounted independent off-site transport: never a SQLite authority mount.
   [[ -d $PB_REPLICA_DIRECTORY && ! -L $PB_REPLICA_DIRECTORY ]]
-  compose run --rm --no-deps -v "$PB_REPLICA_DIRECTORY:/replica" api python -m parkingbreaker.recovery_cli replicate --data "/data/recovery/$name" --output "/replica/$name"
+  compose run --rm --no-deps -v "$PB_REPLICA_DIRECTORY:/replica" api "${copy_command[@]}"
 fi

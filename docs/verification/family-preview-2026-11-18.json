@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-18",
+  "url": "https://times-rising-woods-developmental.trycloudflare.com/",
+  "audience": "Anyone with the link",
+  "mode": "Static sample journey, temporary Cloudflare Quick Tunnel",
+  "origin": "pb-family-static.service (loopback only)",
+  "ingress": "pb-family-link.service",
+  "availability": "Requires the workstation, origin and tunnel to stay online. A new tunnel receives a new URL.",
+  "checks": {
+    "GET /": 200,
+    "GET /try-hurtle": 200,
+    "GET /api/health": 404,
+    "POST /api/cases": 405,
+    "GET /dev-worker/test/research": 404,
+    "GET /.git/config": 404,
+    "GET /.env": 404
+  },
+  "browser": {
+    "url": "https://times-rising-woods-developmental.trycloudflare.com/",
+    "title": "Try Hurtle Turtle · ParkingBreaker",
+    "sample": "Looks right",
+    "width": [
+      390,
+      390
+    ],
+    "images": [
+      64,
+      249,
+      195
+    ],
+    "errors": []
+  },
+  "desktop_rules": {
+    "title": "San Diego’s appeal rules",
+    "counts": "8 of 8 checks\n8 confirmed\n0 unknown\n0 conflicted",
+    "viewport": 1280
+  },
+  "current_android_preview": {
+    "receipt": "android-curbside-2026-11-18.json",
+    "change": "Curbside capture replaces Hurtle’s Block. The original family address serves the updated static journey."
+  },
+  "photo_illustrations": {
+    "date_local": "2026-11-18",
+    "link": "https://times-rising-woods-developmental.trycloudflare.com/try-hurtle?preview=family",
+    "visible_count": 5,
+    "originals_retained": [
+      "front",
+      "rear-right"
+    ],
+    "retired_original": "Straight-on rear view with the phone screen turned toward the car.",
+    "fixed_views": [
+      "ahead",
+      "behind-right",
+      "behind-left"
+    ],
+    "shared_statement": [
+      "As soon as you spot a ticket, start taking photos.",
+      "Get both sides of the ticket and photos of the area around your car. You can review them later and choose which ones accurately support what you’re saying."
+    ],
+    "visible_captions": 0,
+    "fixed_background_pixel_checks": [
+      {
+        "pose": "ahead",
+        "width": 1536,
+        "height": 1024,
+        "backgroundPixelsChecked": 1527647,
+        "backgroundPixelsChanged": 0
+      },
+      {
+        "pose": "behind-right",
+        "width": 1536,
+        "height": 1024,
+        "backgroundPixelsChecked": 1541963,
+        "backgroundPixelsChanged": 0
+      },
+      {
+        "pose": "behind-left",
+        "width": 1536,
+        "height": 1024,
+        "backgroundPixelsChecked": 1531596,
+        "backgroundPixelsChanged": 0
+      }
+    ],
+    "served_asset_sha256": {
+      "ahead.webp": "23d1951b1a6e91361f522bc2c6a14bd94f328ddc2f483dc38106f530b95671ae",
+      "behind-left.webp": "977ce1166a05be5cfaec19b70b64e56c13472b7014a4c97376bbd58fe2567ed3",
+      "behind-right.webp": "251e3e8d2d49d52ad21ba02330ed2dd7e6853e36f43cf7b204627cda4d78b1fd",
+      "front.webp": "5a2fbddc94a62ee15b51849d5917d2ea2496ffe8e2af545b823e1654f0b9d04f",
+      "rear-right.webp": "380e9414d53e6364029024a21957b1f10e2d1b66821137dbac2376c50bf61924",
+      "wide-street.webp": "0faaf9d603654a24f4a3e48ea68a450496d1e52b35cc8bf45635bc9c1dcca535"
+    },
+    "public_checks": {
+      "html_sha256": "65a5ad2d771ad750cf61b1c1551b9afb33add86a5ea32ee29420319c912b328f",
+      "endpoints": {
+        "/images/curbside/rear-panorama.webp": 404,
+        "/api/health": 404,
+        "/images/curbside/wide-street.webp": 200,
+        "/images/curbside/ahead.webp": 200,
+        "/images/curbside/behind-right.webp": 200,
+        "/images/curbside/behind-left.webp": 200
+      }
+    },
+    "browser_checks": "20 focused Playwright checks passed across the gallery, landing, accessibility and optional photo intake. TypeScript, ESLint and both production builds passed.",
+    "physical_device": {
+      "model": "A56",
+      "viewport": {
+        "width": 384,
+        "height": 640,
+        "pageWidth": 384
+      },
+      "result": "Tapped through five illustrations and returned to the sample ticket scan.",
+      "evidence": "output/playwright/curbside-statement/family.json"
+    }
+  }
+}

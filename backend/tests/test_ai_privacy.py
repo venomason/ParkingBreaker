@@ -254,7 +254,7 @@ def test_unrestorable_placeholders_fail_closed(kind: str) -> None:
     assert result.draft == Draft(())
 
 
-def test_context_identifiers_and_reference_tags_restore_without_token_collisions() -> None:
+def test_context_identifiers_restore_without_exposing_retired_references() -> None:
     facts = replace(FACTS, location=SENDER.address_lines[0], violation_description=SENDER.name)
     reference = Reference(
         f"exception-{FACTS.plate}", FactKey.CODE_EXCEPTIONS, EMAIL, PHONE, "https://sf.gov"
@@ -263,10 +263,10 @@ def test_context_identifiers_and_reference_tags_restore_without_token_collisions
     def produce(prompt: Prompt, attempt: int) -> JsonValue:
         location = re.search(r"^- location: (.+)$", prompt.user, re.MULTILINE)
         description = re.search(r"^- violation_description: (.+)$", prompt.user, re.MULTILINE)
-        ref = re.search(r"<<<REFERENCE id=(.+?)>>>\n(.+) \| quoted: (.+)", prompt.user)
         assert location
         assert description
-        assert ref
+        assert "<<<REFERENCE" not in prompt.user
+        assert "exception-" not in prompt.user
         return {
             "sentences": [
                 {"text": location[1], "support": ["fact:location"], "paragraph": 0},
@@ -275,7 +275,6 @@ def test_context_identifiers_and_reference_tags_restore_without_token_collisions
                     "support": ["fact:violation_description"],
                     "paragraph": 0,
                 },
-                {"text": f"{ref[2]} | {ref[3]}", "support": [ref[1]], "paragraph": 1},
             ]
         }
 
@@ -287,7 +286,6 @@ def test_context_identifiers_and_reference_tags_restore_without_token_collisions
         (
             DraftSentence(SENDER.address_lines[0], ("fact:location",)),
             DraftSentence(SENDER.name, ("fact:violation_description",)),
-            DraftSentence(f"{EMAIL} | {PHONE}", (reference.id,), 1),
         )
     )
     assert (

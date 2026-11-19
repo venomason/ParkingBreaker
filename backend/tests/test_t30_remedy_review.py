@@ -149,6 +149,7 @@ async def test_remail_re_renders_the_packet_with_the_corrected_destination(
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         corrected = mailing.correct_destination()
+        mailing.approve_remail()
         mailing.sweep()
         assert mailing.case.attempt == 2
         first = mailing.store.get(mailing.token, 1)
@@ -339,6 +340,7 @@ async def test_status_reports_the_final_outcome_of_a_rejected_remail(
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
+        mailing.approve_remail()
         mailing.lob.script = [LobResponse(422, error="synthetic invalid mail request")]
         mailing.sweep(12)
         assert mailing.case.attempt == 2
@@ -406,6 +408,8 @@ async def test_f1_structural_redirect_preserves_statement_or_refunds_without_rem
         assert address_block(mailing.original.address).encode() in adopted.split(b"\n\n", 3)[3]
         mailing.confirm_return()
         corrected = mailing.correct_destination()
+        if not mismatched_header:
+            mailing.approve_remail()
         mailing.sweep()
         if mismatched_header:
             assert len(mailing.lob.calls) == 1, "a mismatched header was re-mailed"
@@ -614,7 +618,7 @@ async def test_f5_local_gate_refusal_does_not_blame_the_mail_provider(
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
-        mailing.real._resolve_return(mailing.case_id)
+        mailing.approve_remail()
         latest = mailing.store.latest_destination_decision(mailing.case_id, mailing.original.owner)
         assert latest is not None
         address = replace(latest.decision.address, line1="1000 Newer Verified Correction")
@@ -649,6 +653,7 @@ async def test_f5_second_return_reports_its_own_outcome(
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
+        mailing.approve_remail()
         mailing.sweep()
         assert mailing.case.attempt == 2
         post_return(mailing, event_id="second-return")
@@ -783,6 +788,7 @@ async def test_f2_signed_remail_preserves_original_pixels_end_to_end(
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         mailing.confirm_return()
         mailing.correct_destination()
+        mailing.approve_remail()
         mailing.sweep()
         second = mailing.store.get(mailing.token, 2)
         assert second is not None

@@ -30,6 +30,19 @@ from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any, Final, Protocol, runtime_checkable
 
+from parkingbreaker.journey_context import (
+    ContextFunding,
+    ContextOperation,
+    ContextReason,
+    JourneyEventContext,
+    JourneyReference,
+    ReferenceState,
+    decode_context,
+    initialize_journey_event_context,
+)
+from parkingbreaker.journey_context import (
+    JourneyBuildIdentity as JourneyBuildIdentity,
+)
 from parkingbreaker.mail_attempt_store import (
     StorageCorruption,
     check_versions_schema,
@@ -98,6 +111,128 @@ _DDL: Final[tuple[tuple[str, str], ...]] = (
 )
 
 
+CAPTURE_COMPONENT: Final[str] = "journey_capture"
+CAPTURE_VERSION: Final[int] = 1
+_CAPTURE_DDL: Final[str] = """CREATE TABLE pb_journey_capture (
+    journey_id TEXT PRIMARY KEY REFERENCES pb_journey_links(journey_id),
+    started_at TEXT,
+    start_basis TEXT NOT NULL CHECK (start_basis IN (
+        'workspace_created', 'first_durable_attempt', 'first_durable_event', 'legacy_unknown'
+    )),
+    build_sha256 TEXT CHECK (build_sha256 IS NULL OR
+        (length(build_sha256) = 64 AND build_sha256 NOT GLOB '*[^0-9a-f]*')),
+    config_sha256 TEXT CHECK (config_sha256 IS NULL OR
+        (length(config_sha256) = 64 AND config_sha256 NOT GLOB '*[^0-9a-f]*')),
+    CHECK ((start_basis = 'legacy_unknown' AND started_at IS NULL)
+        OR (start_basis != 'legacy_unknown' AND started_at IS NOT NULL))
+)"""
+
+
+class CaptureStartBasis(StrEnum):
+    WORKSPACE_CREATED = "workspace_created"
+    FIRST_DURABLE_ATTEMPT = "first_durable_attempt"
+    FIRST_DURABLE_EVENT = "first_durable_event"
+    LEGACY_UNKNOWN = "legacy_unknown"
+
+
+@dataclass(frozen=True)
+class JourneyCapture:
+    """Recorded capture start, not a claim of complete event or attempt coverage."""
+
+    journey_id: str
+    started_at: datetime | None
+    start_basis: CaptureStartBasis
+    identity: JourneyBuildIdentity
+
+
+def _initialize_journey_capture(database: sqlite3.Connection) -> None:
+    # Invoked inside the ledger initializer transaction. Never infer old capture
+    # start from a workspace/event timestamp or assign this build to historical rows.
+    version = database.execute(
+        "SELECT version FROM pb_store_versions WHERE component=?", (CAPTURE_COMPONENT,)
+    ).fetchone()
+    table = database.execute(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='pb_journey_capture'"
+    ).fetchone()
+    if version is None:
+        if table is not None:
+            raise StorageCorruption("unversioned journey capture schema")
+        database.execute(_CAPTURE_DDL)
+        database.execute(
+            "INSERT INTO pb_journey_capture (journey_id, started_at, start_basis) "
+            "SELECT journey_id, NULL, 'legacy_unknown' FROM pb_journey_links"
+        )
+        database.execute(
+            "INSERT INTO pb_store_versions VALUES (?, ?)", (CAPTURE_COMPONENT, CAPTURE_VERSION)
+        )
+    elif (
+        version != (CAPTURE_VERSION,)
+        or table is None
+        or " ".join(table[0].upper().split()) != " ".join(_CAPTURE_DDL.upper().split())
+    ):
+        raise StorageCorruption("malformed journey capture schema")
+    # A missing row is corruption, never permission to backfill modern provenance.
+    if (
+        database.execute(
+            "SELECT 1 FROM pb_journey_links l LEFT JOIN pb_journey_capture c "
+            "ON c.journey_id=l.journey_id WHERE c.journey_id IS NULL LIMIT 1"
+        ).fetchone()
+        is not None
+    ):
+        raise StorageCorruption("missing journey capture provenance")
+    for action in ("UPDATE", "DELETE"):
+        database.execute(
+            f"CREATE TRIGGER IF NOT EXISTS pb_journey_capture_no_{action.lower()} "
+            f"BEFORE {action} ON pb_journey_capture "
+            "BEGIN SELECT RAISE(ABORT, 'journey capture is immutable'); END"
+        )
+
+
+def ensure_journey_identity_in_transaction(
+    database: _ConnectionLike,
+    *,
+    workspace_token: str,
+    at: datetime,
+    basis: CaptureStartBasis,
+    identity: JourneyBuildIdentity | None = None,
+) -> str:
+    """Allocate identity and capture together with the caller's durable creation."""
+    if not database.in_transaction:
+        raise StorageCorruption("journey identity requires active transaction")
+    workspace = _validate_workspace_token(workspace_token)
+    at = _to_utc(at, "capture start")
+    if type(basis) is not CaptureStartBasis or basis is CaptureStartBasis.LEGACY_UNKNOWN:
+        raise ValueError("new capture requires an observed start basis")
+    if identity is not None and type(identity) is not JourneyBuildIdentity:
+        raise ValueError("invalid journey build identity")
+    _assert_initialized(database)
+    row = database.execute(
+        "SELECT journey_id FROM pb_journey_links WHERE workspace_token=?", (workspace,)
+    ).fetchone()
+    if row is not None:
+        if type(row[0]) is not str or _JOURNEY_ID_RE.fullmatch(row[0]) is None:
+            raise StorageCorruption("malformed stored journey link")
+        if (
+            database.execute(
+                "SELECT 1 FROM pb_journey_capture WHERE journey_id=?", (row[0],)
+            ).fetchone()
+            is None
+        ):
+            raise StorageCorruption("missing journey capture provenance")
+        return row[0]
+    resolved = identity or JourneyBuildIdentity()
+    journey_id = f"jrn_{uuid.uuid4().hex}"
+    database.execute(
+        "INSERT INTO pb_journey_links VALUES (?, ?, ?)",
+        (workspace, journey_id, at.isoformat()),
+    )
+    database.execute(
+        "INSERT INTO pb_journey_capture VALUES (?, ?, ?, ?, ?)",
+        (journey_id, at.isoformat(), basis.value, resolved.build_sha256, resolved.config_sha256),
+    )
+    return journey_id
+
+
 class JourneyEventConflict(ValueError):
     """Stable refusal code when an occurrence key replays with conflicting content."""
 
@@ -144,6 +279,41 @@ _ALLOWED_OUTCOMES: Final[dict[JourneyEventKind, frozenset[JourneyEventOutcome]]]
     JourneyEventKind.PACKET_APPROVED: frozenset({JourneyEventOutcome.SUCCEEDED}),
 }
 
+_CONTEXT_OPERATIONS: Final = {
+    JourneyEventKind.TICKET_READ: ContextOperation.OCR_EXTRACT,
+    JourneyEventKind.TICKET_READ_REFUSED: ContextOperation.OCR_EXTRACT,
+    JourneyEventKind.TICKET_READ_UNKNOWN: ContextOperation.OCR_EXTRACT,
+    JourneyEventKind.FACTS_CONFIRMED: ContextOperation.FACT_CONFIRMATION,
+    JourneyEventKind.INTAKE_SUBMITTED: ContextOperation.INTAKE_SUBMISSION,
+    JourneyEventKind.HOLD_AUTHORIZED: ContextOperation.PAYMENT_AUTHORIZATION,
+    JourneyEventKind.PACKET_APPROVED: ContextOperation.PACKET_APPROVAL,
+}
+
+
+def _validate_context(
+    context: JourneyEventContext | None,
+    kind: JourneyEventKind,
+    outcome: JourneyEventOutcome,
+    duration_ms: int | None,
+) -> None:
+    if context is None:
+        return
+    if type(context) is not JourneyEventContext:
+        raise ValueError("context must be JourneyEventContext")
+    context.validate_duration(duration_ms)
+    if context.operation not in {_CONTEXT_OPERATIONS[kind], ContextOperation.UNKNOWN}:
+        raise ValueError("context operation disagrees with event kind")
+    reason = {
+        JourneyEventOutcome.SUCCEEDED: ContextReason.NOT_APPLICABLE,
+        JourneyEventOutcome.REFUSED: ContextReason.READING_REFUSED,
+        JourneyEventOutcome.UNKNOWN: ContextReason.READING_RESULT_UNKNOWN,
+    }[outcome]
+    if context.reason not in {reason, ContextReason.UNKNOWN}:
+        raise ValueError("context reason disagrees with event outcome")
+    if kind is JourneyEventKind.HOLD_AUTHORIZED and context.funding is ContextFunding.FREE_BETA:
+        raise ValueError("no-charge journey cannot claim a paid hold")
+
+
 _EVENT_FIELDS: Final[frozenset[str]] = frozenset(
     {
         "event_id",
@@ -170,6 +340,7 @@ _INPUT_FIELDS: Final[frozenset[str]] = frozenset(
         "cost_cents",
         "cost_status",
         "schema_version",
+        "context",
     }
 )
 
@@ -293,6 +464,7 @@ class JourneyEventInput:
     cost_cents: int | None = None
     cost_status: CostStatus = CostStatus.NOT_APPLICABLE
     schema_version: int = SCHEMA_VERSION
+    context: JourneyEventContext | None = None
 
     def __post_init__(self) -> None:
         kind = _validate_enum(self.kind, JourneyEventKind, "kind")
@@ -310,6 +482,7 @@ class JourneyEventInput:
             _bounded_int(self.duration_ms, "duration_ms", minimum=0, maximum=MAX_DURATION_MS)
         cost_status = _validate_enum(self.cost_status, CostStatus, "cost_status")
         _validate_cost(self.cost_cents, cost_status)
+        _validate_context(self.context, kind, outcome, self.duration_ms)
 
     @classmethod
     def from_mapping(cls, data: Mapping[str, object]) -> JourneyEventInput:
@@ -353,6 +526,9 @@ class JourneyEventInput:
             cost_cents=cost_cents,
             cost_status=cost_status,
             schema_version=schema_version,
+            context=JourneyEventContext.from_mapping(data["context"])
+            if "context" in data
+            else None,
         )
 
 
@@ -375,6 +551,7 @@ class JourneyEvent:
     duration_ms: int | None
     cost_cents: int | None
     cost_status: CostStatus
+    context: JourneyEventContext | None = None
 
     def __post_init__(self) -> None:
         if type(self.event_id) is not str or _EVENT_ID_RE.fullmatch(self.event_id) is None:
@@ -395,9 +572,10 @@ class JourneyEvent:
             _bounded_int(self.duration_ms, "duration_ms", minimum=0, maximum=MAX_DURATION_MS)
         cost_status = _validate_enum(self.cost_status, CostStatus, "cost_status")
         _validate_cost(self.cost_cents, cost_status)
+        _validate_context(self.context, kind, outcome, self.duration_ms)
 
     def to_dict(self) -> dict[str, object]:
-        return {
+        result: dict[str, object] = {
             "event_id": self.event_id,
             "journey_id": self.journey_id,
             "seq": self.seq,
@@ -411,13 +589,17 @@ class JourneyEvent:
             "cost_status": self.cost_status.value,
         }
 
+        if self.context is not None:
+            result["context"] = self.context.to_dict()
+        return result
+
     @classmethod
     def from_mapping(cls, data: Mapping[str, object]) -> JourneyEvent:
         """Strictly parse a closed public event mapping, rejecting extra fields."""
         if not isinstance(data, Mapping):
             raise ValueError("event must be a mapping")
         keys = set(data.keys())
-        if keys != _EVENT_FIELDS:
+        if keys not in (_EVENT_FIELDS, _EVENT_FIELDS | {"context"}):
             raise ValueError("journey event keys must match the closed schema exactly")
         event_id = data["event_id"]
         journey_id = data["journey_id"]
@@ -456,6 +638,9 @@ class JourneyEvent:
             duration_ms=duration_ms,
             cost_cents=cost_cents,
             cost_status=cost_status,
+            context=JourneyEventContext.from_mapping(data["context"])
+            if "context" in data
+            else None,
         )
 
 
@@ -599,6 +784,8 @@ def initialize_journey_events(database: sqlite3.Connection) -> None:
                     f"BEFORE {action} ON {table} "
                     f"BEGIN SELECT RAISE(ABORT, '{message}'); END"
                 )
+        _initialize_journey_capture(database)
+        initialize_journey_event_context(database)
         database.execute("COMMIT")
     except Exception:
         if database.in_transaction:
@@ -607,7 +794,7 @@ def initialize_journey_events(database: sqlite3.Connection) -> None:
 
 
 def _decode_event_row(row: tuple[Any, ...]) -> JourneyEvent:
-    if len(row) != 11:
+    if len(row) not in (11, 12):
         raise StorageCorruption("malformed stored journey event")
     (
         event_id,
@@ -621,7 +808,7 @@ def _decode_event_row(row: tuple[Any, ...]) -> JourneyEvent:
         duration_ms,
         cost_cents,
         cost_status_text,
-    ) = row
+    ) = row[:11]
     try:
         if type(occurred_text) is not str or type(recorded_text) is not str:
             raise ValueError("invalid stored timestamp")
@@ -637,6 +824,7 @@ def _decode_event_row(row: tuple[Any, ...]) -> JourneyEvent:
             duration_ms=duration_ms,
             cost_cents=cost_cents,
             cost_status=_parse_enum(cost_status_text, CostStatus, "cost_status"),
+            context=decode_context(row[11]) if len(row) == 12 else None,
         )
     except (TypeError, ValueError) as exc:
         raise StorageCorruption(f"malformed stored journey event: {exc}") from exc
@@ -652,6 +840,27 @@ def _rollback_preserving_error(database: _ConnectionLike) -> None:
     except Exception as rollback_error:
         if original is not None:
             original.add_note(f"ROLLBACK also failed: {rollback_error!r}")
+
+
+def prior_journey_event_reference_in_transaction(
+    database: _ConnectionLike, *, workspace_token: str, occurrence_key: str
+) -> JourneyReference:
+    """Reference an exact recorded predecessor in this workspace, never infer one."""
+    if not database.in_transaction:
+        raise StorageCorruption("journey predecessor lookup requires active transaction")
+    workspace = _validate_workspace_token(workspace_token)
+    occurrence = _validate_occurrence_key(occurrence_key)
+    _assert_initialized(database)
+    row = database.execute(
+        "SELECT e.event_id FROM pb_journey_events e JOIN pb_journey_links l "
+        "ON l.journey_id=e.journey_id WHERE l.workspace_token=? AND e.occurrence_sha256=?",
+        (workspace, _occurrence_sha256(occurrence)),
+    ).fetchone()
+    if row is None:
+        return JourneyReference()
+    if type(row[0]) is not str or _EVENT_ID_RE.fullmatch(row[0]) is None:
+        raise StorageCorruption("malformed predecessor identity")
+    return JourneyReference(ReferenceState.KNOWN, row[0])
 
 
 def append_journey_event_in_transaction(
@@ -685,29 +894,31 @@ def append_journey_event_in_transaction(
             resolved_recorded_at = _to_utc(raw_now, "recorded_at")
         return resolved_recorded_at
 
+    # Preserve lazy fallback for legacy/internal callers, but new workspaces
+    # already have identity before their first event. Replays do not read the clock.
     link_row = database.execute(
-        "SELECT journey_id FROM pb_journey_links WHERE workspace_token=?",
-        (workspace,),
+        "SELECT journey_id FROM pb_journey_links WHERE workspace_token=?", (workspace,)
     ).fetchone()
     if link_row is None:
-        journey_id = f"jrn_{uuid.uuid4().hex}"
-        database.execute(
-            "INSERT INTO pb_journey_links (workspace_token, journey_id, created_at) "
-            "VALUES (?, ?, ?)",
-            (workspace, journey_id, _recorded_at().isoformat()),
+        journey_id = ensure_journey_identity_in_transaction(
+            database,
+            workspace_token=workspace,
+            at=_recorded_at(),
+            basis=CaptureStartBasis.FIRST_DURABLE_EVENT,
         )
     else:
-        raw_journey_id = link_row[0]
-        if type(raw_journey_id) is not str or _JOURNEY_ID_RE.fullmatch(raw_journey_id) is None:
+        if type(link_row[0]) is not str or _JOURNEY_ID_RE.fullmatch(link_row[0]) is None:
             raise StorageCorruption("malformed stored journey link")
-        journey_id = raw_journey_id
+        journey_id = link_row[0]
 
     occ_sha = _occurrence_sha256(occurrence)
     content_sha = _content_sha256(journey_id, event)
     existing = database.execute(
-        "SELECT content_sha256, event_id, journey_id, seq, kind, outcome, schema_version, "
-        "occurred_at, recorded_at, duration_ms, cost_cents, cost_status "
-        "FROM pb_journey_events WHERE occurrence_sha256=?",
+        "SELECT e.content_sha256, e.event_id, e.journey_id, e.seq, e.kind, e.outcome, "
+        "e.schema_version, e.occurred_at, e.recorded_at, e.duration_ms, e.cost_cents, "
+        "e.cost_status, c.context_json FROM pb_journey_events e "
+        "LEFT JOIN pb_journey_event_context c ON c.event_id=e.event_id "
+        "WHERE e.occurrence_sha256=?",
         (occ_sha,),
     ).fetchone()
     if existing is not None:
@@ -717,6 +928,14 @@ def append_journey_event_in_transaction(
         stored_event = _decode_event_row(existing[1:])
         if stored_event.journey_id != journey_id or stored_sha != content_sha:
             raise JourneyEventConflict("journey_event_occurrence_conflict")
+        if (
+            stored_event.context is not None
+            and event.context is not None
+            and stored_event.context != event.context
+        ):
+            raise JourneyEventConflict("journey_event_context_conflict")
+        # A legacy replay never receives newly invented historical context. An
+        # omitted context also cannot erase an already-recorded context.
         return stored_event
 
     recorded_at = _recorded_at()
@@ -727,6 +946,13 @@ def append_journey_event_in_transaction(
     if seq_row is None or type(seq_row[0]) is not int or seq_row[0] < 1:
         raise StorageCorruption("invalid stored journey sequence")
     next_seq = seq_row[0]
+    if event.context is not None and event.context.causation_ref.status is ReferenceState.KNOWN:
+        predecessor = database.execute(
+            "SELECT seq FROM pb_journey_events WHERE event_id=? AND journey_id=?",
+            (event.context.causation_ref.opaque_id, journey_id),
+        ).fetchone()
+        if predecessor is None or type(predecessor[0]) is not int or predecessor[0] >= next_seq:
+            raise ValueError("causation requires an earlier recorded event in the same journey")
     event_id = f"evt_{uuid.uuid4().hex}"
     database.execute(
         "INSERT INTO pb_journey_events "
@@ -749,6 +975,11 @@ def append_journey_event_in_transaction(
             event.cost_status.value,
         ),
     )
+    if event.context is not None:
+        database.execute(
+            "INSERT INTO pb_journey_event_context VALUES (?, ?)",
+            (event_id, event.context.to_json()),
+        )
     return JourneyEvent(
         event_id=event_id,
         journey_id=journey_id,
@@ -761,6 +992,7 @@ def append_journey_event_in_transaction(
         duration_ms=event.duration_ms,
         cost_cents=event.cost_cents,
         cost_status=event.cost_status,
+        context=event.context,
     )
 
 
@@ -875,9 +1107,11 @@ def read_journey_events(
             return JourneyEventPage(journey_id=None, events=(), next_after_seq=None)
 
         rows = database.execute(
-            "SELECT event_id, journey_id, seq, kind, outcome, schema_version, "
-            "occurred_at, recorded_at, duration_ms, cost_cents, cost_status "
-            "FROM pb_journey_events WHERE journey_id=? AND seq>? ORDER BY seq ASC LIMIT ?",
+            "SELECT e.event_id, e.journey_id, e.seq, e.kind, e.outcome, e.schema_version, "
+            "e.occurred_at, e.recorded_at, e.duration_ms, e.cost_cents, "
+            "e.cost_status, c.context_json "
+            "FROM pb_journey_events e LEFT JOIN pb_journey_event_context c "
+            "ON c.event_id=e.event_id WHERE e.journey_id=? AND e.seq>? ORDER BY e.seq ASC LIMIT ?",
             (resolved_journey_id, after_seq, limit + 1),
         ).fetchall()
         decoded = tuple(_decode_event_row(item) for item in rows)
@@ -897,8 +1131,52 @@ def read_journey_events(
         raise
 
 
+def read_journey_capture(
+    database: _ConnectionLike, *, workspace_token: str, owner: str | None = None
+) -> JourneyCapture | None:
+    """Internal scoped snapshot; never exports workspace tokens or customer data."""
+    owns_tx = not database.in_transaction
+    if owns_tx:
+        database.execute("BEGIN")
+    try:
+        page = read_journey_events(database, workspace_token=workspace_token, owner=owner, limit=1)
+        result = None
+        if page.journey_id is not None:
+            row = database.execute(
+                "SELECT started_at, start_basis, build_sha256, config_sha256 "
+                "FROM pb_journey_capture WHERE journey_id=?",
+                (page.journey_id,),
+            ).fetchone()
+            if row is None:
+                raise StorageCorruption("missing journey capture provenance")
+            try:
+                basis = CaptureStartBasis(row[1])
+                started = None if row[0] is None else _parse_datetime_value(row[0], "capture start")
+                if (basis is CaptureStartBasis.LEGACY_UNKNOWN) != (started is None):
+                    raise ValueError("invalid capture start")
+                result = JourneyCapture(
+                    page.journey_id, started, basis, JourneyBuildIdentity(row[2], row[3])
+                )
+            except (ValueError, TypeError) as exc:
+                raise StorageCorruption("malformed journey capture provenance") from exc
+        if owns_tx:
+            database.execute("COMMIT")
+        return result
+    except Exception:
+        if owns_tx and database.in_transaction:
+            _rollback_preserving_error(database)
+        raise
+
+
 class JourneyEventsStoreMixin:
     """Typed journey ledger read surface for SqliteTransactionStore."""
+
+    def journey_capture(
+        self: _ConnectionOwner, *, workspace_token: str, owner: str | None = None
+    ) -> JourneyCapture | None:
+        return read_journey_capture(
+            self._require_open(), workspace_token=workspace_token, owner=owner
+        )
 
     def journey_events(
         self: _ConnectionOwner,

@@ -59,6 +59,20 @@ and the CLI does not guess it because it does not read the process environment.
 
 ## Safety rules
 
+The durable checkout reads `PB_PAID_COHORT_CAP` from the backend environment. In live
+mode an omitted value admits zero new paid appeals. Durable fake and test modes
+can exercise any explicit nonnegative cap. The volatile preview cannot enforce one.
+Use the same approved value on all writers of the same database. A phase override
+to `paid` still respects the cap.
+
+The limit counts distinct appeals over the lifetime of the transaction database.
+The first committed payment intent reserves a place, including a declined or uncertain
+attempt. Retry and recovery for that appeal reuse its place. An older paid case counts
+even if it predates the attempt ledger. Closing a case, releasing a hold or issuing a
+refund does not reopen capacity. Selected free entitlements use no paid places.
+When full, the customer sees a saved-work message before card entry. If the last
+place fills during checkout, the server refuses the new hold and refreshes the case.
+
 - Every successful change is one append-only row with revision, exact phase, command ID,
   named actor, reason and UTC timestamp.
 - `--expected-revision` must equal the current revision (`0` when none). A stale value

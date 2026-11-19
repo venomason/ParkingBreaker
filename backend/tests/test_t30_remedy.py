@@ -23,11 +23,12 @@ import json
 from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass, replace
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from httpx2 import ASGITransport, AsyncClient
 
 from mail_samples import seed_approval
 from parkingbreaker import case_state as cs
@@ -44,10 +45,14 @@ from parkingbreaker.address_policy import (
     remedy_for_responsibility,
 )
 from parkingbreaker.api import schemas as s
+from parkingbreaker.api.app import create_app
+from parkingbreaker.api.service import ServiceConflict
+from parkingbreaker.approval_manifest import build_remail_approval_manifest
 from parkingbreaker.case_service import CaseService
 from parkingbreaker.intake_store import IntakeConflict
 from parkingbreaker.lob_fakes import FakeLobClient
 from parkingbreaker.lob_submission import LetterEvidence, LobResponse
+from parkingbreaker.mail_request import envelope_sha256
 from parkingbreaker.payment_fakes import FakePaymentClient, full_outcome
 from parkingbreaker.payment_records import PaymentOutcome
 from parkingbreaker.payment_state import PaymentEffect, PaymentState
@@ -56,7 +61,14 @@ from parkingbreaker.state_table import IllegalTransition
 from parkingbreaker.transaction_records import CaseRecord
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from prepared_packet_support import redirected_pdf
-from test_case_service import Clock, approve_with_preview, drafting_case, fake_resolution
+from test_case_service import (
+    ALICE,
+    BOB,
+    Clock,
+    approve_with_preview,
+    drafting_case,
+    fake_resolution,
+)
 from test_payment_coordinator import compensation_client
 from test_stripe_payment import CHARGE
 
@@ -117,6 +129,23 @@ class Mailing:
         deps = self.real._deps
         self.store.close()
         self.real = CaseService(replace(deps, store=SqliteTransactionStore(self.path)))
+
+    def remail_approval(self) -> s.Approve:
+        saved = self.store.get_draft(self.case_id)
+        assert saved is not None
+        assert saved.adopted_sha256 is not None
+        packet = self.real.packet_preview(
+            self.case_id, s.PacketPreviewRequest(adopted_sha256=saved.adopted_sha256, remail=True)
+        )
+        return s.Approve(
+            remail=True,
+            adopted_sha256=saved.adopted_sha256,
+            packet_sha256=packet.packet_sha256,
+            envelope_sha256=packet.envelope_sha256,
+        )
+
+    def approve_remail(self) -> None:
+        self.real.approve(self.case_id, self.remail_approval())
 
     def sweep(self, count: int = 8) -> None:
         # Each bounded invocation can do only one payment operation. Reopen every
@@ -348,9 +377,14 @@ def assert_full_refund(mailing: Mailing) -> None:
     assert_one_charge(mailing)
 
 
-@pytest.mark.parametrize("correction_available", [False, True])
+@pytest.mark.parametrize(
+    ("correction_available", "deadline_expired"), [(False, True), (True, False), (True, True)]
+)
 async def test_system_verified_wrong_destination_always_full_refund(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, correction_available: bool
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    correction_available: bool,
+    deadline_expired: bool,
 ) -> None:
     async with mailed_case(tmp_path, monkeypatch) as mailing:
         original = mailing.store.get(mailing.token, 1)
@@ -361,7 +395,7 @@ async def test_system_verified_wrong_destination_always_full_refund(
         )
         if correction_available:
             mailing.correct_destination()
-        else:
+        if deadline_expired:
             mailing.clock.now += timedelta(days=120)
         responsibility = classify_address_failure(mailing.original, facts)
         assert responsibility.unconditional_full_refund
@@ -414,7 +448,7 @@ async def test_frozen_customer_instruction_keeps_exclusion_after_verified_correc
 
 
 @pytest.mark.parametrize("directed", [False, True])
-async def test_unknown_cause_automatically_remails_to_persisted_verified_correction(
+async def test_unknown_cause_remails_only_after_fresh_exact_approval(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, directed: bool
 ) -> None:
     async with mailed_case(tmp_path, monkeypatch, directed=directed) as mailing:
@@ -422,9 +456,40 @@ async def test_unknown_cause_automatically_remails_to_persisted_verified_correct
         facts = mailing.confirm_return(reason=UspsReturnReason.NO_SUCH_NUMBER)
         assert not classify_address_failure(mailing.original, facts).exclusion_applies
         corrected = mailing.correct_destination()
+        approval = mailing.remail_approval()
+        first_approval = mailing.store.get_approval_manifest(mailing.token, 1)
+        assert first_approval is not None
+        mailing.sweep(2)
+        assert mailing.case.letter_state is cs.CaseState.RETURNED
+        assert mailing.store.get(mailing.token, 2) is None
+        assert len(mailing.lob.calls) == 1
+        assert first is not None
+        with pytest.raises(ServiceConflict, match="packet_preview_mismatch"):
+            mailing.real.approve(
+                mailing.case_id,
+                approval.model_copy(update={"envelope_sha256": envelope_sha256(first.request)}),
+            )
+        mailing.clock.now += timedelta(minutes=1)
+        async with AsyncClient(
+            transport=ASGITransport(app=create_app(mailing.real)), base_url="http://real.test"
+        ) as client:
+            path = f"/cases/{mailing.case_id}/approval"
+            foreign = await client.post(path, headers=BOB, json=approval.model_dump(mode="json"))
+            assert foreign.status_code == 404
+            accepted = await client.post(path, headers=ALICE, json=approval.model_dump(mode="json"))
+            assert accepted.status_code == 200, accepted.text
+        manifest = mailing.store.get_approval_manifest(mailing.token, 2)
+        assert manifest is not None
+        assert datetime.fromisoformat(manifest.approved_at_utc) == mailing.clock()
+        assert manifest.approved_at_utc > first_approval.approved_at_utc
+        assert manifest.packet_pdf_sha256 == approval.packet_sha256
+        assert manifest.envelope_sha256 == approval.envelope_sha256
+        mailing.restart()
+        mailing.real.approve(mailing.case_id, approval)
         mailing.sweep()
-        assert mailing.case.attempt == 2, "No automatic free re-mail was scheduled"
-        assert mailing.case.letter_state is cs.CaseState.IN_TRANSIT
+        remailing = mailing.case
+        assert remailing.attempt == 2
+        assert remailing.letter_state is cs.CaseState.IN_TRANSIT
         second = mailing.store.get(mailing.token, 2)
         assert second is not None
         assert second.request.recipient == corrected.address
@@ -436,6 +501,53 @@ async def test_unknown_cause_automatically_remails_to_persisted_verified_correct
         assert_one_charge(mailing)
         mailing.sweep(3)
         assert len(mailing.lob.calls) == 2
+        assert_one_charge(mailing)
+
+
+@pytest.mark.parametrize("legacy", ["inherited_text", "inherited_timestamp"])
+async def test_second_create_rejects_legacy_inherited_approval(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, legacy: str
+) -> None:
+    async with mailed_case(tmp_path, monkeypatch) as mailing:
+        first = mailing.store.get(mailing.token, 1)
+        manifest = mailing.store.get_approval_manifest(mailing.token, 1)
+        saved = mailing.store.get_draft(mailing.case_id)
+        assert first is not None
+        assert manifest is not None
+        assert saved is not None
+        mailing.confirm_return()
+        correction = mailing.correct_destination()
+        mailing.clock.now += timedelta(minutes=1)
+        # Reproduce a frozen attempt from before explicit remail approval was enforced.
+        request = replace(
+            first.request,
+            submission_token=uuid4().hex,
+            recipient=correction.address,
+            pdf=redirected_pdf(mailing.real, mailing.case_id, correction.address),
+        )
+        mailing.store.prepare(mailing.token, 2, request, mailing.clock())
+        mailing.store.record_approval_manifest(
+            build_remail_approval_manifest(
+                manifest,
+                request,
+                approved_at=mailing.clock() if legacy == "inherited_text" else first.prepared_at,
+                approved_text=saved.letter_text
+                if legacy == "inherited_text"
+                else "Synthetic changed letter",
+                affirmations=manifest.affirmations,
+            )
+        )
+        mailing.store.apply_letter_event(
+            mailing.token,
+            cs.RemailRequested(),
+            mailing.case.revision,
+            occurred_at=mailing.clock(),
+            new_effect_id=lambda: uuid4().hex,
+        )
+        mailing.restart()
+        mailing.sweep(12)
+        assert len(mailing.lob.calls) == 1
+        assert_full_refund(mailing)
         assert_one_charge(mailing)
 
 
@@ -500,6 +612,7 @@ async def test_agency_side_return_preserves_proof_packet_remedy(
         assert responsibility.responsibility is Responsibility.AGENCY_SIDE_EXISTING_REMEDY
         if corrected:
             mailing.correct_destination()
+            mailing.approve_remail()
         mailing.sweep()
         expected = cs.CaseState.IN_TRANSIT if corrected else cs.CaseState.CLOSED_RETURNED
         assert mailing.case.letter_state is expected, "Agency-side proof remedy was never resolved"

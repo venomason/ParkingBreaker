@@ -1,5 +1,7 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 import { deflateSync } from "node:zlib";
+import { createHash } from "node:crypto";
+import { file } from "./t37-support";
 import { LIVE_FIELDS, type IntakeForm, type TicketFactBindingPayload, type TicketReadingStatus, type WorkspaceView } from "../lib/api";
 import { EMPTY_CONTACT } from "../components/LiveDetails";
 import { emptyFactDraft, factDraftFromAdopted, factDraftFromValues, restoredTicketStep, ticketFormWithDraft, ticketValuesFromDraft, validateFactDraft } from "../lib/intake";
@@ -10,6 +12,7 @@ import { emptyFactDraft, factDraftFromAdopted, factDraftFromValues, restoredTick
 const base = process.env.SECURE_BASE;
 const privateApi = process.env.INGRESS_API_BASE;
 const worker = process.env.INGRESS_WORKER_SECRET;
+const paid = process.env.PB_SERVICE_PHASE === "paid";
 test.use({ ignoreHTTPSErrors: true });
 test.setTimeout(120_000);
 
@@ -138,6 +141,42 @@ async function confirmFacts(page: Page) {
   await expect(page.locator("#visionConfirmBtn")).toBeEnabled();
   await page.locator("#visionConfirmBtn").click();
   await expect(page.locator("#visionConfirmed")).toBeVisible({ timeout: 20000 });
+}
+
+const STATEMENT = "The sign was NOT visible.  The kiosk was blank.\n \nI kept the photo.";
+
+async function submitDetails(page: Page, curbsidePhoto = false) {
+  await page.locator("#actContinueTicket").click();
+  await page.locator("#story").fill(STATEMENT);
+  await page.locator("#actSendStory").click();
+  await page.getByRole("button", { name: /^Yes/ }).first().click();
+  await expect(page.locator("#liveDetails")).toBeVisible();
+  for (const [id, value] of Object.entries({ liveName: "Synthetic Customer", livePhone: "415-555-0100", liveEmail: "ticket-vision@example.test", liveLine1: "123 Example Street", liveCity: "San Francisco", liveState: "CA", liveZip: "94103" })) await page.locator(`#${id}`).fill(value);
+  if (curbsidePhoto) {
+    await expect(page.locator("#liveEvidenceList")).toContainText("1 selected");
+    await expect(page.locator("#liveEvidenceList")).toContainText("Saved supporting photo 1");
+  } else {
+    await page.locator("#liveEvidencePhoto").setInputFiles({ name: "sign.png", mimeType: "image/png", buffer: syntheticPng(90) });
+  }
+  await page.locator("#liveRentalPaid").selectOption("not-rental");
+  await expect(page.locator("#liveTicketPhoto")).toHaveCount(0);
+  await page.locator("#liveSubmit").click();
+  let caseId = "";
+  await expect.poll(async () => { caseId = String((await appeal(page))?.case_id ?? ""); return caseId; }, { timeout: 30000 }).toMatch(/^case_/);
+  return caseId;
+}
+
+async function workerStep(page: Page, caseId: string, step: string) {
+  const response = await page.request.post(`${privateApi}/internal/cases/${caseId}/step`, {
+    headers: { Authorization: `Bearer ${worker}` }, data: { step_id: step },
+  });
+  expect(response.status(), await response.text()).toBe(200);
+}
+
+async function proof(page: Page, caseId: string) {
+  const response = await page.request.get(`${privateApi}/__harness__/proof/${caseId}`);
+  expect(response.ok()).toBe(true);
+  return response.json();
 }
 
 async function workspaceStatus(page: Page, workspaceId: string) {
@@ -303,8 +342,16 @@ test.afterEach(() => {
   expect(saveStatuses.every((status) => status === 200), "autosave/flush must be accepted").toBe(true);
 });
 
-test("empty reading, explicit manual facts and confirmation save, restore and authorize intake", async ({ page }) => {
+test("required OCR, corrected facts and confirmed intake through the paid mailing record", async ({ page }) => {
   await beginVision(page);
+  await expect(page.locator("#visionFrontCamera")).toHaveAttribute("capture", "environment");
+  await expect(page.locator("#visionBackCamera")).toHaveAttribute("capture", "environment");
+  await page.locator("#sceneLibrary").setInputFiles({ name: "curbside.png", mimeType: "image/png", buffer: syntheticPng(90) });
+  const evidence = async () => ((await appeal(page))?.intake_form as IntakeForm | undefined)?.evidence_photo_refs ?? [];
+  await expect.poll(evidence).toHaveLength(1);
+  const [sceneRef] = await evidence();
+  await page.reload();
+  await expect(page.locator("#scene-photos")).toContainText("Scene photo 1");
   await uploadAndRead(page);
   await expect(page.locator("#visionReadings")).toContainText(/unverified|suggestion/i);
 
@@ -368,21 +415,12 @@ test("empty reading, explicit manual facts and confirmation save, restore and au
   await expect(page.locator("#ticketVision")).toBeVisible({ timeout: 20000 });
   await expect(page.locator("#visionConfirmed")).toBeVisible();
   await expect(page.locator("#fact-stage")).toHaveValue(FACTS.stage);
-  await page.locator("#actContinueTicket").click();
-  await expect(page.locator("#story")).toBeVisible();
-
-  await page.locator("#story").fill("The sign was covered. The kiosk was blank.");
-  await page.locator("#actSendStory").click();
-  await page.getByRole("button", { name: /^Yes/ }).first().click();
-  await expect(page.locator("#liveDetails")).toBeVisible();
-  for (const [id, value] of Object.entries({ liveName: "Synthetic Customer", livePhone: "415-555-0100", liveEmail: "ticket-vision@example.test", liveLine1: "123 Example Street", liveCity: "San Francisco", liveState: "CA", liveZip: "94103" })) await page.locator(`#${id}`).fill(value);
-  await page.locator("#liveRentalPaid").selectOption("not-rental");
-  await expect(page.locator("#liveTicketPhoto")).toHaveCount(0);
-  await page.locator("#liveSubmit").click();
-  let caseId = "";
-  await expect.poll(async () => { caseId = String((await appeal(page))?.case_id ?? ""); return caseId; }, { timeout: 30000 }).toMatch(/^case_/);
+  expect(form!.evidence_photo_refs).toEqual([sceneRef]);
+  expect([form!.ticket_photo_ref, form!.ticket_back_photo_ref]).not.toContain(sceneRef);
+  const caseId = await submitDetails(page, true);
   const submitted = await appeal(page);
-  const intake = submitted?.intake as { ticket_confirmation_command_id?: string; ticket?: Record<string, unknown> } | undefined;
+  const intake = submitted?.intake as { ticket_confirmation_command_id?: string; photo_refs?: string[]; ticket?: Record<string, unknown> } | undefined;
+  expect(intake?.photo_refs).toHaveLength(1);
   expect(intake?.ticket_confirmation_command_id).toBe(confirmation.command_id);
   expect(intake?.ticket).toMatchObject({
     citation_number: FACTS.citation_number,
@@ -393,6 +431,78 @@ test("empty reading, explicit manual facts and confirmation save, restore and au
     notice_date: null,
     printed_deadline: null,
   });
+  if (paid) {
+    await authorizeAndResearch(page, caseId);
+    const researched = await call(page, "GET", `/cases/${caseId}/status`);
+    expect(researched.state).toBe("DRAFTING");
+    await workerStep(page, caseId, "draft");
+    expect((await proof(page, caseId)).latest_decision?.provenance).toBe("SYSTEM_VERIFIED");
+    await page.reload();
+    await expect.poll(async () => (await page.locator("#liveLetterText").inputValue()).includes(STATEMENT)).toBe(true);
+    await page.locator("#liveAdopt").click();
+    await expect(page.locator("#livePreview")).toBeEnabled();
+    await page.locator("#liveSignatureFile").setInputFiles(file("own-signature.png"));
+    const previewResponse = page.waitForResponse(r => r.url().endsWith("/packet-preview") && r.ok());
+    await page.locator("#livePreview").click();
+    const preview = await (await previewResponse).json();
+    expect(preview.mail_to.join(" ")).toMatch(/San Francisco/);
+    await expect(page.locator("#liveApprove")).toBeDisabled();
+    await page.locator("#livePacketReviewed").check();
+    const approvalRequest = page.waitForRequest(r => r.url().endsWith("/approval"));
+    const frozen = page.waitForResponse(r => r.url().endsWith("/approval") && r.ok());
+    await page.locator("#liveApprove").click();
+    expect((await approvalRequest).postDataJSON()).toMatchObject({ packet_sha256: preview.packet_sha256, envelope_sha256: preview.envelope_sha256 });
+    await frozen;
+    await expect.poll(async () => {
+      await workerStep(page, caseId, "dispatch");
+      return (await call(page, "GET", `/cases/${caseId}/status`)).payment_state;
+    }).toBe("CAPTURED");
+    await expect(page.locator("#liveTracking")).toContainText("Certified tracking number", { timeout: 30000 });
+    const status = await call(page, "GET", `/cases/${caseId}/status`);
+    expect(status).toMatchObject({ state: "IN_TRANSIT", payment_state: "CAPTURED" });
+    const record = await call(page, "GET", `/cases/${caseId}/mailing-record`);
+    expect(record.pdf_sha256).toBe(preview.packet_sha256);
+    expect(createHash("sha256").update(Buffer.from(record.pdf_base64, "base64")).digest("hex")).toBe(preview.packet_sha256);
+    expect(await proof(page, caseId)).toMatchObject({ prepared_attempts: 1, dispatch_manifest: {
+      original_statement_sha256: createHash("sha256").update(STATEMENT).digest("hex"),
+      approved_pdf_sha256: preview.packet_sha256,
+      approved_envelope_sha256: preview.envelope_sha256,
+      dispatched_pdf_sha256: preview.packet_sha256,
+    } });
+  }
+});
+
+async function authorizeAndResearch(page: Page, caseId: string) {
+  await expect(page.locator("#issuerCard")).toContainText("SFMTA", { timeout: 20000 });
+  expect((await call(page, "GET", "/health")).mode).toBe("fake");
+  // The production-build rehearsal has no hosted Stripe card fixture. Use the
+  // fake payment token through normal owner-scoped authorization and worker routes.
+  await call(page, "PUT", `/cases/${caseId}/tier`, { tier: "CERTIFIED" });
+  await call(page, "POST", `/cases/${caseId}/authorization`, { terms_accepted: true, payment_method_id: "pm_card_visa" });
+  await workerStep(page, caseId, "research");
+  const status = await call(page, "GET", `/cases/${caseId}/status`);
+  if (status.question?.question_id === "VEHICLE_RELATIONSHIP") {
+    await call(page, "POST", `/cases/${caseId}/answers`, { question_id: "VEHICLE_RELATIONSHIP", answer: "REGISTERED_OWNER" });
+  }
+}
+
+if (paid) test("required OCR with an unverified destination releases the hold without preparing mail", async ({ page }) => {
+  await beginVision(page);
+  await uploadAndRead(page);
+  await fillFacts(page);
+  await page.locator("#fact-citation_number").fill("SYN-T30-OCR");
+  await reviewFacts(page);
+  await resolveEveryDifference(page);
+  await confirmFacts(page);
+  const caseId = await submitDetails(page);
+  await authorizeAndResearch(page, caseId);
+  await expect.poll(async () => {
+    await workerStep(page, caseId, "dispatch");
+    return (await call(page, "GET", `/cases/${caseId}/status`)).payment_state;
+  }).toBe("RELEASED");
+  await page.reload();
+  await expect(page.locator("#liveStopMessage")).toContainText("correct address for an appeal at this stage");
+  expect(await proof(page, caseId)).toMatchObject({ prepared_attempts: 0, dispatch_manifest: null });
 });
 
 test("missing confirmation cannot advance and the required intake is refused", async ({ page }) => {
@@ -618,4 +728,21 @@ test("short pipeline notice opens full rules without submitting or losing entere
   await expect(page.locator("#fact-issuer_kind-government")).toBeChecked();
   await confirmFacts(page);
 });
+});
+
+test("ticket fact cards keep edits while switching with keyboard and reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await beginVision(page);
+  await uploadAndRead(page);
+  const groups = page.getByRole("group", { name: "Ticket fact groups" });
+  const citation = page.locator("#fact-citation_number");
+  await citation.fill("TEST-PB-042");
+  await groups.getByRole("button", { name: "Dates & stage" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(groups.getByRole("button", { name: "Dates & stage" })).toHaveAttribute("aria-current", "step");
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#fact-issue_date")).toBeFocused();
+  await groups.getByRole("button", { name: "Ticket & plate" }).click();
+  await expect(citation).toHaveValue("TEST-PB-042");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

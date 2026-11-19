@@ -35,6 +35,8 @@ not construct a packet-check model. `PB_LLM_PRESET` must be absent:
 even a blank value overrides role selection. Unused support/digest preset fallback
 code still names MiniMax; it is not selected by these four role settings.
 Changing the example does not change the running service or grant beta entitlements.
+The November 18 [single-call OCR receipt](../verification/p04-deepseek-single-2026-11-18.json)
+records the approved clear-ticket run and its token cost estimate.
 
 Before any real-provider startup, record secure credential references, account/mode,
 approved privacy/retention terms, available funding and the exact allowed calls.
@@ -99,10 +101,47 @@ Prepare the following exact values before a provisioning/deployment approval:
 
 `deploy/validate.sh --dry-run` checks local syntax only. Target validation requires
 the actual environment path, mounted disk and fresh disk description. The private
-VM overlay is already selected by `deploy/lifecycle.sh` with
-`PB_DEPLOY_TOPOLOGY=cloudrun-private-vm`; its older introductory comment predates
-that integration. Offline lifecycle tests cover the overlay. They do not qualify
-actual network isolation, disk fencing, IAM, TLS or notifications.
+VM overlay is selected by lifecycle and scheduled backup. Set
+`PB_DEPLOY_TOPOLOGY=cloudrun-private-vm` in the provisioning environment and in
+the backup timer's root-owned `ops.env`. Supply the exact Direct VPC frontend subnet
+as `PB_FRONTEND_SUBNET_CIDR` and the private VM address as `PB_PRIVATE_VM_IP`.
+The provisioning dry run prints the rules used by apply. Verify the cloud firewall,
+effective Docker-published port, trusted TLS and real frontend/service identity on
+the isolated target. A host firewall rule alone cannot establish those facts.
+
+Build the backend from the reviewed commit using the `PB_BUILD_COMMIT` build
+argument (`_PB_BUILD_COMMIT` in Cloud Build). Build the qualification frontend
+with `_PB_API_ORIGIN` set to the trusted private HTTPS origin on port 8443.
+Record the returned registry digests and build source. Each immutable VM release
+directory needs `deploy/private-images.json` in this Compose override format.
+Replace the placeholders with full registry digest references and the full Git commit.
+
+```json
+{
+  "x-pb-build-commit": "<40 lowercase hex characters>",
+  "services": {
+    "api": {"image": "<backend repository>@sha256:<64 hex>"},
+    "worker": {"image": "<same backend repository>@sha256:<same digest>"},
+    "monitor": {"image": "<same backend repository>@sha256:<same digest>"},
+    "caddy": {"image": "<reviewed gateway repository>@sha256:<64 hex>"},
+    "scheduler": {"image": "<reviewed scheduler repository>@sha256:<64 hex>"}
+  }
+}
+```
+
+Set `PB_BUILD_COMMIT` and `PB_PROVIDER_MODE` in the lifecycle environment and
+the backup job's protected configuration for that release. Validate the lock with
+`python3 deploy/private-images.py "$PB_RELEASE/deploy/private-images.json" "$PB_BUILD_COMMIT"`.
+Deploy and rollback pull the locked images before stopping the old owner. Both
+the backend image revision label and the private and public health responses must
+match the selected release. The ingress probe needs an approved path to the
+qualification hostname from the VM. A sign-in response or the preview's healthy
+response fails the check. Preserve the outgoing lock with its release directory.
+
+For an infrastructure-only drill in fake mode with separate customer and worker
+processes, set `PB_FAKE_SPLIT_FOR_MEASUREMENT=1` on the isolated fixture.
+Their payment and mailing simulators keep separate in-memory records. Use the
+approved provider test accounts for cross-process payment and mailing recovery.
 
 Use the existing lifecycle after exact approval, with its validation, exclusive
 writer, snapshot, migration/compatibility, health and readiness gates. Do not bypass
@@ -117,9 +156,10 @@ These are different controls; record which one an incident needs.
    sends, stop admitted free cases or close every intake route.
 2. **Stop new free-beta admission:** do not select or approve another entitlement
    batch. Existing admitted cases retain their recovery and support obligations.
-3. **Stop all new intake:** prepare a target ingress rule for the precise new-intake
-   routes, preserving customer status and provider callbacks where feasible. This
-   rule is not provisioned or qualified. The service-phase switch alone is insufficient.
+3. **Stop all new intake.** The private gateway supports `PB_NEW_INTAKE=paused`.
+   On an approved target, apply the gateway setting and verify the effective rule
+   on every reachable customer ingress. Status, sign-in recovery and provider
+   callbacks continue on their existing routes.
 4. **Suspected duplicate dispatch or compromised target:** require the authorized
    operator to stop scheduler and worker on the one owning host, preserve the database,
    queue, original provider IDs and logs, and reconcile uncertain outcomes before
@@ -141,6 +181,34 @@ the override, a stale revision fails, and an uncertain existing hold is reconcil
 against its original intent. `test_runtime_service_phase.py` covers these locally.
 No target database was opened or altered during this preparation.
 
+The gateway's intake pause refuses POST on `/api/auth/appeals`, `/api/workspaces`
+and `/api/workspaces/{id}/intake` after the frontend rewrite. The first route
+creates a new appeal session. A paused gateway returns 503 for all three routes.
+The default is `open` for compatibility. Any other explicit value pauses intake.
+For an approved emergency change, retain the active release and locked images,
+persist the setting in the protected configuration used on restart, record its
+previous value, and recreate only the Caddy service with the same
+Compose inputs and project name as the lifecycle, using `up -d --no-deps caddy`.
+Verify existing customer access after the gateway is ready. Record the reverse
+operation and verify reopening before declaring the incident resolved.
+Requests already forwarded can complete. Pair the ingress pause with the
+transactional paid-authorization stop and a freeze on new free selections.
+Check a workspace created before the stop that has yet to submit intake, a fresh
+signup and a previously selected offer separately. An already entitled or funded
+case keeps its obligations. Exercise owner status/tracking GET, signed Stripe and
+Lob callback POST and private reconciliation against each original effect. Record
+the method, normalized route, HTTP result, durable before/after state and provider
+call counts. Confirm that every other reachable ingress enforces the same stop.
+Restore the prior rule and service-phase revision through the operator workflow.
+
+For the independent alert, probe the isolated frontend's proxied `/api/health`
+from outside the VM once per minute. Record last success, fault onset, first
+failed probe, operator delivery, acknowledgment and clearance in UTC. Allow five
+minutes from host loss to alert delivery. Separately exercise the three-minute
+stale scheduler, ten-minute unsuccessful sweep, overdue queued work, wrong owner
+and low disk signals. Use bounded synthetic fixtures for queue and disk pressure.
+Record target observations and the primary/backup human response separately.
+
 ## Recovery and rollback
 
 The executed local recovery rehearsal uses only synthetic storage and fake providers.
@@ -156,6 +224,17 @@ reports `NEEDS_EXTERNAL`; it does not implement an automatic live reconciliation
 Never restore over the current database or remove quarantine to make startup pass.
 Rollback must retain authority data and pass compatibility on a copy; otherwise roll
 forward. A `PROCESSING_BLOCKED` lifecycle marker is not a global intake kill switch.
+
+For the private topology set `PB_REPLICA_DIRECTORY` to the mountpoint of the
+independent network filesystem. A missed mount raises a backup-job failure while
+preserving the local bundle. The job also checks the filesystem inside the replica
+container before it copies. During the drill verify remote host identity, encrypted
+transport, scoped access and receiver-side manifest hashes. Use a bundle produced
+by the hourly timer, then fence the original host and restore without reading
+its disk. Record the last recovered committed marker before the outage and the
+first time it is safe to resume. Preserve quarantine while any provider effect
+is unresolved. The [R02 preflight receipt](../verification/r02-target-preflight-2026-11-17.json)
+identifies the synthetic target, cost assumptions and missing external evidence.
 
 ## Printing and notifications
 
@@ -213,8 +292,10 @@ flow or the newest prompt changes.
 ## Final release decision
 
 Do not release until provider, target, printing, notification, human and physical-device
-receipts identify the exact candidate and pass. Specify the start/end instants, funded
-cap, one batch of at most five entitlements under the existing admission rules,
-intake-stop owner and explicit activation authority. A GitHub push is not deployment
-or release approval. Each unresolved gate stays open with its next action in
-`../BETA-READINESS.md` and the local Ops run receipt.
+receipts identify the exact candidate and pass. The paid-beta activation packet must
+specify the start/end instants, price and customer disclosures, funded/reserve ceiling,
+enforced paid-cohort cap, intake-stop owner, stop conditions and explicit activation
+authority under [R07](../ROADMAP.md). Do not select a free entitlement batch for this
+launch; preserve the recorded obligations of historical no-charge cases. A GitHub push
+is not deployment or release approval. Each unresolved gate stays open with its next
+action in [current readiness](../BETA-READINESS.md) and the local Ops run receipt.

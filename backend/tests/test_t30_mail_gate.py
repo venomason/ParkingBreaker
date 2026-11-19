@@ -753,7 +753,17 @@ def test_remail_attempt_requires_destination_too(tmp_path: Path) -> None:
         current = letter(store, current, RemailRequested())
         first = store.get(case.case_token, 1)
         assert first is not None
-        store.prepare(case.case_token, 2, replace(first.request, submission_token="remail"), NOW)
+        store.prepare(
+            case.case_token,
+            2,
+            replace(
+                first.request,
+                submission_token="remail",
+                recipient=replace(first.request.recipient, line1="987 Corrected Avenue"),
+                pdf=b"%PDF-1.4\ncorrected synthetic packet",
+            ),
+            NOW,
+        )
         seed_approval(store, case.case_token, 2)
         store._require_open().execute("DELETE FROM pb_address_decisions")
         cursor = step(store, lob, current, now=NOW)

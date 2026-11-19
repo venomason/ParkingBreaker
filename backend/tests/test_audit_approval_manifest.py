@@ -38,7 +38,7 @@ from parkingbreaker.retention_policy import ClosureKind, PolicyAdoption, Unresol
 from parkingbreaker.returned_mail import Remedy, RemedyKind, ReturnCause
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from parkingbreaker.workspace import Workspace
-from test_case_service import ALICE, NOW, fake_resolution
+from test_case_service import ALICE, INTAKE, NOW, fake_resolution
 from test_effect_dispatch import WORKER, approved
 
 assert fake_resolution
@@ -255,11 +255,13 @@ def test_remail_manifest_preserves_customer_hashes_and_updates_envelope(tmp_path
         submission_token="sub_test_2",
     )
     t1 = t0 + timedelta(days=2)
-    manifest2 = build_remail_approval_manifest(manifest1, req2, approved_at=t1)
+    manifest2 = build_remail_approval_manifest(
+        manifest1, req2, approved_at=t1, approved_text="Redirected text", affirmations=affs
+    )
     assert manifest2.attempt == 2
     assert manifest2.case_id == manifest1.case_id
     assert manifest2.raw_customer_text_sha256 == manifest1.raw_customer_text_sha256
-    assert manifest2.approved_text_sha256 == manifest1.approved_text_sha256
+    assert manifest2.approved_text_sha256 != manifest1.approved_text_sha256
     assert manifest2.affirmations_sha256 == manifest1.affirmations_sha256
     assert manifest2.packet_pdf_sha256 != manifest1.packet_pdf_sha256
     assert manifest2.envelope_sha256 != manifest1.envelope_sha256
@@ -336,6 +338,9 @@ def test_remail_manifest_preserves_customer_hashes_and_updates_envelope(tmp_path
             remedy,
             req2,
             now=t1,
+            remail_manifest=build_remail_approval_manifest(
+                m1, req2, approved_at=t1, approved_text="Redirected text", affirmations=affs
+            ),
         )
         loaded_m2 = store.get_approval_manifest(case.case_token, 2)
         assert loaded_m2 is not None
@@ -360,6 +365,10 @@ async def test_dispatch_verifies_envelope_and_records_acceptance_and_crash_recov
         case_token = str(row[0])
         manifest_before = real._store.get_approval_manifest(case_token, 1)
         assert manifest_before is not None
+        assert (
+            manifest_before.raw_customer_text_sha256
+            == hashlib.sha256(INTAKE["customer_position"]["statement"].encode()).hexdigest()
+        )
         # Advancing clock and replaying approve recovers the identical manifest.
         object.__setattr__(real._deps, "clock", lambda: NOW + timedelta(minutes=5))
         draft = (await client.get(f"/cases/{case}/draft", headers=ALICE)).json()

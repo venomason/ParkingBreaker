@@ -1,0 +1,674 @@
+{
+  "date_pacific": "2026-11-18",
+  "purpose": "Expanded launch testing on synthetic data, with two external sandbox providers and real DeepSeek OCR",
+  "base_commit": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+  "fixed_worktree_application_fingerprint": "4c4a736b8f4e08de02636a59432708094086a45a588048f97fbc904811a61046",
+  "private_ops_run": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-launch-20261118-jkh7vR",
+  "paid_activation": false,
+  "repo_ticket_images": {
+    "manifest": "tools/qualification/vision-data/manifest.json",
+    "manifest_sha256": "e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6",
+    "scenarios": [
+      "clear_png",
+      "clear_jpeg",
+      "front_back",
+      "missing_notice_date",
+      "wrong_confirmation",
+      "rotated",
+      "untrusted_annotation",
+      "missing_deadline"
+    ],
+    "files": [
+      "back.png",
+      "clear_jpeg.jpg",
+      "clear_png.png",
+      "front_back.png",
+      "missing_deadline.png",
+      "missing_notice_date.png",
+      "rotated.png",
+      "untrusted_annotation.png",
+      "wrong_confirmation.png"
+    ],
+    "unique_byte_hashes": 7,
+    "additional_browser_ticket": "build-kit/evidence/task-T37-2026-10-22/fixtures/ticket.png",
+    "additional_browser_ticket_sha256": "b7e3b2033ab1ca783ba22648dd10d8190063b5626710cef92bd4826c25552739",
+    "source": "Checked tracked assets and reachable local Git history. The T37 image identifies itself as a synthetic browser fixture. Each manifest file decoded and matched its recorded digest."
+  },
+  "real_ocr": {
+    "route": "Local customer intake HTTP API, owner-scoped upload, DeepSeek Flash, no retries or fallback",
+    "fixtures": "Four synthetic PNGs frozen from the repository benchmark into the November 17 provider fixture directory; distinct from the eight repository image scenarios used in the browser.",
+    "results": [
+      {
+        "fixture": "clear",
+        "source_png_sha256": "d71c299b3762e424e03d91abe64aff80c99bf2edb91e7fdc37ed215c3ab3e511",
+        "model": "deepseek-flash",
+        "intake_http_status": 200,
+        "reading_status": "success",
+        "provider_posts": 1,
+        "provider_usage": {
+          "input_tokens": 2263,
+          "output_tokens": 1276,
+          "cached_input_tokens": 256
+        },
+        "usage_price_estimate_usd": "0.001067418",
+        "field_matches": {
+          "citation_number": true,
+          "license_plate": true,
+          "license_plate_state": true,
+          "issuer_name": true,
+          "issue_date": true,
+          "notice_date": true,
+          "printed_deadline": true,
+          "violation_text": true,
+          "issued_city": true,
+          "issued_state": true,
+          "stage_text": true
+        },
+        "current_on_readback": true,
+        "started_at": "2026-11-18T19:18:17.964331+00:00",
+        "approved_ceiling_cents": 25
+      },
+      {
+        "fixture": "ambiguous",
+        "source_png_sha256": "918a2208c894df969346c7b1dfbef1b935d0fe67222b6dff95c9f9799deca0dc",
+        "model": "deepseek-flash",
+        "intake_http_status": 200,
+        "reading_status": "success",
+        "provider_posts": 1,
+        "provider_usage": {
+          "input_tokens": 2263,
+          "output_tokens": 488,
+          "cached_input_tokens": 1536
+        },
+        "usage_price_estimate_usd": "0.000406458",
+        "field_matches": {
+          "citation_number": true,
+          "license_plate": true,
+          "license_plate_state": true,
+          "issuer_name": true,
+          "issue_date": true,
+          "notice_date": true,
+          "printed_deadline": true,
+          "violation_text": true,
+          "issued_city": true,
+          "issued_state": true,
+          "stage_text": true
+        },
+        "current_on_readback": true,
+        "unknown_field_states": {
+          "citation_number": "unreadable"
+        },
+        "confirmation_state": "missing",
+        "started_at": "2026-11-18T19:24:59.882511+00:00",
+        "approved_ceiling_cents": 2
+      },
+      {
+        "fixture": "corrected",
+        "source_png_sha256": "a38f923f048938aab8942ace6b7194ba85655ae36631fdcf35644c935dc5ee35",
+        "model": "deepseek-flash",
+        "intake_http_status": 200,
+        "reading_status": "success",
+        "provider_posts": 1,
+        "provider_usage": {
+          "input_tokens": 2263,
+          "output_tokens": 828,
+          "cached_input_tokens": 1536
+        },
+        "usage_price_estimate_usd": "0.000610458",
+        "field_matches": {
+          "citation_number": true,
+          "license_plate": true,
+          "license_plate_state": true,
+          "issuer_name": true,
+          "issue_date": true,
+          "notice_date": true,
+          "printed_deadline": true,
+          "violation_text": true,
+          "issued_city": true,
+          "issued_state": true,
+          "stage_text": true
+        },
+        "current_on_readback": true,
+        "unknown_field_states": {
+          "license_plate": "not_shown"
+        },
+        "confirmation_state": "missing",
+        "started_at": "2026-11-18T19:24:52.271046+00:00",
+        "approved_ceiling_cents": 2
+      },
+      {
+        "fixture": "physical-original",
+        "source_png_sha256": "67a30533e562df97c30b9024913d996383a87ff4b32da7174d2b376e88d6faaf",
+        "model": "deepseek-flash",
+        "intake_http_status": 200,
+        "reading_status": "success",
+        "provider_posts": 1,
+        "provider_usage": {
+          "input_tokens": 2263,
+          "output_tokens": 682,
+          "cached_input_tokens": 1536
+        },
+        "usage_price_estimate_usd": "0.000522858",
+        "field_matches": {
+          "citation_number": true,
+          "license_plate": true,
+          "license_plate_state": true,
+          "issuer_name": true,
+          "issue_date": true,
+          "notice_date": true,
+          "printed_deadline": true,
+          "violation_text": true,
+          "issued_city": true,
+          "issued_state": true,
+          "stage_text": true
+        },
+        "current_on_readback": true,
+        "unknown_field_states": {},
+        "confirmation_state": "missing",
+        "started_at": "2026-11-18T19:24:45.019825+00:00",
+        "approved_ceiling_cents": 2
+      }
+    ],
+    "total_estimated_usd": "0.002607192",
+    "total_input_output_checks": 44,
+    "pricing_basis": "Provider token counts and published off-peak rates, without an invoice.",
+    "price_source": "https://api-docs.deepseek.com/quick_start/pricing/"
+  },
+  "stripe_sandbox": {
+    "started_at": "2026-11-18T19:31:49.833381+00:00",
+    "environment": "Stripe sandbox",
+    "test_mode_verified": true,
+    "held_cents": 2999,
+    "captured_cents": 0,
+    "steps": [
+      "known test payment method read with livemode false",
+      "original test hold and provider expiry observed; zero captured",
+      "same authorization command returned the original hold and charge",
+      "separate retrieve reconciled the outstanding hold",
+      "original test hold canceled with zero capturable and zero received",
+      "application retrieved the original canceled test hold"
+    ],
+    "authorization_status": "requires_capture",
+    "authorization_classification": "verified_object",
+    "external_reference_sha256": "5323f6d3468da8f1cb7103e7531f443340ed8b1cb83491fb3355631defd5d455",
+    "original_charge_and_expiry_observed": true,
+    "release_status": "canceled",
+    "passed": true,
+    "finished_at": "2026-11-18T19:31:52.717294+00:00"
+  },
+  "lob_sandbox": {
+    "source": "paid-ocr/rehearsal.json",
+    "approved_pdf_sha256": "a0381cb1f0e075e524ac448caa0f27b00ead22f805e1cca27bb7ddd361490d78",
+    "approved_envelope_sha256": "5249da521c5d1310445b3db76b29c261c024fd9f97c5cf94341d3dea4c867069",
+    "approved_request_sha256": "61d28672eb8df74fc45a511142c198e6b8852dc939fed59511cb14e17f7aadf5",
+    "synthetic": true,
+    "mode": "test",
+    "max_creates": 1,
+    "single_create_attempt": true,
+    "matching_provider_letters": 1,
+    "original_reference_sha256": "e4a21837dd0b55c3f12b71c8d65c6d17a536df2c7c2e7d7d07bc4cefa19e9890",
+    "app_create_http_status": 200,
+    "initial_evidence": "created",
+    "proof": {
+      "proof_sha256": "bbab8e1d9898b538137f0df41e9ebdbfea9b3a0365f9b13325356d1dfb07452b",
+      "provider_status": "rendered",
+      "original_letter_reconciled_by_application": true,
+      "application_reconciliation_evidence": "rendered",
+      "certified": true,
+      "provider_address_normalization": "11 South Van Ness Avenue became 11 S VAN NESS AVE and the provider appended ZIP+4. Office, attention, street number, street, city, state and five-digit ZIP matched the approved destination.",
+      "sender_matched": true,
+      "proof_pages": [
+        {
+          "page": 1,
+          "size_points": [
+            612.0,
+            792.0
+          ],
+          "role": "certified address sheet"
+        },
+        {
+          "page": 2,
+          "size_points": [
+            612.0,
+            792.0
+          ],
+          "role": "postal reverse"
+        },
+        {
+          "page": 3,
+          "size_points": [
+            612.0,
+            792.0
+          ],
+          "role": "appeal"
+        },
+        {
+          "page": 4,
+          "size_points": [
+            612.0,
+            792.0
+          ],
+          "role": "citation front"
+        },
+        {
+          "page": 5,
+          "size_points": [
+            612.0,
+            792.0
+          ],
+          "role": "citation back"
+        },
+        {
+          "page": 6,
+          "size_points": [
+            612.0,
+            792.0
+          ],
+          "role": "evidence"
+        }
+      ],
+      "all_four_source_pages_text_preserved_in_order": true,
+      "visual_review": "Six pages inspected. Certified barcode and sender and destination blocks visible on page 1. Pages 3 through 6 preserve the appeal and fixture image order. This approved packet uses solid-tone synthetic images.",
+      "physical_print_or_delivery_observed": false
+    },
+    "provider_mode_evidence": "Account-specific test credential, independent query for the original submission and sandbox PDF.",
+    "readback_note": "The first exact street-string comparison flagged the provider abbreviation. The independent proof review checked the actual street number, direction, name, suffix, locality, postal code, recipient and attention. No additional letter was created.",
+    "scope": "Separate Stripe and Lob drills. No physical print, delivery, capture or signed provider callback on a joined case was observed.",
+    "private_proof": "lob-sandbox/proof.pdf",
+    "provider_docs": "https://docs.lob.com/"
+  },
+  "stripe_sandbox_callbacks": {
+    "mode": "Stripe CLI forwarded real sandbox events to the local ParkingBreaker callback route. No public webhook endpoint was configured.",
+    "final_run": {
+      "started_at": "2026-11-18T19:47:36.846735+00:00",
+      "forwarding": "Stripe CLI test-mode session, local-only HTTP ingress",
+      "events": {
+        "payment_intent.created": {
+          "invalid_signature_http": 400,
+          "first": [
+            200,
+            {
+              "received": true,
+              "duplicate": false
+            }
+          ],
+          "replay": [
+            200,
+            {
+              "received": true,
+              "duplicate": true
+            }
+          ],
+          "original_object_sha256": "5802894f5468a56cc642167f5a247cd67d2a66aaab2abe3d7f2e5a5a7dca9785"
+        },
+        "payment_intent.canceled": {
+          "invalid_signature_http": 400,
+          "first": [
+            200,
+            {
+              "received": true,
+              "duplicate": false
+            }
+          ],
+          "replay": [
+            200,
+            {
+              "received": true,
+              "duplicate": true
+            }
+          ],
+          "original_object_sha256": "5802894f5468a56cc642167f5a247cd67d2a66aaab2abe3d7f2e5a5a7dca9785"
+        }
+      },
+      "incoming_listener_ready": true,
+      "objects_created": 1,
+      "creation_status": "requires_capture",
+      "cli_event_frames": 2,
+      "matching_callback_types": [
+        "payment_intent.created",
+        "payment_intent.canceled"
+      ],
+      "before_binding_http": 409,
+      "before_binding_reason": "webhook_case_not_ready",
+      "bound_from_observed_test_hold": true,
+      "original_canceled": true,
+      "captured_cents": 0,
+      "same_resource": true,
+      "passed": true,
+      "listener_stopped": true,
+      "finished_at": "2026-11-18T19:47:39.528145+00:00"
+    },
+    "earlier_probes": [
+      {
+        "outcome": "No completed callback receipt from the initial listener harness. The test intent was canceled without any capture."
+      },
+      {
+        "outcome": "With a per-request SQLite connection, both signed events reached the app for an unbound test intent. Both received HTTP 409. Invalid signatures received 400. The test intent was canceled without any capture."
+      }
+    ],
+    "total_test_payment_intents_including_hold_release": 4,
+    "manual_holds_released": 2,
+    "unconfirmed_test_objects_canceled": 2,
+    "total_captured_cents": 0,
+    "documentation": "https://docs.stripe.com/webhooks"
+  },
+  "recovery": {
+    "elapsed_seconds": 0.012502472999585734,
+    "records_match": true,
+    "artifacts_match": true,
+    "compared_tables": {
+      "pb_ticket_intake_operations": 1,
+      "pb_ticket_ocr_observations": 1,
+      "pb_ai_calls": 1,
+      "pb_ai_spend": 1,
+      "pb_workspaces": 1,
+      "pb_workspace_history": 2,
+      "pb_intake_owners": 1,
+      "pb_ticket_intake_confirmations": 0
+    },
+    "checked_record_table_hashes": 77,
+    "photo_count": 1,
+    "photo_sha256": "d71c299b3762e424e03d91abe64aff80c99bf2edb91e7fdc37ed215c3ab3e511",
+    "restored_spend_cents": 1,
+    "restored_quarantined": true,
+    "corrupt_copy_refused": true,
+    "corrupt_copy_quarantined": true,
+    "corrupt_copy_alert": true,
+    "restore_transport": "separate local tree",
+    "provider_calls_during_restore": 0
+  },
+  "official_rule_replay": {
+    "official_url": "https://www.portland.gov/transportation/parking/pay-and-or-contest-parking-ticket",
+    "manual_source_check": "The city instructs written explanations to be placed in the yellow citation envelope and describes a hearing waiver.",
+    "isolated_replay": "Official phrase supplied in an otherwise synthetic confirmed research finding; no live research provider or actual customer ticket.",
+    "results": {
+      "REQUIRED_ITEMS item": {
+        "ready": false,
+        "event": "Stopped",
+        "target": "STOPPED_NO_CHARGE",
+        "effects": [
+          "RELEASE_HOLD"
+        ],
+        "reason": "NOT_YET_VERIFIED"
+      },
+      "REQUIRED_ITEMS full": {
+        "ready": false,
+        "event": "Stopped",
+        "target": "STOPPED_NO_CHARGE",
+        "effects": [
+          "RELEASE_HOLD"
+        ],
+        "reason": "NOT_YET_VERIFIED"
+      },
+      "TICKET_SPECIFIC_REQUIREMENTS item": {
+        "ready": false,
+        "event": "Stopped",
+        "target": "STOPPED_NO_CHARGE",
+        "effects": [
+          "RELEASE_HOLD"
+        ],
+        "reason": "NOT_YET_VERIFIED"
+      },
+      "TICKET_SPECIFIC_REQUIREMENTS full": {
+        "ready": false,
+        "event": "Stopped",
+        "target": "STOPPED_NO_CHARGE",
+        "effects": [
+          "RELEASE_HOLD"
+        ],
+        "reason": "NOT_YET_VERIFIED"
+      }
+    }
+  },
+  "webkit": {
+    "version": "26.0",
+    "physical_device": false,
+    "host": "Linux, private Playwright Ubuntu 24.04 WebKit runtime on Ubuntu 26.04 with private compatibility libraries",
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        844,
+        390
+      ]
+    ],
+    "mobile_touch_emulation": true,
+    "required_paid_flow_tests": {
+      "startTime": "2026-11-18T19:38:48.125Z",
+      "duration": 78259.544,
+      "expected": 13,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "image_scenarios": [
+      {
+        "fixture": "clear_png",
+        "checks": [
+          "saved clear_png.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "clear_jpeg",
+        "checks": [
+          "saved clear_jpeg.jpg",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "front_back",
+        "checks": [
+          "saved front_back.png",
+          "saved back.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "missing_notice_date",
+        "checks": [
+          "saved missing_notice_date.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "wrong_confirmation",
+        "checks": [
+          "saved wrong_confirmation.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "rotated",
+        "checks": [
+          "saved rotated.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "untrusted_annotation",
+        "checks": [
+          "saved untrusted_annotation.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      },
+      {
+        "fixture": "missing_deadline",
+        "checks": [
+          "saved missing_deadline.png",
+          "upload left reading idle",
+          "fits 390x844",
+          "fits 844x390",
+          "explicit read returned 11 suggestions",
+          "reload preserved upload and reading without repeating it",
+          "no confirmation, submission or authorization"
+        ],
+        "passed": true,
+        "serverStatus": "success"
+      }
+    ],
+    "services_stopped": true,
+    "rehearsal": "output/launch-r02-20261118-jkh7vR/webkit-final/webkit-rehearsal.json",
+    "suite": "web/tests/beta-ticket-vision.spec.ts",
+    "configuration": "Canonical public TLS hostname through an owned loopback CONNECT proxy; private worker HTTP bypasses the proxy. Fixture image reads used the fake OCR provider."
+  },
+  "other_browser_gates": [
+    {
+      "id": "after-fix-paid-ocr",
+      "paid_product_flow": true,
+      "provider": "fake",
+      "required_ocr_frontend": true,
+      "browser_project": "default Chromium suite",
+      "tests": 13,
+      "results": 13,
+      "rehearsal": "output/launch-r02-20261118-jkh7vR/after-fix-paid-ocr/rehearsal.json",
+      "rehearsal_sha256": "c5041d99a43334afe0a0d309b7f31d3e97a8703207317d4dab333b7a9cebae5b"
+    },
+    {
+      "id": "after-fix-firefox",
+      "paid_product_flow": false,
+      "provider": "fake",
+      "required_ocr_frontend": true,
+      "browser_project": "firefox-mobile375x812",
+      "tests": 53,
+      "results": 53,
+      "rehearsal": "output/launch-r02-20261118-jkh7vR/after-fix-firefox/rehearsal.json",
+      "rehearsal_sha256": "cb81241596fe0e720d2bee81652f21e24039eff1dff548354d80588cce283e73"
+    },
+    {
+      "id": "after-fix-paid",
+      "paid_product_flow": true,
+      "provider": "fake",
+      "required_ocr_frontend": false,
+      "browser_project": "default Chromium suite",
+      "tests": 152,
+      "results": 152,
+      "rehearsal": "output/launch-r02-20261118-jkh7vR/after-fix-paid/rehearsal.json",
+      "rehearsal_sha256": "9aefa0b776b0783356ffbaa7ca2f9ca8b9aa86ccc7ff752d637527eb2b667d29"
+    },
+    {
+      "id": "after-fix-mobile",
+      "paid_product_flow": false,
+      "provider": "fake",
+      "required_ocr_frontend": true,
+      "browser_project": "chromium-mobile375x812",
+      "tests": 53,
+      "results": 53,
+      "rehearsal": "output/launch-r02-20261118-jkh7vR/after-fix-mobile/rehearsal.json",
+      "rehearsal_sha256": "3c55e99ae5d80c4078a284651a771fc043e6b1f866bb961013e594a4e17a12f1"
+    }
+  ],
+  "checks": {
+    "make_check": {
+      "backend_passed": 13827,
+      "warnings": 1,
+      "pytest_seconds": 1079.9,
+      "log_sha256": "9071d79b945fbe46df739a2edfc2369baa0de7957eb31b9d5f9fb9d8a4932238"
+    },
+    "make_web_check": {
+      "exit": 0,
+      "checks": [
+        "ESLint",
+        "TypeScript",
+        "Next production build"
+      ],
+      "log_sha256": "ea1760e0f4b4de56e7f919c85ddd9acecc68d95c3552dedbc04138398327cd98"
+    },
+    "targeted_recovery_auth_fulfilment": {
+      "passed": 96,
+      "log_sha256": "b77bd10464b09d218747ce429a0a9a5ad115840a5a11e02f191c5fb7eeaded76"
+    },
+    "fixture_self_test": {
+      "provider_called": false,
+      "passed": true,
+      "reserved_cents": 800,
+      "manifest_sha256": "e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6",
+      "model": "deepseek-flash"
+    },
+    "all_browser_suite_results": 284,
+    "separate_webkit_fixture_scenarios": 8
+  },
+  "autosave_fix": {
+    "file": "web/lib/useWorkspaceAutosave.ts",
+    "before_sha256": "d41f194cf3d978e15007a3f98992a958e6463ac3bdc5a0ff93fe2f7f6923fe4a",
+    "after_sha256": "dab750cf06af1558cd2181ca556e72254474fef40e222d06a3aa62de4e9bbd72",
+    "before": "With canonical proxy routing, 12/13 WebKit checks passed. Opening the rules overlapped one redundant PUT of the previously acknowledged draft. The submitted form was identical. The server readback also serialized a nullable API default.",
+    "after": "Preserve the acknowledged signature on readback of the same workspace and draft revision. The original unmodified 13-test suite passed.",
+    "early_harness_failures": [
+      "The first probe asserted before the reading response arrived and ran the existing suite from the wrong directory.",
+      "WebKit needed direct worker loopback and a canonical TLS origin for replay cookies. After correcting both, only the extra draft write remained."
+    ],
+    "diagnostic_evidence_sha256": "a8c5bd53f7e9bb26f4365ccca61d51ebae23225c3565213017ac9aaa6b26f476"
+  },
+  "remaining": [
+    "A current physical iPhone and Android camera flow, including denied permission and network interruption.",
+    "A deployed, owner-scoped official-source case through customer correction, confirmation and filing/refusal.",
+    "A joined Stripe/Lob sandbox case exercising original-object recovery, Lob-signed callbacks, the deployed Stripe endpoint and hold expiry.",
+    "GCP interactive sign-in, immutable image qualification, fenced single-writer target, encrypted off-host restore, external alert and responder.",
+    "Delivered customer access email, release controls and paid cohort admission."
+  ],
+  "verified_public_preview": {
+    "/": {
+      "http_status": 200
+    },
+    "/api/health": {
+      "http_status": 200,
+      "status": "ok",
+      "mode": "fake",
+      "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58"
+    },
+    "at": "2026-11-18T19:48:15.218435+00:00"
+  },
+  "generated_at_utc": "2026-11-18T19:57:20.576010+00:00"
+}

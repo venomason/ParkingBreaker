@@ -4,6 +4,8 @@
 import { CERTIFIED_CENTS } from "../lib/prices";
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
+import { LocalJourneyPreviewContext } from "../components/LocalJourneyPreview";
+import { JourneyCard } from "../components/JourneyCard";
 import { IntakeIntroduction } from "../components/IntakeIntroduction";
 import { LegalDisclosure } from "../components/LegalDisclosure";
 import { IntakeTrust } from "../components/IntakeTrust";
@@ -40,6 +42,7 @@ import {
 } from "../lib/api";
 import type { ApprovalRequest, PacketPreview, CaseStatus, Draft, Offer, Stop, Tracking, IntakeForm, BetaOffer, TicketDiscrepancyResolution, TicketReadingStatus, TicketReviewSnapshot, TicketFactBindingPayload, WorkspaceView, TicketFacts } from "../lib/api";
 import { LiveDetails, LiveDetailsData, EMPTY_CONTACT, EvidencePhotoEntry, LiveContactValues } from "../components/LiveDetails";
+import { CurbsidePhotos } from "../components/CurbsidePhotos";
 import { LiveResearch, ResearchEvidence } from "../components/LiveResearch";
 import { LiveLetter } from "../components/LiveLetter";
 import { LiveFulfillment } from "../components/LiveFulfillment";
@@ -62,6 +65,7 @@ function plainError(error: unknown): string {
     photo_not_readable: "That file could not be read and was not saved. Export a fresh JPEG or PNG, or take another clear photo of the paper original.",
     photo_type_not_supported: "That file was not uploaded. This beta accepts JPEG or PNG only. For a PDF or HEIC file, export a clear JPEG/PNG copy or photograph the paper original, keeping all printed details visible.",
     photo_size_invalid: "That file was not uploaded. Choose a non-empty JPEG or PNG up to 10 MB. Export a smaller image without making the printed details unreadable.",
+    customer_statement_not_printable: "Edit the statement to replace characters the letter cannot print, such as curly quotes or long dashes. Then save it again.",
     card_not_authorized: "The card wasn't authorized. Nothing was charged. Try another card.",
     choose_tier_first: "Choose how your letter should be mailed first.",
     card_form_unavailable: "The secure card form is unavailable. No authorization was requested. Please try again later.",
@@ -201,7 +205,7 @@ function buildReceipts(step: number, fields: TicketField[], photo: boolean | nul
   const list: Receipt[] = [];
   if (step > 1 && step !== 8) list.push({ stepNum: 1, stepName: "Ticket", summary: `\u2713 Ticket confirmed \u00b7 ${fv("agency").replace("City of ", "")} \u00b7 Oct 2` });
   if (step > 2 && step !== 8) list.push({ stepNum: 2, stepName: "Your side", summary: `\u2713 Your side recorded \u00b7 ${photo ? "1 photo saved" : "in your own words"}` });
-  if (step > 3 && step !== 8 && step !== 9) list.push({ stepNum: 3, stepName: "Research", summary: "\u2713 8 facts confirmed, 1 unknown \u00b7 PO Box 129038" });
+  if (step > 3 && step !== 8 && step !== 9) list.push({ stepNum: 3, stepName: "Appeal rules", summary: "San Diego mailing instructions" });
   if (step > 4 && step !== 8 && step !== 9) list.push({ stepNum: 4, stepName: "Mailing choice", summary: `\u2713 ${tierName} \u00b7 $${price} card hold authorized` });
   if (step > 6 && step !== 8 && step !== 9) list.push({ stepNum: 6, stepName: "Exact PDF", summary: "\u2713 Exact PDF approved for mailing" });
   return list;
@@ -227,7 +231,8 @@ function liveReceipts(step: number, fields: TicketField[], offer: Offer | null, 
 // ─── Main page component ──────────────────────────────────────────────────────
 
 export default function Home() {
-  if (process.env.NODE_ENV === "production" && !LIVE) return <main className="access-shell"><section className="access-card"><h1>Your appeal service is unavailable</h1><p>Please try again later.</p></section></main>;
+  const localPreview = React.useContext(LocalJourneyPreviewContext);
+  if (process.env.NODE_ENV === "production" && !LIVE && !localPreview) return <main className="access-shell"><section className="access-card"><h1>Your appeal service is unavailable</h1><p>Please try again later.</p></section></main>;
   return LIVE && !PREVIEW_AUTH ? <CustomerGate><Journey /></CustomerGate> : <Journey />;
 }
 
@@ -311,7 +316,7 @@ function Journey() {
   const pricingRefreshFailed = resolvedAccess.pricingRefreshFailed;
   const applyFunding = resolvedAccess.applyFunding;
   const [step, setStep] = useState(1);
-  const [evidenceCount, setEvidenceCount] = useState(8);
+  const [evidenceCount, setEvidenceCount] = useState(SAMPLE_FACTS.filter(f => f.st === "ok").length);
   const [fields, setFields] = useState<TicketField[]>(LIVE ? LIVE_FIELDS : SAMPLE_FIELDS);
   const [plate, setPlate] = useState(LIVE ? "" : SAMPLE_PREVIEW.plate);
   const [plateState, setPlateState] = useState(LIVE ? "" : SAMPLE_PREVIEW.plateState);
@@ -376,7 +381,7 @@ function Journey() {
     setLivePacketPreview(null);
   }, []);
   const [liveError, setLiveError] = useState<string | null>(null);
-  // Set only after the server refuses a stale paid attempt with paid_orders_paused.
+  // Set after the server closes paid admission during checkout.
   const [paidPaused, setPaidPaused] = useState(false);
   const [backPhoto, setBackPhoto] = useState(false);
   const [story, setStory] = useState("");
@@ -463,7 +468,7 @@ function Journey() {
     setSheetTerms(false); setSheetSample(false); setSheetProv(false);
     setSheetNotes(false); setSheetPdf(false); setSheetProvEditing(false);
     if (!LIVE && n === 1) setFields((LIVE ? LIVE_FIELDS : SAMPLE_FIELDS).map((f) => ({ ...f })));
-    if (!LIVE && n === 2) { setStory(""); setOwner(null); setPhoto(null); setSents([]); setAdopted(false); }
+    if (!LIVE && n === 2) { setStory(""); setOwner(null); setSents([]); setAdopted(false); }
     if (n === 3) setEvidenceCount(0);
     if (n === 4) setTier(null);
     if (n === 7) setTier((previous) => previous ?? "certified");
@@ -478,8 +483,9 @@ function Journey() {
   }, [fields, photo, owner, plate, plateState, sents.length, story, setActionBar, invalidateLivePreview]);
 
   useEffect(() => {
+    if (step === 1 && run === 0) return;
     const target = document.getElementById(`s${step}`);
-    target?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    target?.scrollIntoView({ block: "start", behavior: "instant" });
     document.getElementById(`h-s${step}`)?.focus({ preventScroll: true });
   }, [step, run]);
 
@@ -1020,7 +1026,7 @@ function Journey() {
         // affordance immediately (header, sidebar, card), then reread the actual
         // server phase/status/offer in place. The mounted Journey and unsaved
         // edits stay; no new payment method or replacement key is created.
-        if (error instanceof ApiError && error.status === 409 && error.detail === "paid_orders_paused") {
+        if (error instanceof ApiError && error.status === 409 && (error.detail === "paid_orders_paused" || error.detail === "paid_cohort_full")) {
           setPaidPaused(true);
           blockNewPaid();
           setLiveOffer(null);
@@ -1230,14 +1236,17 @@ function Journey() {
 
   const uploadEvidencePhoto = useCallback(async (entry: EvidencePhotoEntry): Promise<string | null> => {
     if (!entry.file) return null;
+    if (entry.error) setEvidencePhotos(previous => previous.map(photo => photo.id === entry.id ? {...photo, error: undefined} : photo));
     setPhotoUploads(count => count + 1); setLiveError(null);
     try {
       const workspace = await ensureWorkspace();
       const uploaded = await api.uploadPhoto(workspace.workspace_id, entry.file);
-      setEvidencePhotos(previous => previous.map(current => current.id === entry.id ? {...current,ref:uploaded.photo_ref} : current));
+      setEvidencePhotos(previous => previous.map(current => current.id === entry.id ? {...current,ref:uploaded.photo_ref,error:undefined} : current));
       return uploaded.photo_ref;
     } catch (error) {
-      setLiveError(plainError(error));
+      const message = plainError(error);
+      setEvidencePhotos(previous => previous.map(photo => photo.id === entry.id ? {...photo, error:message} : photo));
+      setLiveError(message);
       return null;
     } finally { setPhotoUploads(count => count - 1); }
   }, [ensureWorkspace]);
@@ -1743,7 +1752,7 @@ function Journey() {
 
       <a href="#main" className="skip">Skip to content</a>
 
-      <Header now={now} step={step} timerEnd={timerEnd} lapsed={lapsed} evidenceCount={LIVE ? liveStatus?.research ? `${liveStatus.research.findings.filter(f => f.status === "CONFIRMED").length}/${liveStatus.research.findings.length}` : "pending" : `${evidenceCount}/9`} onBrandClick={() => { if (LIVE && liveCase) { if (liveStatus) goTo(customerStage(liveStatus)); } else goTo(1); }} onEvidenceClick={() => setSheetChk(true)} onRulesClick={openRules} fulfillmentLabel={LIVE && step === 7 && liveStatus ? fulfillmentCopy(liveStatus,liveTracking).title : undefined} deliveryComplete={LIVE && liveStatus?.state === "DELIVERED" && liveTracking?.case_id === liveStatus.case_id && liveTracking?.state === "DELIVERED"} />
+      <Header now={now} step={step} timerEnd={timerEnd} lapsed={lapsed} evidenceCount={LIVE ? liveStatus?.research ? `${liveStatus.research.findings.filter(f => f.status === "CONFIRMED").length}/${liveStatus.research.findings.length}` : "pending" : `${evidenceCount}/${SAMPLE_FACTS.length}`} onBrandClick={() => { if (LIVE && liveCase) { if (liveStatus) goTo(customerStage(liveStatus)); } else goTo(1); }} onEvidenceClick={() => setSheetChk(true)} onRulesClick={openRules} fulfillmentLabel={LIVE && step === 7 && liveStatus ? fulfillmentCopy(liveStatus,liveTracking).title : undefined} />
 
       {LIVE && !PREVIEW_AUTH && !liveCase && <div className="access-session" role="status"><span>{photoUploads ? "Saving photo…" : autosaveState === "error" ? "Save paused. Your entries remain on this page; another tab may have changed this appeal." : autosaveState === "saving" ? "Saving your entries…" : autosaveState === "saved" ? "Entries saved for this appeal" : "Your entries will save as you go"}</span>{autosaveState === "error" && <button className="chip" onClick={() => {void flushWorkspace().catch(() => {});}}>Retry save</button>}</div>}
       <main id="main" className={`app-shell${step === 1 ? " intake-shell" : ""}`}>
@@ -1752,10 +1761,11 @@ function Journey() {
           <Receipts receipts={LIVE && liveCase ? receipts.map(receipt => ({...receipt,reopenable:receipt.stepNum === 3})) : receipts} onReopen={goTo} />
           {LIVE && liveError && step !== 2 && step !== 3 && step !== 6 && step !== 7 && <div className="guard action-error" role="alert" id="liveActionError">{liveError}</div>}
           {lapsed && (step === 5 || step === 6) && <div className="guard" role="status"><span>{LIVE ? "The saved review window has ended. Your work stays saved; checking server status is required before another action." : "Your window closed. Nothing was charged and your work is saved."}</span>{LIVE && liveCase ? <button className="chip" type="button" disabled={liveBusy} onClick={async () => { try { setLiveError(null); handleDestinationStatus(await api.status(liveCase.caseId)); } catch (error) { setLiveError(plainError(error)); } }}>Check my appeal</button> : <button className="chip" type="button" onClick={handleRestartWindow}>Start a new window</button>}</div>}
-          <div key={run}>
-          {step === 1 && (<Step1Ticket live={LIVE} fields={fields} setFields={setFields} plate={plate} setPlate={setPlate} plateState={plateState} setPlateState={setPlateState} backPhoto={backPhoto} setBackPhoto={setBackPhoto} onComplete={handleStep1Complete} setActionBar={setActionBar} vision={LIVE && !PREVIEW_AUTH ? step1Vision : undefined} />)}
+          <JourneyCard step={step}><div key={run}>
+          {step === 1 && <Step1Ticket live={LIVE} fields={fields} setFields={setFields} plate={plate} setPlate={setPlate} plateState={plateState} setPlateState={setPlateState} backPhoto={backPhoto} setBackPhoto={setBackPhoto} onComplete={handleStep1Complete} setActionBar={setActionBar} vision={LIVE && !PREVIEW_AUTH ? step1Vision : undefined}
+            scenePhotos={<CurbsidePhotos live={LIVE} samplePhoto={Boolean(photo)} onSamplePhoto={setPhoto} photos={evidencePhotos} onAdd={addEvidencePhotos} onRemove={removeEvidencePhoto} onRetry={uploadEvidencePhoto} />} />}
           {step === 2 && (<Step2YourSide story={story} setStory={setStory} owner={owner} setOwner={setOwner} photo={photo} setPhoto={setPhoto} onComplete={handleStep2Complete} setActionBar={setActionBar} onRulesClick={openRules} liveSlot={LIVE ? <LiveDetails busy={liveBusy || photoUploads > 0} submitting={liveBusy} error={liveError} onSubmit={handleLiveDetails} values={contactValues} onChange={setContactValues} ticketPhoto={photoFiles.ticket} ticketBackPhoto={photoFiles.back} evidencePhotos={evidencePhotos} ticketPhotoRef={photoRefs.ticket} ticketBackPhotoRef={photoRefs.back} onSelectPhoto={(kind,file) => {void selectPhoto(kind,file);}} onAddEvidencePhotos={addEvidencePhotos} onRemoveEvidencePhoto={removeEvidencePhoto} onMoveEvidencePhoto={moveEvidencePhoto} visionRequired={visionRequired} visionFacts={visionAdoptedFacts ? { issuedCity: visionAdoptedFacts.issued_city, issuedState: visionAdoptedFacts.issued_state, issuerKind: visionAdoptedFacts.issuer_kind } : null} /> : undefined} />)}
-          {step === 3 && LIVE && (<LiveResearch status={liveStatus} busy={liveBusy} onDraft={handleLiveDraft} onRetry={handleStep5Complete} caseId={liveCase?.caseId} onStatus={handleDestinationStatus} error={liveError} onAnswer={async answer => { if (!liveCase || liveBusy) return; setLiveBusy(true); setLiveError(null); try { handleDestinationStatus(await api.answer(liveCase.caseId,answer)); } catch (error) { setLiveError(plainError(error)); } finally { setLiveBusy(false); } }} setActionBar={setActionBar} />)}
+          {step === 3 && LIVE && (<LiveResearch issuerName={liveOffer?.issuer.issuer_name} status={liveStatus} busy={liveBusy} onDraft={handleLiveDraft} onRetry={handleStep5Complete} caseId={liveCase?.caseId} onStatus={handleDestinationStatus} error={liveError} onAnswer={async answer => { if (!liveCase || liveBusy) return; setLiveBusy(true); setLiveError(null); try { handleDestinationStatus(await api.answer(liveCase.caseId,answer)); } catch (error) { setLiveError(plainError(error)); } finally { setLiveBusy(false); } }} setActionBar={setActionBar} />)}
           {step === 3 && !LIVE && (<Step3Research onProgress={setEvidenceCount} onComplete={completeResearch} setActionBar={setActionBar} onOpenFact={(f) => { setSheetFactData(f); setSheetFact(true); }} onOpenChecklist={() => setSheetChk(true)} onGoConflict={openConflict} />)}
           {step === 4 && LIVE && liveBeta && (<Step4BetaOffer offer={liveBeta} caseId={liveCase?.caseId ?? ""} busy={liveBusy || betaBusy} blocked={betaBlocked} error={betaError} onAccept={handleBetaAccept} onRefresh={() => { void refreshBetaOffer(); }} setActionBar={setActionBar} />)}
           {step === 4 && LIVE && !liveBeta && (!liveOffer || phase !== "paid" || paidPaused || newPaidBlocked) && (<ControlledBetaWaiting paused={paidPaused} admittedPaid={admittedPaid} savedPending={savedPending} phaseRefreshFailed={pricingRefreshFailed} busy={liveBusy} onRetry={checkSavedStatus} setActionBar={setActionBar} />)}
@@ -1766,9 +1776,9 @@ function Journey() {
           {step === 6 && !LIVE && (<Step6LetterStudio traceMode={traceMode} setTraceMode={setTraceMode} citationNumber={fv("cit")} lapsed={lapsed} onOpenNotes={openNotes} onOpenSentenceModal={handleOpenSentenceModal} onOpenExactPdf={handleOpenExactPdf} onRestartWindow={handleRestartWindow} setActionBar={setActionBar} sents={sents} adopted={adopted} setAdopted={setAdopted} senderName={senderName} setSenderName={setSenderName} senderAddress={senderAddress} setSenderAddress={setSenderAddress} />)}
           {step === 7 && LIVE && liveStatus && <LiveFulfillment status={liveStatus} tracking={liveTracking} busy={liveBusy} error={liveError} onRefresh={() => { void refreshMailing(); }} />}
           {step === 7 && !LIVE && (<Step7Mailed tier={tier ?? "certified"} onDownloadEvidence={handleDownloadEvidence} onDownloadReport={handleDownloadReport} setActionBar={setActionBar} />)}
-          {step === 8 && (<Step8Stop liveStop={LIVE && liveStop ? { message: liveStop.message, officialQuote: liveStop.official_quote ?? null, officialUrl: liveStop.official_url ?? null, savedWords: liveDraft?.text ?? story } : undefined} onCopyNotes={copyNotes} onOpenAgencyForm={openAgencyForm} onEditDetails={reopenStopDetails} onStartNew={startNewFromStop} setActionBar={setActionBar} />)}
+          {step === 8 && (<Step8Stop liveStop={LIVE && liveStop ? { message: liveStop.message, officialQuote: liveStop.official_quote ?? null, officialUrl: liveStop.official_url ?? null, savedWords: liveDraft?.text ?? story } : undefined} onCopyNotes={copyNotes} onOpenAgencyForm={openAgencyForm} onEditDetails={liveStop?.reason_key === "paid_cohort_full" ? undefined : reopenStopDetails} onStartNew={liveStop?.reason_key === "paid_cohort_full" ? undefined : startNewFromStop} setActionBar={setActionBar} />)}
           {step === 9 && (<Step9Conflict optedIn={conflictOptedIn} setOptedIn={setConflictOptedIn} onBackToResearch={backToResearch} setActionBar={setActionBar} />)}
-          </div>
+          </div></JourneyCard>
           {LIVE && liveCase && liveStatus?.payment_state === "NO_CHARGE" && (
             <BetaNotices key={`beta-notices-${liveCase.caseId}`} caseId={liveCase.caseId} workspaceId={liveCase.workspaceId} />
           )}
@@ -1849,8 +1859,8 @@ function Journey() {
       </BottomSheet>
 
       {/* Full checklist */}
-      <BottomSheet id="chkDlg" isOpen={sheetChk} onClose={() => setSheetChk(false)} title="Research Checklist">
-        {LIVE ? <ResearchEvidence research={liveStatus?.research} idPrefix="checklist" /> : <>
+      <BottomSheet id="chkDlg" isOpen={sheetChk} onClose={() => setSheetChk(false)} title="Appeal rules for your jurisdiction">
+        {LIVE ? <ResearchEvidence issuerName={liveOffer?.issuer.issuer_name} research={liveStatus?.research} idPrefix="checklist" /> : <>
         <p className="muted small" style={{ marginBottom: "12px" }}>Tap any item to inspect its verbatim quote, official source link and date.</p>
         {(["must", "imp", "nice"] as const).map((t) => {
           const items = SAMPLE_FACTS.filter((f) => f.tier === t);

@@ -23,12 +23,25 @@ from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import NoReturn, Protocol, runtime_checkable
 
+from parkingbreaker.journey_context import (
+    ContextFactRoute,
+    ContextOperation,
+    ContextReason,
+    DurationBasis,
+    JourneyBuildIdentity,
+    JourneyEventContext,
+    normalize_journey_identity,
+    opaque_reference,
+    runtime_journey_identity,
+)
 from parkingbreaker.journey_events import (
+    CaptureStartBasis,
     CostStatus,
     JourneyEventInput,
     JourneyEventKind,
     JourneyEventOutcome,
     append_journey_event_in_transaction,
+    ensure_journey_identity_in_transaction,
     extract_usage_cost,
 )
 from parkingbreaker.mail_attempt_store import StorageCorruption, rollback_preserving_error
@@ -979,6 +992,7 @@ def claim_ticket_intake_operation(
     *,
     workspace_token: str | None = None,
     owner: str | None = None,
+    journey_identity: JourneyBuildIdentity | None = None,
 ) -> OperationClaim:
     """Persist one paid-operation claim before any provider call.
 
@@ -996,6 +1010,7 @@ def claim_ticket_intake_operation(
         None if workspace_token is None else _opaque(workspace_token, "workspace token")
     )
     supplied_owner = None if owner is None else _opaque(owner, "owner")
+    identity = normalize_journey_identity(journey_identity)
     _begin(database)
     try:
         reservation = _load_reservation(database, "intake_id", subject)
@@ -1082,6 +1097,13 @@ def claim_ticket_intake_operation(
         ).fetchone()
         if row is None:
             raise StorageCorruption("ticket intake claim was not stored")
+        ensure_journey_identity_in_transaction(
+            database,
+            workspace_token=reservation.workspace_token,
+            at=at,
+            basis=CaptureStartBasis.FIRST_DURABLE_ATTEMPT,
+            identity=identity,
+        )
         claim = _claim(row, claim_token=raw_token)
         database.execute("COMMIT")
         return claim
@@ -1104,6 +1126,7 @@ def complete_ticket_intake_operation(
     operation: IntakeOperation | str | None = None,
     binding_sha256: str | None = None,
     ocr_observation: OcrObservationInput | None = None,
+    journey_identity: JourneyBuildIdentity | None = None,
 ) -> OperationClaim:
     """Complete exactly one pending claim once, replaying an identical completion.
 
@@ -1129,6 +1152,7 @@ def complete_ticket_intake_operation(
     supplied_subject = None if intake_id is None else _opaque(intake_id, "intake id")
     supplied_operation = None if operation is None else _operation(operation)
     supplied_binding = None if binding_sha256 is None else _digest(binding_sha256, "binding digest")
+    identity = normalize_journey_identity(journey_identity)
     _begin(database)
     try:
         canonical_request = request
@@ -1255,6 +1279,26 @@ def complete_ticket_intake_operation(
                     duration_ms=duration_ms,
                     cost_cents=cost_cents,
                     cost_status=cost_status,
+                    context=JourneyEventContext(
+                        operation=ContextOperation.OCR_EXTRACT,
+                        build_sha256=identity.build_sha256,
+                        config_sha256=identity.config_sha256,
+                        reason=(
+                            ContextReason.NOT_APPLICABLE
+                            if completed.status is ClaimStatus.SUCCESS
+                            else ContextReason.READING_REFUSED
+                            if completed.status is ClaimStatus.REFUSED
+                            else ContextReason.READING_RESULT_UNKNOWN
+                        ),
+                        fact_route=ContextFactRoute.NOT_APPLICABLE,
+                        duration_basis=DurationBasis.SERVER_WALL_ELAPSED,
+                        operation_ref=opaque_reference(
+                            "op", f"ocr_extract:{completed.intake_id}:{completed.binding_sha256}"
+                        ),
+                        attempt_ref=opaque_reference(
+                            "att", f"ticket_intake:{completed.request_id}"
+                        ),
+                    ),
                 ),
             )
             if ocr_observation is not None:
@@ -1290,6 +1334,7 @@ def record_ticket_intake_confirmation(
     *,
     workspace_token: str | None = None,
     owner: str | None = None,
+    journey_identity: JourneyBuildIdentity | None = None,
 ) -> CustomerConfirmation:
     """Append one hash-only customer confirmation bound to a completed review result.
 
@@ -1312,6 +1357,7 @@ def record_ticket_intake_confirmation(
         None if workspace_token is None else _opaque(workspace_token, "workspace token")
     )
     supplied_owner = None if owner is None else _opaque(owner, "owner")
+    identity = normalize_journey_identity(journey_identity)
     _begin(database)
     try:
         reservation = _load_reservation(database, "intake_id", subject)
@@ -1425,6 +1471,25 @@ def record_ticket_intake_confirmation(
                 outcome=JourneyEventOutcome.SUCCEEDED,
                 occurred_at=confirmation.confirmed_at,
                 cost_status=CostStatus.NOT_APPLICABLE,
+                context=JourneyEventContext(
+                    operation=ContextOperation.FACT_CONFIRMATION,
+                    build_sha256=identity.build_sha256,
+                    config_sha256=identity.config_sha256,
+                    reason=ContextReason.NOT_APPLICABLE,
+                    fact_route=(
+                        ContextFactRoute.CUSTOMER_SUPPLIED
+                        if customer_supplied
+                        else ContextFactRoute.OCR
+                    ),
+                    duration_basis=DurationBasis.NOT_APPLICABLE,
+                    operation_ref=opaque_reference(
+                        "op",
+                        f"fact_confirmation:{confirmation.intake_id}:{confirmation.generation}",
+                    ),
+                    attempt_ref=opaque_reference(
+                        "att", f"fact_confirmation:{confirmation.command_id}"
+                    ),
+                ),
             ),
         )
         database.execute("COMMIT")
@@ -1559,6 +1624,7 @@ class TicketIntakeStore:
             now,
             workspace_token=workspace_token,
             owner=owner,
+            journey_identity=runtime_journey_identity(self._connection_source),
         )
 
     def begin_operation(
@@ -1608,6 +1674,7 @@ class TicketIntakeStore:
             operation=operation,
             binding_sha256=binding_sha256,
             ocr_observation=ocr_observation,
+            journey_identity=runtime_journey_identity(self._connection_source),
         )
 
     def finish_operation(
@@ -1665,6 +1732,7 @@ class TicketIntakeStore:
             now,
             workspace_token=workspace_token,
             owner=owner,
+            journey_identity=runtime_journey_identity(self._connection_source),
         )
 
     def read_confirmation(
@@ -1749,6 +1817,7 @@ class TicketIntakeStoreMixin:
             now,
             workspace_token=workspace_token,
             owner=owner,
+            journey_identity=runtime_journey_identity(self),
         )
 
     def complete_ticket_intake_operation(
@@ -1777,6 +1846,7 @@ class TicketIntakeStoreMixin:
             operation=operation,
             binding_sha256=binding_sha256,
             ocr_observation=ocr_observation,
+            journey_identity=runtime_journey_identity(self),
         )
 
     def record_ticket_intake_confirmation(
@@ -1807,6 +1877,7 @@ class TicketIntakeStoreMixin:
             now,
             workspace_token=workspace_token,
             owner=owner,
+            journey_identity=runtime_journey_identity(self),
         )
 
     def read_ticket_intake_confirmation(

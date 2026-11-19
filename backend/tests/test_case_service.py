@@ -190,6 +190,28 @@ async def api(tmp_path: Path) -> AsyncIterator[AsyncClient]:
         yield client
 
 
+async def test_unprintable_statement_can_be_corrected_before_intake(api: AsyncClient) -> None:
+    workspace = (await api.post("/workspaces", headers=ALICE, json={"notes": ""})).json()
+    path = f"/workspaces/{workspace['workspace_id']}"
+    photo = await api.post(
+        f"{path}/photos",
+        headers=ALICE,
+        json={"content_type": "image/png", "data_base64": PNG_B64},
+    )
+    ref = photo.json()["photo_ref"]
+    body = {**INTAKE, "photo_refs": [ref], "citation_photo_ref": ref}
+    refused = await api.post(
+        f"{path}/intake",
+        headers=ALICE,
+        json={**body, "customer_position": {"statement": "I didn\u2019t see the sign."}},
+    )
+    assert refused.status_code == 409
+    assert refused.json()["detail"] == "customer_statement_not_printable"
+    assert (await api.get(path, headers=ALICE)).json().get("intake") is None
+    corrected = await api.post(f"{path}/intake", headers=ALICE, json=body)
+    assert corrected.status_code == 200, corrected.text
+
+
 async def submit(client: AsyncClient, body: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     workspace = (await client.post("/workspaces", headers=ALICE, json={"notes": ""})).json()
     uploaded = await client.post(

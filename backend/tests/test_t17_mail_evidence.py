@@ -508,7 +508,10 @@ def test_one_free_remail_uses_persisted_verified_correction_and_survives_restart
         decision = seed_destination(store, case, NOW, CORRECTED)
         assert decision.provenance is AddressProvenance.SYSTEM_VERIFIED
         assert decision.fingerprint != address_fingerprint(RECIPIENT)
-        request = replace(make_request(token="remail-token"), recipient=CORRECTED)
+        request = replace(
+            make_request(pdf=b"%PDF-1.4\ncorrected synthetic packet", token="remail-token"),
+            recipient=CORRECTED,
+        )
         store.prepare(case.case_token, 2, request, NOW)
         seed_approval(store, case.case_token, 2)
         original = store.get(case.case_token, 1)
@@ -609,7 +612,13 @@ def test_wrong_address_return_cannot_remail_without_a_verified_different_destina
                 (intake.intake_id, intake.owner, saved.revision + 1, _json(asdict(decision))),
             )
         store.prepare(
-            case.case_token, 2, replace(make_request(token="remail-token"), recipient=address), NOW
+            case.case_token,
+            2,
+            replace(
+                make_request(pdf=b"%PDF-1.4\ncorrected synthetic packet", token="remail-token"),
+                recipient=address,
+            ),
+            NOW,
         )
     with SqliteTransactionStore(path) as store:
         submit(store, wire, case, NOW)

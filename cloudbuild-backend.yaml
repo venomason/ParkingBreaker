@@ -2,9 +2,12 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
+      '--build-arg', 'PB_BUILD_COMMIT=${_PB_BUILD_COMMIT}',
       '-t', 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:staging',
       '-f', 'backend/Dockerfile',
       '.'
     ]
 images:
   - 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:staging'
+substitutions:
+  _PB_BUILD_COMMIT: ''

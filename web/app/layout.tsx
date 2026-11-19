@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./fonts.css";
 import "./globals.css";
+import "./journey.css";
+import "./brand-logo.css";
 import { InteractivePulse } from "../components/InteractivePulse";
 
 const PRELOAD_FONTS = [
@@ -21,7 +23,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0B1D33",
+  interactiveWidget: "resizes-content",
+  themeColor: "#F2EFE6",
   colorScheme: "light",
 };
 

@@ -1,12 +1,12 @@
-# REVIEW OVERLAY: compose.yaml + deploy/compose.production.yaml + this file, in order.
+# REVIEW OVERLAY: compose.yaml + deploy/compose.production.yaml + this file +
+# the release's deploy/private-images.json (five pinned services, checked by lifecycle).
 # Compose >=2.24.4 (!override and !reset). `docker compose config` is read-only.
 # Keep ONE fenced VM owning the regional disk. PB_DATA_PATH remains its existing
 # mounted directory, never a named volume, NFS/FUSE mount or Cloud Run filesystem.
 # Existing validate.sh disk-owner checks, flock, stop-before-start, quarantine,
 # backup/restore and schema gates remain mandatory; replicas are not disk fencing.
-# lifecycle.sh currently selects only the production stack and expects local web.
-# It MUST be separately integrated/rehearsed with this overlay before activation;
-# do not bypass it with `compose up`. This file alone is not a deployment workflow.
+# lifecycle.sh selects this overlay for cloudrun-private-vm. Rehearse the real
+# frontend-to-VM route on the isolated target before activation.
 # VM MUST have no public ingress/IP. Firewall TCP 8443 to the frontend VPC tag/range.
 # PB_PRIVATE_VM_IP must be the VM's RFC1918 address (never 0.0.0.0/public/loopback).
 # PB_PRIVATE_API_HOST must resolve to it and match the provisioned trusted TLS cert.
@@ -15,12 +15,14 @@
 services:
   web: !reset null
   api:
+    build: !reset null
     container_name: parkingbreaker-api
     deploy: {replicas: 1}
     ports: !reset []
     networks: !override [customer, api_egress]
     environment:
       PB_API_ROLE: customer
+      PB_BUILD_COMMIT: ${PB_BUILD_COMMIT:?reviewed backend commit required}
       PB_DATA_DIR: /data
       PB_PUBLIC_ORIGIN: ${PB_PUBLIC_ORIGIN:?final HTTPS customer origin required}
     volumes: !override
@@ -29,12 +31,14 @@ services:
         target: /data
         bind: {create_host_path: false}
   worker:
+    build: !reset null
     container_name: parkingbreaker-worker
     deploy: {replicas: 1}
     ports: !reset []
     networks: !override [worker_control, worker_egress]
     environment:
       PB_API_ROLE: worker
+      PB_BUILD_COMMIT: ${PB_BUILD_COMMIT:?reviewed backend commit required}
       PB_DATA_DIR: /data
       PB_PUBLIC_ORIGIN: ${PB_PUBLIC_ORIGIN:?final HTTPS customer origin required}
     volumes: !override
@@ -50,6 +54,7 @@ services:
     depends_on: !override [worker]
     command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch']
   monitor:
+    build: !reset null
     container_name: parkingbreaker-monitor
     deploy: {replicas: 1}
     ports: !reset []
@@ -65,12 +70,15 @@ services:
     image: caddy:2.10.2-alpine
     user: "10001:10001"
     restart: unless-stopped
+    environment:
+      PB_NEW_INTAKE: ${PB_NEW_INTAKE-open}
+      PB_PRIVATE_API_HOST: ${PB_PRIVATE_API_HOST:?private TLS DNS name required}
     ports:
       - target: 8443
         published: "8443"
         host_ip: ${PB_PRIVATE_VM_IP:?private RFC1918 VM address required}
         protocol: tcp
-    networks: [customer]
+    networks: [customer, gateway_ingress]
     depends_on: [api]
     configs:
       - source: private_customer_gateway
@@ -85,10 +93,17 @@ services:
     tmpfs: [/tmp]
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
+    # The pinned Caddy executable carries this file capability on Alpine.
+    cap_add: [NET_BIND_SERVICE]
     deploy: {replicas: 1}
 
 networks:
   customer: {internal: true}
+  # Docker skips port publishing when all of a container's networks are internal.
+  gateway_ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
   worker_control: {internal: true}
   api_egress: {}
   worker_egress: {}
@@ -96,19 +111,4 @@ networks:
 
 configs:
   private_customer_gateway:
-    content: |
-      {
-          admin off
-          auto_https off
-          persist_config off
-      }
-      https://${PB_PRIVATE_API_HOST:?private TLS DNS name required}:8443 {
-          tls /tls/fullchain.pem /tls/privkey.pem
-          route {
-              @private path /internal /internal/* /api/internal /api/internal/* /dev-worker /dev-worker/* /api/dev-worker /api/dev-worker/*
-              respond @private 404
-              @customer path /health /auth /auth/* /workspaces /workspaces/* /cases /cases/* /webhooks /webhooks/*
-              reverse_proxy @customer api:8000
-              respond 404
-          }
-      }
+    file: ./deploy/Caddyfile.private

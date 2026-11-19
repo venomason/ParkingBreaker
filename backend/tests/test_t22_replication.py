@@ -76,6 +76,45 @@ def test_scheduled_backup_has_offline_dry_run() -> None:
 # ---- host backup script: same command bodies as --apply, recorded by command stand-ins ----
 
 
+def test_private_backup_and_replica_use_the_active_private_stack(tmp_path: Path) -> None:
+    from test_t22_lifecycle import commands, rehearsal, run_script
+
+    replica = tmp_path / "offsite"
+    replica.mkdir()
+    env, state = rehearsal(
+        tmp_path, PB_DEPLOY_TOPOLOGY="cloudrun-private-vm", PB_REPLICA_DIRECTORY=str(replica)
+    )
+    # Simulate the mounted transport. Docker is also a command recorder in this rehearsal.
+    findmnt = tmp_path / "shims/findmnt"
+    findmnt.write_text('#!/bin/sh\nprintf "%s\\n" "fuse.sshfs"\n')
+    findmnt.chmod(0o755)
+    result = run_script("backup.sh", "--rehearse", str(state), env=env)
+    assert result.returncode == 0, result.stderr
+    backup, copy = commands(tmp_path)
+    deploy = Path(env["PB_RELEASE"]) / "deploy"
+    overlay = f"-f {deploy}/compose.private-vm.yaml -f {deploy}/private-images.json"
+    assert overlay in backup
+    assert overlay in copy
+    assert f"-v {replica}:/replica" in copy
+    assert "findmnt --noheadings --mountpoint /replica" in copy
+    assert "recovery_cli replicate" in copy
+
+
+def test_private_backup_keeps_local_bundle_and_alerts_without_offhost_mount(tmp_path: Path) -> None:
+    from test_t22_lifecycle import commands, rehearsal, run_script
+
+    replica = tmp_path / "ordinary-directory"
+    replica.mkdir()
+    env, state = rehearsal(
+        tmp_path, PB_DEPLOY_TOPOLOGY="cloudrun-private-vm", PB_REPLICA_DIRECTORY=str(replica)
+    )
+    result = run_script("backup.sh", "--rehearse", str(state), env=env)
+    assert result.returncode != 0
+    (backup,) = commands(tmp_path)
+    assert "recovery_cli backup" in backup
+    assert "backup_job_failed" in (tmp_path / "data/recovery/recovery-alerts.jsonl").read_text()
+
+
 def test_scheduled_backup_runs_the_recovery_cli_inside_the_api_container(tmp_path: Path) -> None:
     from test_t22_lifecycle import commands, rehearsal, run_script
 

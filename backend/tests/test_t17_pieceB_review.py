@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from mail_samples import make_request, seed_destination
+from mail_samples import make_request, seed_destination, synthetic_remail_manifest
 from parkingbreaker import case_state as cs
 from parkingbreaker import payment_state as ps
 from parkingbreaker.address_policy import (
@@ -271,13 +271,18 @@ def returned_with_remail_intent(
         )
         assert remedy is not None
         assert remedy.remails
+        request = replace(
+            make_request(pdf=b"%PDF-1.4\ncorrected synthetic packet", token="unpaid-remail-token"),
+            recipient=CORRECTED,
+        )
         store.resolve_returned_mail(
             case.case_token,
             case.revision,
             responsibility,
             remedy,
-            replace(make_request(token="unpaid-remail-token"), recipient=CORRECTED),
+            request,
             now=late,
+            remail_manifest=synthetic_remail_manifest(store, case, request, late),
         )
     return case, late
 
@@ -453,6 +458,7 @@ async def test_pending_capture_waits_across_restarts_then_paid_remail_sends(
         assert status.remail is False
         assert status.refund_status is None
         settle_original_capture(mailing)
+        mailing.approve_remail()
         mailing.sweep(4)
         assert len(mailing.lob.calls) == 2
         settled = mailing.case  # fresh read: the earlier RETURNED assertion narrowed the old one
@@ -779,13 +785,18 @@ def test_scan_proof_keeps_later_scans_and_separates_attempts(
         )
         assert remedy is not None
         assert remedy.remails
+        request = replace(
+            make_request(pdf=b"%PDF-1.4\ncorrected synthetic packet", token="second-token"),
+            recipient=CORRECTED,
+        )
         store.resolve_returned_mail(
             case.case_token,
             case.revision,
             responsibility,
             remedy,
-            replace(make_request(token="second-token"), recipient=CORRECTED),
+            request,
             now=NOW,
+            remail_manifest=synthetic_remail_manifest(store, case, request, NOW),
         )
     second_time = (NOW + timedelta(minutes=2)).isoformat()
     second = resource(

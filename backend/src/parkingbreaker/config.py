@@ -38,6 +38,7 @@ from parkingbreaker.config_fakes import (
 )
 from parkingbreaker.dotgov_source import load_dotgov_snapshot
 from parkingbreaker.http_fetcher import HttpFetcher
+from parkingbreaker.journey_context import JourneyBuildIdentity
 from parkingbreaker.llm import LlmClient, MultimodalLlmClient
 from parkingbreaker.llm_gateway import CallLoggingLlmClient, SpendLedger
 from parkingbreaker.lob_client import LobSdkClient
@@ -93,6 +94,17 @@ PHASE_VARIABLE = "PB_SERVICE_PHASE"
 _PHASE_ERROR = f"{PHASE_VARIABLE} must be paid or controlled_free_beta"
 
 
+def _paid_cohort_cap(mode: ProviderMode, values: Mapping[str, str]) -> int | None:
+    raw = values.get("PB_PAID_COHORT_CAP")
+    if raw is None:
+        return 0 if mode is ProviderMode.LIVE else None
+    if mode is ProviderMode.PREVIEW:
+        raise ConfigError("PB_PAID_COHORT_CAP requires a durable provider mode")
+    if not raw.isascii() or not raw.isdecimal() or len(raw) > 19 or int(raw) > 2**63 - 1:
+        raise ConfigError("PB_PAID_COHORT_CAP must be a nonnegative SQLite integer")
+    return int(raw)
+
+
 def resolve_service_phase(settings: Settings) -> ServicePhase:
     """Resolve the frozen process phase before any data or adapter is opened.
 
@@ -106,6 +118,30 @@ def resolve_service_phase(settings: Settings) -> ServicePhase:
     if not isinstance(settings.service_phase, ServicePhase):
         raise ConfigError(_PHASE_ERROR)
     return settings.service_phase
+
+
+def journey_identity_from_settings(settings: Settings) -> JourneyBuildIdentity | None:
+    """Optional declared nonsecret manifest digests, not a deployment attestation.
+
+    Never hash the whole environment, infer a build from Git or assign this identity
+    to old rows. Blank/unconfigured values remain unknown independently.
+    """
+    digests: list[str | None] = []
+    for name in ("PB_JOURNEY_BUILD_SHA256", "PB_JOURNEY_CONFIG_SHA256"):
+        raw = settings.values.get(name, "").strip()
+        if not raw:
+            digests.append(None)
+            continue
+        try:
+            JourneyBuildIdentity(build_sha256=raw)
+        except ValueError:
+            raise ConfigError(
+                f"{name} must be a nonsecret lowercase SHA-256 manifest digest"
+            ) from None
+        digests.append(raw)
+    if digests == [None, None]:
+        return None
+    return JourneyBuildIdentity(digests[0], digests[1])
 
 
 TICKET_READING_PREVIEW_VARIABLE = "PB_TICKET_READING_PREVIEW"
@@ -187,6 +223,7 @@ def load_settings(
             raise ConfigError(_PHASE_ERROR) from None
     if mode is ProviderMode.LIVE and phase is None:
         raise ConfigError(f"{_PHASE_ERROR} in live mode")
+    _paid_cohort_cap(mode, values)
     try:
         load_review_canary_config(values)
     except ValueError as exc:
@@ -247,6 +284,8 @@ def build_services(
     require_recovery_gates(settings)
     # Resolve and validate the frozen phase before any data directory or adapter exists.
     service_phase = resolve_service_phase(settings)
+    paid_cohort_cap = _paid_cohort_cap(settings.mode, settings.values)
+    journey_identity = journey_identity_from_settings(settings)
     try:
         review_canary = load_review_canary_config(settings.values)
     except ValueError as exc:
@@ -257,8 +296,17 @@ def build_services(
     store = (
         store
         if store is not None
-        else SqliteTransactionStore(settings.data_dir / "parkingbreaker.sqlite")
+        else SqliteTransactionStore(
+            settings.data_dir / "parkingbreaker.sqlite", journey_identity=journey_identity
+        )
     )
+    if journey_identity is not None:
+        try:
+            store.bind_journey_identity(journey_identity)
+        except ValueError:
+            raise ConfigError(
+                "journey runtime identity conflicts with configured manifest"
+            ) from None
     photos = LocalBlobStore(settings.data_dir / "photos")
 
     def clock() -> datetime:
@@ -485,6 +533,7 @@ def build_services(
             research_for_subject=research_for_subject,
             drafter_for_subject=drafter_for_subject,
             service_phase=service_phase,
+            paid_cohort_cap=paid_cohort_cap,
             ticket_intake=ticket_intake,
         )
     )

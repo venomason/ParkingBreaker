@@ -6,45 +6,42 @@
    ========================================================================== */
 
 :root {
-  /* Core palette — Authority Navy, Uniform Blue, Emblem Gold, Hurtle Green, Alabaster */
-  --ink: #0b1d33;
-  --ink-2: #163a5f;
-  --ink-3: #475569;
-  --paper: #f8fafc;
-  --paper-2: #eef2f6;
-  --surface: #ffffff;
-  --surface-glass: rgba(248, 250, 252, 0.94);
-  --volt: #e5a93c;
-  --volt-deep: #d49424;
-  --volt-soft: #fdf4e3;
-  --forest: #36752b;
-  --forest-deep: #2f6925;
-  --forest-soft: #e9f5e6;
+  /* Customer palette shared by intake, access and the appeal workspace. */
+  --ink: #102b36;
+  --ink-2: #42565d;
+  --ink-3: var(--ink-2);
+  --paper: #f2efe6;
+  --surface: #fff;
+  --surface-glass: rgb(255 255 255 / 96%);
+  --forest: #124c3d;
+  --forest-deep: #0c3b2f;
+  --forest-soft: #edf4ef;
+  --paper-2: var(--forest-soft);
+  --volt: #e9ae42;
+  --volt-soft: var(--forest-soft);
 
-  /* Fine lines and states */
-  --line: #dbe2ea;
-  --line-strong: #94a3b8;
-  --focus: #0b1d33;
-  --red: #b91c1c;
-  --red-soft: #fee2e2;
-  --amber: #d97706;
-  --amber-soft: #fef3c7;
-  --amber-ink: #78350f;
-  --sage: #36752b;
-  --sage-soft: #e9f5e6;
-  --slate: #163a5f;
-  --slate-soft: #e8eef5;
+  --line: #d1dbd4;
+  --line-strong: #657a70;
+  --focus: var(--forest);
+  --sage: #21563e;
+  --sage-soft: #e8f5ec;
+  --amber-ink: #694005;
+  --amber: var(--amber-ink);
+  --amber-soft: #fff1d6;
+  --red: #8b2822;
+  --red-soft: #fce9e7;
+  --slate: var(--ink-2);
+  --slate-soft: var(--forest-soft);
 
-  /* Compatibility aliases: existing components use these names inline. */
   --bg: var(--paper);
   --bg-2: var(--paper-2);
-  --coral: #163a5f;
-  --coral-ink: #0b1d33;
-  --coral-soft: #e8eef5;
-  --coral-tint: #f1f5f9;
-  --plum: #163a5f;
-  --plum-soft: #e8eef5;
-  --plum-ink: #0b1d33;
+  --coral: var(--forest);
+  --coral-ink: var(--ink);
+  --coral-soft: var(--forest-soft);
+  --coral-tint: var(--paper);
+  --plum: var(--forest);
+  --plum-soft: var(--forest-soft);
+  --plum-ink: var(--ink);
 
   /* Shape and depth — fluid organic curves */
   --r-xl: 28px;
@@ -93,18 +90,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Soft organic ambient gradients instead of a rigid square grid. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(65% 50% at 12% 8%, rgba(229, 169, 60, 0.10) 0%, transparent 70%),
-    radial-gradient(55% 45% at 88% 16%, rgba(78, 159, 61, 0.08) 0%, transparent 72%),
-    radial-gradient(70% 55% at 50% 92%, rgba(22, 58, 95, 0.06) 0%, transparent 75%);
-}
+
 
 /* ---------------------------------------------------------------- Typography */
 
@@ -265,6 +251,14 @@ img {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
+}
+
+.err:not(:empty), .field-error:not(:empty),
+:is(.journey-card, .access-card, .access-session) :is(p, span)[role="alert"]:not(:empty) {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .err:empty {
@@ -500,14 +494,7 @@ img {
   white-space: nowrap;
 }
 
-.brand-mark {
-  display: block;
-  flex: none;
-}
 
-.brand-word {
-  display: inline-block;
-}
 
 .top-r {
   display: flex;
@@ -546,7 +533,7 @@ img {
 .iconbtn .badge-ct {
   padding: 1px 6px;
   border-radius: 3px;
-  background: var(--volt);
+  background: var(--forest-soft);
   color: var(--ink);
   font-family: var(--font-mono), monospace;
   font-size: 10.5px;
@@ -610,111 +597,14 @@ img {
   background: var(--ink-3);
 }
 
-/* Progress rail: six milestones, one unambiguous current stage. */
-.pbar-wrap {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
+.path-now {
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 18px 10px;
-}
-
-.path-now {
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--forest);
-}
-
-.pbar-steps {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 2px;
-}
-
-.pbar-steps::before {
-  content: "";
-  position: absolute;
-  top: 11px;
-  left: calc(100% / 12);
-  right: calc(100% / 12);
-  height: 2px;
-  background: var(--line);
-}
-
-.pbar-steps i {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-  background: none;
-  font-style: normal;
-  color: var(--ink-3);
-}
-
-.milestone-number {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  background: var(--paper);
-  color: var(--ink-3);
-  font-family: var(--font-mono), monospace;
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.milestone-label {
-  overflow: hidden;
-  max-width: 100%;
-  color: var(--ink-3);
-  font-size: 10.5px;
-  line-height: 1.25;
-  text-align: center;
-}
-
-.pbar-steps i.done .milestone-number {
-  border-color: var(--forest);
-  background: var(--forest);
-  color: #fff;
-}
-
-.pbar-steps i.done .milestone-label {
+  line-height: 1.4;
   color: var(--ink-2);
-}
-
-.pbar-steps i.cur .milestone-number {
-  border-color: var(--ink);
-  background: var(--volt);
-  color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(229, 169, 60, 0.36);
-}
-
-.pbar-steps i.cur .milestone-label {
-  color: var(--ink);
-  font-weight: 650;
-}
-
-.pbar-steps i.paused .milestone-number {
-  border-color: var(--amber);
-  background: var(--amber-soft);
-  color: var(--amber-ink);
-}
-
-@media (max-width: 1023px) {
-  .milestone-label {
-    display: none;
-  }
 }
 
 @media (min-width: 1024px) {
@@ -726,25 +616,9 @@ img {
     font-size: 19px;
   }
 
-  .brand-mark {
-    width: 36px;
-    height: 36px;
-  }
-
-  .pbar-wrap {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 24px;
-    padding: 0 32px 12px;
-  }
-
-  .pbar-steps {
-    gap: 6px;
-  }
 
   .path-now {
-    font-size: 10.5px;
-    white-space: nowrap;
+    padding: 0 32px 12px;
   }
 }
 
@@ -759,28 +633,9 @@ img {
     gap: 8px;
   }
 
-  .brand-mark {
-    width: 30px;
-    height: 30px;
-  }
-
-  .pbar-wrap {
-    padding: 0 14px 8px;
-    gap: 5px;
-  }
 
   .path-now {
-    font-size: 9.5px;
-  }
-
-  .milestone-number {
-    width: 20px;
-    height: 20px;
-    font-size: 8.5px;
-  }
-
-  .pbar-steps::before {
-    top: 10px;
+    padding: 0 14px 8px;
   }
 }
 
@@ -823,7 +678,9 @@ img {
   min-height: 52px;
   min-width: 44px;
   padding: 12px 20px;
-  border: 1px solid transparent;
+  border: 1px solid var(--forest);
+  background: var(--surface);
+  color: var(--forest);
   border-radius: 10px;
   font: inherit;
   font-size: 15.5px;
@@ -842,14 +699,16 @@ img {
 }
 
 .btn-primary {
-  border-color: var(--volt-deep);
-  background: var(--volt);
-  color: var(--ink);
+  border-color: var(--forest);
+  background: var(--forest);
+  color: var(--surface);
   box-shadow: inset 0 -2px 0 rgba(16, 23, 16, 0.1);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--volt-deep);
+.btn-primary:hover:not(:disabled),
+.btn-primary:active:not(:disabled) {
+  border-color: var(--forest-deep);
+  background: var(--forest-deep);
 }
 
 .btn-primary:disabled,
@@ -861,18 +720,16 @@ img {
   cursor: not-allowed;
 }
 
-.btn-ghost {
-  border-color: var(--line-strong);
-  background: var(--surface);
-  color: var(--ink);
-}
-
-.btn-ghost:hover:not(:disabled) {
-  border-color: var(--ink);
-}
-
+.btn-ghost,
 .btn-soft {
-  border-color: #cbd8c6;
+  border-color: var(--forest);
+  background: var(--surface);
+  color: var(--forest);
+}
+
+.btn-ghost:hover:not(:disabled),
+.btn-soft:hover:not(:disabled) {
+  border-color: var(--forest-deep);
   background: var(--forest-soft);
   color: var(--forest-deep);
 }
@@ -903,10 +760,10 @@ img {
   min-height: 44px;
   min-width: 44px;
   padding: 9px 13px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--forest);
   border-radius: 7px;
   background: var(--surface);
-  color: var(--ink);
+  color: var(--forest);
   font-size: 12.5px;
   font-weight: 600;
   text-align: center;
@@ -915,18 +772,19 @@ img {
 }
 
 .chip:hover:not(:disabled) {
-  border-color: var(--ink);
-  background: var(--paper);
+  border-color: var(--forest-deep);
+  background: var(--forest-soft);
 }
 
 .chip:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-.chip[aria-pressed="true"] {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+.chip[aria-pressed="true"],
+.chip[aria-pressed="true"]:hover:not(:disabled) {
+  border-color: var(--forest-deep);
+  background: var(--forest);
+  color: var(--surface);
 }
 
 .spinner {
@@ -953,7 +811,7 @@ img {
   border: 1px solid var(--line);
   border-left: 3px solid var(--forest);
   border-radius: 0 8px 8px 0;
-  background: #eef1ea;
+  background: var(--forest-soft);
   color: var(--ink-2);
   font-size: 13.5px;
   line-height: 1.55;
@@ -1016,8 +874,8 @@ img {
 }
 
 .s-na {
-  background: #eff1ec;
-  color: #4b544b;
+  background: var(--forest-soft);
+  color: var(--ink-2);
 }
 
 /* ------------------------------------------------------------------- Screens */
@@ -1758,13 +1616,15 @@ select[aria-invalid="true"] {
 .msg.c {
   border: 1px solid var(--line);
   border-bottom-left-radius: 2px;
-  background: var(--surface);
+  background: var(--forest-soft);
+  color: var(--ink);
 }
 
 .msg.u {
+  border: 1px solid var(--line);
   border-bottom-right-radius: 2px;
-  background: var(--ink);
-  color: #f5f6f2;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .msg.g {
@@ -1890,21 +1750,21 @@ select[aria-invalid="true"] {
   gap: 10px;
   margin-bottom: 14px;
   padding: 12px 14px;
-  border: 1px solid #e2cf9a;
-  border-left: 3px solid var(--amber);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--forest);
   border-radius: 0 8px 8px 0;
-  background: var(--amber-soft);
-  color: var(--amber-ink);
+  background: var(--forest-soft);
+  color: var(--ink);
   font-size: 13.5px;
   font-weight: 600;
   line-height: 1.45;
 }
 
 .r-live-bar.done {
-  border-color: #cbd8c6;
-  border-left-color: var(--forest);
-  background: var(--forest-soft);
-  color: var(--forest-deep);
+  border-color: var(--line);
+  border-left-color: var(--sage);
+  background: var(--sage-soft);
+  color: var(--sage);
 }
 
 .r-matrix {
@@ -2380,7 +2240,7 @@ fieldset legend h3 {
   width: 24px;
   height: 24px;
   margin: 2px 0;
-  accent-color: var(--ink);
+  accent-color: var(--forest);
 }
 
 /* -------------------------------------------------------------------- Step 5 */
@@ -2514,14 +2374,14 @@ fieldset legend h3 {
   border-left: 3px solid var(--amber);
   border-radius: 0 8px 8px 0;
   background: var(--amber-soft);
-  color: var(--ink-2);
+  color: var(--amber-ink);
 }
 
 .flagbar.clear {
-  border-color: #cbd8c6;
-  border-left-color: var(--forest);
-  background: var(--forest-soft);
-  color: var(--forest-deep);
+  border-color: var(--line);
+  border-left-color: var(--sage);
+  background: var(--sage-soft);
+  color: var(--sage);
 }
 
 .flagbar b {
@@ -2535,7 +2395,7 @@ fieldset legend h3 {
 
 .flagbar p {
   margin: 0;
-  color: var(--ink);
+  color: inherit;
   font-size: 14px;
   line-height: 1.55;
 }
@@ -2908,7 +2768,7 @@ fieldset legend h3 {
   width: 22px;
   height: 22px;
   margin-top: 3px;
-  accent-color: var(--ink);
+  accent-color: var(--forest);
 }
 
 .optin b {
@@ -2930,7 +2790,7 @@ fieldset legend h3 {
   border-left: 3px solid var(--amber);
   border-radius: 0 8px 8px 0;
   background: var(--amber-soft);
-  color: var(--ink-2);
+  color: var(--amber-ink);
   font-size: 13.5px;
   line-height: 1.6;
 }
@@ -4159,7 +4019,7 @@ input[type="file"]:focus-visible {
   width: 24px;
   height: 24px;
   margin: 1px 0;
-  accent-color: var(--ink);
+  accent-color: var(--forest);
 }
 
 .signature-card {
@@ -4679,8 +4539,7 @@ input[type="file"]:focus-visible {
   .screen *,
   .mark,
   .access-skeleton span,
-  .ticket.scanning::after,
-  .pbar-steps i {
+  .ticket.scanning::after {
     animation: none !important;
   }
 }
@@ -4690,7 +4549,7 @@ input[type="file"]:focus-visible {
 .intake-trust :focus-visible,
 .jumper :focus-visible,
 .jumper-toggle:focus-visible {
-  outline-color: var(--volt);
+  outline-color: var(--focus);
 }
 
 @media (forced-colors: active) {
@@ -4708,8 +4567,7 @@ input[type="file"]:focus-visible {
   }
 
   .ps-index,
-  .reqbar-dot,
-  .milestone-number {
+  .reqbar-dot {
     border: 1px solid CanvasText;
   }
 }
@@ -4860,16 +4718,6 @@ input[type="file"]:focus-visible {
     font-size: 23px;
   }
 
-  .milestone-number {
-    width: 18px;
-    height: 18px;
-    font-size: 8px;
-  }
-
-  .pbar-steps::before {
-    top: 9px;
-  }
-
   .ps-label {
     font-size: 9px;
   }
@@ -4895,7 +4743,7 @@ input[type="file"]:focus-visible {
 .card,
 .access-card {
   border-radius: var(--r-xl);
-  border-color: rgba(219, 226, 234, 0.7);
+  border-color: var(--line);
   box-shadow: var(--shadow);
 }
 
@@ -4955,18 +4803,14 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  box-shadow: 0 0 0 4px rgba(229, 169, 60, 0.22);
+  box-shadow: 0 0 0 3px var(--surface);
 }
 
 .card,
 .drop,
 .access-card {
   position: relative;
-  background-image: radial-gradient(
-    360px circle at var(--px, 50%) var(--py, 0%),
-    rgba(229, 169, 60, 0.08),
-    transparent 60%
-  );
+  background-image: none;
 }
 
 .pb-pointer-pulse {

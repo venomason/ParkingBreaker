@@ -15,7 +15,7 @@ from parkingbreaker.research.search import (
     search_request,
     select_pages,
 )
-from parkingbreaker.research.sources import CODE_PUBLISHER_DOMAINS, AuthorityClass
+from parkingbreaker.research.sources import AuthorityClass
 from test_research_run import TICKET
 
 SCOPES = (SourceScope("sfmta.com"), *SHARED_CODE_SCOPES)
@@ -25,7 +25,7 @@ def test_search_request_contains_only_authority_context_and_trusted_domains() ->
     request = search_request(TICKET, ["sfmta.com"])
     assert TICKET.city_id in request.query
     assert TICKET.violation_code not in request.query
-    assert request.official_domains == ("sfmta.com", *SHARED_CODE_DOMAINS, *CODE_PUBLISHER_DOMAINS)
+    assert request.official_domains == ("sfmta.com",)
     assert request.keys == CRITICAL_KEYS
     assert not request.broadened
     assert request.limit == MAX_SEARCH_HITS

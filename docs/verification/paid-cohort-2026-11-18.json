@@ -1,0 +1,186 @@
+{
+  "observed_utc": "2026-11-19T04:27:33.713324+00:00",
+  "source_base_commit": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+  "application_fingerprint": "f90fd82dfcffdb1dcf15f7d61bc7094021fab9551c0b3be45cdcbd2ad95540dc",
+  "scope": "Local working tree with offline providers. No deployment or paid activation.",
+  "paid_beta_activated": false,
+  "production_cohort_size_configured": false,
+  "cap_unit": "Cumulative distinct paid appeals in the transaction database, reserved on the first committed provider intent; retries keep the original place.",
+  "backend": {
+    "passed": 13843,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "runner": "PB_PROVIDER_MODE=preview pytest -n 6 --dist=loadfile on isolated /var/tmp storage using cached pytest-xdist and execnet",
+    "log": "output/paid-cap-backend-20261118.log",
+    "log_sha256": "63f4818a3cf8e67d832332dbc1ec8a73bec5093c179d3737e6447c9c15015e15",
+    "focused_checks": 60,
+    "ruff_lint": true,
+    "ruff_format_files": 490,
+    "mypy_files": 490
+  },
+  "web": {
+    "lint": true,
+    "types": true,
+    "production_builds_with_fake_providers": true,
+    "browser_campaigns": [
+      {
+        "suite": "browser",
+        "receipt": "output/paid-cohort-browser-20261118/rehearsal.json",
+        "sha256": "b85e31c092ef964b24a19768b39aaa642cbe035cb80b851a788dad63550f9326",
+        "tests": 155,
+        "duration_ms": 268984.187,
+        "skips": 0,
+        "flaky": 0
+      },
+      {
+        "suite": "ocr",
+        "receipt": "output/paid-cohort-ocr-20261118/rehearsal.json",
+        "sha256": "67ca41dbd5f01808c25490790f9bbdca3624d607a806457dcf926cea9121f771",
+        "tests": 14,
+        "duration_ms": 21349.238,
+        "skips": 0,
+        "flaky": 0
+      },
+      {
+        "suite": "mobile",
+        "receipt": "output/paid-cohort-mobile-20261118/rehearsal.json",
+        "sha256": "5a371f182390cb56abd606217fae84c99b9897cfe0f9e0860f814e69cbb9ccb8",
+        "tests": 55,
+        "duration_ms": 76379.75,
+        "skips": 0,
+        "flaky": 0
+      }
+    ],
+    "total_tests": 224
+  },
+  "checkout_http": {
+    "result": {
+      "transport": "local ASGI",
+      "providers": "fake",
+      "cap": 1,
+      "successful_authorization_http": 200,
+      "second_authorization_http": 409,
+      "second_reason": "paid_cohort_full",
+      "second_state": "STOPPED_NO_CHARGE",
+      "total_durable_intents": 1
+    },
+    "evidence": "output/paid-cap-http-20261118.json",
+    "sha256": "8bcc4a00700007348455826aacc3f57e7af328fedee0bf3de3c5cb1d7858d297",
+    "script_sha256": "50f0c530ca97acc297de8f6956f241b5c0c72537a7001e2ce21c81f731473dee"
+  },
+  "recovered_pending_intent": {
+    "result": {
+      "restore": {
+        "elapsed_seconds": 0.017248477997782174,
+        "records_match": true,
+        "artifacts_match": true
+      },
+      "verified_artifacts": 2,
+      "pending_reserved_places": 1,
+      "overflow_blocked": true,
+      "original_intent_preserved": true,
+      "reconciliation": "BLOCKED",
+      "quarantine_present": true,
+      "fake_payment_calls": 0,
+      "fake_mail_calls": 0,
+      "scope": "single workstation"
+    },
+    "evidence": "output/paid-cap-restore-20261118.json",
+    "sha256": "59a0ce95cb27ad63726b2568cf19b9c76fed075b512433e402f05c414cb343fa",
+    "script_sha256": "35c43055322373f1ecded8b2315096687d7088bf4cf760c206710ef685b878d5"
+  },
+  "initial_diagnostics": [
+    "The checkout venv lacked pytest-xdist. The full run used the locally cached plugin without altering project dependencies.",
+    "The first focused run found the cap wired to the wrong dependency record. The field was moved to CaseServiceDeps before the passing runs.",
+    "The initial offline HTTP fixture used a different stage name than the saved official procedure. Intake stopped with S7. The final two-driver run uses the matching stage and separate synthetic owners."
+  ],
+  "offline_qualification_self_tests": {
+    "research_routing": true,
+    "vision_budget_and_routing": true,
+    "provider_called": false
+  },
+  "local_recovery": {
+    "synthetic_letters": 1,
+    "synthetic_captures": 1,
+    "original_items_reconciled": 1,
+    "records_match": true,
+    "artifacts_match": true,
+    "status": "READY_FAKE",
+    "validate_deploy_and_rollback_dry_runs": true
+  },
+  "public_readback": [
+    {
+      "host": "qual.parkingbreaker.com",
+      "path": "/",
+      "utc": "2026-11-19T04:22:33.847250+00:00",
+      "http": 403,
+      "tls_hostname_verified": true
+    },
+    {
+      "host": "parkingbreaker.com",
+      "path": "/api/health",
+      "utc": "2026-11-19T04:22:33.955378+00:00",
+      "http": 200,
+      "tls_hostname_verified": true,
+      "status": "ok",
+      "mode": "fake",
+      "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58"
+    }
+  ],
+  "next_private_stage": {
+    "scope": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/approved-window/guest-rehearsal-scope.json",
+    "sha256": "8809d7aee0a43a575f44cfcb85f6e4f7ad60f5a145a3f47ab3f52e62b63f44ae",
+    "timer_observation": "Local systemd cleanup timer active for November 19 at 14:30 PST; backup-expiry timer active for November 26 at 15:35 PST. Actual cloud cleanup is unverified.",
+    "signed_candidate_includes_local_cap": false
+  },
+  "open_gates": [
+    "Signed private guest deployment, one-writer fencing and off-host restore",
+    "External alert delivery and responder acknowledgment",
+    "Joined deployed OCR correction and official filing or refusal for unfamiliar issuers",
+    "Deployed Stripe and Lob callback and expiry reconciliation, email delivery and physical iPhone Safari",
+    "Funded cohort, dated release decision and exact candidate"
+  ],
+  "clean_build_context": {
+    "observed_utc": "2026-11-19T04:43:35.902351+00:00",
+    "scope": "Isolated local build using the tested working tree. The approved signed cloud candidate is separate.",
+    "application_fingerprint": "f90fd82dfcffdb1dcf15f7d61bc7094021fab9551c0b3be45cdcbd2ad95540dc",
+    "archive_sha256": "28cfcf00a654239a8ef8bdb99e626a6021b4aebff6fbeafefc16a697aba51cc3",
+    "files_verified": 430,
+    "bytes": 11468830,
+    "artifacts": {
+      "output/local-release-f90fd82dfcff/source-manifest.json": "54beb1eb568bb1d70b1f7b3e95090cc5ed434ce44ed55c0fa2d4c8a681146de6",
+      "output/local-release-f90fd82dfcff/boot-proof.json": "6f39bc430dbd26cce797ffc0bee89fd0b29ea050c6a94f254522c8e084f8ff06",
+      "output/local-release-f90fd82dfcff/boot_probe.py": "72d1b887948267058ccb32e226b4c7850f2521dad22848d1f42baacdb5b89f1b",
+      "output/local-release-f90fd82dfcff/uv-sync.log": "d2e1d94f2e6861abadc2cbc7ef6a24937450f5c8f71a6969cd1f96af368bd6db",
+      "output/local-release-f90fd82dfcff/npm-ci.log": "2c231154422bdb863a6e4e465e9e6f37987efa6dd2502a8569f934d3035e0efd",
+      "output/local-release-f90fd82dfcff/web-build.log": "ad23ede65e944d04d5f1618782f0f260660224fd81728163f72b8f1774e4857f"
+    },
+    "install": [
+      "uv sync --frozen --offline --no-dev --python /usr/bin/python3.12",
+      "npm ci --offline --ignore-scripts --no-audit --no-fund"
+    ],
+    "web_build": "npm run build with the rehearsal private origin and live API frontend against offline providers",
+    "observed": {
+      "backend_http": 200,
+      "backend_mode": "fake",
+      "homepage_http": 200,
+      "homepage_has_brand": true,
+      "local_only_family_route_http": 404,
+      "curbside_asset_http": 200,
+      "asset_matches_source": true,
+      "public_api_paths": [
+        "health",
+        "auth/:path*",
+        "workspaces/:path*",
+        "cases/:path*",
+        "webhooks/:path*"
+      ],
+      "configured_private_api_origin": "https://pb-qual-api.internal.parkingbreaker.com:8443"
+    },
+    "limits": [
+      "This is a source archive and a loopback boot, with no published image or cloud deployment.",
+      "The initial smoke check expected the local-only family route to return 200. The candidate correctly returned 404 with the public API frontend enabled; the corrected check passed."
+    ]
+  }
+}

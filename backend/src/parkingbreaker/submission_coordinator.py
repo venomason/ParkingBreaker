@@ -10,7 +10,11 @@ from datetime import datetime
 
 from parkingbreaker.address_disclosure import DISCLOSURE_SHA256
 from parkingbreaker.address_policy import mailing_gate
-from parkingbreaker.approval_manifest import ApprovalIntegrityError, verify_dispatch_integrity
+from parkingbreaker.approval_manifest import (
+    ApprovalIntegrityError,
+    verify_dispatch_integrity,
+    verify_remail_approval,
+)
 from parkingbreaker.case_state import CaseState
 from parkingbreaker.intake_store import IntakeConflict
 from parkingbreaker.lob_submission import (
@@ -156,6 +160,10 @@ def run_submission_step(
                 intake = None
             manifest = store.get_approval_manifest(case_id, attempt)
             try:
+                if attempt == 2:
+                    verify_remail_approval(
+                        store.get_approval_manifest(case_id, 1), manifest, prepared.prepared_at
+                    )
                 if manifest is None:
                     if intake is not None:
                         raise ApprovalIntegrityError("missing_approval_manifest")

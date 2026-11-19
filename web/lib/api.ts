@@ -374,6 +374,11 @@ export const api = {
       adopted_sha256: adoptedSha256,
       ...(signatureRef ? { signature_ref: signatureRef } : {}),
     }),
+  previewRemail: (c: string, adoptedSha256: string) =>
+    call<PacketPreview>("POST", `/cases/${c}/packet-preview`, {
+      adopted_sha256: adoptedSha256,
+      remail: true,
+    }),
   approve: (c: string, request: ApprovalRequest) =>
     call<CaseStatus>("POST", `/cases/${c}/approval`, request),
   tracking: (c: string) => call<Tracking>("GET", `/cases/${c}/tracking`),
@@ -489,17 +494,7 @@ export const SAMPLE_FACTS: Array<{ id: string; fact: string; tier: "must" | "imp
     means: "Keeps the letter focused strictly on your confirmed facts.",
     note: undefined
   },
-  {
-    id: "f9",
-    fact: "Governing code section",
-    tier: "imp" as const,
-    st: "unk" as const,
-    quote: null,
-    src: "City of San Diego · Municipal Code search",
-    url: "https://www.sandiego.gov/city-clerk/officialdocs/municipal-code",
-    means: "Not needed to mail your letter; omitted rather than guessed.",
-    note: "No verbatim quote was found in this simulated code search. We do not guess a section or cite one in the letter."
-  }
+
 ];
 
 export interface TicketField {
@@ -636,7 +631,6 @@ export const SAMPLE_RESEARCH = [
     { msg: "Confirming postmark rule…", id: "f5", delay: 440 },
     { msg: "Checking supporting material wording…", id: "f7", delay: 440 },
     { msg: "Recording brevity guidance…", id: "f8", delay: 400 },
-    { msg: "Searching Municipal Code section…", id: "f9", delay: 520 },
   ];
 
 // SAMPLE until API: tracking display records for each mailing tier.

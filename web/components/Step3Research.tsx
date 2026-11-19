@@ -64,7 +64,7 @@ export function Step3Research({
       );
     } else {
       setActionBar(
-        "8 confirmed · 1 unknown (not needed to mail)",
+        "Review the agency’s mailing instructions before continuing",
         <button
           className="btn btn-primary"
           type="button"
@@ -82,13 +82,13 @@ export function Step3Research({
       <div className="voice">
         <ConciergeMark size={44} state={isDone ? "done" : "thinking"} />
         <div>
-          <p className="eyebrow">Step 4 · Research</p>
+          <p className="eyebrow">Step 4 · Appeal rules</p>
           <h2 id="h-s3" tabIndex={-1}>
-            See what the city’s words actually say.
+            San Diego’s appeal rules
           </h2>
           <span className="prototype-label">Simulated for this prototype</span>
           <p className="lead" id="s3say">
-            We’ll read the saved city passage, then show how each quote supports this sample letter.
+            Read the agency’s filing instructions for this sample appeal. You decide what to say in your letter.
           </p>
         </div>
       </div>
@@ -96,7 +96,6 @@ export function Step3Research({
       <div className="card">
         <div className={`r-live-bar ${isDone ? "done" : ""}`} id="rLiveBar">
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            {/* Real tier-dot matrix: Must (6), Imp (2), Nice (1) */}
             <span className="r-matrix" aria-label="Tier dot matrix">
               <span className={`rm-dot ${mustFacts.length > 0 ? "on-must" : ""}`} />
               <span className={`rm-dot ${impFacts.length > 0 ? "on-imp" : ""}`} />
@@ -122,7 +121,7 @@ export function Step3Research({
         </div>
 
         <div className="counts" id="counts">
-          <span>{shownFacts.length} of 9 facts</span>
+          <span>{shownFacts.length} of {SAMPLE_FACTS.length} checks</span>
           <span style={{ color: "var(--sage)" }}>{cOk} confirmed</span>
           <span>{cUnk} unknown</span>
           <span>{cCon} conflicted</span>
@@ -141,12 +140,11 @@ export function Step3Research({
 
       {isDone && (
         <div className="card summary" id="rsum">
-          <h3>Here’s the research picture.</h3>
+          <h3>Mailing this sample appeal</h3>
           <ul id="rsumList">
             <li><b>6 Must-have items shown:</b> confirmed in this saved sample passage.</li>
             <li>
-              <b>Important:</b> supporting documentation is mentioned; the governing code section
-              remains Unknown and is not cited.
+              <b>Important:</b> the agency mentions supporting documentation.
             </li>
             <li><b>Nice-to-have:</b> the city asks for brevity.</li>
             <li><b>Mail to:</b> P.O. Box 129038, San Diego, CA 92112-9038.</li>

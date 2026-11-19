@@ -20,10 +20,10 @@ function visual(name: string, props: object, file = "CaseVisuals"): string {
 }
 
 test("customer milestones follow the live journey without renumbering internal steps",async({page})=>{
-  for(const [step,label] of [[1,"Step 1 of 6 · Your ticket"],[2,"Step 2 of 6 · Your side"],[4,"Step 3 of 6 · Mailing choice"],[5,"Step 3 of 6 · Mailing choice"],[3,"Step 4 of 6 · Research"],[6,"Step 5 of 6 · Your letter"]] as const){
+  for(const [step,label] of [[1,"Step 1 of 6 · Your ticket"],[2,"Step 2 of 6 · Your side"],[4,"Step 3 of 6 · Mailing choice"],[5,"Step 3 of 6 · Mailing choice"],[3,"Step 4 of 6 · Appeal rules"],[6,"Step 5 of 6 · Your letter"]] as const){
     await page.setContent(visual("Header",{step,timerEnd:null,now:0,lapsed:false},"Header"));
     await expect(page.locator("#pathNow")).toHaveText(label);
-    await expect(page.locator(".milestone-label")).toHaveText(["Your ticket","Your side","Mailing choice","Research","Your letter","Tracking"]);
+    await expect(page.locator("#pathSegs, .milestone-number, .milestone-label")).toHaveCount(0);
   }
   await page.setContent(visual("Receipts",{receipts:[{stepNum:4,stepName:"Mailing choice",summary:"Chosen"},{stepNum:3,stepName:"Research",summary:"Checked"},{stepNum:6,stepName:"Your letter",summary:"Approved"}]},"Receipts"));
   await expect(page.locator(".receipt-num")).toHaveText(["03","04","05"]);
@@ -62,6 +62,26 @@ test("requirement counts distinguish missing and conflicting facts without a suc
   await expect(page.locator("body")).not.toContainText("100%");
 });
 
+test("appeal rules link the official wording to its source and hide retired code findings", async ({page}) => {
+  const url = "https://agency.example/first-review";
+  await page.setContent(visual("ResearchEvidence", {issuerName: "City Parking Office", research: {
+    jurisdiction: "test-issuer", stage: "first-level review", sources: [],
+    findings: [
+      {fact: "FILING_INSTRUCTION", status: "CONFIRMED", passages: [
+        {quote: "Enter the provision printed on your ticket in box four.", source_url: url}
+      ]},
+      {fact: "GOVERNING_CODE_SECTION", status: "CONFIRMED", official_quote: "Historic citation text"},
+      {fact: "MANDATORY_FORMS", status: "UNKNOWN"}
+    ]
+  }}, "LiveResearch"));
+  await expect(page.locator(".research-detail")).toContainText("City Parking Office · first-level review");
+  await expect(page.getByRole("link", {name: "Read the official source"})).toHaveAttribute("href", url);
+  await expect(page.locator(".finding")).toHaveCount(2);
+  await expect(page.locator(".findings")).toContainText("Enter the provision printed on your ticket in box four.");
+  await expect(page.locator(".findings")).toContainText("No verified wording");
+  await expect(page.locator("body")).not.toContainText("Historic citation text");
+});
+
 for(const phase of ["paid","controlled_free_beta"] as const){
   for(const width of [320,390,1440]){
     test(`${phase} redesigned landing is readable and accessible at ${width}px`,async({page},testInfo)=>{
@@ -72,7 +92,7 @@ for(const phase of ["paid","controlled_free_beta"] as const){
       await page.route("**/api/auth/pricing",r=>r.fulfill({json:{experiment_id:"certified-price-v1",service_phase:phase,amount_cents:phase==="paid"?2499:null,arm:phase==="paid"?"P2499":null}}));
       await page.goto("/");
       await expect(page.locator("#actSnap")).toBeVisible();
-      await expect(page.getByRole("heading",{level:1})).toContainText("Appeal your parking ticket");
+      await expect(page.getByRole("heading",{level:1})).toHaveText("As soon as you spot a ticket, start taking photos.");
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       await page.locator("#actSnap").focus();
       expect(await page.locator("#actSnap").evaluate(e=>getComputedStyle(e).outlineStyle)).not.toBe("none");

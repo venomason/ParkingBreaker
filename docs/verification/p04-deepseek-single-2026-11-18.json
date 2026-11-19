@@ -1,0 +1,81 @@
+{
+  "date_pacific": "2026-11-18",
+  "purpose": "P01/P04 single real DeepSeek extraction through the local customer intake API",
+  "private_ops_run": "parkingbreaker-launch-20261118-jkh7vR",
+  "working_tree_application_fingerprint": "78103dce83f9a82d15b3300c2793f214442b1414e40fd8673b50d72840baff0b",
+  "approval": "Amir approved exactly one DeepSeek Flash call on a synthetic ticket, up to USD 0.25, with no retries. This call consumed that one-call authorization.",
+  "authentication": {
+    "method": "GET",
+    "host": "api.deepseek.com",
+    "path": "/models",
+    "http": 200,
+    "utc": "2026-11-18T19:14:53.478866+00:00",
+    "inference_calls": 0,
+    "configured_flash_listed": true,
+    "flash_image_input_advertised": true
+  },
+  "fixture": "Previously frozen clear Boston qualification fixture B13, synthetic only. Literal printed ticket fields were fixed before the call.",
+  "expected_fields": {
+    "citation_number": "PB-Q-011",
+    "license_plate": "QL101",
+    "license_plate_state": "MA",
+    "issuer_name": "City of Boston Office of the Parking Clerk",
+    "issue_date": "2026-11-11",
+    "notice_date": "2026-11-11",
+    "printed_deadline": "2026-12-02",
+    "issued_city": "Boston",
+    "issued_state": "MA",
+    "stage_text": "initial appeal; ticket received on issue date",
+    "violation_text": "Synthetic on-street parking citation"
+  },
+  "result": {
+    "mode": "live",
+    "model": "deepseek-flash",
+    "fixture": "clear",
+    "source_png_sha256": "d71c299b3762e424e03d91abe64aff80c99bf2edb91e7fdc37ed215c3ab3e511",
+    "provider_posts": 1,
+    "approved_ceiling_cents": 25,
+    "max_output_tokens": 8192,
+    "conservative_request_upper_usd": "0.0144591",
+    "started_at": "2026-11-18T19:18:17.964331+00:00",
+    "provider_usage": {
+      "input_tokens": 2263,
+      "output_tokens": 1276,
+      "cached_input_tokens": 256
+    },
+    "usage_price_estimate_usd": "0.001067418",
+    "provider_http_response_received": true,
+    "intake_http_status": 200,
+    "reading_status": "success",
+    "primary_model": "deepseek-flash",
+    "escalation": "not_needed",
+    "field_matches": {
+      "citation_number": true,
+      "license_plate": true,
+      "license_plate_state": true,
+      "issuer_name": true,
+      "issue_date": true,
+      "notice_date": true,
+      "printed_deadline": true,
+      "violation_text": true,
+      "issued_city": true,
+      "issued_state": true,
+      "stage_text": true
+    },
+    "current_on_readback": true,
+    "local_spend_rows": [
+      [
+        25,
+        1
+      ]
+    ],
+    "finished_at": "2026-11-18T19:18:28.571564+00:00"
+  },
+  "price_source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "cost_basis": "At 19:18 UTC the published Flash off-peak prices per million tokens were USD 0.15 uncached input, 0.003 cached input and 0.60 output. CPU-side application ledger rounds conservatively to whole cents. No provider invoice or balance delta was observed.",
+  "scope": "Normal POST /workspaces, upload, intake-form save, POST ticket-reading and GET readback through FastAPI, CaseService, the ticket intake coordinator, routed production reader, durable spend reservation and DeepSeek Chat Completions adapter. Local fixture authentication and unconnected research/payment/mail dependencies. Secondary model disabled. No customer information, external research, confirmation, charge or mailing.",
+  "setup": "Fresh execution process. Offline preflight stopped before provider transport. An initial local TestClient setup violated SQLite thread ownership and was replaced with the in-process asynchronous ASGI transport before any provider request.",
+  "procedure_sha256": "79465cff4a4f3ec37932d36fd385ae0adb9ea783506fb3d262af24d757b820ca",
+  "approved_fixture_description_sha256": "634c6f9bc0d67a78d9a874d042bf1440dc5384bc82bc889050f3abc111fc89f2",
+  "remaining": "Ambiguous, refused and customer-corrected paths and official research still require separately scoped qualification. The production target has no verified provider configuration."
+}

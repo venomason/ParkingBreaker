@@ -668,6 +668,14 @@ def test_promotion_flips_the_same_optional_gap_to_blocking(
         for k in DEFAULT_TIERS
         if DEFAULT_TIERS[k] is FactTier.MUST_HAVE
     )
+    if trigger in {"form", "packet"}:
+        assert tiers.tiers[key] is FactTier.NICE_TO_HAVE
+        assert not tiers.promotions
+        assert tiers.compulsory_gaps == (proof,)
+        result = validate_tier1(findings, SOURCES, tiers=tiers)
+        assert not result.proceed
+        assert [p.key for p in result.reasons] == [FactKey.TICKET_SPECIFIC_REQUIREMENTS]
+        return
     assert tiers.tiers[key] is FactTier.MUST_HAVE
     assert tiers.promotions
     assert tiers.promotions[0].key is key

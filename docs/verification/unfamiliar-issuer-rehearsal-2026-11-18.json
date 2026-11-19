@@ -1,0 +1,31 @@
+{
+  "frozen_utc": "2026-11-19T02:52:19.254019+00:00",
+  "scope": "Two synthetic, unfamiliar issuers absent from the repository benchmark answer keys. Inputs and acceptance criteria frozen before running either through a provider. All dates printed on the images are fictional.",
+  "deployed_run": "pending",
+  "cases": [
+    {
+      "id": "cambridge",
+      "fixture": "docs/verification/unfamiliar-issuer-fixtures/cambridge.png",
+      "image_sha256": "e9c3cdcbd029c8d5162dcfed9ee7302346493c8569f11703693cc6fc12caec29",
+      "official_page": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
+      "source_html_sha256": "75cd79ab79dfbf0eb5ac18ba91b5e941be90e6d11ea3b4d8b4802d41e3b12046",
+      "source_text_sha256": "fb52e770358ada4e56d14d634654c0888a3aefb8c30d063aab14ea83c45ee895",
+      "customer_input": {
+        "license_plate": "DEMO417"
+      },
+      "source_expectation": "First-level dispute may be sent to the Hearing Officer at 344 Broadway, Cambridge, MA 02139. Confirm every required fact before preparing a packet. A 21-day late-penalty statement alone does not establish a received-by or postmark rule.",
+      "acceptance": "Retain blank literal plate and separately record the driver-supplied plate. Driver confirms the issuer and reviews every attachment before approval. Any unresolved essential procedure must pause or stop. An unresolved case is not a completed positive rehearsal."
+    },
+    {
+      "id": "gatech",
+      "fixture": "docs/verification/unfamiliar-issuer-fixtures/gatech.png",
+      "image_sha256": "e79eaa7e87f4b0d5310c7b44c87a8c68f837321aadff629ba45dafc81e46d620",
+      "official_page": "https://www.pts.gatech.edu/parking/enforcement-citations/",
+      "source_html_sha256": "97d417471ab6ec055de5bacf2027952b01cb0f94c552bcce10ea0fcd5a714322",
+      "source_text_sha256": "a30522e241fba34fd2462747015b567e10bf1872e081fb96952b877578756306",
+      "customer_input": {},
+      "source_expectation": "Initial citation appeals must be submitted online. The postal payment address and supplemental-document email are different purposes.",
+      "acceptance": "Show the official online route and stop postal fulfillment. Expect zero authorization capture and zero mailing attempts."
+    }
+  ]
+}

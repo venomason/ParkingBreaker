@@ -33,8 +33,8 @@ from parkingbreaker.research.run import (
     SeedUrl,
     run_research,
 )
-from parkingbreaker.research.search import SHARED_CODE_DOMAINS, SearchHit
-from parkingbreaker.research.sources import CODE_PUBLISHER_DOMAINS, AuthorityClass, SourceRecord
+from parkingbreaker.research.search import SearchHit
+from parkingbreaker.research.sources import AuthorityClass, SourceRecord
 from samples import RETRIEVED_AT, SAN_FRANCISCO, fixture
 from test_research_findings import silence_finding
 
@@ -90,14 +90,13 @@ def sha_of(sources: Sequence[SourceRecord], url: str) -> str:
 
 def answers(address: dict[str, JsonValue] = ADDRESS, deadline: int = 21) -> FakeExtractor:
     def produce(sources: Sequence[SourceRecord]) -> list[Finding]:
-        c, s = sha_of(sources, CONTEST_URL), sha_of(sources, CODE_URL)
+        c = sha_of(sources, CONTEST_URL)
 
         def ok(key: FactKey, value: JsonValue, quote: str, sha: str) -> Finding:
             return Finding(key, value, FindingStatus.CONFIRMED, quote, (sha,))
 
         return [
             ok(K.MAIL_IN_ACCEPTED, True, "Contests sent by mail must be received", c),
-            ok(K.GOVERNING_CODE_SECTION, "SEC. 7.2.22", "SEC. 7.2.22. STREET CLEANING.", s),
             ok(K.DEADLINE_DAYS, deadline, "within 21 calendar days of the citation", c),
             ok(K.DEADLINE_CLOCK_START, "ISSUE_DATE", "of the citation issue date", c),
             ok(K.DEADLINE_RULE, "RECEIPT", "must be received by the SFMTA by the deadline", c),
@@ -120,13 +119,7 @@ def answers(address: dict[str, JsonValue] = ADDRESS, deadline: int = 21) -> Fake
                 "within 21 calendar days of the citation issue date",
                 c,
             ),
-            ok(K.FINE_AMOUNT, 90, "The fine for a violation of this Section is $90.", s),
-            ok(
-                K.CODE_EXCEPTIONS,
-                ["a vehicle stopped to load or unload passengers"],
-                "shall not apply to a vehicle stopped to load or unload passengers",
-                s,
-            ),
+            ok(K.FINE_AMOUNT, 90, "The street cleaning fine is $90.", c),
         ]
 
     return FakeExtractor(produce, usage=Usage(5000, 800, 3))
@@ -140,13 +133,13 @@ def test_full_research_releases() -> None:
         TICKET, TEST_AGENCY, SEEDS, fake_fetcher, answers(), clock, wait=waits.append
     )
     assert result.decision == (True, ())
-    assert [s.url for s in result.sources] == [CONTEST_URL, CODE_URL]
+    assert [s.url for s in result.sources] == [CONTEST_URL]
     assert result.failures == ()
     assert {f.key for f in result.findings} == set(FactKey) - RETIRED_KEYS
     assert all(f.status is FindingStatus.CONFIRMED for f in result.findings)
     assert result.cost == Usage(5000, 800, 3)
     assert result.started_at < result.sources[0].retrieved_at < result.finished_at
-    assert fake_fetcher.calls == [CONTEST_URL, CODE_URL]
+    assert fake_fetcher.calls == [CONTEST_URL]
     assert [q.key for q in result.questions] == [k for k in FactKey if k not in RETIRED_KEYS]
 
 
@@ -211,40 +204,15 @@ def test_address_still_requires_official_delivery_point_and_contest_purpose() ->
         assert result.decision == (False, ("MAILING_ADDRESS: unknown",)), field
 
 
-def test_failed_optional_code_fetch_is_recorded_without_blocking() -> None:
-    waits: list[float] = []
+def test_retired_code_seed_is_never_fetched_or_reported_as_a_gap() -> None:
     partial = FakeFetcher({CONTEST_URL: html_response(CONTEST_URL, fixture("sfmta_contest.html"))})
-
-    def produce(sources: Sequence[SourceRecord]) -> list[Finding]:
-        return [
-            f
-            for f in answers().produce([*sources, *_code_stub()])
-            if f.key is not K.GOVERNING_CODE_SECTION
-        ]
-
     result = run_research(
-        TICKET,
-        TEST_AGENCY,
-        SEEDS,
-        partial,
-        FakeExtractor(produce),
-        TickingClock(),
-        wait=waits.append,
+        TICKET, TEST_AGENCY, SEEDS, partial, answers(), TickingClock(), wait=lambda _: None
     )
-    assert [f.url for f in result.failures] == [CODE_URL]
+    assert partial.calls == [CONTEST_URL]
+    assert not result.failures
     assert result.decision.ok
-    assert (
-        next(f for f in result.findings if f.key is K.GOVERNING_CODE_SECTION).status
-        is FindingStatus.UNKNOWN
-    )
-
-
-def _code_stub() -> list[SourceRecord]:
-    return [
-        SourceRecord(
-            CODE_URL, CODE_URL, RETRIEVED_AT, 200, "stub", "text/html", "", AuthorityClass.STATUTE
-        )
-    ]
+    assert RETIRED_KEYS.isdisjoint(f.key for f in result.findings)
 
 
 def test_injection_page_cannot_change_the_deadline() -> None:
@@ -275,11 +243,6 @@ def test_injection_page_cannot_change_the_deadline() -> None:
 def test_contest_source_can_release_without_optional_code_provisions() -> None:
     waits: list[float] = []
 
-    def produce(sources: Sequence[SourceRecord]) -> list[Finding]:
-        return [
-            f for f in answers().produce([*sources, *_code_stub()]) if f.source_sha256s[0] != "stub"
-        ]
-
     contest_only = FakeFetcher(
         {CONTEST_URL: html_response(CONTEST_URL, fixture("sfmta_contest.html"))}
     )
@@ -288,7 +251,7 @@ def test_contest_source_can_release_without_optional_code_provisions() -> None:
         SAN_FRANCISCO,
         (CONTEST_SEED,),
         contest_only,
-        FakeExtractor(produce),
+        answers(),
         TickingClock(),
         wait=waits.append,
     )
@@ -532,8 +495,6 @@ def test_discovery_searches_portal_host_but_filters_and_fetches_only_tenant(
     assert request.official_domains == (
         "sfmta.com",
         "portal.com",
-        *SHARED_CODE_DOMAINS,
-        *CODE_PUBLISHER_DOMAINS,
     )
     assert [source.url for source in result.sources] == [allowed]
     assert sibling not in transport.calls

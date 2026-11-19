@@ -428,7 +428,10 @@ def test_only_existing_approved_remail_and_no_second_payment(tmp_path: Path, sta
         store.prepare(
             case.case_token,
             2,
-            replace(make_request(token="remail-token"), recipient=corrected),
+            replace(
+                make_request(pdf=b"%PDF-1.4\ncorrected synthetic packet", token="remail-token"),
+                recipient=corrected,
+            ),
             NOW,
         )
         seed_approval(store, case.case_token, 2)

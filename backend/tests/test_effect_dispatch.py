@@ -12,7 +12,7 @@ from uuid import uuid4
 import pytest
 from httpx2 import ASGITransport, AsyncClient
 
-from mail_samples import RECIPIENT, seed_destination
+from mail_samples import RECIPIENT, seed_approval, seed_destination
 from parkingbreaker.api.app import create_app
 from parkingbreaker.case_service import CaseService
 from parkingbreaker.case_state import CaseState
@@ -446,7 +446,6 @@ async def test_certified_return_and_free_remail_never_capture_again(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
 
-    from parkingbreaker.approval_manifest import build_remail_approval_manifest
     from parkingbreaker.case_state import RemailRequested
 
     lob = FakeLobClient(
@@ -493,7 +492,7 @@ async def test_certified_return_and_free_remail_never_capture_again(
         returned_case = real._store.get_case(token)
         assert returned_case is not None
         seed_destination(real._store, returned_case, NOW, corrected)
-        remail = real._store.prepare(
+        real._store.prepare(
             token,
             2,
             replace(
@@ -504,13 +503,7 @@ async def test_certified_return_and_free_remail_never_capture_again(
             ),
             NOW,
         )
-        original_manifest = real._store.get_approval_manifest(token, 1)
-        assert original_manifest is not None
-        real._store.record_approval_manifest(
-            build_remail_approval_manifest(
-                original_manifest, remail.request, approved_at=remail.prepared_at
-            )
-        )
+        seed_approval(real._store, token, 2)
         real._apply(token, RemailRequested())
         await dispatch(client)
         assert real.status(case).state is CaseState.IN_TRANSIT

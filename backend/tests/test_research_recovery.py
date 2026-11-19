@@ -554,17 +554,33 @@ def test_verified_notice_clock_asks_customer_without_restarting_recovery() -> No
     assert resolved.deadline.deadline == date(2026, 10, 26)
     assert search.calls == []
     assert extractor.calls == 1
-    assert len(transport.calls) == len(SEEDS)
+    assert transport.calls == [CONTEST_URL]
+
+
+@pytest.fixture
+def important_amount(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Exercise the optional recovery algorithm independently of the active tier policy."""
+    from parkingbreaker.research import questions
+
+    monkeypatch.setattr(
+        questions,
+        "DEFAULT_TIERS",
+        {
+            **questions.DEFAULT_TIERS,
+            FactKey.FINE_AMOUNT: questions.FactTier.IMPORTANT,
+        },
+    )
 
 
 @pytest.mark.parametrize("status", [FindingStatus.UNKNOWN, FindingStatus.CONFLICTED])
+@pytest.mark.usefixtures("important_amount")
 def test_tier2_gap_recovers_once_is_recorded_and_never_blocks(status: FindingStatus) -> None:
     from parkingbreaker.research_records import decode_research, research_json
 
     extractor = FakeExtractor(
         lambda sources: [
             replace(f, status=status, value=None, evidence=())
-            if f.key is FactKey.GOVERNING_CODE_SECTION
+            if f.key is FactKey.FINE_AMOUNT
             else f
             for f in answers().produce(sources)
         ]
@@ -582,15 +598,13 @@ def test_tier2_gap_recovers_once_is_recorded_and_never_blocks(status: FindingSta
         wait=lambda _: None,
     )
     assert len(search.calls) == 1
-    assert search.calls[0].keys == frozenset({FactKey.GOVERNING_CODE_SECTION})
+    assert search.calls[0].keys == frozenset({FactKey.FINE_AMOUNT})
     assert extractor.calls == 1
     assert result.decision.ok
     assert result.resolve().ready
     assert result.pending == ()
     saved = decode_research(research_json(result))
-    assert (
-        next(f for f in saved.findings if f.key is FactKey.GOVERNING_CODE_SECTION).status is status
-    )
+    assert next(f for f in saved.findings if f.key is FactKey.FINE_AMOUNT).status is status
     assert saved.progress.broadened_search_done
     assert saved.resolve().ready
 
@@ -622,12 +636,11 @@ def test_tier3_only_quote_gap_has_no_dedicated_recovery() -> None:
     assert not result.progress.broadened_search_done
 
 
+@pytest.mark.usefixtures("important_amount")
 def test_tier2_uses_remaining_re_extraction_and_ai_budget_only() -> None:
     extractor = FakeExtractor(
         lambda sources: [
-            replace(f, verbatim_quote="unsupported claim")
-            if f.key is FactKey.GOVERNING_CODE_SECTION
-            else f
+            replace(f, verbatim_quote="unsupported claim") if f.key is FactKey.FINE_AMOUNT else f
             for f in answers().produce(sources)
         ],
         usage=answers().usage,
@@ -654,12 +667,13 @@ def test_tier2_uses_remaining_re_extraction_and_ai_budget_only() -> None:
     assert any(a.error == "budget exhausted" for a in result.attempts)
 
 
+@pytest.mark.usefixtures("important_amount")
 def test_required_and_tier2_gaps_share_one_search_with_no_second_budget() -> None:
     extractor = FakeExtractor(
         lambda sources: [
             f
             for f in answers().produce(sources)
-            if f.key not in {FactKey.DEADLINE_DAYS, FactKey.GOVERNING_CODE_SECTION}
+            if f.key not in {FactKey.DEADLINE_DAYS, FactKey.FINE_AMOUNT}
         ]
     )
     search = FakeSearcher(lambda request: [])
@@ -675,9 +689,7 @@ def test_required_and_tier2_gaps_share_one_search_with_no_second_budget() -> Non
         wait=lambda _: None,
     )
     assert len(search.calls) == 1
-    assert search.calls[0].keys == frozenset(
-        {FactKey.DEADLINE_DAYS, FactKey.GOVERNING_CODE_SECTION}
-    )
+    assert search.calls[0].keys == frozenset({FactKey.DEADLINE_DAYS, FactKey.FINE_AMOUNT})
     assert result.resolve().questions == (Ask(CustomerQuestion.NOTICE_ISSUE_DATE),)
     assert not result.resolve().ready
     resolved = result.resolve(ResearchAnswers(printed_deadline=date(2026, 10, 20)))
@@ -687,6 +699,7 @@ def test_required_and_tier2_gaps_share_one_search_with_no_second_budget() -> Non
 
 
 @pytest.mark.parametrize("elapsed_minutes", [25, 30])
+@pytest.mark.usefixtures("important_amount")
 def test_optional_recovery_at_review_reserve_or_window_limit_does_not_delay_adoption(
     elapsed_minutes: int,
 ) -> None:
@@ -708,7 +721,7 @@ def test_optional_recovery_at_review_reserve_or_window_limit_does_not_delay_adop
 
     def produce(sources: Sequence[SourceRecord]) -> list[Finding]:
         clock.now += timedelta(minutes=elapsed_minutes)
-        return [f for f in baseline.findings if f.key is not FactKey.GOVERNING_CODE_SECTION]
+        return [f for f in baseline.findings if f.key is not FactKey.FINE_AMOUNT]
 
     extractor = FakeExtractor(produce)
     search = FakeSearcher(lambda request: [])
@@ -734,6 +747,7 @@ def test_optional_recovery_at_review_reserve_or_window_limit_does_not_delay_adop
     assert any(a.error == "review time reserved" for a in result.attempts)
 
 
+@pytest.mark.usefixtures("important_amount")
 def test_tier2_transient_fetch_does_not_retry_inside_review_reserve() -> None:
     from datetime import datetime, timedelta
 
@@ -755,19 +769,25 @@ def test_tier2_transient_fetch_does_not_retry_inside_review_reserve() -> None:
         calls: int = 0
 
         def get(self, url: str) -> FetchResponse:
-            if url == CODE_URL:
+            if url == amount_url:
                 self.calls += 1
                 clock.now += timedelta(minutes=25)
                 return html_response(url, "", 503)
             return html_response(url, fixture("sfmta_contest.html"))
 
+    amount_url = "https://www.sfmta.com/fee-schedule"
     transport = Transport()
     delays: list[float] = []
     search = FakeSearcher(lambda request: [])
     result = run_research(
         TICKET,
         TEST_AGENCY,
-        SEEDS,
+        [
+            SEEDS[0],
+            SeedUrl(
+                amount_url, AuthorityClass.OFFICIAL_PROCEDURE, frozenset({FactKey.FINE_AMOUNT})
+            ),
+        ],
         transport,
         FakeExtractor(lambda _: baseline.findings),
         clock,
@@ -809,9 +829,8 @@ def test_retired_customer_citation_cannot_promote_a_recovery_gap() -> None:
     )
     assert result.tier_evaluation is not None
     assert all(p.key is not FactKey.CODE_EXCEPTIONS for p in result.tier_evaluation.promotions)
-    # Optional recovery may still chase the procedural code provision, but never the
-    # retired defence key the customer selected long ago.
-    assert all(FactKey.CODE_EXCEPTIONS not in request.keys for request in search.calls)
+    assert search.calls == []
+    assert all(f.key is not FactKey.GOVERNING_CODE_SECTION for f in result.findings)
     assert result.resolve().ready
 
 
@@ -872,6 +891,7 @@ def test_expired_caller_window_runs_no_providers_and_never_renews_budget() -> No
     assert len(result.findings) == len(ANSWERABLE_KEYS)
 
 
+@pytest.mark.usefixtures("important_amount")
 def test_optional_extractor_failure_keeps_verified_tier1_and_ends_ai_recovery() -> None:
     from parkingbreaker.llm import LlmProviderError
 
@@ -883,9 +903,7 @@ def test_optional_extractor_failure_keeps_verified_tier1_and_ends_ai_recovery() 
         if calls > 1:
             raise LlmProviderError("provider offline", retryable=True)
         return [
-            replace(f, verbatim_quote="unsupported claim")
-            if f.key is FactKey.GOVERNING_CODE_SECTION
-            else f
+            replace(f, verbatim_quote="unsupported claim") if f.key is FactKey.FINE_AMOUNT else f
             for f in answers().produce(sources)
         ]
 
@@ -904,12 +922,13 @@ def test_optional_extractor_failure_keeps_verified_tier1_and_ends_ai_recovery() 
     assert result.decision.ok
     assert result.resolve().ready
     assert (
-        next(f for f in result.findings if f.key is FactKey.GOVERNING_CODE_SECTION).status
+        next(f for f in result.findings if f.key is FactKey.FINE_AMOUNT).status
         is FindingStatus.UNKNOWN
     )
     assert any(a.error == "provider offline" for a in result.attempts)
 
 
+@pytest.mark.usefixtures("important_amount")
 def test_tier2_quote_recovery_can_confirm_without_spending_broader_search() -> None:
     calls = 0
 
@@ -918,7 +937,7 @@ def test_tier2_quote_recovery_can_confirm_without_spending_broader_search() -> N
         calls += 1
         return [
             replace(f, verbatim_quote="unsupported claim")
-            if calls == 1 and f.key is FactKey.GOVERNING_CODE_SECTION
+            if calls == 1 and f.key is FactKey.FINE_AMOUNT
             else f
             for f in answers().produce(sources)
         ]
@@ -939,6 +958,6 @@ def test_tier2_quote_recovery_can_confirm_without_spending_broader_search() -> N
     assert result.resolve().ready
     assert search.calls == []
     assert (
-        next(f for f in result.findings if f.key is FactKey.GOVERNING_CODE_SECTION).status
+        next(f for f in result.findings if f.key is FactKey.FINE_AMOUNT).status
         is FindingStatus.CONFIRMED
     )

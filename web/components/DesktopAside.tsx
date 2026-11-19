@@ -39,7 +39,7 @@ export function DesktopAside({
   const newCharge = !newPaidBlocked && !paidCase && !savedPending && !betaCase && servicePhase === "paid" && funding === "paid";
   return (
     <aside className="desk-aside" aria-label="Clerk principles and live evidence">
-      <p className="aside-kicker">A little less on your plate</p>
+      <details className="guide-notes"><summary>Mailing and service details</summary>
       <h3>Your words.<br />The details handled.</h3>
       <p>
         We prepare and mail your letter in your own words. We don’t judge your case
@@ -80,6 +80,7 @@ export function DesktopAside({
           </button>
         </div>
       </div>
+      </details>
     </aside>
   );
 }

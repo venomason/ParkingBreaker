@@ -265,13 +265,23 @@ def create_rehearsal_app():
     @app.get("/__harness__/proof/{case_id}")
     async def durable_proof(case_id: str) -> dict[str, object]:
         """Private synthetic evidence only; Next ingress does not expose this route."""
-        owner = services._intake(case_id).owner
+        intake = services._intake(case_id)
+        owner = intake.owner
+        token = intake.case_token
+        manifest = None if token is None else store.get_approval_manifest(token, 1)
         addresses = store.customer_address_revisions(case_id, owner)
         consents = store.address_consent_events(case_id, owner)
         decisions = store.destination_decision_history(case_id, owner)
         decision = decisions[-1].decision if decisions else None
         return {
             "case_id": case_id,
+            "prepared_attempts": 0 if token is None else sum(store.get(token, attempt) is not None for attempt in (1, 2)),
+            "dispatch_manifest": None if manifest is None else {
+                "original_statement_sha256": manifest.raw_customer_text_sha256,
+                "approved_pdf_sha256": manifest.packet_pdf_sha256,
+                "approved_envelope_sha256": manifest.envelope_sha256,
+                "dispatched_pdf_sha256": manifest.dispatched_pdf_sha256,
+            },
             "address_revisions": len(addresses),
             "consent_events": len(consents),
             "decision_history": len(decisions),

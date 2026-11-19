@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-17",
+  "scope": "First three paid beta increments on local simulated providers",
+  "base_commit": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+  "application_fingerprint": "630b9db36468fc30b6fc7689ab137a601f0371eaabb162c015c12f3a27be3c6b",
+  "increment_1": {
+    "backend": {
+      "command": "make check (pytest-xdist 3.8.0, 8 workers, disk-backed temporary storage)",
+      "passed": 13756,
+      "warnings": 8,
+      "seconds": 228.83,
+      "log": "output/launch-first-increment1-check.log",
+      "log_sha256": "4c573b121970dc131a2071254afa66510f2a8fd62c663c4df6c6948d34de21ab"
+    },
+    "frontend": "lint, type-check and production build passed",
+    "patch": "output/launch-first-increment1.patch",
+    "behavior": "New approval hashes use the submitted intake statement. Printable bytes are preserved. Unsupported characters are refused with an editable correction path."
+  },
+  "increment_2": {
+    "focused_tests": 346,
+    "review_tests": 46,
+    "behavior": "A returned case with an eligible correction stays RETURNED. The exact second PDF and envelope get a fresh customer approval before any create. Prior create uncertainty is reconciled. The unconditional system-address-error refund remains independent."
+  },
+  "increment_3": {
+    "browser": [
+      {
+        "evidence": "output/launch-first-paid-ocr-joined/rehearsal.json",
+        "check_receipt": "build-kit/evidence/checks/1794977248052463179-synthetic-browser.json",
+        "passing": 13,
+        "fingerprint": "4d28b4155d6fa4770287b0f37520892d76f6ccdbced992caf5720be796aaad34",
+        "services_stopped": true
+      },
+      {
+        "evidence": "output/launch-first-legacy-free-ocr/rehearsal.json",
+        "check_receipt": "build-kit/evidence/checks/1794977288883198747-synthetic-browser-controlled-free-beta.json",
+        "passing": 53,
+        "fingerprint": "4d28b4155d6fa4770287b0f37520892d76f6ccdbced992caf5720be796aaad34",
+        "services_stopped": true
+      },
+      {
+        "evidence": "output/launch-first-legacy-paid/rehearsal.json",
+        "check_receipt": "build-kit/evidence/checks/1794977379195268955-synthetic-browser.json",
+        "passing": 152,
+        "fingerprint": "4d28b4155d6fa4770287b0f37520892d76f6ccdbced992caf5720be796aaad34",
+        "services_stopped": true
+      }
+    ],
+    "behavior": "One paid required-OCR journey reached simulated capture and a matching mailing record. The unverified-office case released the hold and prepared zero mail attempts. The browser used the normal owner-scoped authorization route with a fake payment token and drove the private worker explicitly."
+  },
+  "integrated_backend": {
+    "command": "make check (pytest-xdist 3.8.0, 8 workers, disk-backed temporary storage)",
+    "passed": 13797,
+    "warnings": 8,
+    "seconds": 245.43,
+    "log": "output/launch-first-integrated-final.log",
+    "log_sha256": "1bdb58f1b0ef19994ac7150712ace38f47fc4524bdce4acbdd1d07fa2b56fc9c"
+  },
+  "offline_qualification_self_tests": "research and vision passed without external provider calls",
+  "scope_of_snapshot_difference": "Only backend/tests/test_t30_remedy_review.py differs between the browser snapshot and the final application fingerprint. Added explicit approval at the remail fixture seam. Browser product and harness files match.",
+  "initial_failures": [
+    "Hosted card slot unavailable for the joined synthetic browser case. Used existing fake payment fixture at normal authorization API.",
+    "Verified destination checked before draft locked its decision. Asserted after that transition.",
+    "First integrated run retained 13 automatic-remail assumptions in the historical review suite. Updated the fixtures to give explicit approval while retaining the downstream assertions."
+  ],
+  "paid_activation": false
+}

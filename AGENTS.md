@@ -4,8 +4,8 @@ Owner direction: November 17, 2026 (Pacific). This is the shared project workflo
 
 ## Direct execution and efficient context
 
-- The active model codes directly and owns design, implementation, verification and completion. This replaces the November 16 mandatory AGY/Hydrogen workflow and older DeepSeek default. Do not switch providers, launch workers or add model handoffs automatically.
-- Unless the owner explicitly requests delegation for the current task, it requires demonstrated at least 10× lower total token use on comparable work, including coordination, worker context, review and retries, with no reduction in quality or completion speed. No such comparison is established here. Do not run paid benchmarks just to justify delegation. Report measured results; never invent savings.
+- The active model owns implementation and verification. Continue in the current session using existing authorization. Use another model or worker when Amir requests it, with a bounded assignment and independent verification.
+
 - Inspect the worktree status and relevant diff first. Read the next task in docs/ROADMAP.md and its named source/tests. Use targeted rg searches and bounded reads; expand only when a dependency or uncertainty requires it. Do not load source exports, dependencies or entire historical logs for a narrow change.
 - For substantive changes, establish the observed defect or requirement, intended behavior, affected files, invariants and acceptance checks before editing. Keep this brief; do not create another planning document when the roadmap already owns the task.
 - Batch independent reads/checks where safe. Keep dependent writes and stateful operations sequential. Reuse verified context until relevant inputs change. Keep progress updates concise and focused on findings, remaining uncertainty and next action.

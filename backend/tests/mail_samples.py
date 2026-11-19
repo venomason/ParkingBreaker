@@ -1,6 +1,9 @@
 """Synthetic frozen mailing requests shared by tests; no customer records."""
 
 from datetime import datetime
+from io import BytesIO
+
+from pypdf import PdfReader
 
 from parkingbreaker.address_policy import (
     AddressProvenance,
@@ -10,6 +13,7 @@ from parkingbreaker.address_policy import (
     address_fingerprint,
 )
 from parkingbreaker.agencies import MailingAddress
+from parkingbreaker.approval_manifest import ApprovalManifest, build_approval_manifest
 from parkingbreaker.lob_submission import LetterOptions, LetterRequest
 from parkingbreaker.mail_config import MailClass
 from parkingbreaker.transaction_records import CaseRecord
@@ -70,18 +74,29 @@ def seed_destination(
 
 def seed_approval(store: SqliteTransactionStore, case_token: str, attempt: int = 1) -> None:
     """Explicit approval for handcrafted send-ready fixtures, never production bypass."""
-    from parkingbreaker.approval_manifest import (
-        build_approval_manifest,
-        build_remail_approval_manifest,
-    )
+    from parkingbreaker.approval_manifest import build_remail_approval_manifest
 
     prepared = store.get(case_token, attempt)
     assert prepared is not None
     if attempt == 2:
         original = store.get_approval_manifest(case_token, 1)
         assert original is not None
+        case = store.get_case(case_token)
+        assert case is not None
+        intake = store.intake_for_workspace(case.workspace_token)
+        draft = None if intake is None else store.get_draft(intake.intake_id)
         manifest = build_remail_approval_manifest(
-            original, prepared.request, approved_at=prepared.prepared_at
+            original,
+            prepared.request,
+            approved_at=prepared.prepared_at,
+            approved_text=(
+                "Synthetic corrected packet."
+                if draft is None
+                else PdfReader(BytesIO(prepared.request.pdf))
+                .attachments["adopted-letter.txt"][0]
+                .decode()
+            ),
+            affirmations=original.affirmations,
         )
     else:
         case = store.get_case(case_token)
@@ -99,3 +114,20 @@ def seed_approval(store: SqliteTransactionStore, case_token: str, attempt: int =
             affirmations=(),
         )
     store.record_approval_manifest(manifest)
+
+
+def synthetic_remail_manifest(
+    store: SqliteTransactionStore, case: CaseRecord, request: LetterRequest, now: datetime
+) -> ApprovalManifest:
+    """Explicit approval at the low-level effect fixture seam."""
+    from parkingbreaker.approval_manifest import build_remail_approval_manifest
+
+    original = store.get_approval_manifest(case.case_token, 1)
+    assert original is not None
+    return build_remail_approval_manifest(
+        original,
+        request,
+        approved_at=now,
+        approved_text="Synthetic corrected packet.",
+        affirmations=original.affirmations,
+    )

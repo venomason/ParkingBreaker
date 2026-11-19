@@ -12,7 +12,7 @@ from parkingbreaker.llm import Usage
 from parkingbreaker.research.extractor import LlmExtractor
 from parkingbreaker.research.fakes import FakeLlmClient, html_response
 from parkingbreaker.research.payment_effects import PaymentOutcome, evaluate_payment_rule
-from parkingbreaker.research.questions import build_questions
+from parkingbreaker.research.questions import ANSWERABLE_KEYS, build_questions
 from parkingbreaker.research.run import run_research
 from parkingbreaker.research_records import research_json
 from samples import source
@@ -30,7 +30,7 @@ def test_one_existing_model_call_carries_rule_evidence_separately_from_core_find
     client = FakeLlmClient(extracted_reply(), Usage())
     extraction = LlmExtractor(client).extract(build_questions(TICKET), (source(HEADING + FINE),))
     assert len(client.calls) == 1
-    assert len(extraction.findings) == 15  # retired defence key
+    assert tuple(f.key for f in extraction.findings) == tuple(ANSWERABLE_KEYS)
     assert len(extraction.payment_rules) == 1
     assert extraction.payment_rules[0].scope == SCOPE
 

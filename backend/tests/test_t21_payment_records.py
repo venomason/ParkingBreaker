@@ -10,6 +10,7 @@ import pytest
 
 from parkingbreaker.research.ladder import CustomerQuestion
 from parkingbreaker.research.payment_effects import PaymentCondition, PaymentEffect
+from parkingbreaker.research.questions import ANSWERABLE_KEYS
 from parkingbreaker.research.resolution import ResearchAnswers
 from parkingbreaker.research.run import ResearchResult
 from parkingbreaker.research_records import decode_research, research_json
@@ -36,7 +37,7 @@ def test_rule_round_trip_keeps_core_findings_and_packet_requirements_separate() 
     assert decoded.payment_rules == research.payment_rules
     assert decoded.payment_scope == SCOPE
     assert research_json(decoded) == encoded
-    assert len(decoded.findings) == 15  # retired defence key is not re-materialised
+    assert tuple(f.key for f in decoded.findings) == tuple(ANSWERABLE_KEYS)
     assert len(decoded.resolve().fulfilled_requirements) == len(
         result_fixture().resolve().fulfilled_requirements
     )

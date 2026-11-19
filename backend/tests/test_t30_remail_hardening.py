@@ -152,6 +152,7 @@ def failed_remail_case(mailing: Mailing) -> None:
     """
     mailing.confirm_return()
     mailing.correct_destination()
+    mailing.approve_remail()
     mailing.lob.script = [LobResponse(422, error="synthetic refusal")]
     mailing.sweep(1)
     assert mailing.case.letter_state is cs.CaseState.CLOSED_RETURNED

@@ -19,6 +19,31 @@ Five atomic hooks call `append_journey_event_in_transaction`:
 4. `complete_authorization_attempt` (`transaction_store.py`): emits `hold_authorized` (`succeeded`) for newly started paid holds (`PaymentState.NO_CHARGE` / `amount_cents == 0` beta cases do not emit `hold_authorized`).
 5. `SqliteTransactionStore._apply_event` (`transaction_store.py`): emits `packet_approved` (`succeeded`) when a letter transition reaches `CaseState.FROZEN`.
 
+## Capture-start provenance (T02 bounded slice)
+
+The separate `journey_capture` schema component, version `1`, extends the existing
+ledger with immutable `pb_journey_capture` rows linked by `journey_id`. A new workspace
+gets its journey identity and capture start in the same transaction as workspace/history
+and owner creation. A legacy workspace without a link gets identity at its first newly
+committed pending OCR/review claim; direct legacy event callers retain an explicitly
+labeled `first_durable_event` fallback. Neither start basis claims complete capture.
+
+Migration labels existing journey links `legacy_unknown`, with no inferred start time
+or invented build/config identity, and preserves their old links/events. Build/config
+identity accepts only explicit SHA-256 digests or unknown; current runtime derivation is
+not yet wired. The scoped internal `journey_capture` reader returns typed provenance,
+not raw workspace/customer data. The retention inventory/planner recognizes and retains
+this restricted operational scope. Timeline coverage remains `LIMITED` for every current
+stored journey. Full event-context and attempt-transition history work remains open.
+
+[The capture-start receipt](verification/journey-capture-start-2026-11-17.json) records
+453 focused/integration/recovery checks and the full 13,768-test backend suite passing
+across the recorded runs, including the unchanged Unix-socket fixture under a short
+path. Frontend lint/types/build, offline qualification self-tests, 152 paid browser and
+53 required-OCR mobile-emulation checks also passed on the recorded source. The
+receipt preserves initial fixture/type, test-storage and browser-temp-path failures.
+This is a local milestone, not live-provider/device qualification or paid activation.
+
 ## Same-Transaction Semantics and Failure Policy
 
 - `append_journey_event_in_transaction` requires an already-active SQLite transaction (`database.in_transaction`) on the authority connection and executes before `COMMIT`.

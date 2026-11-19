@@ -2,12 +2,11 @@
 
 import React, { useEffect, useRef } from "react";
 import { Icon } from "./Icons";
-import { PBShieldIcon } from "./HurtleMascot";
+import { BrandLogo } from "./BrandLogo";
 
 interface HeaderProps {
   step: number;
   fulfillmentLabel?: string;
-  deliveryComplete?: boolean;
   timerEnd: number | null;
   now: number;
   lapsed: boolean;
@@ -21,7 +20,7 @@ const MILESTONES = [
   "Your ticket",
   "Your side",
   "Mailing choice",
-  "Research",
+  "Appeal rules",
   "Your letter",
   "Tracking",
 ];
@@ -29,11 +28,10 @@ const MILESTONES = [
 export function Header({
   step,
   fulfillmentLabel,
-  deliveryComplete,
   timerEnd,
   now,
   lapsed,
-  evidenceCount = "8/9",
+  evidenceCount = "pending",
   onBrandClick,
   onEvidenceClick,
   onRulesClick,
@@ -77,8 +75,7 @@ export function Header({
           onClick={onBrandClick}
           aria-label="ParkingBreaker home"
         >
-          <PBShieldIcon size={34} className="brand-mark" />
-          <span className="brand-word">ParkingBreaker</span>
+          <BrandLogo />
         </button>
 
         <div className="top-r">
@@ -115,33 +112,15 @@ export function Header({
         </div>
       </div>
 
-      <div className="pbar-wrap" aria-label="Your progress">
-        <p className="path-now" id="pathNow">
-          {step === 8
-            ? "Stopped safely · nothing charged"
-            : step === 9
-            ? "Example · conflicting instructions"
-            : step === 7
-            ? fulfillmentLabel ?? "Tracking · step 6 of 6"
-            : `Step ${m + 1} of 6 · ${MILESTONES[m]}`}
-        </p>
-        <div className="pbar-steps" id="pathSegs" aria-hidden="true">
-          {[0, 1, 2, 3, 4, 5].map((i) => {
-            const done =
-              step === 7
-                ? fulfillmentLabel ? i < 5 || Boolean(deliveryComplete) : true
-                : step === 8
-                ? i < 2
-                : step === 9
-                ? i < 3
-                : i < m;
-            const cur = (step === 7 && fulfillmentLabel ? !deliveryComplete && i === 5 : false) || step !== 7 && step !== 8 && step !== 9 && i === m;
-            const paused = (step === 8 && i === 2) || (step === 9 && i === 3);
-            const cls = done ? "done" : cur ? "cur" : paused ? "paused" : "";
-            return <i key={i} className={cls}><span className="milestone-number">{done ? "✓" : i + 1}</span><span className="milestone-label">{MILESTONES[i]}</span></i>;
-          })}
-        </div>
-      </div>
+      <p className="path-now" id="pathNow">
+        {step === 8
+          ? "Stopped safely · nothing charged"
+          : step === 9
+          ? "Example · conflicting instructions"
+          : step === 7
+          ? fulfillmentLabel ?? "Tracking · step 6 of 6"
+          : `Step ${m + 1} of 6 · ${MILESTONES[m]}`}
+      </p>
     </header>
   );
 }

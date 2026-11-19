@@ -1,0 +1,43 @@
+{
+  "date_pacific": "2026-11-18",
+  "scope": "Agency and appeal-stage filing instructions. Local application tests and simulated user journeys.",
+  "behavior": [
+    "A required provision is shown as an official filing instruction. Retired legal research keys are excluded from search, model questions, drafting context and recovery.",
+    "A compulsory packet requirement still blocks submission until fulfilled. Conflicting official wording retains a source link for each passage.",
+    "Historic v2-v4 tier evaluations retain their original wire representation. Reassessment applies current procedure-only rules."
+  ],
+  "verification": {
+    "full_backend_tests_passed": 13827,
+    "backend_command": "PB_PROVIDER_MODE=preview uv run --offline --with pytest-xdist pytest -n 4 --dist worksteal --tb=short (disk-backed TMPDIR)",
+    "issuer_destination_fulfilment_and_clerical_cases_passed": 97,
+    "backend_static_checks": "Ruff lint and format and strict mypy passed",
+    "frontend_checks": "TypeScript and ESLint passed. Checked-in OpenAPI matched the application schema.",
+    "browser_rehearsals": {
+      "paid": {
+        "tests": 154,
+        "receipt": "output/filing-rules-disk-paid/rehearsal.json",
+        "sha256": "a5bcc546a1406717fddcdaa727ad6ae1d28a4190540803faa2a27f3bf539cab5",
+        "fingerprint": "291cb9d3989e70bcb0ba430d204be7a7c37bd14ec7d86e6ae008ea3c54437f20"
+      },
+      "paid_ocr": {
+        "tests": 14,
+        "receipt": "output/filing-rules-ocr-stable/rehearsal.json",
+        "sha256": "d057c8401f3104bf8d424158647db90f2879bb65c08e9be91e893a83d0d3aa05",
+        "fingerprint": "f4186a9f1c8c6907d18d83132a4a8144fe7d50591bfcb19351beebc0cf8fbca2"
+      },
+      "free_mobile_ocr": {
+        "tests": 54,
+        "receipt": "output/filing-rules-mobile-stable/rehearsal.json",
+        "sha256": "91d1dbff18bfdda6baa13abde5a6f50dd2a0ce5483a9c15f9bc03d3de332091a",
+        "fingerprint": "f4186a9f1c8c6907d18d83132a4a8144fe7d50591bfcb19351beebc0cf8fbca2"
+      }
+    },
+    "dedicated_rules_browser_test": "Exact source link, issuer and review stage, unknown wording and historical-code suppression passed.",
+    "offline_qualification": "Research routing and vision campaign self-tests passed; neither called a provider."
+  },
+  "limits": "Browser paths used fake providers. National filing accuracy, physical-device coverage and a production end-to-end case remain unqualified.",
+  "verification_notes": [
+    "An earlier full run exposed a test expecting references to be sent to the drafter. It now checks that the provider never receives them.",
+    "Earlier browser runs rejected changing source or exhausted the temporary storage quota. The paid rehearsal was repeated on disk. The OCR rehearsal fingerprints predate the test-only privacy assertion update."
+  ]
+}

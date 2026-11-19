@@ -1,0 +1,796 @@
+{
+  "as_of": "2026-11-18T22:35:50.662103+00:00",
+  "project": "neuraldraft-parkingbreaker",
+  "region": "us-west1",
+  "scope": "Authenticated read-only cloud preflight. Candidate freeze and build specs are local.",
+  "authorized_new_cloud_spend_usd": 25,
+  "cloud_resources_created": 0,
+  "cloud_settings_changed": false,
+  "paid_activation": false,
+  "billing_enabled": true,
+  "preview": {
+    "service": "parkingbreaker-frontend",
+    "revision": "parkingbreaker-frontend-preview-0bf011b",
+    "traffic_percent": 100,
+    "images": {
+      "frontend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend@sha256:adacd79a40c82d2247839e9610ca1023386322a393117ecafeb1e27097dab5f4",
+      "backend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:dcda57c126fd458c15313db18014640fd80448f81ac7723cad6ac65d92450d48"
+    },
+    "revisions_observed": 9,
+    "ingress": "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER",
+    "public_check": {
+      "/": {
+        "http": 200
+      },
+      "/api/health": {
+        "http": 200,
+        "mode": "fake",
+        "status": "ok",
+        "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58"
+      },
+      "at": "2026-11-18T22:34:24.965750+00:00"
+    },
+    "rollback_reference": "Record and recheck these exact digests and traffic before any drill. Existing preview is outside the change scope."
+  },
+  "inventory": {
+    "all_project_vm_count": 0,
+    "all_project_disk_count": 0,
+    "regional_disks_us_west1": 0,
+    "oregon_run_services": [
+      "parkingbreaker-frontend"
+    ],
+    "available_zones": [
+      "us-west1-b",
+      "us-west1-c",
+      "us-west1-a"
+    ],
+    "regional_balanced_size_range": "10GB-65536GB",
+    "oregon_vpc_subnets": [
+      [
+        "default",
+        "10.138.0.0/20"
+      ]
+    ],
+    "proposed_ranges_overlap_nondefault_project_routes": false,
+    "project_networks": [
+      "default"
+    ],
+    "project_routers": 0,
+    "oregon_vpc_connectors": 0,
+    "existing_forwarding_rules": [
+      "parkingbreaker-http-forwarding-rule",
+      "parkingbreaker-https-forwarding-rule",
+      "parkingbreaker-ipv6-http-forwarding-rule",
+      "parkingbreaker-ipv6-https-forwarding-rule"
+    ],
+    "regional_repositories": [
+      "parkingbreaker"
+    ],
+    "regional_repo_image_versions": 9,
+    "registry_packages": [
+      "backend",
+      "frontend"
+    ],
+    "service_accounts_count": 1,
+    "preview_account_project_roles": [
+      "roles/artifactregistry.writer",
+      "roles/storage.objectViewer"
+    ],
+    "project_permission_preflight": {
+      "reported": [
+        "artifactregistry.repositories.uploadArtifacts",
+        "cloudbuild.builds.create",
+        "compute.disks.create",
+        "compute.firewalls.create",
+        "compute.globalForwardingRules.create",
+        "compute.instances.create",
+        "compute.networks.create",
+        "compute.routers.create",
+        "compute.subnetworks.create",
+        "dns.managedZones.create",
+        "iam.serviceAccounts.create",
+        "monitoring.alertPolicies.create",
+        "monitoring.uptimeCheckConfigs.create",
+        "resourcemanager.projects.setIamPolicy",
+        "run.services.create",
+        "serviceusage.services.enable"
+      ],
+      "unreported": []
+    },
+    "iam_limit": "The project-level permission response does not exercise actAs on a future service account or prove the effective runtime grants.",
+    "dns_api_enabled": false,
+    "iap_api_enabled": false,
+    "public_dns_authority": "ns27.domaincontrol.com and ns28.domaincontrol.com",
+    "qual_hostname_result": "NXDOMAIN",
+    "cloud_uptime_checks": 0,
+    "cloud_notification_channels": 0,
+    "quotas": {
+      "CPUS": {
+        "used": 0.0,
+        "limit": 32.0
+      },
+      "DISKS_TOTAL_GB": {
+        "used": 0.0,
+        "limit": 2048.0
+      },
+      "IN_USE_ADDRESSES": {
+        "used": 0.0,
+        "limit": 4.0
+      },
+      "SSD_TOTAL_GB": {
+        "used": 0.0,
+        "limit": 250.0
+      },
+      "INSTANCES": {
+        "used": 0.0,
+        "limit": 8.0
+      },
+      "E2_CPUS": {
+        "used": 0.0,
+        "limit": 8.0
+      }
+    }
+  },
+  "candidate": {
+    "base_commit": "678dec04a612ca0f2003ca8b7a207fb7fcff5641",
+    "git_tree": "fc4d913ff146d376339e74fae747bf80b015dbe5",
+    "application_fingerprint": "4c4a736b8f4e08de02636a59432708094086a45a588048f97fbc904811a61046",
+    "archive_sha256": "dd482a29322ef347f06a8f318cf1eee139ee90ea5973995ffeb76a62dc23f690",
+    "files": 404,
+    "archive_bytes": 6117248,
+    "state": "Locally frozen build input and private index; no signed release commit or cloud build yet.",
+    "bundle_local_path": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/candidate-build-source.tar.gz",
+    "private_build_configs": {
+      "backend": "2fa82e5abf543ea599c9a8e52569cdbb7e75fc8864bff641165b87eb3c65e1f0",
+      "frontend": "8d38244ec63854a1ac7631e2e8d42253f3d8e304516d654723145a0b6920fd41"
+    },
+    "target_api_origin": "https://pb-qual-api.internal.parkingbreaker.com:8443",
+    "candidate_registry_state": "No qual-backend or qual-frontend package was present. The two staged Cloud Build recipes use separate package paths and require the signed release commit substitution. Newly built digests and executable smoke checks are still required.",
+    "observed_upstream_images": [
+      {
+        "repo": "library/caddy",
+        "tag": "2.10.2-alpine",
+        "manifest_index": "sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+        "linux_amd64_manifest": "sha256:d8c17a862962def15cde69863a3a463f25a2664942eafd7bdbf050e9c3116b83",
+        "source": "registry-1.docker.io",
+        "size_compressed_bytes": 22502233
+      },
+      {
+        "repo": "curlimages/curl",
+        "tag": "8.16.0",
+        "manifest_index": "sha256:463eaf6072688fe96ac64fa623fe73e1dbe25d8ad6c34404a669ad3ce1f104b6",
+        "linux_amd64_manifest": "sha256:5a91ea0c9c3ee27b4abe657b68cf6bf0676afa13b236b3bda34283cb3924d4f6",
+        "source": "registry-1.docker.io",
+        "size_compressed_bytes": 13092842
+      }
+    ],
+    "existing_preview_images_eligible_for_private_release": false
+  },
+  "target": {
+    "primary": "pb-qual-backend-01, us-west1-a, e2-standard-2, 30 GiB pd-standard boot, private IP 10.44.2.4",
+    "recovery": "pb-qual-recovery-01, us-west1-b, e2-standard-2, 30 GiB standard boot plus separate 50 GiB zonal standard backup disk pb-qual-backup-01",
+    "authority": "pb-qual-data-01 and separate fresh pb-qual-restore-01, each 50 GiB regional pd-balanced across zones a/b, single writer, ext4 /srv/parkingbreaker and data subdirectory",
+    "quota_correction": "Two regional 50 GiB balanced disks use 200 GiB of SSD quota. The old all-balanced plan required another 110 GiB. Using standard boot/backup disks leaves 50 GiB of SSD quota headroom at observation time. Restore timing must be measured on those disk types.",
+    "network": "Isolated pb-qual-vpc; frontend 10.44.1.0/26, hosts 10.44.2.0/24. Scoped frontend-to-gateway 8443, scoped IAP admin 22, private egress, dedicated HTTPS/NEG and qualification hostname. Verify effective ingress and private TLS before running cases.",
+    "identities": "New scoped pb-qual-web, pb-qual-backend and pb-qual-recovery identities; keep frontend free of provider/worker/secrets grants. No existing workload identity would be reused.",
+    "observer": "Cloud Monitoring outside the VMs. Proposed alert recipient and drill responder is Amir at the signed-in account; actual delivery and timed acknowledgment remain open.",
+    "source_and_rollback": "Use synthetic data and fake providers. Fence old writer and capture identities before cutover. Reconcile on fresh storage before resume. Keep isolated admission closed on any failure."
+  },
+  "estimate": {
+    "currency": "USD",
+    "basis": "Public on-demand rates for planning, before taxes or discounts. No free tier assumed. The $5 incidental allowance includes builds, limited egress, registry, DNS, TLS-related and monitoring activity. Actual invoice unavailable.",
+    "rates": [
+      {
+        "line": "Qualification VM and independent backup/drill host, one E2-standard-2 each",
+        "quantity": 48,
+        "unit": "VM-hour",
+        "unit_rate_usd": "0.06701142",
+        "subtotal_usd": "3.21654816",
+        "basis": "compute"
+      },
+      {
+        "line": "Two 30 GiB zonal standard boot disks plus 50 GiB zonal standard backup disk",
+        "quantity": 2640,
+        "unit": "GiB-hour",
+        "unit_rate_usd": "0.000054795",
+        "subtotal_usd": "0.144658800",
+        "basis": "disk"
+      },
+      {
+        "line": "Primary and fresh restore regional balanced disks, 50 GiB each in two zones",
+        "quantity": 2400,
+        "unit": "GiB-hour",
+        "unit_rate_usd": "0.000273973",
+        "subtotal_usd": "0.657535200",
+        "basis": "disk"
+      },
+      {
+        "line": "Cloud Run ingress and web, 1 vCPU each, reserve both configured instances active all day",
+        "quantity": 345600,
+        "unit": "vCPU-second",
+        "unit_rate_usd": "0.000024",
+        "subtotal_usd": "8.294400",
+        "basis": "run"
+      },
+      {
+        "line": "Cloud Run ingress 128 MiB and web 512 MiB, two instances active all day",
+        "quantity": 108000,
+        "unit": "GiB-second",
+        "unit_rate_usd": "0.0000025",
+        "subtotal_usd": "0.2700000",
+        "basis": "run"
+      },
+      {
+        "line": "Synthetic requests only",
+        "quantity": 10000,
+        "unit": "request",
+        "unit_rate_usd": "0.0000004",
+        "subtotal_usd": "0.0040000",
+        "basis": "run"
+      },
+      {
+        "line": "One forwarding rule for isolated load balancer",
+        "quantity": 24,
+        "unit": "rule-hour",
+        "unit_rate_usd": "0.025",
+        "subtotal_usd": "0.600",
+        "basis": "network"
+      },
+      {
+        "line": "Public NAT for two private hosts",
+        "quantity": 48,
+        "unit": "VM-hour",
+        "unit_rate_usd": "0.0014",
+        "subtotal_usd": "0.0672",
+        "basis": "nat"
+      },
+      {
+        "line": "One NAT external address",
+        "quantity": 24,
+        "unit": "address-hour",
+        "unit_rate_usd": "0.005",
+        "subtotal_usd": "0.120",
+        "basis": "nat"
+      },
+      {
+        "line": "NAT processing",
+        "quantity": 2,
+        "unit": "GiB",
+        "unit_rate_usd": "0.045",
+        "subtotal_usd": "0.090",
+        "basis": "nat"
+      },
+      {
+        "line": "Seven days of 50 GiB zonal standard backup disk after the drill",
+        "quantity": 8400,
+        "unit": "GiB-hour",
+        "unit_rate_usd": "0.000054795",
+        "subtotal_usd": "0.460278000",
+        "basis": "disk"
+      },
+      {
+        "line": "Planning allowance for small-volume network egress/LB processing, DNS, test monitoring, build, registry, logs and billing variance",
+        "quantity": 1,
+        "unit": "combined allowance",
+        "unit_rate_usd": "5.00",
+        "subtotal_usd": "5.00",
+        "basis": "assumption"
+      }
+    ],
+    "subtotal_usd": "18.924620160",
+    "proposed_ceiling_usd": 25,
+    "backup_retention_included_usd": "0.460278000",
+    "cleanup_note": "At the stated rate a retained 50 GiB backup disk is about $0.066/day. Other residue would add charges. Billing alerts do not enforce a spend ceiling.",
+    "sources": {
+      "compute": "https://cloud.google.com/products/compute/pricing/general-purpose",
+      "disk": "https://cloud.google.com/compute/disks-image-pricing",
+      "network": "https://cloud.google.com/vpc/network-pricing",
+      "run": "https://cloud.google.com/run/pricing",
+      "nat": "https://cloud.google.com/nat/pricing",
+      "budget": "https://docs.cloud.google.com/billing/docs/how-to/budgets",
+      "regional_disk": "https://docs.cloud.google.com/compute/docs/disks/regional-persistent-disk",
+      "quota": "https://docs.cloud.google.com/compute/resource-usage",
+      "build": "https://cloud.google.com/build/pricing",
+      "registry": "https://cloud.google.com/artifact-registry/pricing"
+    }
+  },
+  "approval_proposal": {
+    "state": "Approved by owner for the stated window and ceiling",
+    "window_utc": [
+      "2026-11-19T00:00:00Z",
+      "2026-11-20T00:00:00Z"
+    ],
+    "window_pacific": "Nov 18 at 4 p.m. to Nov 19 at 4 p.m. PST. Finish sooner if acceptance is reached; reprice before starting if this window is missed.",
+    "ceiling_usd_all_incremental": 25,
+    "steps": [
+      "Sign the frozen tree on an isolated local qualification ref; use only its prepared source bundle, two builds capped at 30 minutes each and separate qual-* image paths. Mirror pinned Caddy and curl digests for the drill. Do not move staging or preview tags.",
+      "Enable only the required project APIs for private DNS and IAP if disabled. Before VM spend verify control of the qualification DNS records, TLS path, tagged build digests, scoped IAM, authenticated synthetic ingress and automatic teardown. Record all new resource IDs.",
+      "Create the isolated target described above; at most two E2 VMs, two regional data volumes, one dedicated frontend service (maximum two instances, two containers each), one NAT IP and one public qualification forwarding rule. Add only the qualification DNS/TLS records, roles scoped to dedicated resources or identities, independent monitor and notification channel.",
+      "Run the restart, fencing, off-host backup/restore and host-loss tests with synthetic fixtures. Up to one verification message, one test alert and its recovery notification to the active Google account only. Amir acknowledges in the drill.",
+      "Stop sooner on uncertainty about costs/traffic, control failure or unexpected effects. Schedule the time bound and verify it before load. Keep 10,000 synthetic requests and 2 GiB NAT processing as planning limits. Do not start infrastructure if bounded traffic, egress, cleanup and remaining headroom cannot be established.",
+      "At cutoff remove only the recorded qualification resources including VMs, disks except the seven-day backup, network/LB, qualification DNS/cert, IAM bindings, service accounts, build source copies, dedicated image digests, monitors and channel. Retire unused newly enabled services only if safe for all other users of the project; otherwise retain enabled API and record it. Delete the synthetic backup by Nov 26 at 4 p.m. PST and verify final inventory."
+    ],
+    "outside_scope": [
+      "Customer data, charging, physical mail, paid model calls, production activation or changes to the existing preview or its traffic."
+    ],
+    "actual_deployment_gates": [
+      "Signed candidate and tested application digests",
+      "Registrar write access and trusted certificate issuance for the new name",
+      "Budget controls, shutdown and disposal path; actual permissions and available capacity",
+      "Named responder receipt and acknowledgment"
+    ]
+  },
+  "ops_run": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229",
+  "evidence_file_sha256": {
+    "accounts.json": "5d5730ef1284c6e7722385a09a8f5a0d39b421ed5c6d1798d8264f0becb2027a",
+    "addresses.json": "e2fac7c2bb7eca193fa898bb4f97666dfb7b7b85f5e1083e36e92b59387e1a7b",
+    "backend-build.json": "2fa82e5abf543ea599c9a8e52569cdbb7e75fc8864bff641165b87eb3c65e1f0",
+    "billing.json": "971da3c08bb2e47e441689687f68b65f78467403b48b106a1a0ba69dbd2a5fec",
+    "buckets.json": "031220179469f5b2f737e4f5d95ed1098ea0cd31c204c7acdb9680b88581a3cd",
+    "candidate.json": "863e0caf342f2a631d195f02e8e7cb0866f56734c8381fccd6d5822cfac2c89a",
+    "channels.json": "812d3f10c6375a8112b7bd825a9a471c513686993af61e775012ecc5eecdeda0",
+    "connectors.json": "f506b3418b642d5b4657972d6d19d0476aea4f45ba1a4a0c57d4457ed7b88f71",
+    "disk-type.json": "81a15f69fb1e72b442ea4367ff17b2ed9b1abab0fc07e276db0495900c72a67e",
+    "disks.json": "ebffc4bc26f76d6234fc71da3040806640dee51b354de7f73f5e75d87bbe4539",
+    "dns-api.json": "e06885bd329d993a9d06497d679c98029d7a700f8b1f7d7aad4ed3813c263350",
+    "dns-parkingbreaker.com.txt": "a0b93517deacb79e7e25283a8e05291d3c88f8ade845557d2c7f529eceadb737",
+    "dns-pb-qual-api.internal.parkingbreaker.com.txt": "711dd582163e3392baec47b91dca1e14cc12ecd68d4db958093e5d09abfb902c",
+    "dns-qual.parkingbreaker.com.txt": "c180a0961ea608e4b1927b95952f8adeca338e70a3295bbc7b1f1759f4ca3b0f",
+    "external-image-metadata.json": "b0383ee04b26a07b1025a1a1eb2d52fdaf66456e8bf62f4f9f105733c15949c0",
+    "firewalls.json": "8c5450c1262304286fad91789de895004834baf49683fe21bb2902e374967271",
+    "forwarding.json": "430c95a07de1f54634692cd691fbe36dbfb74a4011d04d9f90126d93978687a9",
+    "frontend-build.json": "8d38244ec63854a1ac7631e2e8d42253f3d8e304516d654723145a0b6920fd41",
+    "images.json": "2c662c259ab57526453fe5fee5b996ce25cb3d0a6ed284d51453c1344cbc1b34",
+    "instances.json": "27881e089938b9d49fe17091f9700f76a406601c8e0bada7ca24205b1af199c3",
+    "machine.json": "1e787a24cb2ef267fcbbe00f448fafca88373da03bbea59e631064a0adaf6d04",
+    "networks.json": "3fa4f6033f259dd81ef3be40497df008b220b464e3938a450e72090d6721e78f",
+    "preview-v2.json": "5c6123053450f64b2259e93dbc78aba99303de3ba422c9bdb06421a5cf71321b",
+    "preview.json": "5f88a328af2ce9bd6cab9a62db8b34e396d803a2e7ec16115e192958c064ee91",
+    "project-permission-check.json": "6b8538edf46d0ddbc7ec950c12e3899e8256f98e51fe14789b1de1280a08372e",
+    "project-roles.json": "1ea37dccb6d992493cec4b5bd909ef8736885a4f0fe0b475a9b614cc0bb0d6b6",
+    "project.json": "4585841ef8b7ae084717447e59ada7c09a08992d1dad02f0c94996e179885fa8",
+    "public-health.json": "72ca81a46b7d7114fadd3c1cf831c557f0c500a5a5fd03da1ffed85db3ba9b92",
+    "region.json": "c70b489d22ff7a5d0174fa96c90c59b8ed510e5d0656c2c0d75068a13f569e0a",
+    "regional-disk.json": "cbc66f48af11a563fa543dbf7d85b18e8ee32d363da479aaa68d6e62b2251ee7",
+    "regional-volumes.json": "7a70b16f2e05ef676cdda7a2cfe0f9768c641b6468e397d0d28469d4d5c88aa5",
+    "repositories.json": "e589c66cae2da739debb655126a603f83e48a92efb8509186962f61a2b6db3b9",
+    "revisions.json": "aa74bfca4e5247f0e5d9ef71789e32200abb356ea19b06595f95d642c29ba10d",
+    "routers.json": "99141979307b00a3bcea0135371656fe3dadd045d9f8eaa49ac897331015fb8d",
+    "routes.json": "999d0457a33a8c2fadc6be65d3a35fc01f2991fa04d99ac61f7b2d82db86e69d",
+    "run-services.json": "32aac68b8d37576d88ae36646683a77f67fa1c57f552f9b961ff4012d2dad72f",
+    "services.json": "44c36811a8ce6ef9dc604fb2eb7d23f8908cb658e7b1c5ef5938c7ce3d2d1d33",
+    "subnets.json": "7df8ab0be5936cfc07ffa8202a8950d9f6980cfbc81f4357b4c0b5c6aa45f732",
+    "uptime.json": "b930cbfe4ddd630bb034990c4adaa09aa801f76ac6c706b60aa11a8755dff7ad",
+    "usable-permissions.json": "c09d73b9ba6e1f108093aa576551702978a465df695677f2b7ed8e93aa47c611",
+    "zonal-boot.json": "7e8fba28f61b51dc57296c1bc3577680c6b215e3cca8219b12a95014137890fc",
+    "zones.json": "8bad8e98e16baabfea8bea9e5c2e0450188df402218f72ea07cef09068fa919d",
+    "validation-only.json": "fd9d1ee178cd84f88657389ea62b8d0ca2555f33ecab1f828b67466787b1b79b"
+  },
+  "limits": "Read-only listing does not reserve resources or qualify an operational target. There is no live paid beta approval.",
+  "cloud_run_shape_preflight": {
+    "source": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+    "documented_memory_limits": "https://docs.cloud.google.com/run/docs/configuring/services/memory-limits",
+    "request": "Two nonpersisting validateOnly creates using known registry digests as shape placeholders for a two-container Gen2 service. The 128 MiB and 512 MiB ingress shapes each returned HTTP 200. The qualification hostname, private VPC, application startup and invoice were not exercised.",
+    "data": {
+      "before_http": 404,
+      "at": "2026-11-18T22:37:31.626057+00:00",
+      "validateOnly": true,
+      "128Mi": {
+        "http": 200,
+        "error": null,
+        "done": null,
+        "rpc_status": null,
+        "initial_response_fields": [
+          "metadata",
+          "name"
+        ],
+        "operation_read_http": 404
+      },
+      "512Mi": {
+        "http": 200,
+        "error": null,
+        "done": null,
+        "rpc_status": null,
+        "initial_response_fields": [
+          "metadata",
+          "name"
+        ],
+        "operation_read_http": 404
+      },
+      "after_http": 404
+    },
+    "estimate_sensitivity": "If ingress must be raised to 512 MiB per instance alongside the 512 MiB web container, the modeled incremental maximum for 24 hours at two active instances is $0.162 before discounts, within the proposed $25 ceiling. Verify the deployed target."
+  },
+  "owner_decision_after_preflight": {
+    "source": "Owner reply to call_c253505c7a6c49b1a8ee9c0355289ed6",
+    "scope": "approval_proposal",
+    "approved": true,
+    "ceiling_usd_all_incremental": 25,
+    "window_utc": [
+      "2026-11-19T00:00:00Z",
+      "2026-11-20T00:00:00Z"
+    ],
+    "synthetic_backup_remove_by": "2026-11-27T00:00:00Z",
+    "paid_customer_activation": false,
+    "preflight_values_as_of": "2026-11-18T22:35:50.662103+00:00",
+    "recorded_at": "2026-11-18T23:15:50.281861+00:00"
+  },
+  "authorized_new_cloud_spend_usd_at_preflight": 0,
+  "prewindow_verification": {
+    "archive_files_matched_to_frozen_git_tree": 404,
+    "build_recipe_hashes_verified": 2,
+    "loopback_gateway_checks": 12,
+    "loopback_gateway_passed": 12,
+    "checked_caddy_linux_amd64": "sha256:d8c17a862962def15cde69863a3a463f25a2664942eafd7bdbf050e9c3116b83",
+    "archived_backend_synthetic_restore": {
+      "captures": 1,
+      "letters": 1,
+      "reconciliation": {
+        "checked": 1,
+        "issues": [],
+        "status": "READY_FAKE"
+      },
+      "restore": {
+        "artifacts_match": true,
+        "elapsed_seconds": 0.005564180999499513,
+        "records_match": true
+      }
+    },
+    "scheduled_start_utc": "2026-11-19T00:00:00Z",
+    "first_cleanup_utc": "2026-11-19T22:30:00Z",
+    "cloud_target_result": "pending",
+    "private_evidence_directory": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/approved-window"
+  },
+  "approved_rehearsal_progress": {
+    "observed_at": "2026-11-19T00:45:00.881243+00:00",
+    "signed_commit": "50526bf3b3f137fbce82e4f97be68ff26ad69a89",
+    "signature_verified": true,
+    "builds": {
+      "backend": {
+        "id": "ecf5ad05-0b05-4d5e-bcb4-4b39fd7975cd",
+        "status": "SUCCESS",
+        "digest": "sha256:e1de4b1ebbb478a5d6fc8131fd5bb9530382b05e756acb34b3def315bdfc0354",
+        "startTime": "2026-11-19T00:00:21.366279994Z",
+        "finishTime": "2026-11-19T00:02:25.135123Z"
+      },
+      "frontend": {
+        "id": "63c71c5e-ed7f-49b2-8401-4cd2806979b0",
+        "status": "SUCCESS",
+        "digest": "sha256:de94a8b9ebdc21980120f3921834db40056465dd12b3b770c9b59eeb2c0bec8a",
+        "startTime": "2026-11-19T00:00:23.198081689Z",
+        "finishTime": "2026-11-19T00:04:10.035432Z"
+      }
+    },
+    "dedicated_ipv4_allocated": true,
+    "status": "Managed TLS and authenticated ingress verified. Both private VMs are running with the three intended data, restore and backup disks attached. Guest container tools, application deployment, host loss, recovery and alert delivery are pending.",
+    "private_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/approved-window/cloud-start.json",
+    "invoice_usd": null,
+    "image_smoke": {
+      "backend": {
+        "role": "backend",
+        "digest": "sha256:e1de4b1ebbb478a5d6fc8131fd5bb9530382b05e756acb34b3def315bdfc0354",
+        "compressed_bytes": 109930144,
+        "mode": "published image, loopback HTTP in an unprivileged isolated network namespace",
+        "response": {
+          "status": "ok",
+          "mode": "fake",
+          "build_commit": "50526bf3b3f137fbce82e4f97be68ff26ad69a89"
+        }
+      },
+      "frontend": {
+        "role": "frontend",
+        "digest": "sha256:de94a8b9ebdc21980120f3921834db40056465dd12b3b770c9b59eeb2c0bec8a",
+        "compressed_bytes": 213600537,
+        "mode": "published image, loopback HTTP in an unprivileged isolated network namespace",
+        "response": {
+          "http": 200,
+          "private_origin": true
+        }
+      }
+    },
+    "verified_images": [
+      {
+        "role": "backend",
+        "digest": "sha256:e1de4b1ebbb478a5d6fc8131fd5bb9530382b05e756acb34b3def315bdfc0354",
+        "platform": "linux/amd64",
+        "user": "app",
+        "revision_label": "50526bf3b3f137fbce82e4f97be68ff26ad69a89"
+      },
+      {
+        "role": "frontend",
+        "digest": "sha256:de94a8b9ebdc21980120f3921834db40056465dd12b3b770c9b59eeb2c0bec8a",
+        "platform": "linux/amd64",
+        "user": "node",
+        "revision_label": null
+      },
+      {
+        "role": "caddy",
+        "digest": "sha256:d8c17a862962def15cde69863a3a463f25a2664942eafd7bdbf050e9c3116b83",
+        "platform": "linux/amd64",
+        "user": null,
+        "revision_label": null
+      },
+      {
+        "role": "curl",
+        "digest": "sha256:5a91ea0c9c3ee27b4abe657b68cf6bf0676afa13b236b3bda34283cb3924d4f6",
+        "platform": "linux/amd64",
+        "user": "curl_user",
+        "revision_label": null
+      }
+    ],
+    "temporary_build_source_removed": "2026-11-19T00:04:49.793368+00:00",
+    "direct_run_ingress": {
+      "at": "2026-11-19T00:07:31.666889+00:00",
+      "http": 404,
+      "uid": "bfb6da82-695c-4f45-b890-0980109d6034",
+      "revision": "projects/neuraldraft-parkingbreaker/locations/us-west1/services/pb-qual-frontend-01/revisions/pb-qual-frontend-01-00001-c4v",
+      "cap": 2
+    },
+    "billing_total_usd": null,
+    "dedicated_hostname": "qual.parkingbreaker.com",
+    "dedicated_ip": "136.81.91.111",
+    "dedicated_target_resources_observed": 17,
+    "direct_run_ingress_http": 404,
+    "public_dns_and_certificate": {
+      "dns": {
+        "at": "2026-11-19T00:20:03.462268+00:00",
+        "source": "authoritative DNS readback after owner saved the GoDaddy record",
+        "hostname": "qual.parkingbreaker.com",
+        "type": "A",
+        "ttl_seconds": 600,
+        "answers": {
+          "ns27.domaincontrol.com": "136.81.91.111",
+          "ns28.domaincontrol.com": "136.81.91.111"
+        }
+      },
+      "certificate": "ACTIVE",
+      "https_verified": true,
+      "ingress_http": [
+        403,
+        200,
+        404,
+        404
+      ],
+      "edge_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/approved-window/verified-edge.json"
+    },
+    "qualification_vms_created": 2,
+    "alert_delivered": false,
+    "original_preview_healthy": true,
+    "public_dns_watcher_active": true,
+    "private_checkpoint": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/approved-window/cloud-edge-checkpoint.json",
+    "qualification_data_restore_backup_disks": 3,
+    "private_host_receipt": "/home/ghostmonday/Vault/Ops/runs/parkingbreaker-cloud-20261118-2229/approved-window/host-inventory.json"
+  },
+  "guest_rehearsal": {
+    "at": "2026-11-19T05:03:18.175418+00:00",
+    "signed_commit": "50526bf3b3f137fbce82e4f97be68ff26ad69a89",
+    "status": "BLOCKED_SIGNED_GATEWAY_CONFIG",
+    "verified_operating_system": "Ubuntu 24.04.5 LTS",
+    "tool_versions": {
+      "docker": "29.1.3",
+      "compose": "2.40.3+ds1-0ubuntu1~24.04.1",
+      "sshfs": "3.7.3"
+    },
+    "guest_packages": "Verified Ubuntu archive signatures and package hashes. Installed offline over existing IAP.",
+    "initialized_and_mounted_ext4": [
+      {
+        "host": "pb-qual-backend-01",
+        "disk": "pb-qual-data-01",
+        "id": "2654776613611502210",
+        "at": "2026-11-19T04:52:52.035236+00:00"
+      },
+      {
+        "host": "pb-qual-recovery-01",
+        "disk": "pb-qual-restore-01",
+        "id": "1319929528525781662",
+        "at": "2026-11-19T04:52:55.669345+00:00"
+      },
+      {
+        "host": "pb-qual-recovery-01",
+        "disk": "pb-qual-backup-01",
+        "id": "7997027871779715739",
+        "at": "2026-11-19T04:52:59.401229+00:00"
+      }
+    ],
+    "disk_read_grants": "Scoped to each dedicated service account on its own regional disk, solely compute.disks.get, time limited and no project-wide binding.",
+    "cloud_single_attached_writer_per_regional_disk": true,
+    "app_env_permissions": "root-owned 0600 on both VMs, fake providers, admission paused",
+    "checked_origin": "Public TLS and ingress authentication reached from primary. Signed backend could not serve via the private gateway.",
+    "signed_lifecycle": {
+      "validation_images_old_owner_exclusivity_and_migration_passed": true,
+      "exit_status": 1,
+      "error": "Compose rejects content-backed Caddy config for a read-only service. File is the sole supported config option.",
+      "candidate_containers_off_after_failure": true,
+      "processing_blocked": true
+    },
+    "exact_pinned_caddy_offline_probe": {
+      "frozen_drop_all_exit": 255,
+      "frozen_error": "exec /usr/bin/caddy: operation not permitted",
+      "only_NET_BIND_SERVICE_added_exit": 0,
+      "kept": "same digest, user 10001:10001, read-only, no-new-privileges, no network"
+    },
+    "offline_off_host_restore": {
+      "fixture": "r02-synthetic-20261119T045920Z",
+      "manifest_sha256": "ee934c4c7d5580cc6890fa90f41492d3121454cd049c679601ac24f6dda473ef",
+      "mode": "Pinned backend on both approved guests. Independently seeded offline fixture, not a live scheduled backup.",
+      "transport": "Pinned SSH host key, restricted SFTP user and real fuse.sshfs on primary host and inside the copy container.",
+      "storage_at_rest": "Google-managed Persistent Disk encryption, synthetic data only",
+      "receiver_backup_disk": "pb-qual-backup-01",
+      "fresh_restore_disk": "pb-qual-restore-01",
+      "records_match": true,
+      "artifacts_match": true,
+      "restore_seconds": "0.04398998000033316",
+      "quarantine_preserved": true,
+      "signed_backend_refused_quarantined_data": true,
+      "original_provider_reconciliation": "NEEDS_EXTERNAL",
+      "reconcile_exit": 3,
+      "restore_started_after_copy": true,
+      "restart_host_fencing_alert_and_acknowledgment": "pending"
+    },
+    "guest_network_bounds": {
+      "combined_guest_nic_bytes_since_boot": 451633959,
+      "scope_planning_limit_bytes": 2147483648,
+      "basis": "All traffic on both guest interfaces including IAP and private traffic. Upper bound on NAT-processed guest traffic over the observation window.",
+      "actual_incremental_invoice_usd": null
+    },
+    "teardown": "Cloud VM hard deletion 2026-11-19T22:00:00Z. Independent timers for general cleanup at 22:30Z and retained backup on November 26 at 15:35 PST. NAT, private backup SSH rule and scoped custom role recorded for cleanup.",
+    "ops_evidence": {
+      "first-lifecycle.log": "74d3d36d138735c93883828f2adcaf017ba2bbee2f103dfdbb9fe06bfd939984",
+      "caddy-capability.log": "3fd1a3c473c61c6b220b3b5d1433f9c513ecbb53205b3c86231141aa1ca9b634",
+      "offhost-copy.log": "cd0763476d7745a4dd2a0a9cbc0d3647f3f155425a5d9c13072b96fbf08ff5ff",
+      "offhost-restore.log": "05ec9cf98f4673068ef6d7085d95e1d7e9a05072b9d17c71221b6db7a537374c",
+      "quarantine-verify.log": "aabe633c639854a41640270c5da848e1bfbd5918824cd5ec1de3db96363f01db",
+      "current-cloud-inventory.log": "6c7cbeff652efbef6bcc33f9b4fe740e3231195f74eb81b73ecb131646f967b4",
+      "disposal-timers.log": "63dc7d8b655989cbc9aac92273688a263d922ded1ea0ef3fa89bf1df3791fe4b",
+      "guest-network-counts.jsonl": "e63db4abb17116c8dd2853c13dd3c3eeaa8b0fc08f89a80cc812da873632c2c4",
+      "persisted-reader.log": "4c8924ff23991222af4fabd085fdf2e9d6bd8deb16a6d0d71fb35d7cfa2c644e",
+      "caddy-file-validate.log": "71b18def53ea53084888fab1058c8bcefd03f0e28fb5c50fbdae6cebc577eda5"
+    },
+    "independent_persistence_check": {
+      "persisted_fixture_after_first_container_exit": true,
+      "verified_manifest_sha256": "ee934c4c7d5580cc6890fa90f41492d3121454cd049c679601ac24f6dda473ef",
+      "record_hash_groups": 77,
+      "artifact_hashes": 2
+    },
+    "isolated_file_backed_caddy_validation": {
+      "validation": "Passed on the pinned image with the current private TLS leaf and exact Caddy content, network disabled.",
+      "rendered_gateway_sha256": "55d0a597e07beb5eb7c3437be6639ddd78d6e9a7c197bf2ade133840a748696a",
+      "signed_stack_deployed": false
+    },
+    "final_readback_at": "2026-11-19T05:04:22.689297+00:00"
+  },
+  "guest_live_application": {
+    "observed_at": "2026-11-19T06:00:16.560984+00:00",
+    "application_build_commit": "50526bf3b3f137fbce82e4f97be68ff26ad69a89",
+    "signed_gateway_deployment_config_commit": "14eafcf19f4828845eb9a411c1fd0732dfc9020b",
+    "status": "CORRECTED_SIGNED_REHEARSAL_APPLICATION_READY",
+    "scope": "Isolated synthetic target with same immutable images, original app build, no customer data.",
+    "guest_config_changes": [
+      "Separated two signed gateway configs from the original image build. File-backed read-only Caddy config, NET_BIND_SERVICE only, and a Caddy-only publication bridge with masquerading disabled.",
+      "Enabled existing PB_FAKE_SPLIT_FOR_MEASUREMENT=1 in protected fake-only environment. Fake provider in-memory effects are independent across API and worker.",
+      "Restored root-owned scheduler bind file to its signed Git 0755 mode after confirming exact bytes. Lifecycle and image locks unchanged."
+    ],
+    "lifecycle_reached_ready": true,
+    "private_tls": {
+      "health_http": 200,
+      "trusted_hostname": true,
+      "bind": "10.44.2.4:8443",
+      "fresh_monitor_poll_and_successful_sweep": true
+    },
+    "public_ingress": {
+      "health_http": 200,
+      "anonymous_http": 403,
+      "authenticated_page_http": 200,
+      "private_paths_http": [
+        404,
+        404
+      ],
+      "build_verified": true
+    },
+    "paused_new_intake_paths_http": [
+      503,
+      503,
+      503
+    ],
+    "off_host": {
+      "backup_timer_enabled": true,
+      "validated_trigger": "manual start of the same signed systemd service",
+      "backup_manifest_sha256": "19a500fa4fc6a035d7f2f3d5966de77655c99615f7d130b102cdb9720304ce58",
+      "matched_restore_manifest": true,
+      "matched_records": true,
+      "matched_artifacts": true,
+      "quarantine_enforced_by_signed_backend": true,
+      "original_provider_reconciliation": "NEEDS_EXTERNAL"
+    },
+    "observer": {
+      "check_created": true,
+      "managed_authentication_target": "Managed Cloud Run OIDC check did not establish a healthy baseline and was removed",
+      "policy_armed": true,
+      "authorized_recipient_acknowledgment": null,
+      "fallback": "One independent workstation polling the exact authenticated public TLS health endpoint once per minute",
+      "policy_name": "projects/neuraldraft-parkingbreaker/alertPolicies/6931330991521502068",
+      "approved_recipient_only": true,
+      "baseline": [
+        {
+          "at": "2026-11-19T05:31:59.911006Z",
+          "value": 1
+        },
+        {
+          "at": "2026-11-19T05:32:58.479894Z",
+          "value": 1
+        }
+      ],
+      "incident": {
+        "name": "projects/neuraldraft-parkingbreaker/alerts/0.of6x4762oizc",
+        "state": "CLOSED",
+        "openTime": "2026-11-19T05:38:41Z",
+        "closeTime": "2026-11-19T05:43:10Z"
+      },
+      "incident_opened_seconds_after_vm_stopped": 258.188
+    },
+    "production_preview_health": {
+      "status": "ok",
+      "mode": "fake",
+      "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58"
+    },
+    "actual_incremental_invoice_usd": null,
+    "log_sha256": {
+      "ingress-correction-verified.log": "bc97ed312efc8988016457f191e621f2fc7dcd895de757b0e887b2170ec75ee6",
+      "scheduler-mode-repair.log": "32256d587da99514541357307b5766b63e62c1858ff0f6e4f4f8a9c66766f4a0",
+      "final-lifecycle.log": "4273c72b1e21b266fb7d4a2233e39b7bf11eb439852aab135ae207b5fda5ff2a",
+      "live-private-health.log": "d948c4a9c704793b8034f37d52737d18ef243ada6d870ab3a0f330881b2d81cd",
+      "live-backup.log": "4857036d39c50472bd9912c005fa1cdf7408d693c958b70ac61fc8cbfad6287f",
+      "live-offhost-restore.log": "cb7aae15eddc5a1eee4cdad67db84a0330a1d35671bd1559b19b1bbb1e5ed9f4",
+      "live-offhost-restore-verify.log": "31f0c626140e7759974f3b216c263065b6522ca8d869019f96f33b775e2300ff",
+      "paused-ingress-controls.log": "cbb2d66e0c5b31bcc0a82e70ba80c4ca2ad3fc5b71ab5b0d7172182e84ac8795",
+      "live-preoutage-state.log": "ead8860f6a545c7b2c45b8dbb16806c8e09e2528a5684db4b82f1823faae8d9d"
+    },
+    "outage": {
+      "at": "2026-11-19T05:33:26.377003+00:00",
+      "state": "running",
+      "instance": "pb-qual-backend-01",
+      "instance_id": "1656875236224924533",
+      "disk_users_before": [
+        "https://www.googleapis.com/compute/v1/projects/neuraldraft-parkingbreaker/zones/us-west1-a/instances/pb-qual-backend-01"
+      ],
+      "observer": "independent_workstation",
+      "policy": "projects/neuraldraft-parkingbreaker/alertPolicies/6931330991521502068",
+      "verified_stopped": "2026-11-19T05:34:24.954663+00:00",
+      "disk_users_while_stopped": [
+        "https://www.googleapis.com/compute/v1/projects/neuraldraft-parkingbreaker/zones/us-west1-a/instances/pb-qual-backend-01"
+      ],
+      "provider_stop_timestamp": "2026-11-19T05:34:22.812000+00:00",
+      "start_intent_at": "2026-11-19T05:38:30.617338+00:00",
+      "verified_running": "2026-11-19T05:38:41.626075+00:00",
+      "first_observer_failure_at": "2026-11-19T05:35:04.445273+00:00",
+      "first_observer_recovery_at": "2026-11-19T05:40:22.763527+00:00",
+      "signed_readiness_after_restart_at": "2026-11-19T05:40:24Z",
+      "workspace_persisted_after_primary_restart": true,
+      "same_regional_disk_and_only_original_vm_attachment": true,
+      "recovery_vm_never_promoted": true,
+      "cold_restore_photo_bytes_verified": true,
+      "fixture_age_at_simulated_loss_seconds": 673.973,
+      "time_from_stopped_to_external_health_seconds": 359.952
+    },
+    "disposal": {
+      "at": "2026-11-19T06:00:16.532860+00:00",
+      "remaining_scoped_resources": [
+        "pb-qual-vpc",
+        "pb-qual-frontend-subnet"
+      ],
+      "retained_backup": {
+        "name": "pb-qual-backup-01",
+        "encrypted_disk_id": "7997027871779715739",
+        "size_gib": 50,
+        "attached": false
+      },
+      "retire_backup_by": "2026-11-27T00:00:00Z",
+      "original_preview": {
+        "status": "ok",
+        "mode": "fake",
+        "build_commit": "0bf011b7c243bed1b864bdb1739438469fdacb58"
+      },
+      "original_preview_healthy": true
+    }
+  }
+}

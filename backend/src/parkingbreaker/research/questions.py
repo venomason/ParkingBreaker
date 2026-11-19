@@ -43,7 +43,7 @@ class FactTier(StrEnum):
 DEFAULT_TIERS: Mapping[FactKey, FactTier] = MappingProxyType(
     {
         FactKey.MAIL_IN_ACCEPTED: FactTier.MUST_HAVE,
-        FactKey.GOVERNING_CODE_SECTION: FactTier.IMPORTANT,
+        FactKey.GOVERNING_CODE_SECTION: FactTier.NICE_TO_HAVE,
         FactKey.DEADLINE_DAYS: FactTier.MUST_HAVE,
         FactKey.DEADLINE_CLOCK_START: FactTier.MUST_HAVE,
         FactKey.DEADLINE_RULE: FactTier.MUST_HAVE,
@@ -79,7 +79,9 @@ LIST_KEYS = RULE_KEYS | {
 
 # Keys kept for decoding historical records only. They are never asked, extracted, promoted
 # or used to drive recovery, so an old saved finding cannot restart defence research.
-RETIRED_KEYS: frozenset[FactKey] = frozenset({FactKey.CODE_EXCEPTIONS})
+RETIRED_KEYS: frozenset[FactKey] = frozenset(
+    {FactKey.CODE_EXCEPTIONS, FactKey.GOVERNING_CODE_SECTION}
+)
 
 # Every key that can still be researched, in stable order.
 ANSWERABLE_KEYS: tuple[FactKey, ...] = tuple(k for k in FactKey if k not in RETIRED_KEYS)
@@ -136,12 +138,6 @@ def build_questions(
         FactKey.MAIL_IN_ACCEPTED: (
             f"Does the agency accept contests of parking citations by mail in {where}?",
             "boolean; true only if the official source explicitly permits contests by mail",
-        ),
-        FactKey.GOVERNING_CODE_SECTION: (
-            f"Which code section or ordinance number must a mailed contest cite or attach "
-            f"for {violation} in {where}, according to the official form or notice?",
-            "string, the section citation exactly as written, or an explicit statement that "
-            'none is required, e.g. "Sec. 7.2.22"',
         ),
         FactKey.DEADLINE_DAYS: (
             f"How many days does a person have to contest a citation issued {issued} "
@@ -202,7 +198,9 @@ def build_questions(
                 "empty with an explicit absence or complete-procedure assessment",
             ),
             FactKey.TICKET_SPECIFIC_REQUIREMENTS: (
-                "Which other compulsory conditions apply to this ticket and stage?",
+                "Which other compulsory filing conditions apply to this ticket and stage? If the "
+                "agency requires a provision to be identified, what are its exact filing "
+                "instructions, without identifying or researching the provision?",
                 "list of verbatim compulsory conditions; "
                 "empty with an explicit absence or complete-procedure assessment",
             ),
@@ -303,17 +301,25 @@ def effective_tiers(
 
     # Historic customer exception/citation selections stay decodable but never promote a
     # research key: the service does not research or argue a defence.
-    for evidence in (verified_requirements.code_required, packet_plan.code_required):
-        if evidence is not None:
-            promote(
-                FactKey.GOVERNING_CODE_SECTION, "required form or packet needs provision", evidence
-            )
+    # An official instruction about a code citation is shown verbatim to the driver.
+    # It cannot trigger research into the ordinance or selection of letter content.
     if verified_requirements.amount_required is not None:
         promote(
             FactKey.FINE_AMOUNT,
             "process requires amount or deposit",
             verified_requirements.amount_required,
         )
-    return EffectiveTiers(
-        MappingProxyType(tiers), tuple(promotions), verified_requirements.compulsory_conditions
+    # A mandatory instruction still has to be fulfilled under the packet rules.
+    # Inventory that instruction as written, without asking for its legal answer.
+    compulsory = tuple(
+        dict.fromkeys(
+            evidence
+            for evidence in (
+                *verified_requirements.compulsory_conditions,
+                verified_requirements.code_required,
+                packet_plan.code_required,
+            )
+            if evidence is not None
+        )
     )
+    return EffectiveTiers(MappingProxyType(tiers), tuple(promotions), compulsory)

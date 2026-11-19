@@ -635,6 +635,7 @@ def value_supported_by_quote(key: FactKey, value: JsonValue, quote: str) -> bool
                     rf"(?:your |an? |the )?)?{_CONTEST}\b[^.!?;]*\bby mail[.]?"
                     r"|to (?:submit|send|file|request) (?:your |an? |the )?"
                     rf"{_CONTEST} by mail\b[^.!?;]*[.:]?"
+                    rf"|to submit (?:your |an? |the ){_CONTEST} via mail, you must include:"
                     rf"|(?:we accept|the agency accepts) (?:mailed {_CONTEST}"
                     rf"|{_CONTEST} by mail)[.]?",
                     " ".join(lowered.split()),

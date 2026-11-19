@@ -3,7 +3,7 @@
 set -euo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 if [[ ${1:-} == --dry-run ]]; then
-  bash -n "$here/"*.sh
+  for script in "$here/"*.sh; do bash -n "$script"; done
   if command -v shellcheck >/dev/null; then shellcheck "$here/"*.sh; fi
   printf '%s\n' 'offline syntax checks passed; target validation requires env, mounted regional disk and fresh disk describe'
   exit 0
@@ -29,7 +29,9 @@ case ${PB_DEPLOY_TOPOLOGY:-single-vm} in
   single-vm) ;;
   cloudrun-private-vm)
     : "${PB_PUBLIC_ORIGIN:?}" "${PB_PRIVATE_VM_IP:?}" "${PB_PRIVATE_API_HOST:?}" "${PB_PRIVATE_TLS_PATH:?}"
-    files+=(-f "$release/deploy/compose.private-vm.yaml") ;;
+    python3 "$here/../backend/src/parkingbreaker/deployment_policy.py" "${PB_FRONTEND_SUBNET_CIDR:?}" "$PB_PRIVATE_VM_IP"
+    python3 "$here/private-images.py" "$release/deploy/private-images.json" "${PB_BUILD_COMMIT:?}" >/dev/null
+    files+=(-f "$release/deploy/compose.private-vm.yaml" -f "$release/deploy/private-images.json") ;;
   *) echo 'unsupported deployment topology' >&2; exit 2 ;;
 esac
 docker compose --env-file "$PB_ENV_FILE" -p parkingbreaker "${files[@]}" config --quiet

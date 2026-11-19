@@ -237,7 +237,7 @@ def test_explicit_form_overrides_silence_until_completed_form_is_in_frozen_packe
 def test_new_evidence_rechecks_saved_assessment_after_record_round_trip() -> None:
     research = result_fixture()
     encoded = research_json(research)
-    assert json.loads(encoded)["version"] == 4
+    assert json.loads(encoded)["version"] == 5
     saved = decode_research(encoded)
     assert saved == research
     assert research_json(saved) == encoded

@@ -1,7 +1,7 @@
 "use client";
 
+import { HurtleGuide } from "./HurtleGuide";
 import React, { useEffect } from "react";
-import { ConciergeMark } from "./ConciergeMark";
 import { Icon } from "./Icons";
 import { SAMPLE_PREVIEW } from "../lib/api";
 
@@ -106,7 +106,7 @@ export function Step6LetterStudio({
   return (
     <section className="screen on" id="s6" aria-labelledby="h-s6">
       <div className="voice">
-        <ConciergeMark size={44} state="idle" />
+        <HurtleGuide pose="letter" />
         <div>
           <p className="eyebrow">Step 5 · Your letter</p>
           <h2 id="h-s6" tabIndex={-1}>
@@ -126,7 +126,7 @@ export function Step6LetterStudio({
       >
         {flagged.length > 0 ? (
           <>
-            <Icon id="dot" size={20} style={{ color: "#b3122b", flex: "none" }} />
+            <Icon id="dot" size={20} style={{ flex: "none" }} />
             <div>
               <b>Proofreader · 1 thing to check</b>
               <p>

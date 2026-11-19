@@ -20,7 +20,16 @@ from parkingbreaker.blob_store import FakeBlobStore
 from parkingbreaker.case_service import CaseService, CaseServiceDeps, ResearchDeps
 from parkingbreaker.case_state import CaseState, CustomerApproved, DraftReady, ResearchComplete
 from parkingbreaker.config_fakes import AcceptingLobClient
+from parkingbreaker.journey_context import (
+    ContextFactRoute,
+    ContextFunding,
+    ContextOperation,
+    ContextReason,
+    DurationBasis,
+    ReferenceState,
+)
 from parkingbreaker.journey_events import (
+    CAPTURE_COMPONENT,
     COMPONENT,
     CostStatus,
     JourneyEvent,
@@ -384,6 +393,35 @@ def test_full_five_hook_funnel_replays_and_privacy_projection(
         assert [e.seq for e in page.events] == [1, 2, 3, 4, 5]
         assert all(e.outcome is JourneyEventOutcome.SUCCEEDED for e in page.events)
         assert all(e.schema_version == 1 for e in page.events)
+        contexts = [e.context for e in page.events]
+        assert all(item is not None for item in contexts)
+        assert [item.operation for item in contexts if item is not None] == [
+            ContextOperation.OCR_EXTRACT,
+            ContextOperation.FACT_CONFIRMATION,
+            ContextOperation.INTAKE_SUBMISSION,
+            ContextOperation.PAYMENT_AUTHORIZATION,
+            ContextOperation.PACKET_APPROVAL,
+        ]
+        reading_context, confirmation_context, submitted_context, hold_context, approval_context = (
+            contexts
+        )
+        assert reading_context is not None
+        assert confirmation_context is not None
+        assert submitted_context is not None
+        assert hold_context is not None
+        assert approval_context is not None
+        assert reading_context.duration_basis is DurationBasis.SERVER_WALL_ELAPSED
+        assert confirmation_context.fact_route is ContextFactRoute.OCR
+        assert submitted_context.funding is ContextFunding.UNKNOWN
+        assert hold_context.funding is approval_context.funding is ContextFunding.PAID
+        assert hold_context.causation_ref.opaque_id == page.events[2].event_id
+        assert approval_context.causation_ref.opaque_id == page.events[3].event_id
+        assert all(item.capture_coverage == "limited" for item in contexts if item is not None)
+        assert all(
+            item.build_sha256 is None and item.config_sha256 is None
+            for item in contexts
+            if item is not None
+        )
         assert all(e.journey_id == page.journey_id for e in page.events)
         assert all(e.occurred_at.date() == NOW.date() for e in page.events)
         assert all(e.recorded_at != e.occurred_at for e in page.events)
@@ -456,6 +494,8 @@ def test_ticket_read_refused_unknown_and_unknown_cost(tmp_path: Path) -> None:
         assert events_u[0].outcome is JourneyEventOutcome.UNKNOWN
         assert events_u[0].cost_cents is None
         assert events_u[0].cost_status is CostStatus.UNKNOWN
+        assert events_u[0].context is not None
+        assert events_u[0].context.reason is ContextReason.READING_RESULT_UNKNOWN
     finally:
         store_u.close()
 
@@ -474,6 +514,8 @@ def test_ticket_read_refused_unknown_and_unknown_cost(tmp_path: Path) -> None:
         assert events_r[0].outcome is JourneyEventOutcome.REFUSED
         assert events_r[0].cost_cents == 0
         assert events_r[0].cost_status is CostStatus.KNOWN
+        assert events_r[0].context is not None
+        assert events_r[0].context.reason is ContextReason.READING_REFUSED
     finally:
         store_r.close()
 
@@ -675,7 +717,8 @@ def test_delayed_recording_replay_and_clock_skew(tmp_path: Path) -> None:
             "SELECT created_at FROM pb_journey_links WHERE workspace_token=?", ("ws_2",)
         ).fetchone()
         assert link_row is not None
-        assert datetime.fromisoformat(str(link_row[0])) == first.recorded_at
+        # Identity now begins at durable workspace creation, not a later event.
+        assert datetime.fromisoformat(str(link_row[0])) == NOW
 
         # Replay with a later clock and a different recorded_at preserves original identity
         # and original recording time; semantic dedupe ignores new recording time.
@@ -953,6 +996,8 @@ def test_restart_ordering_and_existing_db_without_invented_history(tmp_path: Pat
     # and tables, keep existing workspace/case rows, then reopen.
     db = sqlite3.connect(path)
     try:
+        db.execute("DROP TABLE pb_journey_capture")
+        db.execute("DELETE FROM pb_store_versions WHERE component=?", (CAPTURE_COMPONENT,))
         db.execute("DROP TABLE pb_journey_events")
         db.execute("DROP TABLE pb_journey_links")
         db.execute("DELETE FROM pb_store_versions WHERE component=?", (COMPONENT,))
@@ -1237,5 +1282,8 @@ def test_beta_no_charge_case_never_emits_hold_authorized(tmp_path: Path) -> None
         events = store.journey_events(workspace_token=beta_case.workspace_token).events
         assert JourneyEventKind.HOLD_AUTHORIZED not in [e.kind for e in events]
         assert [e.kind for e in events] == [JourneyEventKind.PACKET_APPROVED]
+        assert events[0].context is not None
+        assert events[0].context.funding is ContextFunding.FREE_BETA
+        assert events[0].context.causation_ref.status is ReferenceState.UNKNOWN
     finally:
         store.close()

@@ -28,9 +28,11 @@ from parkingbreaker.address_store import _decisions as destination_decisions_sna
 from parkingbreaker.ai_journal_store import AiJournalStoreMixin, initialize_ai_journal
 from parkingbreaker.ai_spend_store import AiSpendStoreMixin, initialize_ai_spend
 from parkingbreaker.approval_manifest import (
+    ApprovalManifest,
     ApprovalManifestStoreMixin,
-    build_remail_approval_manifest,
     initialize_approval_manifests,
+    verify_dispatch_integrity,
+    verify_remail_approval,
 )
 from parkingbreaker.beta_feedback_store import (
     BetaFeedbackStoreMixin,
@@ -75,14 +77,27 @@ from parkingbreaker.draft_ownership_store import (
 )
 from parkingbreaker.identity_store import IdentityStoreMixin, initialize_identity
 from parkingbreaker.intake_store import IntakeConflict, IntakeStoreMixin, initialize_intake
+from parkingbreaker.journey_context import (
+    ContextFunding,
+    ContextOperation,
+    ContextReason,
+    DurationBasis,
+    JourneyEventContext,
+    JourneyReference,
+    opaque_reference,
+)
 from parkingbreaker.journey_events import (
+    CaptureStartBasis,
     CostStatus,
+    JourneyBuildIdentity,
     JourneyEventInput,
     JourneyEventKind,
     JourneyEventOutcome,
     JourneyEventsStoreMixin,
     append_journey_event_in_transaction,
+    ensure_journey_identity_in_transaction,
     initialize_journey_events,
+    prior_journey_event_reference_in_transaction,
 )
 from parkingbreaker.journey_timeline import JourneyTimelineStoreMixin
 from parkingbreaker.lob_submission import (
@@ -990,7 +1005,10 @@ class SqliteTransactionStore(
 ):
     """The existing SQLite database extended with workspace and case records."""
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, journey_identity: JourneyBuildIdentity | None = None) -> None:
+        if journey_identity is not None and type(journey_identity) is not JourneyBuildIdentity:
+            raise ValueError("invalid journey build identity")
+        self._journey_identity = journey_identity
         self._submission_locked = False
         self._submission_anchor: _SubmissionLockAnchor | None = None
         self._overseer_key: tuple[bytes, int] | None = None
@@ -1046,6 +1064,18 @@ class SqliteTransactionStore(
         except Exception:
             self.close()
             raise
+
+    @property
+    def journey_identity(self) -> JourneyBuildIdentity:
+        return self._journey_identity or JourneyBuildIdentity()
+
+    def bind_journey_identity(self, identity: JourneyBuildIdentity) -> None:
+        """Bind declared current-runtime identity; never alter persisted origin/context."""
+        if type(identity) is not JourneyBuildIdentity:
+            raise ValueError("invalid journey build identity")
+        if self._journey_identity is not None and self._journey_identity != identity:
+            raise ValueError("journey runtime identity already bound")
+        self._journey_identity = identity
 
     def __enter__(self) -> SqliteTransactionStore:
         self._require_open()
@@ -1195,6 +1225,8 @@ class SqliteTransactionStore(
         *,
         now: datetime,
         cost_is_estimate: bool | None = None,
+        remail_manifest: ApprovalManifest | None = None,
+        expected_research: tuple[str, int] | None = None,
     ) -> None:
         """Atomically save one remedy, its frozen re-mail or refund intent, and transition.
 
@@ -1210,7 +1242,10 @@ class SqliteTransactionStore(
             case = self.get_case(case_token)
             if case is None:
                 raise RevisionConflict("missing returned case")
-            if self.returned_mail_resolution(case_token, case.attempt) is not None:
+            if (
+                remail_manifest is None
+                and self.returned_mail_resolution(case_token, case.attempt) is not None
+            ):
                 database.execute("COMMIT")
                 return
             if case.revision != expected_revision or case.letter_state is not CaseState.RETURNED:
@@ -1218,12 +1253,14 @@ class SqliteTransactionStore(
             if now < max(r.occurred_at for r in self._iter_transition_history(case_token)):
                 raise ValueError("remedy precedes returned-mail evidence")
             remails = remedy is not None and remedy.remails
-            if remails != (remail_request is not None):
-                raise ValueError("re-mail remedy requires its frozen request")
+            if remails != (remail_request is not None) or remails != (remail_manifest is not None):
+                raise PreparationConflict("re-mail requires its request and explicit approval")
             if remail_request is not None:
                 if case.attempt != 1:
                     raise ValueError("re-mail already used")
-                prepared_attempt = self.prepare(case_token, 2, remail_request, now)
+                prepared_attempt = self.prepare(
+                    case_token, 2, remail_request, now, expected_research=expected_research
+                )
                 binding = self.frozen_destination(case_token, 2)
                 first = self.get(case_token, 1)
                 if (
@@ -1233,16 +1270,14 @@ class SqliteTransactionStore(
                     or binding.address == first.request.recipient
                 ):
                     raise PreparationConflict("re-mail requires a new verified destination")
-                attempt1_manifest = self.get_approval_manifest(case_token, 1)
-                if attempt1_manifest is not None:
-                    self.record_approval_manifest(
-                        build_remail_approval_manifest(
-                            attempt1_manifest,
-                            remail_request,
-                            approved_at=prepared_attempt.prepared_at,
-                        ),
-                        manage_transaction=False,
-                    )
+                assert remail_manifest is not None
+                verify_remail_approval(
+                    self.get_approval_manifest(case_token, 1),
+                    remail_manifest,
+                    prepared_attempt.prepared_at,
+                )
+                verify_dispatch_integrity(remail_manifest, remail_request)
+                self.record_approval_manifest(remail_manifest, manage_transaction=False)
                 event: Event = RemailRequested()
             else:
                 if remedy is not None and remedy.refund_cents:
@@ -1537,6 +1572,14 @@ class SqliteTransactionStore(
                 "UPDATE pb_workspaces SET payload_json=?, updated_at=?, revision=? "
                 "WHERE workspace_token=? AND revision=?",
                 (payload, now.isoformat(), revision, workspace_token, expected_revision),
+            )
+        if revision == 1:
+            ensure_journey_identity_in_transaction(
+                database,
+                workspace_token=workspace_token,
+                at=now,
+                basis=CaptureStartBasis.WORKSPACE_CREATED,
+                identity=self._journey_identity,
             )
         database.execute(
             "INSERT INTO pb_workspace_history VALUES (?, ?, ?, ?)",
@@ -1895,6 +1938,25 @@ class SqliteTransactionStore(
                         outcome=JourneyEventOutcome.SUCCEEDED,
                         occurred_at=result.authorized_at,
                         cost_status=CostStatus.NOT_APPLICABLE,
+                        context=JourneyEventContext(
+                            operation=ContextOperation.PAYMENT_AUTHORIZATION,
+                            build_sha256=self.journey_identity.build_sha256,
+                            config_sha256=self.journey_identity.config_sha256,
+                            reason=ContextReason.NOT_APPLICABLE,
+                            funding=ContextFunding.PAID,
+                            duration_basis=DurationBasis.NOT_APPLICABLE,
+                            operation_ref=opaque_reference(
+                                "op", f"payment_authorization:{intake_id}"
+                            ),
+                            attempt_ref=opaque_reference(
+                                "att", f"payment_authorization:{idempotency_key}"
+                            ),
+                            causation_ref=prior_journey_event_reference_in_transaction(
+                                database,
+                                workspace_token=result.workspace_token,
+                                occurrence_key=f"intake_submitted:{intake_id}",
+                            ),
+                        ),
                     ),
                 )
             database.execute("COMMIT")
@@ -2295,6 +2357,32 @@ class SqliteTransactionStore(
                         outcome=JourneyEventOutcome.SUCCEEDED,
                         occurred_at=occurred_at,
                         cost_status=CostStatus.NOT_APPLICABLE,
+                        context=JourneyEventContext(
+                            operation=ContextOperation.PACKET_APPROVAL,
+                            build_sha256=self.journey_identity.build_sha256,
+                            config_sha256=self.journey_identity.config_sha256,
+                            reason=ContextReason.NOT_APPLICABLE,
+                            funding=ContextFunding.FREE_BETA if no_charge else ContextFunding.PAID,
+                            duration_basis=DurationBasis.NOT_APPLICABLE,
+                            operation_ref=opaque_reference(
+                                "op", f"packet_approval:{case_id}:{result.attempt}"
+                            ),
+                            attempt_ref=opaque_reference(
+                                "att",
+                                f"packet_approval:{case_id}:{result.revision}:{result.attempt}",
+                            ),
+                            # Paid approval depends on this exact case's recorded hold.
+                            # The no-charge route has no paid-hold causation event.
+                            causation_ref=(
+                                prior_journey_event_reference_in_transaction(
+                                    database,
+                                    workspace_token=current.workspace_token,
+                                    occurrence_key=f"hold_authorized:{case_id}",
+                                )
+                                if not no_charge
+                                else JourneyReference()
+                            ),
+                        ),
                     ),
                 )
             if owns_transaction:

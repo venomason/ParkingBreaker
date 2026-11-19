@@ -3,12 +3,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import Link from "next/link";
+import { BrandLogo } from "./BrandLogo";
 import { AccessLoading } from "./AccessLoading";
 import { api, ApiError } from "../lib/api";
 import type { BetaOffer, CaseStatus, ServicePhase } from "../lib/api";
 
 export function AccessPanel({ children }: { children: ReactNode }) {
-  return <main className="access-shell"><Link className="access-brand" href="/">ParkingBreaker</Link><section className="access-card">{children}</section></main>;
+  return <main className="access-shell"><Link className="access-brand" href="/" aria-label="ParkingBreaker home"><BrandLogo /></Link><section className="access-card">{children}</section></main>;
 }
 
 export function RequestAccess({ workspaceId }: { workspaceId: string }) {

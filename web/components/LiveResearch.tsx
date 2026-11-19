@@ -33,11 +33,12 @@ interface LiveResearchProps {
   onDraft: () => void;
   onRetry?: () => void;
   caseId?: string;
+  issuerName?: string;
   onStatus?: (status: CaseStatus) => void;
   setActionBar: (sub: React.ReactNode, buttons: React.ReactNode) => void;
 }
 
-export function LiveResearch({ status, busy, onDraft, onRetry, caseId, onStatus, error, onAnswer, setActionBar }: LiveResearchProps) {
+export function LiveResearch({ status, busy, onDraft, onRetry, caseId, issuerName, onStatus, error, onAnswer, setActionBar }: LiveResearchProps) {
   const copiesScope = `${caseId}:${status?.required_copies?.research_sha256}:${status?.required_copies?.revision}`;
   const [copiesPending, setCopiesPending] = useState<{ scope: string; pending: boolean } | null>(null);
   const onCopiesPending = useCallback((pending: boolean) => setCopiesPending({ scope: copiesScope, pending }), [copiesScope]);
@@ -67,11 +68,11 @@ export function LiveResearch({ status, busy, onDraft, onRetry, caseId, onStatus,
     <section className="screen on" id="s3" aria-labelledby="h-s3">
       <div className="voice">
         <div>
-          <p className="eyebrow">Official research</p>
+          <p className="eyebrow">Step 4 · Appeal rules</p>
           <h2 id="h-s3" tabIndex={-1}>
-            {busy ? "Reading the agency's official pages…" : "What the official pages say"}
+            {busy ? "Reading the agency's official pages…" : "Appeal rules for your jurisdiction"}
           </h2>
-          <p className="lead">Every fact below comes with the agency&#39;s own words and the page it came from.</p>
+          <p className="lead">Read the filing instructions for this appeal. You decide what goes in your statement.</p>
         </div>
       </div>
       {caseId && onStatus ? <DestinationChoice caseId={caseId} status={status} onStatus={onStatus} /> : null}
@@ -79,18 +80,38 @@ export function LiveResearch({ status, busy, onDraft, onRetry, caseId, onStatus,
       {question && <div className="card state-card" id="liveCustomerQuestion"><h3>{question.prompt}</h3><p className="small">Choose the answer that describes you. We use it only to check the agency’s procedural requirements.</p><div className="choices">{question.choices.map(answer => <button key={String(answer)} className="btn btn-ghost" type="button" disabled={busy || !onAnswer} onClick={() => answerQuestion(answer)}>{answer === true ? "Yes" : answer === false ? "No" : answer === null ? "I’m not sure" : ({REGISTERED_OWNER:"Registered owner",DRIVER_NOT_OWNER:"Driver, not the owner",BUSINESS_OR_FLEET_VEHICLE:"Business or fleet vehicle",RENTAL_OR_LEASE_RENTER:"Rental or lease renter",AUTHORISED_REPRESENTATIVE:"Authorized representative",OTHER:"Another relationship"})[answer]}</button>)}</div></div>}
       {!busy && !ready && !question && !choicePending && onRetry && <div className="card state-card"><p>Your agency check is not complete yet. Your entries remain saved.</p><button className="btn btn-primary" type="button" onClick={onRetry}>Retry agency check</button></div>}
       {error && <p className="err" role="alert">{error}</p>}
-      <ResearchEvidence research={status?.research} />
+      <ResearchEvidence research={status?.research} issuerName={issuerName} />
     </section>
   );
 }
 
-export function ResearchEvidence({research, idPrefix = "live"}: {research: CaseStatus["research"] | undefined; idPrefix?: string}) {
-  if (!research) return <p className="muted small">No saved official research is available for this appeal yet.</p>;
+export function ResearchEvidence({research, issuerName, idPrefix = "live"}: {research: CaseStatus["research"] | undefined; issuerName?: string; idPrefix?: string}) {
+  if (!research) return <p className="muted small">The agency’s filing rules have not been verified for this appeal yet.</p>;
+  const rules = research.findings.filter(finding => !["GOVERNING_CODE_SECTION", "CODE_EXCEPTIONS"].includes(finding.fact));
   return (
     <div className="research-detail">
-      <RequirementChecks findings={research.findings} idPrefix={idPrefix} />
-      <div className="card sources-card" id={`${idPrefix}Sources`}>
-        <h3>Pages read</h3>
+      {(research.jurisdiction || research.stage) && <p className="small muted">{[issuerName || research.jurisdiction, research.stage].filter(Boolean).join(" · ")}</p>}
+      <RequirementChecks findings={rules} idPrefix={idPrefix} />
+      <ul className="findings" id={`${idPrefix}Findings`} aria-label="Requirement findings and exact official words">
+        {rules.map((finding, index) => (
+          <li key={finding.fact + index} className={`finding tone-${TONES[finding.status] ?? "unk"}`}>
+            <div className="finding-head">
+              <span className="finding-dot" aria-hidden="true" />
+              <h4 className="finding-title">{title(finding.fact)}</h4>
+              <span className={`bdg s-${TONES[finding.status] ?? "unk"}`}>{LABELS[finding.status] ?? finding.status}</span>
+            </div>
+            {finding.passages?.length ? finding.passages.map(({ quote, source_url }) => (
+              <blockquote className="qline" key={source_url + quote}>
+                <q>{quote}</q>
+                {/^https?:\/\//.test(source_url) && <small><a href={source_url} target="_blank" rel="noopener noreferrer">Read the official source</a></small>}
+              </blockquote>
+            )) : finding.official_quote ? <blockquote className="qline"><q>{finding.official_quote}</q></blockquote>
+              : <p className="small muted">No verified wording is available for this check.</p>}
+          </li>
+        ))}
+      </ul>
+      <details className="card sources-card" id={`${idPrefix}Sources`}>
+        <summary>Official pages checked</summary>
         <p className="small muted">Every quote below comes from one of these saved official pages.</p>
         {research.sources.length ? (
           <ul className="source-list small">
@@ -102,25 +123,7 @@ export function ResearchEvidence({research, idPrefix = "live"}: {research: CaseS
             ))}
           </ul>
         ) : <p className="small muted">No official pages are saved for this appeal yet.</p>}
-      </div>
-      <ul className="findings" id={`${idPrefix}Findings`} aria-label="Requirement findings and exact official words">
-        {research.findings.map((finding) => (
-          <li key={finding.fact} className={`finding tone-${TONES[finding.status] ?? "unk"}`}>
-            <div className="finding-head">
-              <span className="finding-dot" aria-hidden="true" />
-              <h4 className="finding-title">{title(finding.fact)}</h4>
-              <span className={`bdg s-${TONES[finding.status] ?? "unk"}`}>{LABELS[finding.status] ?? finding.status}</span>
-            </div>
-            {finding.official_quote ? (
-              <blockquote className="qline">
-                <q>{finding.official_quote}</q>
-              </blockquote>
-            ) : (
-              <p className="small muted">No quote was saved for this check. Not found, so not guessed.</p>
-            )}
-          </li>
-        ))}
-      </ul>
+      </details>
     </div>
   );
 }

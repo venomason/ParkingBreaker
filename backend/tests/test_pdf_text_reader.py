@@ -20,7 +20,11 @@ def test_isolated_reader_matches_the_one_pure_parser() -> None:
     assert bounded_pdf_text(body) is not None
 
 
-@pytest.mark.parametrize("body", [b"%PDF-broken", b"x" * (MAX_PDF_BYTES + 1), make_pdf("")])
+@pytest.mark.parametrize(
+    "body",
+    [b"%PDF-broken", b"x" * (MAX_PDF_BYTES + 1), make_pdf("")],
+    ids=["malformed", "oversized", "blank-page"],
+)
 def test_unusable_pdf_returns_no_evidence(body: bytes) -> None:
     assert bounded_pdf_text(body) is None
 

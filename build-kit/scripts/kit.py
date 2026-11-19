@@ -336,6 +336,9 @@ def browser_check_command(name: str, ticket_reading_preview: bool = False) -> li
     if ticket_reading_preview:
         if name not in SYNTHETIC_BROWSER_CHECKS:
             raise ValueError("Ticket-reading preview requires a synthetic browser check")
+        if name == "synthetic-browser":
+            # Legacy paid suites deliberately exercise the previous intake UI.
+            command = [arg for arg in command if not arg.endswith(".spec.ts")]
         command.insert(-1, TICKET_READING_SPEC)
     return command
 

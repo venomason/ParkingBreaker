@@ -1,0 +1,144 @@
+{
+  "date_local": "2026-11-18",
+  "device": "Android A56 connected via USB",
+  "os": "Android 13",
+  "browser": "Chrome 157.0.8103.80",
+  "method": "Real handset with CDP-dispatched touch and text events, Android IME and document-scoped orientation changes. No human comfort score.",
+  "family_url": "https://times-rising-woods-developmental.trycloudflare.com/try-hurtle?preview=family",
+  "family_html_sha256": "f8719d37e1bd4c9cd2db619a5dd90c7667d5bba6991384aa71fc986751c9eade",
+  "before": {
+    "viewport_css": [
+      384,
+      640
+    ],
+    "review_card": {
+      "x": 29,
+      "y": 704,
+      "w": 326,
+      "h": 136,
+      "inside": false,
+      "hit": false,
+      "font": "16px"
+    },
+    "editing": {
+      "x": 49,
+      "y": 277,
+      "w": 287,
+      "h": 54,
+      "inside": false,
+      "hit": false,
+      "font": "18px"
+    }
+  },
+  "after": {
+    "viewport_css": [
+      384,
+      640
+    ],
+    "review_card": {
+      "x": 29,
+      "y": 236,
+      "w": 326,
+      "h": 136,
+      "inside": true,
+      "hit": true,
+      "font": "16px"
+    },
+    "keyboard_viewport_css": [
+      384,
+      324.79998779296875
+    ],
+    "editing": {
+      "x": 49,
+      "y": 151,
+      "w": 287,
+      "h": 54,
+      "inside": true,
+      "hit": true,
+      "font": "18px"
+    },
+    "save": {
+      "x": 102,
+      "y": 254,
+      "w": 261,
+      "h": 52,
+      "inside": true,
+      "hit": true,
+      "font": "14px"
+    },
+    "family_touch_journey": {
+      "correctedWithKeyboardOpen": true,
+      "confirmedAndAdvanced": true,
+      "curbsidePhotoCarriedToStory": true,
+      "rules": "8 of 8 checks\n8 confirmed\n0 unknown\n0 conflicted",
+      "landscape": {
+        "orientation": "landscape-primary",
+        "width": 720,
+        "height": 304,
+        "overflow": false
+      },
+      "landscapeScene": true,
+      "portrait": {
+        "orientation": "portrait-primary",
+        "width": 384,
+        "height": 640,
+        "overflow": false
+      }
+    }
+  },
+  "connected_intake": {
+    "hardware": "A56",
+    "scope": "Isolated synthetic app over an owned-tab HTTP bridge; no live OCR or external submission",
+    "nativeCameraPreview": true,
+    "frontAndBackCameraReady": true,
+    "nativeCaptureSurface": "camera",
+    "frontAndBackUploaded": true,
+    "syntheticReadingFields": 11,
+    "sceneSurvivedReload": true,
+    "ticketPhotoRefsAndEvidenceDistinct": true,
+    "sceneRemovableBeforeApproval": true,
+    "fixture_input": "Front and back repository PNGs and a synthetic 3600 × 720 JPEG supplied as file inputs on the physical phone. Native camera was opened and dismissed without photographing the user or surroundings."
+  },
+  "paid_ocr_browser": {
+    "passed": true,
+    "browser_report_validation": {
+      "valid": true,
+      "tests": 14,
+      "results": 14
+    },
+    "browser_check_receipt": "build-kit/evidence/checks/1795056400379372969-synthetic-browser.json",
+    "browser_check_sha256": "7fd7bba6bcf9c4a888302fa4c92b59a4b12e5b39f267721ed9e8022e04ca3e2f"
+  },
+  "phone_screens": {
+    "landing": "output/android-usability/curbside-final-landing.png",
+    "panorama guidance": "output/android-usability/curbside-final-scene.png",
+    "editing with keyboard": "output/android-usability/curbside-final-editing.png",
+    "landscape": "output/android-usability/curbside-final-landscape.png",
+    "reloaded private evidence": "output/android-usability/physical-scene.png"
+  },
+  "scope": "Family URL is a public, static sample. Camera/picker, persistence and OCR field tests ran against isolated fake providers. Live OCR, real submissions, iPhone and the deployed unfamiliar-issuer journey are separate qualifications.",
+  "paid_browser": {
+    "passed": true,
+    "browser_report_validation": {
+      "valid": true,
+      "tests": 154,
+      "results": 154
+    },
+    "browser_check_receipt": "build-kit/evidence/checks/1795056605999600571-synthetic-browser.json",
+    "browser_check_sha256": "d3d62ec41982bd3a3815190919a7e2b5b9e24d44c74b0f091167b6779967ed20"
+  },
+  "two_issuer_rehearsal": {
+    "frozen_inputs": "unfamiliar-issuer-rehearsal-2026-11-18.json",
+    "frozen_inputs_sha256": "1c446f557f0e91f9d6b72ac06a581fea5d0deb51271419db573a0a072b8af576",
+    "offline_official_source_checks_before_fix": {
+      "cambridge_address_quote_matches_source": true,
+      "cambridge_appeal_destination_supported": true,
+      "cambridge_mail_route_quote_matches_source": true,
+      "cambridge_exact_via_mail_wording_recognized": false,
+      "gatech_online_requirement_matches_source": true,
+      "gatech_online_requirement_rejects_claim_of_postal_permission": true
+    },
+    "after_fix": "The explicit Cambridge instruction to submit a dispute via mail is now supported. The Georgia Tech online-only instruction still cannot authorize postal filing. This does not establish a deployed OCR-to-filing decision.",
+    "deployed_qualification": "Pending deployed application, scoped authenticated trial and its approved provider budget."
+  }
+}

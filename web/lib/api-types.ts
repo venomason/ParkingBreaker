@@ -718,6 +718,8 @@ export interface components {
         Approve: {
             /** Adopted Sha256 */
             adopted_sha256: string;
+            /** Remail */
+            remail?: true | null;
             /** Signature Ref */
             signature_ref?: string | null;
             /** Packet Sha256 */
@@ -1329,6 +1331,8 @@ export interface components {
         PacketPreviewRequest: {
             /** Adopted Sha256 */
             adopted_sha256: string;
+            /** Remail */
+            remail?: true | null;
             /** Signature Ref */
             signature_ref?: string | null;
         };
@@ -1426,6 +1430,8 @@ export interface components {
             status: "CONFIRMED" | "NOT_APPLICABLE" | "UNKNOWN" | "CONFLICTED";
             /** Official Quote */
             official_quote?: string | null;
+            /** Passages */
+            passages?: components["schemas"]["RulePassage"][];
         };
         /** ResearchSource */
         ResearchSource: {
@@ -1448,6 +1454,10 @@ export interface components {
             sources: components["schemas"]["ResearchSource"][];
             /** Findings */
             findings: components["schemas"]["ResearchFinding"][];
+            /** Jurisdiction */
+            jurisdiction?: string | null;
+            /** Stage */
+            stage?: string | null;
         };
         /** ResolvedIssuer */
         ResolvedIssuer: {
@@ -1517,6 +1527,13 @@ export interface components {
             /** Remail */
             remail: boolean;
             proof_packet?: components["schemas"]["ReturnProofPacket"] | null;
+        };
+        /** RulePassage */
+        RulePassage: {
+            /** Quote */
+            quote: string;
+            /** Source Url */
+            source_url: string;
         };
         /** SaveIntakeForm */
         SaveIntakeForm: {

@@ -154,37 +154,65 @@ def build_remail_approval_manifest(
     request: LetterRequest,
     *,
     approved_at: datetime,
+    approved_text: str,
+    affirmations: Sequence[tuple[str, str]],
+    build_commit: str | None = None,
 ) -> ApprovalManifest:
-    """Build attempt-2 approval manifest inheriting approved customer text and affirmations."""
+    """Bind the new approval to the redirected text, PDF, envelope and affirmations."""
     approved_at_utc = _utc_iso(approved_at)
     pdf_sha = _sha256_bytes(request.pdf)
     env_sha = envelope_sha256(request)
+    approved_sha = _sha256_text(approved_text)
+    ordered_affirmations = tuple(affirmations)
+    aff_sha = affirmations_digest(ordered_affirmations)
     manifest_sha = _compute_manifest_sha256(
         case_id=original.case_id,
         case_token=original.case_token,
         attempt=2,
         approved_at_utc=approved_at_utc,
-        build_commit=original.build_commit,
+        build_commit=build_commit,
         raw_customer_text_sha256=original.raw_customer_text_sha256,
-        approved_text_sha256=original.approved_text_sha256,
+        approved_text_sha256=approved_sha,
         packet_pdf_sha256=pdf_sha,
         envelope_sha256_hex=env_sha,
-        affirmations_sha256=original.affirmations_sha256,
+        affirmations_sha256=aff_sha,
     )
     return ApprovalManifest(
         case_id=original.case_id,
         case_token=original.case_token,
         attempt=2,
         approved_at_utc=approved_at_utc,
-        build_commit=original.build_commit,
+        build_commit=build_commit,
         raw_customer_text_sha256=original.raw_customer_text_sha256,
-        approved_text_sha256=original.approved_text_sha256,
+        approved_text_sha256=approved_sha,
         packet_pdf_sha256=pdf_sha,
         envelope_sha256=env_sha,
-        affirmations=original.affirmations,
-        affirmations_sha256=original.affirmations_sha256,
+        affirmations=ordered_affirmations,
+        affirmations_sha256=aff_sha,
         manifest_sha256=manifest_sha,
     )
+
+
+def verify_remail_approval(
+    original: ApprovalManifest | None,
+    corrected: ApprovalManifest | None,
+    prepared_at: datetime,
+) -> None:
+    """A corrected request needs its own approval at the attempt's preparation time."""
+    if (
+        original is None
+        or corrected is None
+        or original.attempt != 1
+        or corrected.attempt != 2
+        or (original.case_token, original.case_id) != (corrected.case_token, corrected.case_id)
+        or original.raw_customer_text_sha256 != corrected.raw_customer_text_sha256
+        or original.approved_text_sha256 == corrected.approved_text_sha256
+        or original.packet_pdf_sha256 == corrected.packet_pdf_sha256
+        or original.envelope_sha256 == corrected.envelope_sha256
+        or corrected.approved_at_utc != _utc_iso(prepared_at)
+        or corrected.approved_at_utc < original.approved_at_utc
+    ):
+        raise ApprovalIntegrityError("fresh_remail_approval_required")
 
 
 def verify_dispatch_integrity(

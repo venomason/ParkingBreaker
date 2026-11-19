@@ -2,10 +2,12 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
-      '--build-arg', 'PB_API_ORIGIN=http://127.0.0.1:8000',
+      '--build-arg', 'PB_API_ORIGIN=${_PB_API_ORIGIN}',
       '-t', 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend:staging',
       '-f', 'web/Dockerfile',
       '.'
     ]
 images:
   - 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend:staging'
+substitutions:
+  _PB_API_ORIGIN: 'http://127.0.0.1:8000'

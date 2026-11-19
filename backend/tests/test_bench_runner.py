@@ -337,7 +337,7 @@ def test_b16_golden_run() -> None:
         "disclose": False,
     }
     assert result.resolution["counting"] == {"rule": "POSTMARK", "disclose": False}
-    assert result.brave_requests == 3
+    assert result.brave_requests == 2
     assert result.cost_cents == {"prehold": 7, "research": 3}
     assert result.wall_seconds == {"prehold": 5.0, "research": 3.0}
     assert result.empty_ai_answers == 0
@@ -347,18 +347,18 @@ def test_b16_golden_run() -> None:
     # Preserve the historical fixture. Adapt recovery, fulfilment and milestone
     # expectations here without changing its source text or old-record readback.
     expected = json.loads((FIXTURES / "bench_b16_tiers_run.json").read_text())
-    # The retired defence key is no longer researched, so the historical golden run
-    # carries one fewer finding.
-    expected["findings"] = [f for f in expected["findings"] if f["key"] != "CODE_EXCEPTIONS"]
+    # Compare the original golden record under the current procedural-only policy.
+    expected["findings"] = [
+        f
+        for f in expected["findings"]
+        if f["key"] not in {"CODE_EXCEPTIONS", "GOVERNING_CODE_SECTION"}
+    ]
     expected["resolution"]["notice_conflicts"] = []
     expected["resolution"]["awaiting_packet"] = False
-    expected["brave_requests"] = 3
+    expected["brave_requests"] = 2
     expected["digest"]["research_status"] = "TIER1_PASSED"
     expected["digest"]["research_counts"]["findings"] = len(expected["findings"])
     expected["counter_keys"].append({**expected["counter_keys"][0], "milestone": "TIER1_PASSED"})
-    expected["attempts"].append(
-        {"phase": "research", "stage": "broadened_search", "url": None, "error": None}
-    )
     expected["resolution"]["fulfilled_requirements"] = [
         f
         for f in expected["findings"]
@@ -703,12 +703,12 @@ def test_search_recorder_preserves_safe_provider_metadata(fail: bool) -> None:
 def test_native_search_costs_recorded_per_phase_and_in_digest() -> None:
     deps = replace(dependencies(), searcher=PaidSearcher())
     result = run_case(row(), TODAY, deps)
-    assert result.cost_cents == {"prehold": 9, "research": 7}
-    assert [call.phase for call in result.search_calls] == ["prehold", "research", "research"]
+    assert result.cost_cents == {"prehold": 9, "research": 5}
+    assert [call.phase for call in result.search_calls] == ["prehold", "research"]
     assert all(call.usage == Usage(20, 5, 2) for call in result.search_calls)
     assert result.brave_requests == 0
     assert result.digest is not None
-    assert result.digest["cost_cents"] == result.digest["ai_cost_cents"] == 16
+    assert result.digest["cost_cents"] == result.digest["ai_cost_cents"] == 14
     assert CaseRun.from_json(result.to_json()) == result
     # Discovery still fetches and hashes the same official evidence bytes.
     assert {fetch.sha256 for fetch in result.fetches} == {

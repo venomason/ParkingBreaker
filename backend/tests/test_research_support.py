@@ -509,6 +509,7 @@ def test_other_real_contest_destinations_are_supported(value: JsonValue, quote: 
         "supporting documentation to:",  # San Diego
         "You can dispute a ticket by mail.",
         "We accept protests by mail.",
+        "To submit a dispute via mail, you must include:",
     ],
 )
 def test_real_mail_contest_wording_is_supported(quote: str) -> None:
@@ -522,6 +523,9 @@ def test_real_mail_contest_wording_is_supported(quote: str) -> None:
         "You can mail your letter to:",
         "You may also submit your payment by mail.",
         "To submit your payment by mail, send it to:",
+        "To submit a payment via mail, you must include:",
+        "To submit a dispute via mail, you must include prior online approval:",
+        "All citation appeals must be submitted online at My Parking Account.",
     ],
 )
 def test_mail_wording_without_contest_permission_is_unsupported(quote: str) -> None:

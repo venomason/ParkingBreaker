@@ -4,6 +4,10 @@ Owner direction: November 17, 2026; prior November 16 causation rules remain in 
 the customer journey gets one short notice linking to those rules. This concerns
 clerical accuracy and entry into the agency's process, never argument quality.
 
+## The driver’s appeal rules
+
+After confirming the issuer and before preparing the letter, the driver can review the filing instructions verified for that agency and review stage. The appeal rules step shows the agency’s words and links to each source. Missing and conflicting instructions stay visible. If the agency requires a provision from the notice, ParkingBreaker displays the instruction. The driver decides what to write. ParkingBreaker can place driver-confirmed fields on the page and preserve the driver’s exact account. An unfulfilled compulsory instruction goes through the existing packet checks.
+
 ## Paid beta and required ticket reading
 
 Beta describes service maturity, not free pricing. The launch offering uses the existing
@@ -35,6 +39,14 @@ Beta disclosures must state supported limitations without waiving existing commi
 - The current application stops unverified destinations and has retired new
   unverified-address consent. This wording does not re-enable that route. Existing
   address disclosure/consent records retain their original text and meaning.
+
+## Review a corrected remail
+
+If a returned mailing is eligible for a free remail to a different verified office, the
+driver can inspect the corrected PDF, destination and return address. The case stays
+returned until the driver expressly approves that pair. The corrected mailing requires
+no additional charge. The system-address-error full refund remains independent of
+remail approval.
 
 ## Narrow guarantee exclusion
 

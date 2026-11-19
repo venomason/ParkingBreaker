@@ -429,10 +429,17 @@ class ResearchSource(Model):
     retrieved_at: datetime
 
 
+class RulePassage(Model):
+    quote: str
+    source_url: str
+
+
 class ResearchFinding(Model):
     fact: str
     status: Literal["CONFIRMED", "NOT_APPLICABLE", "UNKNOWN", "CONFLICTED"]
     official_quote: str | None = None
+
+    passages: list[RulePassage] = Field(default_factory=list)
 
 
 class ResearchView(Model):
@@ -440,6 +447,8 @@ class ResearchView(Model):
 
     sources: list[ResearchSource]
     findings: list[ResearchFinding]
+    jurisdiction: str | None = None
+    stage: str | None = None
 
 
 class RequiredCopySelection(Model):
@@ -627,6 +636,7 @@ class AdoptionReceipt(Model):
 
 class PacketPreviewRequest(Model):
     adopted_sha256: Digest
+    remail: Literal[True] | None = None
     # The customer's drawn signature, uploaded through the photos route (PNG), used only
     # when the agency's own requirements call for a signature.
     signature_ref: str | None = None

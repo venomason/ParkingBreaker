@@ -9,9 +9,8 @@ The closing sentence is one explicit input with a default. (2.x chose it with
 `a or b if c else d`, which Python reads as `(a or b) if c else d`, so a customer's own
 sentence was dropped whenever no profile existed.)
 
-All text must print in the PDF core fonts (Latin-1). Common typographic characters are
-replaced with ASCII equivalents before the customer sees the letter, so the text they
-adopt is exactly the text that prints; anything else outside Latin-1 is refused.
+All text must print in the PDF core fonts (Latin-1). Unsupported typography is
+reported for correction before adoption. The driver chooses any replacement text.
 """
 
 from __future__ import annotations
@@ -96,30 +95,33 @@ class Letter:
 
 
 def body_paragraphs(draft: Draft) -> list[str]:
-    """Paragraphs in customer order. Customer text is kept exactly; no whitespace collapse.
-
-    Paragraph breaks are layout: each stored paragraph keeps its own characters, and the
-    single blank line between paragraphs is supplied here. Sentences carrying support tags
-    belong to legacy drafted text and keep their previous whitespace-normalized joining.
-    """
+    """Keep customer-authored runs intact and frame legacy drafted paragraphs."""
     grouped: list[list[str]] = []
-    exact: list[bool] = []
+    kinds: list[str] = []
     previous: int | None = None
     for sentence in draft.sentences:
         if NOTICE_SUPPORT in sentence.support and not is_printable(sentence.text):
             raise LetterError("confirmed notice quotation cannot be printed verbatim")
-        if previous != sentence.paragraph:
-            grouped.append([])
-            exact.append(True)
-        grouped[-1].append(sentence.text)
-        exact[-1] = exact[-1] and (
-            VERBATIM_SUPPORT in sentence.support or NOTICE_SUPPORT in sentence.support
+        kind = (
+            VERBATIM_SUPPORT
+            if VERBATIM_SUPPORT in sentence.support
+            else NOTICE_SUPPORT
+            if NOTICE_SUPPORT in sentence.support
+            else "legacy"
         )
+        if (
+            not kinds
+            or kinds[-1] != kind
+            or (kind != VERBATIM_SUPPORT and previous != sentence.paragraph)
+        ):
+            grouped.append([])
+            kinds.append(kind)
+        grouped[-1].append(sentence.text)
         previous = sentence.paragraph
     paragraphs: list[str] = []
-    for text_parts, verbatim in zip(grouped, exact, strict=True):
-        if verbatim:
-            paragraphs.append(re.sub(r"\n[ \t]*\n$", "", "".join(text_parts)))
+    for text_parts, kind in zip(grouped, kinds, strict=True):
+        if kind != "legacy":
+            paragraphs.append("".join(text_parts))
         else:
             paragraphs.append(" ".join(" ".join(part.split()) for part in text_parts))
     return paragraphs

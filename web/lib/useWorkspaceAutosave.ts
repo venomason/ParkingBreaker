@@ -16,8 +16,14 @@ export function useWorkspaceAutosave(form: IntakeForm, enabled: boolean, ready: 
   const [state, setState] = useState<"saved" | "saving" | "error">("saved");
 
   const restore = useCallback((view: WorkspaceView) => {
+    const previous = workspace.current;
     workspace.current = view;
-    if (view.intake_form) saved.current = JSON.stringify(view.intake_form);
+    if (!view.intake_form) return;
+    // A readback of the same revision can add API defaults to a form we just saved.
+    // Keep the acknowledged draft signature so opening the rules cannot repeat that write.
+    if (previous?.intake_form && previous.workspace_id === view.workspace_id &&
+        view.draft_revision != null && previous.draft_revision === view.draft_revision) return;
+    saved.current = JSON.stringify(view.intake_form);
   }, []);
 
   const reset = useCallback(() => {

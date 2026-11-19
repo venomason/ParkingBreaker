@@ -592,3 +592,25 @@ else:
     )
     assert completed.returncode == 0, completed.stderr
     assert completed.stdout.strip() == "unsafe_entry"
+
+
+def test_journey_capture_is_restricted_operational_not_unknown(tmp_path: Path) -> None:
+    root = tmp_path / "snapshot"
+    root.mkdir()
+    with sqlite3.connect(root / "parkingbreaker.sqlite") as database:
+        database.execute("CREATE TABLE pb_journey_capture (journey_id TEXT)")
+        database.execute("INSERT INTO pb_journey_capture VALUES ('opaque-synthetic')")
+    report = inventory_snapshot(root, database_paths=("parkingbreaker.sqlite",))
+    assert report.row_count_for(TableClass.RESTRICTED_IDENTITY_OPERATIONAL) == 1
+    assert report.unknown_table_count == 0
+
+
+def test_event_context_is_restricted_operational_not_unknown(tmp_path: Path) -> None:
+    root = tmp_path / "snapshot"
+    root.mkdir()
+    with sqlite3.connect(root / "parkingbreaker.sqlite") as database:
+        database.execute("CREATE TABLE pb_journey_event_context (event_id TEXT)")
+        database.execute("INSERT INTO pb_journey_event_context VALUES ('opaque-synthetic')")
+    report = inventory_snapshot(root, database_paths=("parkingbreaker.sqlite",))
+    assert report.row_count_for(TableClass.RESTRICTED_IDENTITY_OPERATIONAL) == 1
+    assert report.unknown_table_count == 0

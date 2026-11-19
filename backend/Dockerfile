@@ -30,3 +30,5 @@ USER app
 
 # Default (last) stage: exactly the base image above.
 FROM base AS runtime
+ARG PB_BUILD_COMMIT
+LABEL org.opencontainers.image.revision=$PB_BUILD_COMMIT
