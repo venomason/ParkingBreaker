@@ -79,6 +79,14 @@ Stripe lookups, and retains the Lob submission token when the local letter ID is
 The command returns `NEEDS_EXTERNAL` until the original provider records are checked during the
 joined P06/R03 rehearsal. [Recovery procedure](operations/controlled-beta.md#recovery-and-rollback)
 
+The mobile ticket and packet-review changes at `01a944e` passed `make web-check`
+and all 14 paid OCR checks in `synthetic_rehearsal.py --service-phase paid
+--ticket-reading-preview`. The browser inspected two pages of the exact PDF and
+checked the approval and dispatch fingerprints. A fresh lockfile install also built the
+frontend in test mode with a synthetic publishable key and verified the HTTPS API
+rewrites and embedded key. The Cloud Build recipe now passes those settings through.
+Registry images, provider accounts and the physical phone journey remain to be qualified.
+
 ## First three paid beta increments
 
 [Local verification](verification/launch-increments-2026-11-17.json) records 13,756

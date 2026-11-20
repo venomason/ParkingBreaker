@@ -112,6 +112,9 @@ the isolated target. A host firewall rule alone cannot establish those facts.
 Build the backend from the reviewed commit using the `PB_BUILD_COMMIT` build
 argument (`_PB_BUILD_COMMIT` in Cloud Build). Build the qualification frontend
 with `_PB_API_ORIGIN` set to the trusted private HTTPS origin on port 8443.
+Set `_PB_PROVIDER_MODE=test` and `_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` to the
+matching Stripe test publishable key for the sandbox rehearsal. The Docker build
+passes both to Next.js, which checks the key prefix against the build mode.
 Record the returned registry digests and build source. Each immutable VM release
 directory needs `deploy/private-images.json` in this Compose override format.
 Replace the placeholders with full registry digest references and the full Git commit.
