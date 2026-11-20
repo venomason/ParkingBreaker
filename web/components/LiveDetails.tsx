@@ -236,7 +236,7 @@ export function LiveDetails({ busy, submitting, error, onSubmit, values: v, onCh
         )}
         <aside id="photoGuide" className="photo-guide" aria-labelledby="photoGuideTitle">
           <h3 id="photoGuideTitle">Your selected photos</h3>
-          <p className="small">You can add photos or screenshots of parking receipts, signs, or other evidence. The images you choose will be mailed with your letter.</p>
+          <p className="small">You can add photos or screenshots of parking receipts, signs, or other evidence. The photos you choose will be mailed with your letter. You can continue without supporting photos.</p>
           <p className="small">{PHOTO_UPLOAD_GUIDANCE}</p>
           <p className="small">Only take photos when it is safe. Avoid other people’s faces and unrelated personal details. Any specific agency-required item is collected separately.</p>
         </aside>
