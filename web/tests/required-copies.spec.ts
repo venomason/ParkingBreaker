@@ -162,7 +162,8 @@ test("required copies persist, reorder and lock into the adopted packet with pri
   const preview = page.waitForResponse(response=>response.url().endsWith("/packet-preview") && response.status()===200);
   await page.locator("#livePreview").click();
   expect((await (await preview).json()).page_count).toBeGreaterThanOrEqual(4);
-  await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src",/^blob:/);
+  await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+  await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
   expect((await savedCopies(page,id)).editable).toBe(false);
 });
 

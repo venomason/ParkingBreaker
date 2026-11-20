@@ -6,6 +6,7 @@ import type { Draft, PacketPreview } from "../lib/api";
 
 type Affirmation = { declaration_id: string; text_sha256: string };
 import { PacketReviewProgress } from "./CaseVisuals";
+import { ExactPacketPages } from "./ExactPacketPages";
 import { LegalDisclosure } from "./LegalDisclosure";
 import { CustomerChoiceNotice } from "./CustomerChoiceRules";
 
@@ -228,7 +229,7 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
   };
   if (refused && !locked) return <section className="screen on" id="s6" aria-labelledby="h-s6">
     <p className="eyebrow">Your choice</p><h2 id="h-s6" tabIndex={-1}>Your letter is paused.</h2>
-    <div className="card state-card"><p role="status">You chose not to mail this letter. This action did not request mailing authorization.</p><p>Your saved letter and account remain available. Any card hold follows its saved expiry; pausing does not extend the review window.</p></div>
+    <div className="card state-card"><p role="status">You chose not to mail this letter. This action did not request mailing authorization.</p><p>Your saved letter and account remain available. To correct a ticket fact or an address, start a new appeal from the top of the page. Any card hold follows its saved expiry.</p></div>
     <label htmlFor="pausedLetter">Your words</label><textarea id="pausedLetter" value={text} readOnly />
     <button type="button" className="btn btn-primary" id="liveResumeLetter" onClick={() => { setRefused(false); try { sessionStorage.removeItem(pauseKey); } catch { /* Consent remains required. */ } }}>Resume reviewing my letter</button>
   </section>;
@@ -375,17 +376,14 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
                 <div><b>Return address</b><address style={{ whiteSpace: "pre-line", fontStyle: "normal" }}>{preview.return_address.join("\n")}</address></div>
               </div>
               <p><a id="liveOpenPacket" href={previewUrl} target="_blank" rel="noopener noreferrer">Open exact PDF</a> · <a href={previewUrl} download="parkingbreaker-packet.pdf">Download exact PDF</a></p>
-              <iframe title="Exact packet PDF" src={previewUrl} style={{ width: "100%", minHeight: "500px", border: "1px solid var(--line-strong)" }} />
+              <ExactPacketPages key={previewUrl} url={previewUrl} />
+              {!locked && <button id="liveCorrectBeforeMail" type="button" className="btn" disabled={busy} onClick={pause}>Pause to correct ticket facts or addresses</button>}
               <label className="packet-inspect">
                 <input id="livePacketReviewed" type="checkbox" checked={inspected} disabled={busy || locked} onChange={event => setReviewedUrl(event.target.checked ? previewUrl : null)} />
                 I have inspected this exact PDF, checked the ticket facts, mailing destination and
                 return address, corrected any mistakes, and confirm that this is what I want mailed.
               </label>
-              <p className="small">A confident OCR reading does not guarantee correct facts or a correct
-                appeal address. If anything is wrong, stop and correct it before authorizing mailing.</p>
               <CustomerChoiceNotice onOpenRules={onOpenRules} />
-              {!locked && <button id="liveCorrectBeforeMail" type="button" className="btn"
-                disabled={busy} onClick={pause}>Stop — information or address needs correcting</button>}
               {declarations.length > 0 && (
                 <fieldset id="liveDeclarations" style={{ marginTop: "12px" }}>
                   <legend><b>Declarations the agency requires</b></legend>

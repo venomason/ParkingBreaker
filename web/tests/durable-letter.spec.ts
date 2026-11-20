@@ -45,7 +45,8 @@ async function seed(page: Page) {
 async function previewAndInspect(page: Page) {
   await expect(page.locator("#livePreview")).toBeEnabled();
   await page.locator("#livePreview").click();
-  await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+  await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+  await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#liveApprove")).toBeDisabled();
   await page.locator("#livePacketReviewed").check();
   await expect(page.locator("#liveApprove")).toBeEnabled();
@@ -154,7 +155,8 @@ test("packet inspection shows exact bytes and envelope before any approval reque
   const response = page.waitForResponse(response => response.url().endsWith("/packet-preview") && response.status() === 200);
   await page.locator("#livePreview").click();
   const packet = await (await response).json();
-  await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+  await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+  await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#liveApprove")).toBeDisabled();
   expect(approvals).toBe(0);
   const encoded = await page.locator("#liveOpenPacket").evaluate(async link => {

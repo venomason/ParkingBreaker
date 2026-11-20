@@ -451,7 +451,8 @@ for (const recovery of [false, true]) {
     const previewResult = await previewResponse;
     expect(previewResult.status(), await previewResult.text()).toBe(200);
     let preview = await previewResult.json();
-    await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+    await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+    await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
     const bytes = Buffer.from(await page.locator("#liveOpenPacket").evaluate(async link => Array.from(new Uint8Array(await (await fetch((link as HTMLAnchorElement).href)).arrayBuffer()))));
     expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
     expect(hash(bytes)).toBe(preview.packet_sha256);

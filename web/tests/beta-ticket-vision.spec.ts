@@ -1,6 +1,7 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 import { deflateSync } from "node:zlib";
 import { createHash } from "node:crypto";
+import { writeFile } from "node:fs/promises";
 import { file } from "./t37-support";
 import { LIVE_FIELDS, type IntakeForm, type TicketFactBindingPayload, type TicketReadingStatus, type WorkspaceView } from "../lib/api";
 import { EMPTY_CONTACT } from "../components/LiveDetails";
@@ -37,6 +38,26 @@ function syntheticPng(value: number) {
     Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
     chunk("IHDR", ihdr), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0)),
   ]);
+}
+
+async function parkingReceiptPng(page: Page): Promise<Buffer> {
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 420;
+    canvas.height = 440;
+    const context = canvas.getContext("2d")!;
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#111111";
+    context.font = "24px monospace";
+    context.fillText("SYNTHETIC PARKING RECEIPT", 26, 50);
+    context.font = "40px monospace";
+    context.fillText("8:41 AM", 26, 135);
+    context.font = "24px monospace";
+    context.fillText("Payment accepted", 26, 190);
+    return canvas.toDataURL("image/png").split(",")[1];
+  });
+  return Buffer.from(png, "base64");
 }
 
 async function call(page: Page, method: string, path: string, body?: unknown) {
@@ -144,15 +165,17 @@ async function confirmFacts(page: Page) {
 }
 
 const STATEMENT = "The sign was NOT visible.  The kiosk was blank.\n \nI kept the photo.";
+const RECEIPT_STATEMENT = "I paid at 8:41.  The ticket says 8:43.\n \nI kept my parking receipt.";
 
-async function submitDetails(page: Page, curbsidePhoto = false) {
+async function submitDetails(page: Page, curbsidePhoto = false, statement = STATEMENT) {
   await page.locator("#actContinueTicket").click();
-  await page.locator("#story").fill(STATEMENT);
+  await page.locator("#story").fill(statement);
   await page.locator("#actSendStory").click();
   await page.getByRole("button", { name: /^Yes/ }).first().click();
   await expect(page.locator("#liveDetails")).toBeVisible();
   for (const [id, value] of Object.entries({ liveName: "Synthetic Customer", livePhone: "415-555-0100", liveEmail: "ticket-vision@example.test", liveLine1: "123 Example Street", liveCity: "San Francisco", liveState: "CA", liveZip: "94103" })) await page.locator(`#${id}`).fill(value);
   if (curbsidePhoto) {
+    await expect(page.locator("#photoGuide")).toContainText("parking receipts");
     await expect(page.locator("#liveEvidenceList")).toContainText("1 selected");
     await expect(page.locator("#liveEvidenceList")).toContainText("Saved supporting photo 1");
   } else {
@@ -342,18 +365,18 @@ test.afterEach(() => {
   expect(saveStatuses.every((status) => status === 200), "autosave/flush must be accepted").toBe(true);
 });
 
-test("required OCR, corrected facts and confirmed intake through the paid mailing record", async ({ page }) => {
+test("required OCR, corrected facts and confirmed intake through the paid mailing record", async ({ page }, testInfo) => {
   await beginVision(page);
   await expect(page.locator("#visionFrontCamera")).toHaveAttribute("capture", "environment");
   await expect(page.locator("#visionBackCamera")).toHaveAttribute("capture", "environment");
-  await page.locator("#sceneLibrary").setInputFiles({ name: "curbside.png", mimeType: "image/png", buffer: syntheticPng(90) });
+  await page.locator("#sceneLibrary").setInputFiles({ name: "parking-receipt.png", mimeType: "image/png", buffer: await parkingReceiptPng(page) });
   const evidence = async () => ((await appeal(page))?.intake_form as IntakeForm | undefined)?.evidence_photo_refs ?? [];
   await expect.poll(evidence).toHaveLength(1);
-  const [sceneRef] = await evidence();
+  const [receiptRef] = await evidence();
   await page.reload();
   await expect(page.locator("#scene-photos")).toContainText("Scene photo 1");
   await uploadAndRead(page);
-  await expect(page.locator("#visionReadings")).toContainText(/unverified|suggestion/i);
+  await expect(page.locator("#visionReadings")).toContainText("Enter them from your ticket below.");
 
   // The printed date text stays a separate literal from the customer's ISO date.
   const printedIssue = (await page.locator('[data-vision-field="issue_date"]').textContent()) ?? "";
@@ -415,12 +438,13 @@ test("required OCR, corrected facts and confirmed intake through the paid mailin
   await expect(page.locator("#ticketVision")).toBeVisible({ timeout: 20000 });
   await expect(page.locator("#visionConfirmed")).toBeVisible();
   await expect(page.locator("#fact-stage")).toHaveValue(FACTS.stage);
-  expect(form!.evidence_photo_refs).toEqual([sceneRef]);
-  expect([form!.ticket_photo_ref, form!.ticket_back_photo_ref]).not.toContain(sceneRef);
-  const caseId = await submitDetails(page, true);
+  expect(form!.evidence_photo_refs).toEqual([receiptRef]);
+  expect([form!.ticket_photo_ref, form!.ticket_back_photo_ref]).not.toContain(receiptRef);
+  if (paid) await page.locator("#visionConfirmed").screenshot({ path: testInfo.outputPath("ticket-confirmed.png") });
+  const caseId = await submitDetails(page, true, RECEIPT_STATEMENT);
   const submitted = await appeal(page);
   const intake = submitted?.intake as { ticket_confirmation_command_id?: string; photo_refs?: string[]; ticket?: Record<string, unknown> } | undefined;
-  expect(intake?.photo_refs).toHaveLength(1);
+  expect(intake?.photo_refs).toEqual([receiptRef]);
   expect(intake?.ticket_confirmation_command_id).toBe(confirmation.command_id);
   expect(intake?.ticket).toMatchObject({
     citation_number: FACTS.citation_number,
@@ -435,10 +459,17 @@ test("required OCR, corrected facts and confirmed intake through the paid mailin
     await authorizeAndResearch(page, caseId);
     const researched = await call(page, "GET", `/cases/${caseId}/status`);
     expect(researched.state).toBe("DRAFTING");
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "Appeal rules for your jurisdiction" })).toBeVisible();
+    const mailingRule = page.locator("#liveFindings").getByRole("listitem").filter({ has: page.getByRole("heading", { name: "Appeals by mail", exact: true }) });
+    await expect(mailingRule).toContainText("Confirmed");
+    await expect(mailingRule.locator("q").first()).toBeVisible();
+    await expect(mailingRule.getByRole("link", { name: "Read the official source" }).first()).toHaveAttribute("href", /^https:\/\//);
+    await mailingRule.screenshot({ path: testInfo.outputPath("official-mail-rule.png") });
     await workerStep(page, caseId, "draft");
     expect((await proof(page, caseId)).latest_decision?.provenance).toBe("SYSTEM_VERIFIED");
     await page.reload();
-    await expect.poll(async () => (await page.locator("#liveLetterText").inputValue()).includes(STATEMENT)).toBe(true);
+    await expect.poll(async () => (await page.locator("#liveLetterText").inputValue()).includes(RECEIPT_STATEMENT)).toBe(true);
     await page.locator("#liveAdopt").click();
     await expect(page.locator("#livePreview")).toBeEnabled();
     await page.locator("#liveSignatureFile").setInputFiles(file("own-signature.png"));
@@ -446,6 +477,17 @@ test("required OCR, corrected facts and confirmed intake through the paid mailin
     await page.locator("#livePreview").click();
     const preview = await (await previewResponse).json();
     expect(preview.mail_to.join(" ")).toMatch(/San Francisco/);
+    const pdf = Buffer.from(preview.pdf_base64, "base64");
+    expect(createHash("sha256").update(pdf).digest("hex")).toBe(preview.packet_sha256);
+    await writeFile(testInfo.outputPath("exact-approved-packet.pdf"), pdf);
+    await expect(page.getByRole("link", { name: "Open exact PDF" })).toBeVisible();
+    await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
+    await expect(page.locator("#livePacketPage")).toHaveAccessibleName("Exact PDF, page 1");
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await expect(page.locator("#livePacketPage")).toHaveAccessibleName("Exact PDF, page 2");
+    await expect(page.locator("#livePacketPage")).toBeVisible();
+    await expect(page.locator("#liveCorrectBeforeMail")).toBeVisible();
+    await page.getByRole("heading", { name: "Inspect your exact mailing" }).screenshot({ path: testInfo.outputPath("exact-packet-heading.png") });
     await expect(page.locator("#liveApprove")).toBeDisabled();
     await page.locator("#livePacketReviewed").check();
     const approvalRequest = page.waitForRequest(r => r.url().endsWith("/approval"));
@@ -464,7 +506,7 @@ test("required OCR, corrected facts and confirmed intake through the paid mailin
     expect(record.pdf_sha256).toBe(preview.packet_sha256);
     expect(createHash("sha256").update(Buffer.from(record.pdf_base64, "base64")).digest("hex")).toBe(preview.packet_sha256);
     expect(await proof(page, caseId)).toMatchObject({ prepared_attempts: 1, dispatch_manifest: {
-      original_statement_sha256: createHash("sha256").update(STATEMENT).digest("hex"),
+      original_statement_sha256: createHash("sha256").update(RECEIPT_STATEMENT).digest("hex"),
       approved_pdf_sha256: preview.packet_sha256,
       approved_envelope_sha256: preview.envelope_sha256,
       dispatched_pdf_sha256: preview.packet_sha256,
@@ -474,6 +516,10 @@ test("required OCR, corrected facts and confirmed intake through the paid mailin
 
 async function authorizeAndResearch(page: Page, caseId: string) {
   await expect(page.locator("#issuerCard")).toContainText("SFMTA", { timeout: 20000 });
+  await expect(page.locator("#actChooseCertified")).toBeEnabled();
+  await page.locator("#actChooseCertified").click();
+  await expect(page.locator("#tierset input")).toBeChecked();
+  await expect(page.locator("#pay")).toContainText("hold on your card");
   expect((await call(page, "GET", "/health")).mode).toBe("fake");
   // The production-build rehearsal has no hosted Stripe card fixture. Use the
   // fake payment token through normal owner-scoped authorization and worker routes.

@@ -43,9 +43,9 @@ export function Step4Offer({
   useEffect(() => {
     if (!selectedTier) {
       setActionBar(
-        "Nothing is pre-selected · Tap a mailing option above",
-        <button className="btn btn-primary" type="button" disabled>
-          {`Choose Certified Mail ($${certifiedPrice})`}
+        "No charge unless your letter is mailed",
+        <button className="btn btn-primary" id="actChooseCertified" type="button" disabled={certifiedPrice == null} onClick={() => setSelectedTier("certified")}>
+          {certifiedPrice == null ? "Certified Mail unavailable" : `Choose Certified Mail · $${certifiedPrice.toFixed(2)}`}
         </button>
       );
       return;
@@ -77,7 +77,7 @@ export function Step4Offer({
         {live ? `Authorize $${price}${liveOffer?.testMode ? " (test card)" : ""} →` : `Authorize $${price} (simulated) →`}
       </button>
     );
-  }, [selectedTier, isAuthorizing, price, onComplete, setActionBar, live, liveOffer?.testMode, certifiedPrice]);
+  }, [selectedTier, isAuthorizing, price, onComplete, setActionBar, live, liveOffer?.testMode, certifiedPrice, setSelectedTier]);
 
   useEffect(() => {
     if (live || !isAuthorizing || !selectedTier) return;
@@ -94,7 +94,7 @@ export function Step4Offer({
         <div>
           <p className="eyebrow">Step 3 · Mailing choice</p>
           <h2 id="h-s4" tabIndex={-1}>
-            Your timeline and mailing choice.
+            Choose how to mail your appeal.
           </h2>
           <p className="thought" aria-live="polite">
             {isAuthorizing ? (live ? "Placing the hold…" : "Placing the hold (simulated)…") : ""}
@@ -109,8 +109,7 @@ export function Step4Offer({
             <strong>{liveOffer?.issuerName}</strong>
           </p>
           <p className="muted small">
-            Your letter goes to {liveOffer?.decidingBody}. After the hold, we read the agency&#39;s
-            official appeal pages and show you every fact with its exact quote.
+            After you authorize a temporary card hold, we verify the rules for filing your appeal. You review the exact packet before mailing.
           </p>
         </div>
       ) : (
@@ -143,7 +142,7 @@ export function Step4Offer({
         <legend>
           <h3>How should your letter be mailed?</h3>
           <span className="muted small">
-            Nothing is selected for you. Your price includes printing and mailing your exact approved letter.
+            The price includes preparation, printing and mailing.
           </span>
         </legend>
         <div className="tiers">
@@ -185,10 +184,6 @@ export function Step4Offer({
 
         </div>
       </fieldset>
-
-      <p className="muted small">
-        Early beta pricing includes preparing, printing and sending your approved packet by Certified Mail. We’re refining the service and resolving issues as they arise. We’ll review standard pricing once operations are consistently reliable.
-      </p>
 
       <p className="nocharge">
         <Icon id="shield" size={18} />

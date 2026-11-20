@@ -108,7 +108,8 @@ test("live ticket runs from intake to mailed and charged", async ({ page }) => {
   await shot(page, "3-letter-signed");
   expect(approvalRequests).toBe(0);
   await page.locator("#livePreview").click();
-  await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+  await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+  await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#liveApprove")).toBeDisabled();
   expect(approvalRequests).toBe(0);
   await page.locator("#livePacketReviewed").check();

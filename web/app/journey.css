@@ -1,3 +1,5 @@
+.journey-deck { overflow-x: clip; }
+
 body:has(.journey-deck) .top { background: var(--surface); border-top: 0; }
 body:has(.journey-deck) .iconbtn { border-color: var(--forest); color: var(--forest); background: var(--surface); border-radius: 999px; }
 body:has(.journey-deck) .access-session { background: var(--forest-soft); color: var(--ink); }

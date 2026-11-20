@@ -21,6 +21,7 @@ const TONES: Record<string, string> = {
 };
 
 function title(fact: string): string {
+  if (fact === "MAIL_IN_ACCEPTED") return "Appeals by mail";
   return fact.charAt(0) + fact.slice(1).toLowerCase().replaceAll("_", " ");
 }
 
@@ -112,7 +113,7 @@ export function ResearchEvidence({research, issuerName, idPrefix = "live"}: {res
       </ul>
       <details className="card sources-card" id={`${idPrefix}Sources`}>
         <summary>Official pages checked</summary>
-        <p className="small muted">Every quote below comes from one of these saved official pages.</p>
+        <p className="small muted">These are the saved official pages for the quotes above.</p>
         {research.sources.length ? (
           <ul className="source-list small">
             {research.sources.map((source) => (

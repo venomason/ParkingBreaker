@@ -67,7 +67,8 @@ async function mailedCase(page: Page, name: string, mode: "keyboard" | "pointer"
     await expect(page.locator("#livePreview")).toBeEnabled();
     await page.locator("#liveSignatureFile").setInputFiles(file("own-signature.png"));
     await page.locator("#livePreview").focus(); await page.keyboard.press("Enter");
-    await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+    await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+    await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
     await page.locator("#livePacketReviewed").focus(); await page.keyboard.press("Space");
     await expect(page.locator("#liveApprove")).toBeEnabled();
     await page.locator("#liveApprove").focus(); await page.keyboard.press("Enter");
@@ -186,7 +187,8 @@ for (const width of [375, 1440]) {
     await page.locator("#liveAdopt").click();
     await expect(page.locator("#livePreview")).toBeEnabled();
     await page.locator("#livePreview").click();
-    await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+    await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+    await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
     const packet = Buffer.from(await page.locator("#liveOpenPacket").evaluate(async (element) => Array.from(new Uint8Array(await (await fetch((element as HTMLAnchorElement).href)).arrayBuffer()))));
     mkdirSync(output, { recursive: true }); writeFileSync(resolve(output, `${width}-photos-packet.pdf`), packet);
     const colors = pageColors(packet);
@@ -223,7 +225,8 @@ test.describe("touch input (375px)", () => {
     await expect(page.locator("#livePreview")).toBeEnabled();
     await page.locator("#liveSignatureFile").setInputFiles(file("own-signature.png"));
     await page.locator("#livePreview").tap();
-    await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src", /^blob:/);
+    await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+    await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
     await page.locator("#livePacketReviewed").tap();
     await page.locator("#liveApprove").tap();
     await expect(page.locator("#liveTracking")).toBeVisible({ timeout: 30000 });

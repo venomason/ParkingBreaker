@@ -85,8 +85,10 @@ export function TicketFactReview({
     onDraftChange(next);
   };
   const set = (key: keyof FactDraft) => (value: FactDraft[typeof key]) => changeDraft({ ...draft, [key]: value });
-  const textField = (key: keyof FactDraft, label: string, extra?: React.ReactNode) => (
-    <label>
+  const textField = (key: keyof FactDraft, label: string) => {
+    const literalField = ADOPTED_TO_LITERAL[key as keyof AdoptedFacts];
+    const suggestion = reading?.current && literalField ? printed(literalField) : null;
+    return <label>
       {label}
       <input
         id={`fact-${key}`}
@@ -99,9 +101,9 @@ export function TicketFactReview({
         autoComplete="off"
       />
       {errors[`fact-${key}`] && <span className="field-error" id={`fact-${key}-error`}>{errors[`fact-${key}`]}</span>}
-      {extra}
-    </label>
-  );
+      {suggestion && <span className="muted small">Read from your photo: “{suggestion}”</span>}
+    </label>;
+  };
 
   const submit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
@@ -138,8 +140,7 @@ export function TicketFactReview({
   return (
     <div id="visionFactReview" className="stack" data-review-variant={telemetry.variant} onFocusCapture={telemetry.interact}>
       <section aria-labelledby="visionReadingsTitle" className="card" id="visionReadings">
-        <p className="eyebrow">Unverified reading</p>
-        <h3 id="visionReadingsTitle" style={{ marginBottom: "6px" }}>What the reading suggests</h3>
+        <h3 id="visionReadingsTitle" style={{ marginBottom: "6px" }}>{hasReading ? "Check what we read" : "Check your ticket details"}</h3>
         {reading?.escalation === "completed" && <p className="small" role="status">
           Gemini independently checked borderline text. Any remaining uncertain or conflicting
           fields need your input. Agreement between models is not proof of accuracy.
@@ -148,10 +149,9 @@ export function TicketFactReview({
           && <p className="small" role="status">The additional reading was unavailable or unusable.
             Enter the remaining facts yourself; no uncertain value has been filled in for you.</p>}
         <p className="muted small" style={{ marginBottom: "10px" }}>
-          These are suggestions from an AI reading of your uploaded photos, not confirmed facts. The reading can see
-          everything printed on the photo, which may include your name, plate or address. Check every value yourself.
+          {hasReading ? "Photo suggestions appear next to the fields below. Compare each one with your ticket." : reading?.current && reading.status === "success" ? "We couldn’t read the ticket details. Enter them from your ticket below." : "Check or complete the fields below using your ticket."}
         </p>
-        {reading && reading.status !== "missing" && <details id="visionSuggestions" className="guide-notes"><summary>See the printed fields</summary>
+        {reading && reading.status !== "missing" && <details id="visionSuggestions" className="guide-notes"><summary>See all reading results</summary>
         <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {literalEntries.map(({ field, value, state }) => (
             <li key={field} data-vision-field={field} style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
@@ -169,12 +169,8 @@ export function TicketFactReview({
       </section>
 
       <form ref={formRef} id="visionFactsForm" className="card" onSubmit={submit} noValidate aria-busy={busy}>
-        <p className="eyebrow">Your supplied facts</p>
-        <h3 style={{ marginBottom: "6px" }}>Enter the ticket facts yourself</h3>
-        <p className="muted small" style={{ marginBottom: "10px" }}>
-          Printed dates stay as they appear on the ticket above. Below, choose the calendar dates, stage and issuer
-          yourself. Suggestions may be prefilled; your corrections are recorded as customer-supplied facts, never as AI-extracted text. Do not guess an uncertain character. Supply every required fact before continuing.
-        </p>
+        <h3 style={{ marginBottom: "6px" }}>Your ticket details</h3>
+        <p className="muted small" style={{ marginBottom: "10px" }}>Fill in anything missing. If a character is unclear, check the ticket or take a clearer photo.</p>
         {telemetry.variant === "manual_guidance_v1" && <p id="manualReviewGuidance" className="small">
           Compare one field at a time with your ticket. If a character is unclear, check a clearer photo before continuing. Your entries stay here if you need to correct a field.
         </p>}
@@ -295,7 +291,6 @@ export function TicketFactReview({
             Use my supplied facts without an AI comparison
           </button>
         )}
-        {!hasReading && <p className="muted small">These facts come from you. No AI reading or comparison verifies them.</p>}
       </form>
 
       {review && (

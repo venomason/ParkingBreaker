@@ -132,7 +132,8 @@ export async function inspect(page: Page, id: string, name: string) {
   await expect(page.locator("#livePreview")).toBeEnabled();
   await page.locator("#liveSignatureFile").setInputFiles(file("own-signature.png"));
   await page.locator("#livePreview").click();
-  await expect(page.locator("#livePacketPreview iframe")).toHaveAttribute("src",/^blob:/);
+  await expect(page.locator("#liveOpenPacket")).toHaveAttribute("href", /^blob:/);
+  await expect(page.locator("#livePacketPage")).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#liveApprove")).toBeDisabled();
   const bytes = await page.locator("#liveOpenPacket").evaluate(async element => Array.from(new Uint8Array(await (await fetch((element as HTMLAnchorElement).href)).arrayBuffer())));
   const packet = Buffer.from(bytes);

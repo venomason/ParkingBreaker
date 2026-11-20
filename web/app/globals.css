@@ -3976,6 +3976,29 @@ input[type="file"]:focus-visible {
   margin-bottom: 6px;
 }
 
+.packet-page-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.packet-page-controls .chip {
+  min-height: 44px;
+}
+
+.packet-page canvas {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+}
+
+#liveCorrectBeforeMail {
+  margin: 12px 0;
+}
+
 #livePacketPreview .crow {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
