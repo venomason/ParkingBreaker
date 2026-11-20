@@ -1,6 +1,6 @@
 # Controlled-beta readiness
 
-Updated November 18, 2026 (Pacific). **NO-GO for live paid beta.**
+Updated November 19, 2026 (Pacific). **NO-GO for live paid beta.**
 
 **Preview deployed:** [parkingbreaker.com](https://parkingbreaker.com) serves application commit `0bf011b7c243bed1b864bdb1739438469fdacb58` on `parkingbreaker-frontend-preview-0bf011b`. Both container digests, 100% traffic, page/assets and ticket-upload/synthetic-OCR checks are recorded in [the deployment receipt](verification/deployment-preview-2026-11-17.json). It uses fake providers, the paid product flow and temporary preview storage; no real payments or mailing were activated.
 
@@ -71,6 +71,13 @@ Task IDs resolve to the authoritative roadmap.
 | Unattended improvement | Ledger, OCR/manual-review observations and T01 reconstruction tested; queue not implemented | T01–T07 local proof, then T08/R09 for qualified production release |
 
 Historical cloud inventories do not establish current service health. No new deployment, charge, mail, outreach, ad spend or provider trial is authorized by this page. Consolidation and recovery provenance remain in [CONSOLIDATION.md](CONSOLIDATION.md).
+
+The R03 restore tool now exports a restricted inventory of original provider lookup anchors and
+approval fingerprints from the quarantined SQLite snapshot. A local mixed paid and no-charge
+recovery fixture verified that the export preserves every restored file, omits beta consent from
+Stripe lookups, and retains the Lob submission token when the local letter ID is missing.
+The command returns `NEEDS_EXTERNAL` until the original provider records are checked during the
+joined P06/R03 rehearsal. [Recovery procedure](operations/controlled-beta.md#recovery-and-rollback)
 
 ## First three paid beta increments
 

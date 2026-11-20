@@ -51,9 +51,10 @@ from parkingbreaker.lob_submission import (
     resolve_lookup,
 )
 from parkingbreaker.payment_fakes import FakePaymentClient
-from parkingbreaker.payment_records import PaymentClient, PaymentOutcome
+from parkingbreaker.payment_records import PaymentClient, PaymentOutcome, decode_cursor
 from parkingbreaker.payment_state import PaymentState
 from parkingbreaker.recovery_policy import backup_room, letter_compatible, payment_compatible
+from parkingbreaker.submission_records import decode_outcome
 from parkingbreaker.transaction_store import SqliteTransactionStore
 
 DATABASE = "parkingbreaker.sqlite"
@@ -417,6 +418,121 @@ class ReconciliationReport(TypedDict):
     status: str
     checked: int
     issues: list[str]
+
+
+def export_reconciliation_inventory(destination: Path, output: Path) -> None:
+    """Export local lookup anchors from a completed restore without opening it for writes."""
+    marker = destination / QUARANTINE
+    if not marker.is_file() or marker.is_symlink() or destination.is_symlink():
+        raise ValueError("isolated quarantined restore required")
+    if output.resolve().is_relative_to(destination.resolve()):
+        raise ValueError("write inventory outside the restore directory")
+    restore_receipt = json.loads((destination / "restore-report.json").read_text())
+    if (
+        restore_receipt["records_match"] is not True
+        or restore_receipt["artifacts_match"] is not True
+    ):
+        raise ValueError("completed restore required")
+    with closing(_connection(destination / DATABASE)) as db:
+        db.row_factory = sqlite3.Row
+        db.execute("BEGIN")
+        payments = []
+        for row in db.execute(
+            """SELECT c.case_token, c.authorization_ref, c.amount_cents, c.payment_state,
+                      p.payload
+               FROM pb_cases c LEFT JOIN pb_payment_cursor p USING (case_token)
+               WHERE c.payment_state != ? ORDER BY c.case_token""",
+            (PaymentState.NO_CHARGE,),
+        ):
+            cursor = None if row["payload"] is None else decode_cursor(row["payload"])
+            payments.append(
+                {
+                    "case_token": row["case_token"],
+                    "authorization_ref": row["authorization_ref"],
+                    "amount_cents": row["amount_cents"],
+                    "restored_payment_state": row["payment_state"],
+                    "charge_ref": (
+                        None
+                        if cursor is None
+                        else cursor.outcome.original_charge_ref
+                        or cursor.outcome.charge_ref
+                        or cursor.authorization_charge_ref
+                    ),
+                    "refund_lookup_required": (
+                        row["payment_state"] == PaymentState.REFUNDED
+                        or (cursor is not None and cursor.kind == "refund")
+                    ),
+                }
+            )
+        letters = []
+        for row in db.execute(
+            """SELECT m.case_token, m.attempt, m.submission_token, m.pdf_sha256,
+                      m.request_sha256, m.prepared_at, s.outcome_json,
+                      a.manifest_sha256, a.envelope_sha256, a.provider_letter_id
+               FROM pb_mail_attempts m
+               LEFT JOIN pb_submission_cursors s USING (case_token, attempt)
+               LEFT JOIN pb_approval_manifests a USING (case_token, attempt)
+               ORDER BY m.case_token, m.attempt"""
+        ):
+            outcome = None if row["outcome_json"] is None else decode_outcome(row["outcome_json"])
+            cursor_letter_id = (
+                outcome.letter_id if isinstance(outcome, Accepted | Uncertain | Canceled) else None
+            )
+            letters.append(
+                {
+                    "case_token": row["case_token"],
+                    "attempt": row["attempt"],
+                    "prepared_at": row["prepared_at"],
+                    "submission_token": row["submission_token"],
+                    "cursor_letter_id": cursor_letter_id,
+                    "dispatch_letter_id": row["provider_letter_id"],
+                    "packet_pdf_sha256": row["pdf_sha256"],
+                    "request_sha256": row["request_sha256"],
+                    "approval_manifest_sha256": row["manifest_sha256"],
+                    "approved_envelope_sha256": row["envelope_sha256"],
+                }
+            )
+        open_authorizations = [
+            dict(row)
+            for row in db.execute(
+                """SELECT intake_id, attempt_number, authorization_ref, amount_cents,
+                          state, created_at
+                   FROM pb_intake_authorization_attempts
+                   WHERE state IN ('pending', 'uncertain') ORDER BY intake_id, attempt_number"""
+            )
+        ]
+        missing_mail_anchors = [
+            dict(row)
+            for row in db.execute(
+                """SELECT c.case_token, c.attempt, c.letter_state
+                   FROM pb_cases c
+                   WHERE c.letter_state IN ('FROZEN', 'SUBMITTING', 'IN_TRANSIT', 'DELIVERED',
+                                            'RETURNED', 'CLOSED_RETURNED')
+                     AND NOT EXISTS (
+                         SELECT 1 FROM pb_mail_attempts m WHERE m.case_token = c.case_token
+                         AND m.attempt = c.attempt
+                     )
+                   ORDER BY c.case_token"""
+            )
+        ]
+    _write(
+        output,
+        (
+            json.dumps(
+                {
+                    "status": "NEEDS_EXTERNAL",
+                    "scope": "restored records only",
+                    "stripe_payment_intents": payments,
+                    "lob_letter_attempts": letters,
+                    "unresolved_intake_authorizations": open_authorizations,
+                    "missing_mail_anchors": missing_mail_anchors,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n"
+        ).encode(),
+    )
 
 
 def reconcile_restored(

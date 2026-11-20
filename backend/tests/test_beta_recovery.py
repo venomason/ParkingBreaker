@@ -9,7 +9,11 @@ owner-scoped photos and saved draft replay data must survive exactly.
 
 from __future__ import annotations
 
+import json
 import sqlite3
+import stat
+import subprocess
+import sys
 import uuid
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -519,6 +523,72 @@ def _mixed_snapshot(tmp_path: Path) -> tuple[BetaSnapshot, CaseRecord, FakePayme
         assert outcome.status == "succeeded"
         recovery.backup(data, bundle)
     return BetaSnapshot(data, bundle, lob, beta, packet), paid, payments
+
+
+def test_reconciliation_cli_exports_private_original_anchors_without_modifying_restore(
+    tmp_path: Path,
+) -> None:
+    snapshot, paid, _ = _mixed_snapshot(tmp_path)
+    restored = tmp_path / "restored"
+    recovery.restore(snapshot.bundle, restored)
+    before = {path: path.read_bytes() for path in restored.rglob("*") if path.is_file()}
+    output = tmp_path / "operator.json"
+    command = [
+        sys.executable,
+        "-m",
+        "parkingbreaker.recovery_cli",
+        "reconcile",
+        "--data",
+        str(restored),
+        "--output",
+        str(output),
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+
+    assert result.returncode == 3, result.stderr
+    assert json.loads(result.stdout)["status"] == "NEEDS_EXTERNAL"
+    assert paid.authorization_ref not in json.loads(result.stdout).values()
+    assert PAID_LETTER not in result.stdout
+    assert stat.S_IMODE(output.stat().st_mode) == 0o600
+    contents = output.read_text()
+    report = json.loads(contents)
+    assert report["status"] == "NEEDS_EXTERNAL"
+    assert report["missing_mail_anchors"] == []
+    assert report["unresolved_intake_authorizations"] == []
+    stripe = report["stripe_payment_intents"]
+    assert len(stripe) == 1
+    assert stripe[0]["authorization_ref"] == paid.authorization_ref
+    assert stripe[0]["case_token"] == paid.case_token
+    assert stripe[0]["restored_payment_state"] == "CAPTURE_PENDING"
+    assert snapshot.case.authorization_ref not in contents
+    assert snapshot.packet.key not in contents
+    letters = {letter["case_token"]: letter for letter in report["lob_letter_attempts"]}
+    assert letters[paid.case_token]["cursor_letter_id"] == PAID_LETTER
+    beta = letters[snapshot.case.case_token]
+    assert beta["cursor_letter_id"] is None
+    assert beta["submission_token"] == snapshot.packet.request.submission_token
+    assert beta["approval_manifest_sha256"]
+    assert beta["approved_envelope_sha256"]
+    assert beta["packet_pdf_sha256"]
+    assert {path: path.read_bytes() for path in restored.rglob("*") if path.is_file()} == before
+
+    refused = subprocess.run(command, capture_output=True, text=True, check=False)
+    assert refused.returncode == 1
+    assert output.read_text() == contents
+
+
+def test_reconciliation_inventory_requires_completed_quarantine(tmp_path: Path) -> None:
+    data = tmp_path / "authority"
+    data.mkdir()
+    output = tmp_path / "operator.json"
+    with pytest.raises(ValueError, match="quarantined"):
+        recovery.export_reconciliation_inventory(data, output)
+    (data / recovery.QUARANTINE).touch()
+    (data / "restore-report.json").write_text('{"records_match":false,"artifacts_match":true}')
+    with pytest.raises(ValueError, match="completed restore"):
+        recovery.export_reconciliation_inventory(data, output)
+    assert not output.exists()
 
 
 def test_mixed_snapshot_reconciles_paid_capture_and_never_asks_about_beta(

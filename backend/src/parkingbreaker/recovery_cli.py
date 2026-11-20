@@ -142,6 +142,10 @@ def main() -> int:
             recovery.replicate(args.data, args.output)
             result = {"status": "verified local replica; off-site storage NEEDS_EXTERNAL"}
         elif args.action == "reconcile":
+            if args.data is not None or args.output is not None:
+                if args.data is None or args.output is None:
+                    parser.error("reconcile inventory requires --data and new --output")
+                recovery.export_reconciliation_inventory(args.data, args.output)
             print(
                 json.dumps(
                     {

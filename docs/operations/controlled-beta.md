@@ -219,8 +219,20 @@ an off-site or production restore qualification.
 For the actual approved target drill: back up using `parkingbreaker.recovery_cli
 backup`, verify the manifest and off-host copy, restore into a new isolated directory,
 keep `RESTORE_QUARANTINE.json`, prove the original host is fenced, and reconcile the
-original-account Stripe/Lob IDs before unquarantine. `recovery_cli reconcile` currently
-reports `NEEDS_EXTERNAL`; it does not implement an automatic live reconciliation.
+original-account Stripe/Lob IDs before unquarantine. From a fenced, completed restore,
+export the original lookup anchors to a new private path outside the restore:
+
+```bash
+python -m parkingbreaker.recovery_cli reconcile \
+  --data /private/restored --output /private/evidence/provider-inventory.json
+```
+
+The command exits 3 with `NEEDS_EXTERNAL`. Use the restricted report to match the
+Stripe PaymentIntent and Lob submission token or letter ID against the approved
+provider accounts. Compare the exact PDF, envelope and approval fingerprints to the
+joined payment and mail rehearsal. The report only covers records in the backup.
+Account identity, post-backup effects and attempts with missing anchors require
+independent evidence. Keep the report private because it contains original references.
 Never restore over the current database or remove quarantine to make startup pass.
 Rollback must retain authority data and pass compatibility on a copy; otherwise roll
 forward. A `PROCESSING_BLOCKED` lifecycle marker is not a global intake kill switch.
