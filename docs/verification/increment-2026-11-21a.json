@@ -254,6 +254,12 @@
       "two concurrent POST /workspaces right after a terminal case can create two fresh workspaces (work fork, no charge until a separate intake and authorization); sequential requests replay correctly",
       "the test that checks copy is word-based and would not catch a promised outcome phrased in new words; strengthened with explicit negation assertions, still not exhaustive"
     ],
-    "evidence": "~/tmp/freeze2-20261121/mimo-review.log"
+    "evidence": "~/tmp/freeze2-20261121/mimo-review.log",
+    "follow_up_review": {
+      "candidate": "699b209",
+      "verdict": "APPROVE",
+      "confirmation": "the opt-out command id now differs per consent transition so a repeated opt-out inserts a fresh OPT_OUT row instead of replaying the stale one and follow_up_allowed goes False; the duplicate report is caught and never rewrites; the regression tests would fail against the pre-fix code",
+      "evidence": "~/tmp/freeze3-20261121/mimo-fix-review.log"
+    }
   }
 }
