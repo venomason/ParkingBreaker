@@ -147,7 +147,6 @@ from parkingbreaker.draft_ownership_store import (
     DraftRunRefused,
 )
 from parkingbreaker.effect_dispatch import dispatch_once
-from parkingbreaker.intake_pause_store import IntakePauseConflict
 from parkingbreaker.intake_store import (
     IntakeConflict,
     IntakeRecord,
@@ -948,13 +947,15 @@ class CaseService:
             token = f"ws_{self._deps.new_id()}"
             try:
                 created = self._store.create_owned_workspace(
-                    owner, token, carried, now, create_new=True
+                    owner,
+                    token,
+                    carried,
+                    now,
+                    create_new=True,
+                    parent_workspace=previous,
                 )
             except IntakeConflict as exc:
                 raise ServiceConflict(str(exc)) from None
-            # Lineage is audit material; a failure must not strand a paid start.
-            with contextlib.suppress(IntakePauseConflict):
-                self._store.record_workspace_lineage(created.workspace_token, previous, now=now)
             return s.WorkspaceView(
                 workspace_id=created.workspace_token, notes=created.workspace.notes
             )

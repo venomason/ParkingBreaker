@@ -57,7 +57,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     // Only public application routes cross customer ingress. Workers remain on
     // the private API listener and retain their separate bearer authentication.
-    return ["health", "auth/:path*", "workspaces/:path*", "cases/:path*", "webhooks/:path*"].map((path) => ({
+    return ["health", "auth/:path*", "workspaces/:path*", "cases/:path*", "outcomes/:path*", "webhooks/:path*"].map((path) => ({
       source: `/api/${path}`,
       destination: `${apiOrigin}/${path}`,
     }));

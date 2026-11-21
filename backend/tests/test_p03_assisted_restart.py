@@ -339,3 +339,69 @@ async def test_assisted_restart_carries_the_customer_into_a_fresh_prefilled_work
         assert real.status(stopped.case_id).payment_state is PaymentState.RELEASED
     finally:
         await client.aclose()
+
+
+async def test_restart_same_timestamp_smaller_token_and_concurrent_parent_replay(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Rowid ordering beats lexicographic token ties, and concurrent restarts replay one child."""
+    from datetime import UTC, datetime
+
+    from parkingbreaker.workspace import Workspace
+
+    stopped = await stopped_by_lob_rejection(tmp_path, monkeypatch)
+    real = stopped.real
+    try:
+        # Insert a restarted workspace at the exact same timestamp with a lexicographically
+        # smaller token than the parent workspace.
+        parent = stopped.workspace_id
+        owner = real._store.workspace_owner(parent)
+        assert owner is not None
+        parent_row = (
+            real._store._require_open()
+            .execute("SELECT created_at FROM pb_intake_owners WHERE workspace_token=?", (parent,))
+            .fetchone()
+        )
+        assert parent_row is not None
+        same_time = datetime.fromisoformat(str(parent_row[0])).astimezone(UTC)
+        # First restart gets a high token; second restart at the exact same timestamp gets
+        # a lexicographically smaller token so rowid (not token text) must decide latest.
+        high_token = "ws_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+        low_token = "ws_00000000000000000000000000000001"
+        assert low_token < high_token
+        first = real._store.create_owned_workspace(
+            owner,
+            high_token,
+            Workspace(notes="restarted-1"),
+            same_time,
+            create_new=True,
+            parent_workspace=parent,
+        )
+        assert first.workspace_token == high_token
+        assert real._store.latest_owned_workspace(owner) == high_token
+        assert real._store.workspace_parent(high_token) == parent
+        # A concurrent restart using the now-stale parent replays the first restart workspace.
+        concurrent = real._store.create_owned_workspace(
+            owner,
+            "ws_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+            Workspace(notes="restarted-1"),
+            same_time,
+            create_new=True,
+            parent_workspace=parent,
+        )
+        assert concurrent.workspace_token == high_token
+        # A subsequent restart from high_token into a lexicographically smaller token at the
+        # exact same timestamp must still become the latest workspace.
+        second = real._store.create_owned_workspace(
+            owner,
+            low_token,
+            Workspace(notes="restarted-2"),
+            same_time,
+            create_new=True,
+            parent_workspace=high_token,
+        )
+        assert second.workspace_token == low_token
+        assert real._store.latest_owned_workspace(owner) == low_token
+        assert real._store.workspace_parent(low_token) == high_token
+    finally:
+        await stopped.client.aclose()

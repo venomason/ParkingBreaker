@@ -319,6 +319,8 @@ def test_gateway_denies_internal_paths_before_an_exact_customer_allowlist(
         "/workspaces/*",
         "/cases",
         "/cases/*",
+        "/outcomes",
+        "/outcomes/*",
         "/webhooks",
         "/webhooks/*",
     }
@@ -359,7 +361,7 @@ def test_single_vm_disk_and_worker_dispatch_boundaries(
     assert set(scheduler["networks"]) == {"worker_control"}
     assert set(scheduler["depends_on"]) == {"worker"}
     assert scheduler["command"] == [
-        "exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch"
+        "exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch http://worker:8000/internal/follow-ups"
     ]
     assert set(services["worker"]["networks"]) == {"worker_control", "worker_egress"}
     assert set(services["api"]["networks"]) == {"customer", "api_egress"}

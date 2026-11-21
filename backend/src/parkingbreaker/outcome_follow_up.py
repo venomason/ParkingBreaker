@@ -186,6 +186,8 @@ class OutcomeFollowUpService:
         now = self._clock()
         sent = skipped = unknown = deferred = 0
         for case_token, delivered_at in self._store.delivered_cases(limit=self._limit):
+            if self._store.outcome_for(case_token) is not None:
+                continue
             email = self._customer_email(case_token)
             if not email:
                 continue

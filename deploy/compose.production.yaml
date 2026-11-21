@@ -59,7 +59,7 @@ services:
     depends_on: !override [worker]
     environment:
       PB_WORKER_SECRET: ${PB_WORKER_SECRET:?root-only env required}
-    command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch']
+    command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch http://worker:8000/internal/follow-ups']
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
   monitor:

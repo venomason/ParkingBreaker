@@ -607,3 +607,12 @@ def test_private_topology_requires_the_same_reviewed_public_origin(tmp_path: Pat
     result = run_script("lifecycle.sh", "deploy", "--rehearse", str(state), env=env)
     assert result.returncode == 2
     assert commands(tmp_path) == []
+
+
+def test_cloudbuild_backend_requires_full_commit_revision_before_build() -> None:
+    recipe = (ROOT / "cloudbuild-backend.yaml").read_text()
+    dockerfile = (ROOT / "backend/Dockerfile").read_text()
+    assert "^[0-9a-f]{40}$$" in recipe
+    assert recipe.index("^[0-9a-f]{40}$$") < recipe.index("'build'")
+    assert "'PB_BUILD_COMMIT=${_PB_BUILD_COMMIT}'" in recipe
+    assert "LABEL org.opencontainers.image.revision=$PB_BUILD_COMMIT" in dockerfile

@@ -255,3 +255,24 @@ async def test_opt_out_after_a_later_opt_in_is_a_new_decision_not_a_replay(
         assert email.call_count == 0
     finally:
         await client.aclose()
+
+
+async def test_recorded_outcome_stops_subsequent_follow_ups_and_avoids_starvation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, real, _case_id, token, clock = await _delivered_case(tmp_path, monkeypatch)
+    email = FakeEmailClient([_accepted(), _accepted()])
+    try:
+        links = OutcomeLinkService(real._store, key=LINK_KEY, clock=clock)
+        good = derive_follow_up_token(LINK_KEY, token)
+        clock.now = DELIVERED_AT + timedelta(days=5)
+        assert links.report(token, good, "dismissed") is True
+        # Resolved cases are excluded from pending delivery scans so they cannot starve newer cases.
+        assert real._store.delivered_cases(limit=1) == []
+        clock.now = DELIVERED_AT + timedelta(days=31)
+        report = _service(real, email, clock).run()
+        assert report.sent == 0
+        assert report.unknown_recorded == 0
+        assert email.call_count == 0
+    finally:
+        await client.aclose()

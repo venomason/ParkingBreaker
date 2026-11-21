@@ -620,33 +620,6 @@ def create_app(
                 deferred=report.deferred,
             )
 
-        @api.post(
-            "/outcomes/opt-out",
-            response_model=s.OutcomeLinkReceipt,
-            include_in_schema=False,
-        )
-        async def outcome_opt_out(body: s.OutcomeLinkRequest) -> s.OutcomeLinkReceipt:
-            if outcome_links is None:
-                raise HTTPException(503, "outcome_links_not_configured")
-            if not outcome_links.opt_out(body.case_id, body.token):
-                raise HTTPException(400, "invalid_link")
-            return s.OutcomeLinkReceipt(status="opted_out")
-
-        @api.post(
-            "/outcomes/report",
-            response_model=s.OutcomeLinkReceipt,
-            include_in_schema=False,
-        )
-        async def outcome_report(body: s.OutcomeReportRequest) -> s.OutcomeLinkReceipt:
-            if outcome_links is None:
-                raise HTTPException(503, "outcome_links_not_configured")
-            if not outcome_links.report(body.case_id, body.token, body.decision):
-                raise HTTPException(400, "invalid_link")
-            status: Literal["recorded", "pending"] = (
-                "pending" if body.decision == "pending" else "recorded"
-            )
-            return s.OutcomeLinkReceipt(status=status)
-
         @api.post("/internal/dispatch")
         async def dispatch(_auth: Annotated[None, Depends(worker_auth)]) -> dict[str, int]:
             # T24: record the whole sweep, started before any work and finished in cleanup.
@@ -680,6 +653,35 @@ def create_app(
                     except Exception:
                         LOG.warning("sweep run record failed to finish")
 
+    if role != "worker":
+
+        @api.post(
+            "/outcomes/opt-out",
+            response_model=s.OutcomeLinkReceipt,
+            include_in_schema=False,
+        )
+        async def outcome_opt_out(body: s.OutcomeLinkRequest) -> s.OutcomeLinkReceipt:
+            if outcome_links is None:
+                raise HTTPException(503, "outcome_links_not_configured")
+            if not outcome_links.opt_out(body.case_id, body.token):
+                raise HTTPException(400, "invalid_link")
+            return s.OutcomeLinkReceipt(status="opted_out")
+
+        @api.post(
+            "/outcomes/report",
+            response_model=s.OutcomeLinkReceipt,
+            include_in_schema=False,
+        )
+        async def outcome_report(body: s.OutcomeReportRequest) -> s.OutcomeLinkReceipt:
+            if outcome_links is None:
+                raise HTTPException(503, "outcome_links_not_configured")
+            if not outcome_links.report(body.case_id, body.token, body.decision):
+                raise HTTPException(400, "invalid_link")
+            status: Literal["recorded", "pending"] = (
+                "pending" if body.decision == "pending" else "recorded"
+            )
+            return s.OutcomeLinkReceipt(status=status)
+
     async def provider_webhook(provider: str, request: Request) -> dict[str, bool]:
         try:
             recorded = services.webhook(provider, await request.body(), dict(request.headers))
@@ -710,7 +712,11 @@ if not ACCESS_LOG.handlers:
 
 def app_from_environment() -> FastAPI:
     """The served app: PB_PROVIDER_MODE picks the preview fake or the real service."""
-    from parkingbreaker.auth_config import build_customer_access, load_auth_settings
+    from parkingbreaker.auth_config import (
+        build_customer_access,
+        build_outcome_follow_up,
+        load_auth_settings,
+    )
     from parkingbreaker.case_service import CaseService
     from parkingbreaker.config import (
         build_services,
@@ -756,6 +762,9 @@ def app_from_environment() -> FastAPI:
             auth, notifications = build_customer_access(
                 auth_settings, store, clock=lambda: datetime.now(UTC)
             )
+            follow_ups, outcome_links = build_outcome_follow_up(
+                auth_settings, store, clock=lambda: datetime.now(UTC)
+            )
             return create_app(
                 services,
                 worker_secret=settings.worker_secret,
@@ -764,6 +773,8 @@ def app_from_environment() -> FastAPI:
                 notifications=notifications,
                 role=role,
                 sweep_runs=store,
+                follow_ups=follow_ups,
+                outcome_links=outcome_links,
                 **overseer_options(settings.values, services, settings.worker_secret, role),
             )
         except Exception:

@@ -13,6 +13,7 @@ from parkingbreaker.api.customer_auth import AuthHttp
 from parkingbreaker.config import ConfigError, ProviderMode, Settings
 from parkingbreaker.customer_access import AccessService, token_digest
 from parkingbreaker.email_client import FakeEmailClient, ResendEmailClient
+from parkingbreaker.outcome_follow_up import OutcomeFollowUpService, OutcomeLinkService
 from parkingbreaker.tracking_email import TrackingEmailService
 from parkingbreaker.transaction_store import SqliteTransactionStore
 
@@ -88,3 +89,28 @@ def build_customer_access(
     return AuthHttp(
         AccessService(store, clock=clock), delivery, origin=settings.origin, clock=clock
     ), delivery
+
+
+def build_outcome_follow_up(
+    settings: AuthSettings,
+    store: SqliteTransactionStore,
+    *,
+    clock: Callable[[], datetime],
+) -> tuple[OutcomeFollowUpService, OutcomeLinkService]:
+    """Compose the J05 outcome follow-up sender and private link verifier."""
+    client = (
+        FakeEmailClient()
+        if settings.api_key is None
+        else ResendEmailClient(settings.api_key, settings.sender)
+    )
+    return (
+        OutcomeFollowUpService(
+            store,
+            client,
+            key=settings.link_key,
+            origin=settings.origin,
+            sender=settings.sender,
+            clock=clock,
+        ),
+        OutcomeLinkService(store, key=settings.link_key, clock=clock),
+    )
