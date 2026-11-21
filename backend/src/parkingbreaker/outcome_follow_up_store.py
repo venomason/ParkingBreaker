@@ -214,10 +214,49 @@ def initialize_outcome_follow_up(database: sqlite3.Connection) -> None:
         raise
 
 
+class FollowUpStoreProtocol(Protocol):
+    """The slice of the store the follow-up service needs."""
+
+    def delivered_cases(self, limit: int = 100) -> list[tuple[str, datetime]]: ...
+
+    def intake_json_for_case(self, case_token: str) -> str | None: ...
+
+    def follow_up_allowed(self, email: str) -> bool: ...
+
+    def follow_up_sent(self, case_token: str, window: str) -> bool: ...
+
+    def record_follow_up_send(
+        self,
+        case_token: str,
+        window: str,
+        command_id: str,
+        actor: str,
+        reason: str = ...,
+        *,
+        now: datetime,
+    ) -> FollowUpEvent: ...
+
+    def outcome_for(self, case_token: str) -> FollowUpEvent | None: ...
+
+    def record_unknown_outcome(
+        self,
+        case_token: str,
+        command_id: str,
+        actor: str,
+        reason: str = ...,
+        *,
+        now: datetime,
+    ) -> FollowUpEvent: ...
+
+
 class _Connected(Protocol):
     def _require_open(self) -> sqlite3.Connection: ...
 
     def _follow_up_events(self, case_token: str | None = None) -> list[FollowUpEvent]: ...
+
+    def delivered_cases(self, limit: int = 100) -> list[tuple[str, datetime]]: ...
+
+    def intake_json_for_case(self, case_token: str) -> str | None: ...
 
     def _append(
         self,
@@ -243,6 +282,47 @@ class OutcomeFollowUpStoreMixin:
         else:
             rows = database.execute(_SELECT_FOR_CASE, (case_token,)).fetchall()
         return [_event_from_row(tuple(row)) for row in rows]
+
+    # Discovery -------------------------------------------------------------------------
+    def delivered_cases(self: _Connected, limit: int = 100) -> list[tuple[str, datetime]]:
+        """Delivered cases with the recorded delivery time, oldest delivery first."""
+        if type(limit) is not int or limit < 1:
+            raise FollowUpConflict("invalid limit")
+        rows = (
+            self._require_open()
+            .execute(
+                "SELECT c.case_token, h.occurred_at FROM pb_cases c "
+                "JOIN pb_case_history h ON h.case_token = c.case_token "
+                "WHERE c.letter_state = 'DELIVERED' AND h.event_name = 'DeliveryProofStored' "
+                "ORDER BY h.occurred_at ASC, c.case_token ASC LIMIT ?",
+                (limit,),
+            )
+            .fetchall()
+        )
+        delivered: list[tuple[str, datetime]] = []
+        for case_token, occurred_text in rows:
+            try:
+                occurred = datetime.fromisoformat(str(occurred_text))
+                if occurred.tzinfo is None or occurred.utcoffset() is None:
+                    raise ValueError("delivery time is not timezone-aware")
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise StorageCorruption("invalid stored delivery time") from exc
+            delivered.append((str(case_token), occurred.astimezone(UTC)))
+        return delivered
+
+    def intake_json_for_case(self: _Connected, case_token: str) -> str | None:
+        """The customer's submitted intake JSON for a case, if the case has one."""
+        row = (
+            self._require_open()
+            .execute(
+                "SELECT r.intake_json FROM pb_intake_records r "
+                "JOIN pb_cases c ON c.workspace_token = r.workspace_token "
+                "WHERE c.case_token=?",
+                (case_token,),
+            )
+            .fetchone()
+        )
+        return None if row is None else str(row[0])
 
     # Consent ---------------------------------------------------------------------------
     def set_follow_up_consent(
