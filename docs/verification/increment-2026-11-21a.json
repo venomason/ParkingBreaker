@@ -128,7 +128,12 @@
       "legal/financial retention periods (owner + legal input)",
       "diagnostic-bundle leak check on a populated environment",
       "bearer-link revocation coverage exercised against a live store"
-    ]
+    ],
+    "diagnostic_bundles": {
+      "state": "N/A \u2014 no diagnostic-bundle or support-bundle export feature exists",
+      "evidence": "repo-wide search: only health_service.py and recovery.py mention 'bundle', neither exports customer data; there is no bundle endpoint, CLI or download path",
+      "consequence": "the roadmap clause 'diagnostic bundles leak zero secrets or raw ticket PII' is satisfied vacuously today; it becomes a live check if such a feature is added"
+    }
   },
   "p01_ocr_gate_evidence": {
     "suites": [
@@ -184,5 +189,19 @@
         "lint_types": "ruff clean, format clean, mypy Success in 502 files"
       }
     }
+  },
+  "m02_ledger_state_model": {
+    "state": "PARTIAL / SPEC TENSION \u2014 needs an owner decision",
+    "implemented": {
+      "ledger.py": "LineStatus is RECORDED (billed evidence exists) or PENDING (amount unknown, deliberately never estimated and never treated as zero); revenue counts at the charge, never at a card hold",
+      "elsewhere": "AI spend reservations (ai_spend_store caps) and returned-mail cost estimates (returned_mail.estimated_mailing_cost, flagged ESTIMATE) keep reservations and estimates in their own structures"
+    },
+    "gap_vs_roadmap": "M02 asks the ledger to distinguish estimated, reserved and billed states; the ledger intentionally refuses to emit estimated numbers",
+    "options": {
+      "A": "extend LineStatus with ESTIMATED and RESERVED, keeping amounts nullable and marking provenance, so one report shows all three",
+      "B": "keep the stricter two-state ledger and amend M02 to 'billed vs unknown, with reservations and estimates owned by their stores'"
+    },
+    "recommendation": "B unless a report must show un-billed money in one table; A risks estimated numbers reading as fact in a financial view",
+    "tests": "tests/test_disputes_ledger.py, test_ai_spend_cap.py, test_paid_beta_report.py (all in the 308-test gate run)"
   }
 }
