@@ -40,7 +40,20 @@
       "image": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:d139c39",
       "digest": "sha256:498c7489892ccce373be0326f6a1f137406b888c9bc94c120d1baea3607b8f2d"
     },
-    "frontend_candidate_tag": "not yet built for this commit; the deployed frontend digest b572e4d68a4283acc66d5c8856523e4b475dac36d92d2b4ff2014ea9ef67c7c9 comes from build 1f91dba6 on the code-identical source"
+    "frontend_candidate_tag": "not yet built for this commit; the deployed frontend digest b572e4d68a4283acc66d5c8856523e4b475dac36d92d2b4ff2014ea9ef67c7c9 comes from build 1f91dba6 on the code-identical source",
+    "freeze_candidate_images": {
+      "tag": "e4ccce2",
+      "backend": {
+        "digest": "sha256:6f81c4c333983969ef99f357b3d22425fc8bd7f99c6ad7cf3dde117afcaad434",
+        "build": "cf1a9b09-3a9b-4001-9bd3-b31d6f9a3aaa",
+        "status": "SUCCESS"
+      },
+      "frontend": {
+        "digest": "sha256:977bfa98df778eac6978f63d69e83bde5394630bfbfb49375ecedbbbaead43f4",
+        "build": "b14d91fc-e744-4880-85d7-d7dd93e53296",
+        "status": "SUCCESS"
+      }
+    }
   },
   "acceptance_item_3_checks": {
     "ruff_check": "All checks passed",
@@ -63,18 +76,28 @@
       "gates_308": "308 passed, exit 0 (paid cohort cap, runtime/service phase + stop switches, service policy, appeal correction, remail hardening, retention plan/inventory, paid beta report)"
     },
     "browser_campaigns": {
-      "paid": "155/155 valid",
-      "paid_ocr": "14/14 valid",
-      "mobile_ocr_375x812": "55/55 valid",
-      "total_checks": 224,
-      "shared_application_fingerprint": "2871be0a8e4318322e5b359d6c3521f2012a46e4ab4d82bc754b69957fd4b42a",
-      "web_source_manifest_sha256": "0e150e42e238103b0c5b3547bba039f41592983c723f2c8dbbd331d4bc4db8b2",
-      "note": "campaigns ran on the code-identical merged source; identical code content to this commit",
-      "rerun": {
-        "state": "RUNNING on the candidate",
-        "out": "/home/ghostmonday/tmp/campaigns-20261121 (paid, paid+ticket-reading-preview, controlled_free_beta 375x812)",
-        "prior_evidence": "224 checks across the three campaigns shared fingerprint 2871be0a8e4318322e5b359d6c3521f2012a46e4ab4d82bc754b69957fd4b42a on the code-identical merged source"
-      }
+      "result": "ALL THREE PASSED, shared application_fingerprint",
+      "fingerprint": "38756d47cd1415808c31b037d87a84106572fced1f45dc0bb07ad012ffcc0b19",
+      "campaigns": {
+        "paid": {
+          "service_phase": "paid",
+          "ticket_reading_preview": false,
+          "passed": true
+        },
+        "paid_ocr": {
+          "service_phase": "paid",
+          "ticket_reading_preview": true,
+          "passed": true
+        },
+        "controlled_free_beta_mobile_375x812": {
+          "service_phase": "controlled_free_beta",
+          "ticket_reading_preview": true,
+          "passed": true
+        }
+      },
+      "runner": "build-kit/scripts/synthetic_rehearsal.py (the matrix runner runs every project regardless of phase and cannot pass free-beta journeys under the paid phase)",
+      "log": "/home/ghostmonday/tmp/freeze3-20261121/campaigns.log",
+      "evidence_dirs": "/home/ghostmonday/tmp/freeze3-20261121/rehearsal-*"
     },
     "backend_suite_on_commit_7156c89": {
       "result": "13898 passed, 1 warning, exit 0, 19m51s",
@@ -127,7 +150,6 @@
     "health": "GET https://parkingbreaker.com/api/health -> 200, status ok, build_commit ffd1e848b9ed1feea3911f52075ca12743b38937"
   },
   "remaining_before_freeze": [
-    "three campaigns (running)",
     "R02 drill on the durable target"
   ],
   "independent_review": {
@@ -136,5 +158,10 @@
     "fix_commit": "699b209",
     "re_review": "APPROVE \u2014 verified both fixes and that the regression tests fail on pre-fix code",
     "evidence": "~/tmp/freeze3-20261121/mimo-fix-review.log"
+  },
+  "frozen": {
+    "observed_utc": "2026-11-21T10:26:00Z",
+    "status": "FROZEN on code content of 699b209 (tagged e4ccce2; later commits are receipts only)",
+    "checks": "web-check EXIT 0; 13,920 backend tests passed; three campaigns passed with one fingerprint; MiMo review REJECT then fix 699b209 then re-review APPROVE; ruff/format/mypy clean"
   }
 }
