@@ -1,0 +1,72 @@
+{
+  "observed_utc": "2026-11-21T09:05:00Z",
+  "gate": "R01 (BETA) — unified candidate, CI gates, Cloud Build provenance",
+  "candidate": {
+    "branch": "main",
+    "commit": "c19f4da48b458e29fd906a7e2d6c407a8496faf4",
+    "tree": "785edcaf84e4654cbd491f8492062c74e4d1c55b",
+    "working_tree": "clean (0 entries)",
+    "code_content_equivalent_to_deployed_build_source": "ffd1e848b9ed1feea3911f52075ca12743b38937 (verified by recursive diff; only generated caches/run output differ)",
+    "reconciliation": "the prior provisional guarded-paid line and the review-corrected decline-window rule are merged into this commit; docs/ROADMAPlegacy.md keeps the previous plan"
+  },
+  "acceptance_item_1_clean_commit": {
+    "state": "done",
+    "commits": ["2d30fc9", "7a5e264", "5bf7921", "d139c39", "a477104", "c19f4da"],
+    "ignored": ["output/", ".pb-data/", "*.sqlite", "__pycache__/", ".codex/", "test-results/"],
+    "tracked_secret_scan": "no key-shaped plaintext in HEAD"
+  },
+  "acceptance_item_2_cloud_build_image_reference": {
+    "state": "done",
+    "change": "cloudbuild.yaml and cloudbuild-backend.yaml tag ${_IMAGE_TAG}; the commit is passed as the tag and deployments reference immutable digests",
+    "proof_build": {
+      "build_id": "dc246a3b-9f12-400b-b59b-f1c8c8605bbd",
+      "status": "SUCCESS",
+      "duration_s": 114,
+      "image": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:d139c39",
+      "digest": "sha256:498c7489892ccce373be0326f6a1f137406b888c9bc94c120d1baea3607b8f2d"
+    },
+    "frontend_candidate_tag": "not yet built for this commit; the deployed frontend digest b572e4d68a4283acc66d5c8856523e4b475dac36d92d2b4ff2014ea9ef67c7c9 comes from build 1f91dba6 on the code-identical source"
+  },
+  "acceptance_item_3_checks": {
+    "ruff_check": "All checks passed",
+    "ruff_format": "499 files already formatted",
+    "mypy": "Success: no issues found in 499 source files",
+    "make_web_check": "EXIT 0 (lint, strict types, next build --webpack), logged",
+    "qualification_check": "research routing self-test passed, vision self-test passed, provider_called=false",
+    "backend_suite_carried_forward": {
+      "log": "/home/ghostmonday/Workspace/pb-r01/merged-v2-full.log",
+      "collected": 13898, "passed": 13898, "skipped": 0, "xfail": 0, "failures": 0,
+      "basis": "same code content as this commit (recursive diff clean); summary line suppressed by -qq addopts, verified by collect-only count equal to the run character census"
+    },
+    "backend_suite_on_this_commit": "RUNNING (log /home/ghostmonday/tmp/repo-full-suite.log) — to be recorded before the candidate is frozen",
+    "focused_suites_on_this_commit": {
+      "combined_140": "140 passed, exit 0 (t14, first-mail hold, mail gate, effect dispatch, support comms, paid beta report, pricing http, payment stress)",
+      "gates_308": "308 passed, exit 0 (paid cohort cap, runtime/service phase + stop switches, service policy, appeal correction, remail hardening, retention plan/inventory, paid beta report)"
+    },
+    "browser_campaigns": {
+      "paid": "155/155 valid", "paid_ocr": "14/14 valid", "mobile_ocr_375x812": "55/55 valid",
+      "total_checks": 224, "shared_application_fingerprint": "2871be0a8e4318322e5b359d6c3521f2012a46e4ab4d82bc754b69957fd4b42a",
+      "web_source_manifest_sha256": "0e150e42e238103b0c5b3547bba039f41592983c723f2c8dbbd331d4bc4db8b2",
+      "note": "campaigns ran on the code-identical merged source; identical code content to this commit"
+    }
+  },
+  "acceptance_item_4_record": "this file",
+  "deployment": {
+    "revision": "parkingbreaker-frontend-00012-tk6",
+    "service": "parkingbreaker-frontend",
+    "region": "us-west1",
+    "project": "neuraldraft-parkingbreaker",
+    "pinned_digests": {
+      "backend": "sha256:b379bba0406ac6680ce8185b38814fab09e87f737a0b85ff33014f7a88015d6a",
+      "frontend": "sha256:b572e4d68a4283acc66d5c8856523e4b475dac36d92d2b4ff2014ea9ef67c7c9"
+    },
+    "runtime": "provider_mode=fake, service_phase=paid, ticket_reading_preview=1, maxScale=1, ingress internal-and-cloud-load-balancing; consumer secrets resolved from Secret Manager (no plaintext secret env)",
+    "health": "GET https://parkingbreaker.com/api/health -> 200, status ok, build_commit ffd1e848b9ed1feea3911f52075ca12743b38937"
+  },
+  "remaining_before_freeze": [
+    "full backend suite on this commit (in progress)",
+    "short-path socket fixture run",
+    "read-only MiMo Pro review of the frozen diff and receipts",
+    "frontend candidate-tagged build (optional; content already pinned by digest)"
+  ]
+}
