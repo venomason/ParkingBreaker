@@ -602,7 +602,11 @@ def create_app(
                     duplicate=res.duplicate,
                 )
 
-        @api.post("/internal/follow-ups", response_model=s.FollowUpRunReceipt)
+        @api.post(
+            "/internal/follow-ups",
+            response_model=s.FollowUpRunReceipt,
+            include_in_schema=False,
+        )
         async def run_follow_ups(
             _auth: Annotated[None, Depends(worker_auth)],
         ) -> s.FollowUpRunReceipt:
@@ -616,7 +620,11 @@ def create_app(
                 deferred=report.deferred,
             )
 
-        @api.post("/outcomes/opt-out", response_model=s.OutcomeLinkReceipt)
+        @api.post(
+            "/outcomes/opt-out",
+            response_model=s.OutcomeLinkReceipt,
+            include_in_schema=False,
+        )
         async def outcome_opt_out(body: s.OutcomeLinkRequest) -> s.OutcomeLinkReceipt:
             if outcome_links is None:
                 raise HTTPException(503, "outcome_links_not_configured")
@@ -624,7 +632,11 @@ def create_app(
                 raise HTTPException(400, "invalid_link")
             return s.OutcomeLinkReceipt(status="opted_out")
 
-        @api.post("/outcomes/report", response_model=s.OutcomeLinkReceipt)
+        @api.post(
+            "/outcomes/report",
+            response_model=s.OutcomeLinkReceipt,
+            include_in_schema=False,
+        )
         async def outcome_report(body: s.OutcomeReportRequest) -> s.OutcomeLinkReceipt:
             if outcome_links is None:
                 raise HTTPException(503, "outcome_links_not_configured")
