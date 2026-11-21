@@ -22,13 +22,24 @@
     "shell_startup": "clean",
     "deployment_before": "4 plaintext env secrets on the backend container (PB_AUTH_LINK_KEY, PB_WORKER_SECRET, RESEND_API_KEY, LOB_API_KEY)",
     "migration": "moved to Secret Manager entries parkingbreaker-{auth-link-key,worker-secret,resend-api-key,lob-api-key} with secretAccessor granted to the runtime SA",
-    "deployment_after": {"revision": "parkingbreaker-frontend-00012-tk6", "plaintext_secret_env": "NONE", "secret_refs": 4, "health": "200 ok, mode fake"},
-    "mimo_credential": "still live (HTTP 200 at /v1/models); NOT rotated — owner action required to mint a replacement; value never printed"
+    "deployment_after": {
+      "revision": "parkingbreaker-frontend-00012-tk6",
+      "plaintext_secret_env": "NONE",
+      "secret_refs": 4,
+      "health": "200 ok, mode fake"
+    },
+    "mimo_credential": "still live (HTTP 200 at /v1/models); NOT rotated \u2014 owner action required to mint a replacement; value never printed"
   },
   "gate_evidence_run": {
     "command": "pytest tests/test_paid_cohort_cap.py test_runtime_service_phase.py test_service_phase.py test_service_policy.py test_appeal_correction.py test_t30_remail_hardening.py test_retention_plan.py test_retention_inventory.py test_paid_beta_report.py",
     "result": "308 passed in 65.04s, exit 0",
-    "covers": ["paid-cohort cap (R04/R07 input)", "service-phase/stop switches (R04)", "correction + remail hardening (P03)", "retention plan/inventory (R05)", "local cohort report (R08 readiness)"]
+    "covers": [
+      "paid-cohort cap (R04/R07 input)",
+      "service-phase/stop switches (R04)",
+      "correction + remail hardening (P03)",
+      "retention plan/inventory (R05)",
+      "local cohort report (R08 readiness)"
+    ]
   },
   "operational_cleanup": {
     "openclaw": "gateway parked (systemd user unit stopped, 'disabled' state preserved, config untouched); no automations existed",
@@ -39,5 +50,24 @@
     "R02/R03/R06 and P06 joined-provider work remain open; no live provider traffic in this increment",
     "physical iOS/Android journeys (P01/P02/P04/P05) still require owner devices",
     "MiMo key rotation outstanding"
-  ]
+  ],
+  "p03_assisted_restart": {
+    "state": "GAP CONFIRMED \u2014 implementation blocked on an owner data-model decision",
+    "evidence": "backend/tests/test_p03_assisted_restart.py: 1 passed (rejected first mailing stops without charge, hold released, workspace + frozen packet + approval manifest intact) and 1 strict xfail documenting the missing restart path",
+    "observed_refusals": [
+      "POST /workspaces/{id}/intake after a stopped case -> 409 intake_already_submitted_create_new_workspace",
+      "a second workspace for the same owner is also refused -> appeal_already_started (create_owned_workspace replays the single owner workspace)"
+    ],
+    "store_facts": {
+      "pb_intake_records": "one row per workspace_token",
+      "intake_for_workspace": "returns a single record",
+      "workspace_snapshot": "customer_statement/photo_refs/provision_selections are per workspace, so a second transaction would overwrite the shared snapshot",
+      "workspace_py": "restart_prefill() exists and is unit-tested but unwired"
+    },
+    "options": {
+      "A": "allow a second transaction in the same workspace after a terminal stop: relax the one-intake guard for STOPPED_NO_CHARGE/CLOSED_RETURNED, make intake_for_workspace return the latest, reset provision selections via restart_prefill; affects cohort counting and workspace views",
+      "B": "keep one intake per workspace and add an explicit restart that registers a new workspace for the same owner with lineage to the stopped case; needs owner/workspace identity changes and retention coverage"
+    },
+    "needs": "owner choice between A and B before implementation"
+  }
 }
