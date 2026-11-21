@@ -236,6 +236,29 @@ class FollowUpStoreProtocol(Protocol):
         now: datetime,
     ) -> FollowUpEvent: ...
 
+    def set_follow_up_consent(
+        self,
+        email: str,
+        allowed: bool,
+        command_id: str,
+        actor: str,
+        reason: str = ...,
+        *,
+        now: datetime,
+    ) -> FollowUpEvent: ...
+
+    def record_outcome(
+        self,
+        case_token: str,
+        kind: str,
+        detail: str,
+        command_id: str,
+        actor: str,
+        reason: str = ...,
+        *,
+        now: datetime,
+    ) -> FollowUpEvent: ...
+
     def outcome_for(self, case_token: str) -> FollowUpEvent | None: ...
 
     def record_unknown_outcome(

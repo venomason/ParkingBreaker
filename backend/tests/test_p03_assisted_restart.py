@@ -215,6 +215,8 @@ async def test_assisted_restart_carries_the_customer_into_a_fresh_prefilled_work
         restarted = (await client.post("/workspaces", headers=ALICE, json={"notes": ""})).json()
         new_workspace = restarted["workspace_id"]
         assert new_workspace != stopped.workspace_id
+        # Lineage records that this workspace continues the finished one.
+        assert real._store.workspace_parent(new_workspace) == stopped.workspace_id
         before = real._store.get_workspace(stopped.workspace_id)
         after = real._store.get_workspace(new_workspace)
         assert before is not None

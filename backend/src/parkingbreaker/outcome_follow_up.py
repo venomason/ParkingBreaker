@@ -18,6 +18,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Final
 
 from parkingbreaker.customer_access import token_digest
 from parkingbreaker.email_client import EmailClient, EmailMessage, EmailOutcome, EmailReason
@@ -50,6 +51,77 @@ def verify_follow_up_token(key: str, case_token: str, presented: str) -> bool:
     except ValueError:
         return False
     return hmac.compare_digest(expected, presented)
+
+
+class OutcomeLinkService:
+    """The private per-case link: opt out of reminders, or report what the agency decided."""
+
+    DECISIONS: Final = {"dismissed": "dismissed", "upheld": "upheld"}
+
+    def __init__(
+        self,
+        store: FollowUpStoreProtocol,
+        *,
+        key: str,
+        clock: Callable[[], datetime],
+    ) -> None:
+        self._store = store
+        self._key = key
+        self._clock = clock
+
+    def __repr__(self) -> str:
+        return "OutcomeLinkService(<redacted>)"
+
+    def opt_out(self, case_token: str, token: str) -> bool:
+        """Honour an opt-out only when the presented token binds to this exact case."""
+        if not verify_follow_up_token(self._key, case_token, token):
+            return False
+        email = self._email_for(case_token)
+        if email is None:
+            return False
+        self._store.set_follow_up_consent(
+            email,
+            False,
+            f"optout:{case_token}",
+            "customer",
+            "customer opted out through the private link",
+            now=self._clock(),
+        )
+        return True
+
+    def report(self, case_token: str, token: str, decision: str) -> bool:
+        """Record a customer-reported decision; "pending" records nothing at all."""
+        if not verify_follow_up_token(self._key, case_token, token):
+            return False
+        if decision == "pending":
+            return True
+        if decision not in self.DECISIONS:
+            return False
+        email = self._email_for(case_token)
+        if email is None:
+            return False
+        self._store.record_outcome(
+            case_token,
+            "OUTCOME_CUSTOMER",
+            f"customer_reported:{decision}",
+            f"report:{case_token}:{decision}",
+            "customer",
+            "customer reported the agency decision",
+            now=self._clock(),
+        )
+        return True
+
+    def _email_for(self, case_token: str) -> str | None:
+        raw = self._store.intake_json_for_case(case_token)
+        if raw is None:
+            return None
+        try:
+            body = json.loads(raw)
+            contact = body.get("contact") if isinstance(body, dict) else None
+            email = contact.get("email") if isinstance(contact, dict) else None
+        except (TypeError, ValueError):
+            return None
+        return email if isinstance(email, str) and "@" in email else None
 
 
 def _decode_key(key: str) -> bytes:

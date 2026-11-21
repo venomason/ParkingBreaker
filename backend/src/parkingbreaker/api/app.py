@@ -25,6 +25,7 @@ from parkingbreaker.api.customer_auth import AuthHttp, install_auth_routes
 from parkingbreaker.api.fakes import FakeServices
 from parkingbreaker.api.service import CaseServices, ServiceConflict
 from parkingbreaker.appeal.drafting import CUSTOMER_AUTHORED_MODE_VERSION
+from parkingbreaker.outcome_follow_up import OutcomeFollowUpService, OutcomeLinkService
 from parkingbreaker.overseer_feed import OPS_ID_PATTERN
 from parkingbreaker.provider_credentials import valid_header_credential
 from parkingbreaker.support_comms import SupportCommsService, SupportIntakeRequest
@@ -147,6 +148,8 @@ def create_app(
     overseer_feed_secret: str | None = None,
     support_comms: SupportCommsService | None = None,
     support_intake_secret: str | None = None,
+    follow_ups: OutcomeFollowUpService | None = None,
+    outcome_links: OutcomeLinkService | None = None,
 ) -> FastAPI:
     """``role="customer"`` leaves out the /internal worker routes (T31): research, mailing
     and capture sweeps then run only in the separate worker process and cannot hold up
@@ -598,6 +601,39 @@ def create_app(
                     owner_alerted=res.owner_alerted,
                     duplicate=res.duplicate,
                 )
+
+        @api.post("/internal/follow-ups", response_model=s.FollowUpRunReceipt)
+        async def run_follow_ups(
+            _auth: Annotated[None, Depends(worker_auth)],
+        ) -> s.FollowUpRunReceipt:
+            if follow_ups is None:
+                raise HTTPException(503, "follow_ups_not_configured")
+            report = follow_ups.run()
+            return s.FollowUpRunReceipt(
+                sent=report.sent,
+                skipped_no_consent=report.skipped_no_consent,
+                unknown_recorded=report.unknown_recorded,
+                deferred=report.deferred,
+            )
+
+        @api.post("/outcomes/opt-out", response_model=s.OutcomeLinkReceipt)
+        async def outcome_opt_out(body: s.OutcomeLinkRequest) -> s.OutcomeLinkReceipt:
+            if outcome_links is None:
+                raise HTTPException(503, "outcome_links_not_configured")
+            if not outcome_links.opt_out(body.case_id, body.token):
+                raise HTTPException(400, "invalid_link")
+            return s.OutcomeLinkReceipt(status="opted_out")
+
+        @api.post("/outcomes/report", response_model=s.OutcomeLinkReceipt)
+        async def outcome_report(body: s.OutcomeReportRequest) -> s.OutcomeLinkReceipt:
+            if outcome_links is None:
+                raise HTTPException(503, "outcome_links_not_configured")
+            if not outcome_links.report(body.case_id, body.token, body.decision):
+                raise HTTPException(400, "invalid_link")
+            status: Literal["recorded", "pending"] = (
+                "pending" if body.decision == "pending" else "recorded"
+            )
+            return s.OutcomeLinkReceipt(status=status)
 
         @api.post("/internal/dispatch")
         async def dispatch(_auth: Annotated[None, Depends(worker_auth)]) -> dict[str, int]:

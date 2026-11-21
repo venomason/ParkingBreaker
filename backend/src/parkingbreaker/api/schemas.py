@@ -1108,3 +1108,29 @@ class TicketObservabilitySnapshot(Model):
     ocr_observations: list[TicketOcrObservationReadView] = Field(default_factory=list)
     review_sessions: list[TicketReviewSession] = Field(default_factory=list)
     review_observations: list[TicketReviewObservationReceipt] = Field(default_factory=list)
+
+
+class OutcomeLinkRequest(BaseModel):
+    """The private per-case link material carried by a follow-up email."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    case_id: str = Field(min_length=1, max_length=128)
+    token: str = Field(min_length=64, max_length=64)
+
+
+class OutcomeReportRequest(OutcomeLinkRequest):
+    """A customer-reported agency decision; "pending" means no decision yet."""
+
+    decision: Literal["dismissed", "upheld", "pending"]
+
+
+class OutcomeLinkReceipt(BaseModel):
+    status: Literal["opted_out", "recorded", "pending"]
+
+
+class FollowUpRunReceipt(BaseModel):
+    sent: int
+    skipped_no_consent: int
+    unknown_recorded: int
+    deferred: int

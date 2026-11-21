@@ -50,6 +50,14 @@ _SELECT_BY_COMMAND = (
     "SELECT revision, paused, command_id, actor, reason, recorded_at "
     f"FROM {TABLE} WHERE command_id=?"
 )
+LINEAGE_TABLE = "pb_workspace_lineage"
+_LINEAGE_DDL = """CREATE TABLE pb_workspace_lineage (
+    child_workspace TEXT PRIMARY KEY REFERENCES pb_intake_owners(workspace_token),
+    parent_workspace TEXT NOT NULL REFERENCES pb_intake_owners(workspace_token),
+    reason TEXT NOT NULL CHECK (reason = 'restart'),
+    recorded_at TEXT NOT NULL,
+    CHECK (child_workspace <> parent_workspace)
+)"""
 
 
 class IntakePauseConflict(ValueError):
@@ -147,6 +155,7 @@ def initialize_runtime_intake_pause(database: sqlite3.Connection) -> None:
             if table is not None:
                 raise StorageCorruption("unversioned runtime intake pause schema")
             database.execute(_DDL)
+            database.execute(_LINEAGE_DDL)
             database.execute("INSERT INTO pb_store_versions VALUES (?, 1)", (COMPONENT,))
         elif (
             type(version[0]) is not int
@@ -155,6 +164,19 @@ def initialize_runtime_intake_pause(database: sqlite3.Connection) -> None:
             or " ".join(str(table[0]).upper().split()) != " ".join(_DDL.upper().split())
         ):
             raise StorageCorruption("malformed runtime intake pause schema")
+        lineage = database.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (LINEAGE_TABLE,)
+        ).fetchone()
+        if lineage is None or " ".join(str(lineage[0]).upper().split()) != " ".join(
+            _LINEAGE_DDL.upper().split()
+        ):
+            raise StorageCorruption("malformed workspace lineage schema")
+        for action in ("UPDATE", "DELETE"):
+            database.execute(
+                f"CREATE TRIGGER IF NOT EXISTS {LINEAGE_TABLE}_no_{action.lower()} "
+                f"BEFORE {action} ON {LINEAGE_TABLE} "
+                "BEGIN SELECT RAISE(ABORT, 'workspace lineage is append-only'); END"
+            )
         for action in ("UPDATE", "DELETE"):
             database.execute(
                 f"CREATE TRIGGER IF NOT EXISTS {TABLE}_no_{action.lower()} "
@@ -201,6 +223,29 @@ class IntakePauseStoreMixin:
             change.reason,
             change.recorded_at,
         )
+
+    def record_workspace_lineage(
+        self: _Connected, child: str, parent: str, *, now: datetime
+    ) -> None:
+        """Record why a workspace exists: a restart of the parent's finished transaction."""
+        if not child or not parent or child == parent:
+            raise IntakePauseConflict("invalid workspace lineage")
+        database = self._require_open()
+        database.execute(
+            f"INSERT INTO {LINEAGE_TABLE} (child_workspace, parent_workspace, reason, "
+            "recorded_at) VALUES (?, ?, 'restart', ?)",
+            (child, parent, _utc(now).isoformat()),
+        )
+
+    def workspace_parent(self: _Connected, child: str) -> str | None:
+        row = (
+            self._require_open()
+            .execute(
+                f"SELECT parent_workspace FROM {LINEAGE_TABLE} WHERE child_workspace=?", (child,)
+            )
+            .fetchone()
+        )
+        return None if row is None else str(row[0])
 
     def set_intake_pause(
         self: _Connected,

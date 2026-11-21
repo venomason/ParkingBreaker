@@ -18,6 +18,7 @@ from parkingbreaker.lob_fakes import FakeLobClient
 from parkingbreaker.lob_submission import LetterEvidence, LobResponse
 from parkingbreaker.outcome_follow_up import (
     OutcomeFollowUpService,
+    OutcomeLinkService,
     derive_follow_up_token,
     verify_follow_up_token,
 )
@@ -194,5 +195,29 @@ async def test_follow_up_copy_is_clerical_and_carries_a_verifiable_opt_out_link(
         assert verify_follow_up_token(LINK_KEY, token, "0" * 64) is False
         assert derive_follow_up_token(LINK_KEY, token) == match.group(1)
         assert "day 14 and once at day 30" in message.text
+    finally:
+        await client.aclose()
+
+
+async def test_private_link_opts_out_and_reports_decisions(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, real, _case_id, token, clock = await _delivered_case(tmp_path, monkeypatch)
+    try:
+        links = OutcomeLinkService(real._store, key=LINK_KEY, clock=clock)
+        good = derive_follow_up_token(LINK_KEY, token)
+        assert links.opt_out(token, "0" * 64) is False
+        assert links.report(token, "0" * 64, "dismissed") is False
+        assert links.opt_out(token, good) is True
+        assert real._store.follow_up_allowed("alex@example.test") is False
+        # A customer-reported decision is recorded as told, never as an agency fact.
+        assert links.report(token, good, "pending") is True
+        assert real._store.outcome_for(token) is None
+        assert links.report(token, good, "dismissed") is True
+        outcome = real._store.outcome_for(token)
+        assert outcome is not None
+        assert outcome.kind == "OUTCOME_CUSTOMER"
+        assert outcome.detail == "customer_reported:dismissed"
+        assert links.report(token, good, "not-a-decision") is False
     finally:
         await client.aclose()

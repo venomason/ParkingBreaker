@@ -343,6 +343,7 @@ _KNOWN_TABLES: Final[frozenset[str]] = frozenset(
         "pb_mail_attempts",
         "pb_mail_destination_bindings",
         "pb_notices",
+        "pb_workspace_lineage",
         "pb_outcome_follow_up_events",
         "pb_notification_access_links",
         "pb_overseer_key_versions",

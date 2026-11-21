@@ -157,8 +157,7 @@ _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
     {
         "pb_outcome_follow_up_events",
     }
-    | 
-    {
+    | {
         "pb_identity_accounts",
         "pb_identity_links",
         "pb_identity_sessions",
@@ -199,7 +198,7 @@ _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
     }
 )
 _STRUCTURAL_METADATA: Final = frozenset(
-    {"pb_store_versions", "pb_runtime_intake_pause"}
+    {"pb_store_versions", "pb_runtime_intake_pause", "pb_workspace_lineage"}
 )
 _KNOWN_TABLES: Final[dict[str, TableClass]] = {
     **dict.fromkeys(_PROTECTED_CUSTOMER_CONTENT, TableClass.PROTECTED_CUSTOMER_CONTENT),
