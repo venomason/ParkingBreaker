@@ -9,31 +9,155 @@
     "durable_target": "not provisioned"
   },
   "gates": {
-    "R01": {"status": "LOCAL", "evidence": "docs/verification/r01-candidate-2026-11-21.json", "detail": "reconciled candidate committed, cloud build pinned by digest, lint/format/mypy clean, 13,898 tests green on an earlier commit and a rerun in progress on the current production code, 224 browser checks", "blocking": "full suite rerun completes"},
-    "R02": {"status": "BLOCKED", "evidence": "docs/verification/increment-2026-11-21a.json#r02_local_preflight_on_frozen_sha", "detail": "validate, lifecycle deploy/rollback and backup dry-runs pass; 114 t22/readiness tests pass", "blocking": "owner spend approval (~$1 actual, $10 cap) for the qualification target"},
-    "R03": {"status": "BLOCKED", "evidence": "increment receipt backup dry-run", "detail": "encrypted backup dry-run restores with artifacts and records matching (READY_FAKE)", "blocking": "P06 provider objects and the deployed target"},
-    "R04": {"status": "LOCAL", "evidence": "backend/tests/test_r04_intake_pause.py; service-phase and cohort-cap suites", "detail": "all three stop controls exist and are tested locally, including concurrent checkout serialisation protecting the cohort cap", "blocking": "deployed exercise of the switches on the durable target"},
-    "R05": {"status": "LOCAL", "evidence": "increment receipt r05_retention_inventory_review", "detail": "support tables explicitly classified; 33 operational tables fall back to protected-unknown (non-blocking, never purge-eligible); diagnostic bundles N/A (no export feature)", "blocking": "legal/financial retention periods (owner) and a populated-environment bearer-link check"},
-    "R06": {"status": "BLOCKED", "evidence": "this file", "detail": "reconciliation index built", "blocking": "deployed rehearsal requires R02"},
-    "P01": {"status": "LOCAL", "evidence": "164 OCR/review tests; test_pending_reading_cannot_be_bypassed_by_customer_supplied_facts", "detail": "mandatory reading cannot be bypassed, replays do not re-call providers, literal vs adopted provenance distinct", "blocking": "deployed live-OCR trial is P04"},
-    "P02": {"status": "BLOCKED", "evidence": "docs/ROADMAP.md P02 row (corrected to the Foxx A56)", "detail": "budget Android (Foxx A56) is a harsh floor; emulation does not satisfy the gate", "blocking": "physical iPhone and a mid-range Android, or a recorded coverage limitation"},
-    "P03": {"status": "GAP", "evidence": "backend/tests/test_p03_assisted_restart.py (1 passed, 1 strict xfail)", "detail": "stop semantics proven (no charge, hold released, frozen packet untouched); assisted restart absent because one intake per workspace and one workspace per owner are both enforced", "blocking": "owner decision A (same-workspace second transaction) or B (fresh workspace with lineage)"},
-    "P04": {"status": "BLOCKED", "evidence": "none yet", "detail": "four-case deployed live OCR + .gov research trial", "blocking": "live provider scope plus the durable target"},
-    "P05": {"status": "BLOCKED", "evidence": "none yet", "detail": "Resend delivery, prefetch safety, 15-minute link expiry", "blocking": "live email credential and the durable target"},
-    "P06": {"status": "BLOCKED", "evidence": "none yet", "detail": "joined Stripe+Lob case, signed webhook replay, PDF/envelope proof inspection", "blocking": "Stripe test-mode secret key; Lob test key already validated"},
-    "P07": {"status": "BLOCKED", "evidence": "none yet", "detail": "support remedy without delay, responder acknowledgement, support-code routing", "blocking": "deployed target and a named responder"},
-    "P08": {"status": "PASS", "evidence": "increment receipt p08_rules_modal plus earlier P08 notes", "detail": "landing page, Rules modal, Step-4 checkout offer, confirmation/stop emails and price arms agree on clerical scope, no outcome guarantee, and hold/refund terms", "blocking": "nothing"},
-    "J01-J04": {"status": "LOCAL", "evidence": "journey event/capture/context/timeline suites, ai spends caps, isolation and idempotency suites", "detail": "server milestones distinct from browser observations, pause/budget reasons recorded, idempotent state transitions covered", "blocking": "deployed end-to-end walkthrough in R06"},
-    "J05": {"status": "GAP", "evidence": "increment receipt j05_outcome_follow_up", "detail": "no outcome follow-up cadence exists; consent/permission machinery and Resend adapter do exist", "blocking": "owner cadence + consent wording decision"},
-    "M02": {"status": "GAP", "evidence": "increment receipt m02_ledger_state_model", "detail": "ledger distinguishes billed vs unknown only, deliberately never estimating; AI reservations and mail estimates live in their own stores; documented cohort report runs cleanly and fails safe", "blocking": "owner decision A (three-state ledger) or B (align M02 wording)"},
-    "B01": {"status": "OWNER", "evidence": "none", "detail": "merchant/banking/tax/support ownership", "blocking": "owner"},
-    "R07": {"status": "OWNER", "evidence": "R07 draft packet in ~/Workspace/pb-coordination", "detail": "activation packet compiled from receipts once Steps 1-6 close", "blocking": "owner signature and the gates above"}
+    "R01": {
+      "status": "LOCAL",
+      "evidence": "docs/verification/r01-candidate-2026-11-21.json",
+      "detail": "reconciled candidate committed, cloud build pinned by digest, lint/format/mypy clean, 13,898 tests green on an earlier commit and a rerun in progress on the current production code, 224 browser checks",
+      "blocking": "full suite rerun completes"
+    },
+    "R02": {
+      "status": "BLOCKED",
+      "evidence": "docs/verification/increment-2026-11-21a.json#r02_local_preflight_on_frozen_sha",
+      "detail": "validate, lifecycle deploy/rollback and backup dry-runs pass; 114 t22/readiness tests pass",
+      "blocking": "owner spend approval (~$1 actual, $10 cap) for the qualification target"
+    },
+    "R03": {
+      "status": "BLOCKED",
+      "evidence": "increment receipt backup dry-run",
+      "detail": "encrypted backup dry-run restores with artifacts and records matching (READY_FAKE)",
+      "blocking": "P06 provider objects and the deployed target"
+    },
+    "R04": {
+      "status": "LOCAL",
+      "evidence": "backend/tests/test_r04_intake_pause.py; service-phase and cohort-cap suites",
+      "detail": "all three stop controls exist and are tested locally, including concurrent checkout serialisation protecting the cohort cap",
+      "blocking": "deployed exercise of the switches on the durable target"
+    },
+    "R05": {
+      "status": "LOCAL",
+      "evidence": "increment receipt r05_retention_inventory_review",
+      "detail": "support tables explicitly classified; 33 operational tables fall back to protected-unknown (non-blocking, never purge-eligible); diagnostic bundles N/A (no export feature)",
+      "blocking": "legal/financial retention periods (owner) and a populated-environment bearer-link check"
+    },
+    "R06": {
+      "status": "BLOCKED",
+      "evidence": "this file",
+      "detail": "reconciliation index built",
+      "blocking": "deployed rehearsal requires R02"
+    },
+    "P01": {
+      "status": "LOCAL",
+      "evidence": "164 OCR/review tests; test_pending_reading_cannot_be_bypassed_by_customer_supplied_facts",
+      "detail": "mandatory reading cannot be bypassed, replays do not re-call providers, literal vs adopted provenance distinct",
+      "blocking": "deployed live-OCR trial is P04"
+    },
+    "P02": {
+      "status": "BLOCKED",
+      "evidence": "docs/ROADMAP.md P02 row (corrected to the Foxx A56)",
+      "detail": "budget Android (Foxx A56) is a harsh floor; emulation does not satisfy the gate",
+      "blocking": "physical iPhone and a mid-range Android, or a recorded coverage limitation"
+    },
+    "P03": {
+      "status": "GAP",
+      "evidence": "backend/tests/test_p03_assisted_restart.py (1 passed, 1 strict xfail)",
+      "detail": "stop semantics proven (no charge, hold released, frozen packet untouched); assisted restart absent because one intake per workspace and one workspace per owner are both enforced",
+      "blocking": "owner decision A (same-workspace second transaction) or B (fresh workspace with lineage)"
+    },
+    "P04": {
+      "status": "BLOCKED",
+      "evidence": "none yet",
+      "detail": "four-case deployed live OCR + .gov research trial",
+      "blocking": "live provider scope plus the durable target"
+    },
+    "P05": {
+      "status": "LOCAL",
+      "evidence": "API route table review; access-email suites (15-minute TTL, exhaustion, settlement)",
+      "detail": "prefetch safety holds by construction: every state mutation (intake, authorization, answers, adoption, approval, destination address/consent/decline, dispatch) is POST/PUT; GET endpoints are reads, and the only state change a GET can trigger is applying an already-due window expiry, which consumes no consent",
+      "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM) and the 15-minute link expiry against the deployed target; an explicit scanner-replay test is not present and would be added with the live trial",
+      "remaining": [
+        "live Resend delivery + SPF/DKIM",
+        "deployed expiry/regeneration check",
+        "optional explicit prefetch-scanner regression test"
+      ]
+    },
+    "P06": {
+      "status": "BLOCKED",
+      "evidence": "none yet",
+      "detail": "joined Stripe+Lob case, signed webhook replay, PDF/envelope proof inspection",
+      "blocking": "Stripe test-mode secret key; Lob test key already validated"
+    },
+    "P07": {
+      "status": "BLOCKED",
+      "evidence": "none yet",
+      "detail": "support remedy without delay, responder acknowledgement, support-code routing",
+      "blocking": "deployed target and a named responder"
+    },
+    "P08": {
+      "status": "PASS",
+      "evidence": "increment receipt p08_rules_modal plus earlier P08 notes",
+      "detail": "landing page, Rules modal, Step-4 checkout offer, confirmation/stop emails and price arms agree on clerical scope, no outcome guarantee, and hold/refund terms",
+      "blocking": "nothing"
+    },
+    "J01-J04": {
+      "status": "LOCAL",
+      "evidence": "journey event/capture/context/timeline suites, ai spends caps, isolation and idempotency suites",
+      "detail": "server milestones distinct from browser observations, pause/budget reasons recorded, idempotent state transitions covered",
+      "blocking": "deployed end-to-end walkthrough in R06"
+    },
+    "J05": {
+      "status": "GAP",
+      "evidence": "increment receipt j05_outcome_follow_up",
+      "detail": "no outcome follow-up cadence exists; consent/permission machinery and Resend adapter do exist",
+      "blocking": "owner cadence + consent wording decision"
+    },
+    "M02": {
+      "status": "GAP",
+      "evidence": "increment receipt m02_ledger_state_model",
+      "detail": "ledger distinguishes billed vs unknown only, deliberately never estimating; AI reservations and mail estimates live in their own stores; documented cohort report runs cleanly and fails safe",
+      "blocking": "owner decision A (three-state ledger) or B (align M02 wording)"
+    },
+    "B01": {
+      "status": "OWNER",
+      "evidence": "none",
+      "detail": "merchant/banking/tax/support ownership",
+      "blocking": "owner"
+    },
+    "R07": {
+      "status": "OWNER",
+      "evidence": "R07 draft packet in ~/Workspace/pb-coordination",
+      "detail": "activation packet compiled from receipts once Steps 1-6 close",
+      "blocking": "owner signature and the gates above"
+    }
   },
   "summary": {
-    "pass": ["P08"],
-    "local_evidence_complete": ["R01", "R04", "R05", "P01", "J01-J04"],
-    "gap": ["P03", "J05", "M02"],
-    "blocked_external": ["R02", "R03", "R06", "P02", "P04", "P05", "P06", "P07"],
-    "owner_only": ["B01", "R07"]
+    "pass": [
+      "P08"
+    ],
+    "local_evidence_complete": [
+      "R01",
+      "R04",
+      "R05",
+      "P01",
+      "J01-J04"
+    ],
+    "gap": [
+      "P03",
+      "J05",
+      "M02"
+    ],
+    "blocked_external": [
+      "R02",
+      "R03",
+      "R06",
+      "P02",
+      "P04",
+      "P05",
+      "P06",
+      "P07"
+    ],
+    "owner_only": [
+      "B01",
+      "R07"
+    ]
   }
 }
