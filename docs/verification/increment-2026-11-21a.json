@@ -97,5 +97,37 @@
     "observed": "runs cleanly and fails safe: empty DB -> {\"status\": \"unavailable\", \"reason\": \"window_or_transaction_store_invalid\"} with exit 0 (no traceback)",
     "populated_behaviour": "covered by tests/test_paid_beta_report.py (part of the 308-test gate run)",
     "limitation": "no live cohort data exists yet; aggregation correctness is test-established, not measured on real cases"
+  },
+  "r05_retention_inventory_review": {
+    "method": "enumerated literal CREATE TABLE names across src (92), added the 3 dynamically-named address tables (f-string DDL), diffed against the inventory's classification sets (62 names)",
+    "support_tables": {
+      "pb_support_codes": "classified PROTECTED_CUSTOMER_CONTENT",
+      "pb_support_messages": "classified PROTECTED_CUSTOMER_CONTENT",
+      "pb_support_confirmation_emails": "classified PROTECTED_CUSTOMER_CONTENT",
+      "verdict": "the roadmap's 'including support tables' requirement is satisfied explicitly"
+    },
+    "unclassified_tables": {
+      "count": 33,
+      "examples": [
+        "pb_retention_holds",
+        "pb_retention_policies",
+        "pb_setting_changes",
+        "pb_sweep_runs",
+        "pb_incidents",
+        "pb_notices",
+        "pb_ticket_intake_operations",
+        "pb_review_resolutions",
+        "pb_beta_contact_evidence",
+        "pb_trick_sightings"
+      ],
+      "treatment": "classified PROTECTED_UNKNOWN at runtime -> counted in unknown_table_count, emits reason unknown_tables_present, never purge-eligible",
+      "safety": "unknown tables do NOT block inventory_complete (blocked comes only from uninspected DBs, unavailable row counts, or unknown schema objects)",
+      "recommendation": "classify the operational/retention-machinery tables deliberately (STRUCTURAL_METADATA / RESTRICTED_IDENTITY_OPERATIONAL) as a follow-up change with tests; current behaviour is conservative and safe for launch"
+    },
+    "still_owner_or_followup": [
+      "legal/financial retention periods (owner + legal input)",
+      "diagnostic-bundle leak check on a populated environment",
+      "bearer-link revocation coverage exercised against a live store"
+    ]
   }
 }
