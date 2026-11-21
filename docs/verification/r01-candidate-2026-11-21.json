@@ -68,12 +68,37 @@
       "total_checks": 224,
       "shared_application_fingerprint": "2871be0a8e4318322e5b359d6c3521f2012a46e4ab4d82bc754b69957fd4b42a",
       "web_source_manifest_sha256": "0e150e42e238103b0c5b3547bba039f41592983c723f2c8dbbd331d4bc4db8b2",
-      "note": "campaigns ran on the code-identical merged source; identical code content to this commit"
+      "note": "campaigns ran on the code-identical merged source; identical code content to this commit",
+      "rerun": {
+        "state": "RUNNING on the candidate",
+        "out": "/home/ghostmonday/tmp/campaigns-20261121 (paid, paid+ticket-reading-preview, controlled_free_beta 375x812)",
+        "prior_evidence": "224 checks across the three campaigns shared fingerprint 2871be0a8e4318322e5b359d6c3521f2012a46e4ab4d82bc754b69957fd4b42a on the code-identical merged source"
+      }
     },
     "backend_suite_on_commit_7156c89": {
       "result": "13898 passed, 1 warning, exit 0, 19m51s",
       "log": "/home/ghostmonday/tmp/repo-full-suite.log",
       "status_vs_current_candidate": "INVALIDATED by the R04 intake-pause change (commit 6f27d01); rerun required on the current candidate"
+    },
+    "make_web_check_on_candidate": {
+      "result": "EXIT 0 \u2014 npm run lint, npm run type-check (tsc --noEmit), npm run build all passed",
+      "log": "/home/ghostmonday/tmp/web-check.log",
+      "commit": "candidate HEAD (production code identical to 6f27d01; later commits are docs/tests only)"
+    },
+    "qualification_check_on_candidate": {
+      "result": "EXIT 0 \u2014 research routing self-test passed, vision self-test passed",
+      "research": {
+        "routing_self_test_passed": true,
+        "provider_called": false
+      },
+      "vision": {
+        "passed": true,
+        "provider_called": false,
+        "reserved_cents": 800,
+        "manifest_sha256": "e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6",
+        "model": "deepseek-flash"
+      },
+      "log": "/home/ghostmonday/tmp/qualification-check.log"
     }
   },
   "acceptance_item_4_record": "this file",
