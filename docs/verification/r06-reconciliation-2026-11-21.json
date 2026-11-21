@@ -6,7 +6,8 @@
     "receipt_commit": "179d11a",
     "deployed_revision": "parkingbreaker-frontend-00012-tk6",
     "deployed_mode": "fake (not live)",
-    "durable_target": "not provisioned"
+    "durable_target": "not provisioned",
+    "freeze_commit": "b3c31d4 (freeze sequence running: web-check, full suite, three campaigns)"
   },
   "gates": {
     "R01": {
@@ -60,7 +61,7 @@
     "P03": {
       "status": "LOCAL",
       "evidence": "backend/tests/test_p03_assisted_restart.py (2 passed); 254-test regression run",
-      "detail": "stop semantics proven (no charge, hold released, frozen packet and approval untouched, no resubmission). Assisted restart now exists: once the previous case is terminal, POST /workspaces returns a fresh workspace carrying the customer's words, photos and answers with no stale provision selections; a repeated start before submitting replays it; a corrected intake creates a distinct case needing its own tier, authorization, drafting, adoption and exact-packet approval before its own single letter. Capture applies only to the new case; the stopped case stays released.",
+      "detail": "stop semantics proven (no charge, hold released, frozen packet and approval untouched, no resubmission). Assisted restart now exists: once the previous case is terminal, POST /workspaces returns a fresh workspace carrying the customer's words, photos and answers with no stale provision selections; a repeated start before submitting replays it; a corrected intake creates a distinct case needing its own tier, authorization, drafting, adoption and exact-packet approval before its own single letter. Capture applies only to the new case; the stopped case stays released. Lineage now records the restarted workspace's parent (asserted in the P03 test).",
       "blocking": "deployed exercise (needs the durable target)"
     },
     "P04": {
@@ -105,10 +106,10 @@
       "blocking": "deployed end-to-end walkthrough in R06"
     },
     "J05": {
-      "status": "IN PROGRESS (owner-approved scope)",
-      "evidence": "none yet",
-      "detail": "email-only D+14 and D+30 post-mailing; consent/opt-out honored; at most one send per window; agency-reported vs customer-reported outcomes distinct; nonresponse recorded UNKNOWN",
-      "blocking": "implementation, then the single full-suite freeze run"
+      "status": "IMPLEMENTED \u2014 freeze evidence running",
+      "evidence": "backend/tests/test_outcome_follow_up.py (6), test_outcome_follow_up_store.py (8); web lint/type-check clean",
+      "detail": "D+14 and D+30 emails after delivery, one send per window, opt-out honoured and opt-in resumes, rejected/uncertain deferred, UNKNOWN after the final window plus grace, agency and customer outcomes distinct. Private per-case link: opt-out and customer-reported decision endpoints plus the customer page. Scheduler loop calls the sweep beside mailing and a follow-up fault never blocks mailing.",
+      "blocking": "the freeze sequence results (web-check, full suite, three campaigns) and the MiMo review"
     },
     "M02": {
       "status": "PASS (owner decision)",
