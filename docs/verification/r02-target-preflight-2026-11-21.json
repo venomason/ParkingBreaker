@@ -1,0 +1,74 @@
+{
+  "observed_utc": "2026-11-21T11:25:00Z",
+  "gate": "R02 (BETA) \u2014 durable target preflight and isolated target verification",
+  "candidate": {
+    "commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+    "backend_image_by_digest": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:6f81c4c333983969ef99f357b3d22425fc8bd7f99c6ad7cf3dde117afcaad434"
+  },
+  "approval": "owner approved one isolated window <=24h with a 0 ceiling, teardown commands and post-shutdown residual checks at close",
+  "target": {
+    "vm": "pb-qual-backend-01 (e2-medium, us-west1-a, no public address, cloud-platform scope)",
+    "disk": "pb-qual-data-01 (regional pd-standard 200GB, replica zones us-west1-a + us-west1-b, device pb-data)",
+    "egress": "Cloud NAT pb-qual-nat on router pb-qual-router (the VM has no public address, so apt/registry needed NAT)",
+    "deleted": "VM, regional disk, router and NAT all deleted at drill close"
+  },
+  "proofs": {
+    "immutable_digest_deploy": {
+      "result": "PASS",
+      "evidence": "docker pull by digest succeeded and RepoDigests matched the pinned sha256:6f81c4c3...; health responded from the running container"
+    },
+    "single_attached_ext4_writer": {
+      "result": "PASS",
+      "evidence": "findmnt showed /dev/sdb ext4 on /srv/parkingbreaker/data; disk users listed exactly the drill VM"
+    },
+    "old_owner_fencing": {
+      "result": "PASS",
+      "evidence": "production deployment_policy.regional_owner evaluated against the live disk JSON: single owner True; other VM refused; two writers refused; wrong device refused; non-replicated disk refused",
+      "note": "the application itself does not lock the SQLite file across containers (a second container started); fencing is enforced by the deployment policy and lifecycle, exactly as the compose warning states -- operational guardrails are mandatory, not optional"
+    },
+    "data_survival_full_stop_restart": {
+      "result": "PASS",
+      "evidence": "an append-only boot log on the regional disk accumulated across a full instance stop/start (boots=2 with both timestamps) and health returned 200 from the same data directory after restart"
+    },
+    "private_tls_8443": {
+      "result": "PASS",
+      "evidence": "Caddy served the private host on 8443 with the provisioned certificate (subject CN=qual-private.internal) and /health answered 200 over TLS"
+    },
+    "public_refusal_of_internal_routes": {
+      "result": "PASS",
+      "evidence": "GET /internal/dispatch through the private TLS gateway returned 404; /webhooks/stripe was proxied (400 from the app), proving customer routes remain reachable while worker routes are refused"
+    },
+    "fresh_monitor_poll_and_sweep": {
+      "result": "NOT EXERCISED",
+      "reason": "the drill ran the API image only; the monitor/worker/scheduler containers and the lifecycle lock/health sweep were out of this window's scope"
+    }
+  },
+  "not_covered": [
+    "full lifecycle.sh --apply run (lock, image prepare, migration gates) on the target",
+    "worker + scheduler + monitor containers and a recorded monitor poll/sweep",
+    "Cloud Run frontend routed to the private VM over the approved topology",
+    "P06 joined Stripe+Lob qualification (still needs the Stripe test key)"
+  ],
+  "cost_estimate_usd": {
+    "vm_e2_medium": 0.04,
+    "boot_disk_20GB_pd_balanced": 0.003,
+    "regional_disk_200GB_pd_standard": 0.013,
+    "cloud_nat_hours": 0.05,
+    "total_estimate": 0.11,
+    "ceiling": 10.0
+  },
+  "residual_checks_after_teardown": {
+    "instances": "none",
+    "disks": "pb-qual-backup-01 (50GB, pre-existing R03 backup target, ~$2/mo) \u2014 deliberately kept",
+    "snapshots": "none",
+    "routers_or_nats": "none",
+    "firewall_rules": "none new",
+    "addresses": "only the production LB addresses (parkingbreaker-ip, parkingbreaker-ipv6)"
+  },
+  "evidence_paths": {
+    "serial_console_logs": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/serial-*.log",
+    "bootstrap_and_verify_scripts": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/startup.sh, /home/ghostmonday/tmp/r02-drill-20261121T102720Z/verify.sh, /home/ghostmonday/tmp/r02-drill-20261121T102720Z/verify-final.sh",
+    "disk_and_vm_json": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/disk.json, /home/ghostmonday/tmp/r02-drill-20261121T102720Z/vm.json",
+    "residual_checks": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/residual-checks.txt"
+  }
+}
