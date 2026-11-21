@@ -1,74 +1,97 @@
 {
-  "observed_utc": "2026-11-21T11:25:00Z",
+  "observed_utc": "2026-11-21T16:32:00Z",
   "gate": "R02 (BETA) \u2014 durable target preflight and isolated target verification",
   "candidate": {
     "commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
-    "backend_image_by_digest": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:6f81c4c333983969ef99f357b3d22425fc8bd7f99c6ad7cf3dde117afcaad434"
+    "backend_image_by_digest": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5",
+    "caddy_image_by_digest": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+    "scheduler_image_by_digest": "curlimages/curl:8.16.0@sha256:463eaf6072688fe96ac64fa623fe73e1dbe25d8ad6c34404a669ad3ce1f104b6"
   },
-  "approval": "owner approved one isolated window <=24h with a 0 ceiling, teardown commands and post-shutdown residual checks at close",
+  "revision_mismatch_diagnosis_and_resolution": {
+    "expected_commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+    "first_image_digest": "sha256:6f81c4c333983969ef99f357b3d22425fc8bd7f99c6ad7cf3dde117afcaad434",
+    "first_build_id": "cf1a9b09-3a9b-4001-9bd3-b31d6f9a3aaa",
+    "first_image_config_digest": "sha256:82d54c6c3dc8009f16b98f7fbff4b0c71a5e442db4bd3976430c3578ef552e84",
+    "first_image_observed_revision_label": "",
+    "cause": "build metadata defect: cloudbuild-backend.yaml defaulted _PB_BUILD_COMMIT to '' without validation; build cf1a9b09 ran with _PB_BUILD_COMMIT='' and baked org.opencontainers.image.revision='' into sha256:6f81c4c3..., which deploy/lifecycle.sh:108 rejected with 'backend image revision mismatch'",
+    "rebuilt_image_digest": "sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5",
+    "rebuilt_build_id": "35782f20-3c96-4c74-b537-8d92be561ea6",
+    "rebuilt_image_config_digest": "sha256:fcf37d023857fadb39ad45e1686818a1d576e94a5c263acfba9635b6427eaf7d",
+    "rebuilt_image_observed_revision_label": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+    "subsequent_exit_5_cause_and_fix": "in fake-provider drill mode, compose.private-vm.yaml sets PB_API_ROLE=customer/worker which api/app.py:735 refuses unless PB_FAKE_SPLIT_FOR_MEASUREMENT=1 is set, and Caddy Running as UID 10001 requires UID 10001 read permission on /srv/parkingbreaker/tls/privkey.pem plus a reachability path for https://$PB_DOMAIN/api/health",
+    "repo_guard_added": "cloudbuild-backend.yaml on branch launch-fixes (24a207d) now validates _PB_BUILD_COMMIT matches ^[0-9a-f]{40}$ before docker build; deploy/lifecycle.sh provenance check preserved intact"
+  },
+  "approval": "owner approved one isolated window <=24h with a $10 ceiling, teardown commands and post-shutdown residual checks at close",
   "target": {
-    "vm": "pb-qual-backend-01 (e2-medium, us-west1-a, no public address, cloud-platform scope)",
-    "disk": "pb-qual-data-01 (regional pd-standard 200GB, replica zones us-west1-a + us-west1-b, device pb-data)",
-    "egress": "Cloud NAT pb-qual-nat on router pb-qual-router (the VM has no public address, so apt/registry needed NAT)",
-    "deleted": "VM, regional disk, router and NAT all deleted at drill close"
+    "vm": "pb-qual-backend-01 (e2-medium, us-west1-a, 10.138.0.3, no public IP)",
+    "disk": "pb-qual-data-01 (regional pd-standard 200GB, replica zones us-west1-a + us-west1-b, device google-pb-qual-data-01)",
+    "egress": "Cloud NAT pb-qual-nat on router pb-qual-router",
+    "deleted": "VM, regional disk, NAT and router all deleted at 2026-11-21T16:31:49Z; post-shutdown residual checks verified"
   },
   "proofs": {
+    "full_lifecycle_deploy_apply": {
+      "result": "PASS (exit 0, PROCESSING_BLOCKED cleared)",
+      "evidence": "unmodified deploy/lifecycle.sh deploy --apply validated root-owned 0600 env, regional single-owner disk, ext4 mount, private-images.json lock, pulled all 5 pinned images, verified org.opencontainers.image.revision=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75, migrated SQLite, started api/worker/caddy/monitor, passed local + TLS health, started scheduler, and passed parkingbreaker.release_readiness",
+      "drill_standin_note": "https://qual.invalid/api/health was served by a local TLS stand-in on 127.0.0.1:443 forwarding to https://qual-private.internal:8443/health with PB_FAKE_SPLIT_FOR_MEASUREMENT=1; real Cloud Run frontend -> private VM VPC routing remains a separate pre-cutover step"
+    },
     "immutable_digest_deploy": {
       "result": "PASS",
-      "evidence": "docker pull by digest succeeded and RepoDigests matched the pinned sha256:6f81c4c3...; health responded from the running container"
+      "evidence": "all 5 services pulled by sha256 digest and docker image inspect confirmed org.opencontainers.image.revision=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75"
     },
     "single_attached_ext4_writer": {
       "result": "PASS",
-      "evidence": "findmnt showed /dev/sdb ext4 on /srv/parkingbreaker/data; disk users listed exactly the drill VM"
+      "evidence": "findmnt confirmed /dev/sdb ext4 mounted at /srv/parkingbreaker; regional disk users listed only pb-qual-backend-01"
     },
     "old_owner_fencing": {
       "result": "PASS",
-      "evidence": "production deployment_policy.regional_owner evaluated against the live disk JSON: single owner True; other VM refused; two writers refused; wrong device refused; non-replicated disk refused",
-      "note": "the application itself does not lock the SQLite file across containers (a second container started); fencing is enforced by the deployment policy and lifecycle, exactly as the compose warning states -- operational guardrails are mandatory, not optional"
+      "evidence": "deployment_policy.regional_owner passed on live disk.json and refused other-VM, two-writer, wrong-device, and non-regional states"
     },
     "data_survival_full_stop_restart": {
       "result": "PASS",
-      "evidence": "an append-only boot log on the regional disk accumulated across a full instance stop/start (boots=2 with both timestamps) and health returned 200 from the same data directory after restart"
+      "evidence": "/srv/parkingbreaker/data/r02-boots.log persisted across VM resets/stops (boots=2) on the regional disk"
     },
     "private_tls_8443": {
       "result": "PASS",
-      "evidence": "Caddy served the private host on 8443 with the provisioned certificate (subject CN=qual-private.internal) and /health answered 200 over TLS"
+      "evidence": "https://qual-private.internal:8443/health returned 200 with status=ok, mode=fake, customer_authored_mode=true, build_commit=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75"
     },
     "public_refusal_of_internal_routes": {
       "result": "PASS",
-      "evidence": "GET /internal/dispatch through the private TLS gateway returned 404; /webhooks/stripe was proxied (400 from the app), proving customer routes remain reachable while worker routes are refused"
+      "evidence": "through Caddy :8443, POST /internal/dispatch -> 404, GET /dev-worker/test -> 404, while POST /webhooks/stripe -> 400 and POST /webhooks/lob -> 400"
     },
     "fresh_monitor_poll_and_sweep": {
-      "result": "NOT EXERCISED",
-      "reason": "the drill ran the API image only; the monitor/worker/scheduler containers and the lifecycle lock/health sweep were out of this window's scope"
+      "result": "PASS",
+      "evidence": "pb_sweep_runs recorded [(1, 'ok', 0, 0, '2026-11-21T16:28:45.412972+00:00')]; /monitor/health-poll.json recorded {\"version\":1,\"observer\":\"parkingbreaker.health_cli.monitor\",\"pid\":1,\"process_birth\":\"5822\",\"database_identity\":[2064,2621443],\"started_at\":\"2026-11-21T16:28:31.334751+00:00\",\"completed_at\":\"2026-11-21T16:28:31.356613+00:00\"}; release_readiness exited 0"
+    },
+    "r04_deployed_intake_kill_switches": {
+      "result": "PASS (Caddy gateway 503 switch + durable SQLite pb_runtime_intake_pause toggle)",
+      "evidence": "POST /workspaces returned 201 when open; with PB_NEW_INTAKE=paused on Caddy, POST /workspaces returned 503 while GET /health returned 200 and POST /webhooks/stripe returned 400; reopening PB_NEW_INTAKE=open restored POST /workspaces -> 201; SQLite set_intake_pause toggled revision 1 (paused=True) and revision 2 (paused=False)"
+    },
+    "r03_live_disk_backup_restore_and_quarantine_gate": {
+      "result": "PASS (local/fake-mode regional disk backup, restore, and lifecycle exit-4 quarantine refusal)",
+      "evidence": "recovery_cli backup on live /data captured SQLite + photo blob; recovery_cli restore verified artifacts_match=true and records_match=true in 0.042s with RESTORE_QUARANTINE.json present; deploy/lifecycle.sh deploy --apply with RESTORE_QUARANTINE.json present exited 4 before stopping any container (containers_still_up=5)"
     }
   },
   "not_covered": [
-    "full lifecycle.sh --apply run (lock, image prepare, migration gates) on the target",
-    "worker + scheduler + monitor containers and a recorded monitor poll/sweep",
-    "Cloud Run frontend routed to the private VM over the approved topology",
-    "P06 joined Stripe+Lob qualification (still needs the Stripe test key)"
+    "Cloud Run frontend service pointed at the private VM over VPC Direct Egress (drill used local 127.0.0.1:443 -> qual-private.internal:8443 stand-in)",
+    "P06 joined Stripe+Lob qualification and R03 external provider reconciliation against real Stripe/Lob objects (still needs Stripe test key or owner-scoped live rehearsal)"
   ],
   "cost_estimate_usd": {
-    "vm_e2_medium": 0.04,
-    "boot_disk_20GB_pd_balanced": 0.003,
-    "regional_disk_200GB_pd_standard": 0.013,
-    "cloud_nat_hours": 0.05,
-    "total_estimate": 0.11,
+    "drill_1_and_2_combined_estimate": 0.25,
     "ceiling": 10.0
   },
   "residual_checks_after_teardown": {
-    "instances": "none",
-    "disks": "pb-qual-backup-01 (50GB, pre-existing R03 backup target, ~$2/mo) \u2014 deliberately kept",
-    "snapshots": "none",
-    "routers_or_nats": "none",
-    "firewall_rules": "none new",
-    "addresses": "only the production LB addresses (parkingbreaker-ip, parkingbreaker-ipv6)"
+    "verified_utc": "2026-11-21T16:31:49Z",
+    "instances": "none (0 items)",
+    "disks": "pb-qual-backup-01 only (50GB us-west1-b, pre-existing R03 backup artifact, ~$2/mo, deliberately kept)",
+    "snapshots": "none (0 items)",
+    "routers_or_nats": "none (0 items)",
+    "firewall_rules": "none matching pb-qual (0 items)",
+    "addresses": "only production LB addresses (parkingbreaker-ip, parkingbreaker-ipv6)"
   },
   "evidence_paths": {
-    "serial_console_logs": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/serial-*.log",
-    "bootstrap_and_verify_scripts": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/startup.sh, /home/ghostmonday/tmp/r02-drill-20261121T102720Z/verify.sh, /home/ghostmonday/tmp/r02-drill-20261121T102720Z/verify-final.sh",
-    "disk_and_vm_json": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/disk.json, /home/ghostmonday/tmp/r02-drill-20261121T102720Z/vm.json",
-    "residual_checks": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/residual-checks.txt"
+    "drill1_logs": "/home/ghostmonday/tmp/r02-drill-20261121T102720Z/",
+    "drill2_verify_script": "/home/ghostmonday/tmp/r02-drill2-20261121T112652Z/r02-verify.sh",
+    "drill2_serial_log": "/home/ghostmonday/tmp/r02-drill2-20261121T112652Z/serial13-verify.log",
+    "residual_checks": "/home/ghostmonday/tmp/r02-drill2-20261121T112652Z/residual-checks.txt"
   }
 }

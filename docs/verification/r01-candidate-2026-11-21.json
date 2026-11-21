@@ -43,9 +43,17 @@
     "frontend_candidate_tag": "not yet built for this commit; the deployed frontend digest b572e4d68a4283acc66d5c8856523e4b475dac36d92d2b4ff2014ea9ef67c7c9 comes from build 1f91dba6 on the code-identical source",
     "freeze_candidate_images": {
       "tag": "e4ccce2",
-      "backend": {
+      "backend_initial_missing_revision_label": {
         "digest": "sha256:6f81c4c333983969ef99f357b3d22425fc8bd7f99c6ad7cf3dde117afcaad434",
         "build": "cf1a9b09-3a9b-4001-9bd3-b31d6f9a3aaa",
+        "status": "SUPERSEDED \u2014 built with empty _PB_BUILD_COMMIT='' so org.opencontainers.image.revision was '' and deploy/lifecycle.sh rejected it with 'backend image revision mismatch'"
+      },
+      "backend": {
+        "tag": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+        "digest": "sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5",
+        "config_digest": "sha256:fcf37d023857fadb39ad45e1686818a1d576e94a5c263acfba9635b6427eaf7d",
+        "oci_revision_label": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+        "build": "35782f20-3c96-4c74-b537-8d92be561ea6",
         "status": "SUCCESS"
       },
       "frontend": {
@@ -53,6 +61,18 @@
         "build": "b14d91fc-e744-4880-85d7-d7dd93e53296",
         "status": "SUCCESS"
       }
+    },
+    "post_freeze_launch_fixes_worktree": {
+      "worktree": "/home/ghostmonday/Workspace/pb-launch-fixes",
+      "branch": "launch-fixes",
+      "code_commit": "24a207dd9df99919ea0fd5b4e6cc201cc609de03",
+      "fixes": [
+        "cloudbuild-backend.yaml pre-build guard requiring 40-char lowercase hex _PB_BUILD_COMMIT",
+        "J05 outcome_follow_up_store.delivered_cases excludes cases with existing outcomes and deduplicates by case_token to prevent pagination starvation after 50 delivered cases; OutcomeFollowUpService.run skips cases with recorded outcomes so early customer/agency reports never receive D+14/D+30 reminders",
+        "J05 production wiring: moved /outcomes/opt-out and /outcomes/report out of worker-only block onto customer/all roles, wired OutcomeFollowUpService and OutcomeLinkService in app_from_environment(), added /outcomes(/.*) to deploy/Caddyfile.private and web/next.config.ts rewrites, and passed http://worker:8000/internal/follow-ups to scheduler-loop.sh in compose.production.yaml and compose.private-vm.yaml",
+        "P03 assisted restart: rowid tie-breaker on equal created_at timestamps and atomic parent_workspace lineage + concurrent-restart replay inside create_owned_workspace BEGIN IMMEDIATE transaction"
+      ],
+      "verification": "ruff check clean, ruff format clean (506 files), mypy clean (506 files), make web-check EXIT 0, qualification-check EXIT 0, 1,600+ focused regression tests across 64 test files EXIT 0"
     }
   },
   "acceptance_item_3_checks": {
