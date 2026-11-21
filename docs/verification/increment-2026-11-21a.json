@@ -171,14 +171,18 @@
       "evidence": "beta store suites (part of the 308-test run)"
     },
     "stop_all_new_intake": {
-      "state": "MISSING \u2014 not implemented",
-      "evidence": "intake creation (CaseService.submit / accept_beta) performs no phase or pause check; repo-wide search finds no all-intake switch",
-      "blocker": "the durable phase table pb_runtime_service_phase has CHECK (phase IN ('paid','controlled_free_beta')), so extending the enum needs a SQLite table rebuild migration; a separate durable intake-pause table is the alternative",
-      "options": {
-        "A": "rebuild pb_runtime_service_phase with the third value (migration + schema version bump)",
-        "B": "add a dedicated durable intake-pause record (new table + retention classification), leaving the paid phase untouched"
-      },
-      "recommendation": "B \u2014 the kill-switch is an independent concern, avoids rebuilding a money-path table, and needs no change to existing phase semantics"
+      "state": "IMPLEMENTED (option B) and tested",
+      "change": [
+        "new append-only store intake_pause_store.py (pb_runtime_intake_pause, component runtime_intake_pause v1): exact expected revision, command-id replay, append-only triggers, StorageCorruption on malformed state",
+        "CaseService.submit refuses a NEW intake with intake_paused; an identical replay stays allowed",
+        "CaseService.accept_beta refuses new free-beta acceptance while paused",
+        "classified STRUCTURAL_METADATA in retention_inventory and registered in retention_plan"
+      ],
+      "evidence": {
+        "tests": "tests/test_r04_intake_pause.py: 3 passed (refuse/resume, replay allowed while paused, accepted case reaches IN_TRANSIT while paused, durable + stale-revision refused)",
+        "regression": "318 passed in 76.26s (intake atomicity, service phase/runtime/policy, cohort cap, beta admission, retention plan/inventory, case service)",
+        "lint_types": "ruff clean, format clean, mypy Success in 502 files"
+      }
     }
   }
 }
