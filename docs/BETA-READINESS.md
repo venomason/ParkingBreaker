@@ -1,8 +1,9 @@
 # Controlled-beta readiness
 
-Updated November 20, 2026 (Pacific). **NO-GO for live paid beta.**
+Updated November 21, 2026 (Pacific). **NO-GO for live paid beta.**
+Paid activation requires the R07 owner packet; the roadmap gates own it.
 
-**Preview deployed:** [parkingbreaker.com](https://parkingbreaker.com) serves application commit `0bf011b7c243bed1b864bdb1739438469fdacb58` on `parkingbreaker-frontend-preview-0bf011b`. Both container digests, 100% traffic, page/assets and ticket-upload/synthetic-OCR checks are recorded in [the deployment receipt](verification/deployment-preview-2026-11-17.json). It uses fake providers, the paid product flow and temporary preview storage; no real payments or mailing were activated.
+**Preview deployed:** [parkingbreaker.com](https://parkingbreaker.com) serves application source `ffd1e848b9ed1feea3911f52075ca12743b38937` (code-identical to `main@d139c39`, verified by recursive diff) on revision `parkingbreaker-frontend-00012-tk6`, 100% traffic. Both container images are pinned by immutable digest (backend `b379bba0…`, frontend `b572e4d6…`). It uses fake providers, the paid product flow and temporary in-memory storage; no real payments or mailing are activated. Backend provider/consumer secrets now resolve from Secret Manager, so no plaintext consumer secret remains in the deployed environment. Evidence: the host-local deployment receipt (`~/Workspace/pb-r01/deploy-20261121T070749Z/receipt.json`) and [increment receipt](verification/increment-2026-11-21a.json).
 
 The [appeal-rules verification](verification/filing-rules-2026-11-18.json) covers the stage-specific rules view, removal of ordinance lookup, historical record compatibility and packet checks for mandatory instructions.
 
@@ -11,6 +12,17 @@ The [temporary family preview receipt](verification/family-preview-2026-11-18.js
 The [execution roadmap](ROADMAP.md) owns remaining tasks and acceptance criteria. This page owns the evidence summary and release decision. The [controlled-beta operating packet](operations/controlled-beta.md) owns the activation/recovery procedure. No source export, test run, GitHub publication or roadmap is itself deployment authority.
 
 ## Current source status
+
+**November 21 candidate (`main@d139c39`):** the provisional guarded-paid line is merged, and the
+decline-window rule is review-corrected — every in-scope decline timestamp must parse as
+timezone-aware, malformed values raise `StorageCorruption`, and a valid recent decline cannot mask a
+corrupt row (regression test included). Local candidate evidence: ruff clean, format clean (499
+files), mypy clean (499 files), **13,898 backend tests passed with 0 skipped and 0 failures**, and
+**three browser campaigns passed (paid 155/155, paid-OCR 14/14, mobile-OCR 55/55, 224 checks)** on a
+shared application fingerprint `2871be0a…`. The 2026-11-21 [increment receipt](verification/increment-2026-11-21a.json)
+records the Cloud Build image-reference fix (candidate-scoped tags, atomic `:staging` tag retired),
+the Secret Manager migration of the deployed environment, and 308 passing R04/P03/R05/R08-readiness
+tests. R01's remaining acceptance item is CI/test/promotion configuration, not the candidate itself.
 
 The November 17 publication candidate extends commit a717d5ab08dbed349406e0171bc29eddec3419c8 with journey-ledger, OCR/manual-review observability, T01 reconstruction, mandatory OCR and documentation work. Its exact source manifest and checks are in [the publication receipt](verification/publication-2026-11-17.json). The ledger, OCR/manual-review slice, T01 read-only reconstruction and required OCR-attempt gate are implemented and locally tested; see [Telemetry Foundation](TELEMETRY-FOUNDATION.md) for scope, atomicity, replay guarantees and limitations. No persistent analyzer, exporter or autonomous repair is live. Owner direction is paid beta: the example uses fake providers with the paid flow. Launch requires both BETA and PAID admission gates; no free entitlement batch is planned.
 

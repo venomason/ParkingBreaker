@@ -3,11 +3,14 @@ steps:
     args: [
       'build',
       '--build-arg', 'PB_BUILD_COMMIT=${_PB_BUILD_COMMIT}',
-      '-t', 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:staging',
+      '-t', 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:${_IMAGE_TAG}',
       '-f', 'backend/Dockerfile',
       '.'
     ]
 images:
-  - 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:staging'
+  - 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend:${_IMAGE_TAG}'
 substitutions:
   _PB_BUILD_COMMIT: ''
+  # Candidate-scoped tag. Pass the commit: --substitutions=_IMAGE_TAG=$COMMIT
+  # Deployments must reference the immutable digest, never this tag.
+  _IMAGE_TAG: 'staging'
