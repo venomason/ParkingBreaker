@@ -159,5 +159,26 @@
       "retention classification for the new follow-up rows"
     ],
     "risk_if_built_unilaterally": "customer-visible messaging with compliance implications; must not ship without the consent language and cadence approved"
+  },
+  "r04_stop_controls": {
+    "stop_new_paid": {
+      "implementation": "ServicePhase.PAID vs CONTROLLED_FREE_BETA; a new paid authorization is refused with paid_orders_paused",
+      "evidence": "tests/test_service_phase.py, test_runtime_service_phase.py, test_service_policy.py, test_paid_cohort_cap.py (all part of the 308-test run)",
+      "cohort_cap_concurrency": "test_last_place_serializes_two_connections_then_survives_restart proves two connections cannot both take the last cap place"
+    },
+    "stop_free_beta": {
+      "implementation": "beta campaign/batch closure refuses acceptance with beta_campaign_window_closed",
+      "evidence": "beta store suites (part of the 308-test run)"
+    },
+    "stop_all_new_intake": {
+      "state": "MISSING \u2014 not implemented",
+      "evidence": "intake creation (CaseService.submit / accept_beta) performs no phase or pause check; repo-wide search finds no all-intake switch",
+      "blocker": "the durable phase table pb_runtime_service_phase has CHECK (phase IN ('paid','controlled_free_beta')), so extending the enum needs a SQLite table rebuild migration; a separate durable intake-pause table is the alternative",
+      "options": {
+        "A": "rebuild pb_runtime_service_phase with the third value (migration + schema version bump)",
+        "B": "add a dedicated durable intake-pause record (new table + retention classification), leaving the paid phase untouched"
+      },
+      "recommendation": "B \u2014 the kill-switch is an independent concern, avoids rebuilding a money-path table, and needs no change to existing phase semantics"
+    }
   }
 }
