@@ -310,16 +310,19 @@ class OutcomeFollowUpStoreMixin:
 
     # Discovery -------------------------------------------------------------------------
     def delivered_cases(self: _Connected, limit: int = 100) -> list[tuple[str, datetime]]:
-        """Delivered cases with the recorded delivery time, oldest delivery first."""
+        """Delivered cases without a recorded outcome, oldest delivery first."""
         if type(limit) is not int or limit < 1:
             raise FollowUpConflict("invalid limit")
         rows = (
             self._require_open()
             .execute(
-                "SELECT c.case_token, h.occurred_at FROM pb_cases c "
+                "SELECT c.case_token, MIN(h.occurred_at) AS delivered_at FROM pb_cases c "
                 "JOIN pb_case_history h ON h.case_token = c.case_token "
                 "WHERE c.letter_state = 'DELIVERED' AND h.event_name = 'DeliveryProofStored' "
-                "ORDER BY h.occurred_at ASC, c.case_token ASC LIMIT ?",
+                f"AND NOT EXISTS (SELECT 1 FROM {TABLE} e WHERE e.case_token = c.case_token "
+                "AND e.kind IN ('OUTCOME_AGENCY', 'OUTCOME_CUSTOMER', 'OUTCOME_UNKNOWN')) "
+                "GROUP BY c.case_token "
+                "ORDER BY delivered_at ASC, c.case_token ASC LIMIT ?",
                 (limit,),
             )
             .fetchall()

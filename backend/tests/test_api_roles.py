@@ -62,3 +62,53 @@ def test_fake_providers_refuse_the_split(
         app_from_environment()
     monkeypatch.setenv("PB_API_ROLE", "all")
     assert app_from_environment() is not None
+
+
+async def test_outcome_routes_split_by_role_and_wire_from_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import base64
+
+    from parkingbreaker.api.app import app_from_environment
+
+    key = base64.urlsafe_b64encode(b"k" * 32).rstrip(b"=").decode()
+    base_env = {
+        "PB_PROVIDER_MODE": "fake",
+        "PB_WORKER_SECRET": SECRET,
+        "PB_DATA_DIR": str(tmp_path),
+        "PB_AUTH_MODE": "email",
+        "PB_AUTH_LINK_KEY": key,
+        "PB_PUBLIC_ORIGIN": "https://parkingbreaker.com",
+        "RESEND_FROM_EMAIL": "appeals@parkingbreaker.com",
+        "PB_FAKE_SPLIT_FOR_MEASUREMENT": "1",
+    }
+    for name, value in base_env.items():
+        monkeypatch.setenv(name, value)
+
+    monkeypatch.setenv("PB_API_ROLE", "customer")
+    customer_app = app_from_environment()
+    async with AsyncClient(
+        transport=ASGITransport(app=customer_app), base_url="http://role.test"
+    ) as c:
+        # Customer role serves private outcome links (wired, never 503) and refuses worker sweep.
+        opt_out = await c.post("/outcomes/opt-out", json={"case_id": "missing", "token": "0" * 64})
+        report = await c.post(
+            "/outcomes/report",
+            json={"case_id": "missing", "token": "0" * 64, "decision": "dismissed"},
+        )
+        sweep = await c.post("/internal/follow-ups", headers=WORKER)
+    assert (opt_out.status_code, report.status_code, sweep.status_code) == (400, 400, 404)
+
+    monkeypatch.setenv("PB_API_ROLE", "worker")
+    worker_app = app_from_environment()
+    async with AsyncClient(
+        transport=ASGITransport(app=worker_app), base_url="http://role.test"
+    ) as c:
+        # Worker role serves authenticated follow-up sweep (wired, no 503) and omits public links.
+        sweep = await c.post("/internal/follow-ups", headers=WORKER)
+        opt_out = await c.post("/outcomes/opt-out", json={"case_id": "missing", "token": "0" * 64})
+        report = await c.post(
+            "/outcomes/report",
+            json={"case_id": "missing", "token": "0" * 64, "decision": "dismissed"},
+        )
+    assert (sweep.status_code, opt_out.status_code, report.status_code) == (200, 404, 404)

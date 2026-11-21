@@ -1,54 +1,54 @@
 {
-  "observed_utc": "2026-11-21T09:10:00Z",
+  "observed_utc": "2026-11-21T16:35:00Z",
   "purpose": "R06 reconciliation: every Phase 1 gate, its evidence on the current candidate, and the single thing blocking it. Statuses: PASS (evidence on the candidate), LOCAL (evidence complete except deployed exercise), GAP (capability or coverage missing), BLOCKED (needs a credential, spend approval, device or owner decision), OWNER (owner action only).",
   "candidate": {
-    "branch": "main",
-    "receipt_commit": "179d11a",
-    "deployed_revision": "parkingbreaker-frontend-00012-tk6",
-    "deployed_mode": "fake (not live)",
-    "durable_target": "not provisioned",
-    "freeze_commit": "699b209 (tagged e4ccce2) \u2014 frozen; suite 13,920 passed; three campaigns passed; MiMo review approved"
+    "branch": "main (frozen at 699b209 / receipt HEAD 75121bf); post-freeze defect fixes verified in isolated worktree /home/ghostmonday/Workspace/pb-launch-fixes (branch launch-fixes @ 24a207d)",
+    "frozen_code_commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+    "fix_worktree_commit": "24a207dd9df99919ea0fd5b4e6cc201cc609de03",
+    "backend_image_digest_699b209": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5 (build 35782f20, org.opencontainers.image.revision=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75)",
+    "frontend_image_digest_699b209": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend@sha256:977bfa98df778eac6978f63d69e83bde5394630bfbfb49375ecedbbbaead43f4 (build b14d91fc)",
+    "deployed_revision": "parkingbreaker-frontend-00012-tk6 (fake mode preview on Cloud Run)",
+    "durable_target": "qualified in isolated R02 drill (lifecycle.sh deploy --apply EXIT 0) and torn down per window rules; not yet standing in production"
   },
   "gates": {
     "R01": {
-      "status": "PASS (frozen)",
+      "status": "PASS (frozen on 699b209; post-freeze fixes verified on launch-fixes @ 24a207d)",
       "evidence": "docs/verification/r01-candidate-2026-11-21.json",
-      "detail": "web-check EXIT 0; 13,920 backend tests passed in the single freeze run; three campaigns passed with one shared fingerprint; images built and digest-pinned; MiMo V2.6 Pro review REJECT then fix then APPROVE; ruff/format/mypy clean",
-      "blocking": "nothing"
+      "detail": "699b209 passed web-check, 13,920 backend tests, 3 synthetic browser campaigns (fingerprint 38756d47...), MiMo V2.6 Pro review APPROVE, and rebuilt backend image sha256:616894c0... with verified OCI revision label. Post-freeze audit in launch-fixes (24a207d) fixed cloudbuild-backend.yaml empty-_PB_BUILD_COMMIT guard, J05 production routing/wiring/starvation, and P03 same-timestamp restart tie-breaker + atomic lineage (ruff/format/mypy clean on 506 files, web-check EXIT 0, qualification-check EXIT 0, 1,600+ focused regression tests across 64 files EXIT 0).",
+      "blocking": "merge launch-fixes (24a207d) to main and build its candidate image digest when ready for final cutover"
     },
     "R02": {
-      "status": "LOCAL \u2014 five proofs pass on an isolated target",
-      "evidence": "docs/verification/r02-target-preflight-2026-11-21.json",
-      "detail": "isolated VM with a replicated regional disk: immutable-digest deploy, single attached ext4 writer, production-policy fencing refusing every violation, data survival across a full stop/start, private TLS on 8443, worker routes refused while customer routes reachable",
+      "status": "LOCAL \u2014 isolated-target full lifecycle.sh deploy --apply EXIT 0 + all 6 target proofs pass",
+      "evidence": "docs/verification/r02-target-preflight-2026-11-21.json; /home/ghostmonday/tmp/r02-drill2-20261121T112652Z/serial13-verify.log; /home/ghostmonday/tmp/r02-drill2-20261121T112652Z/residual-checks.txt",
+      "detail": "unmodified deploy/lifecycle.sh deploy --apply exited 0 on pb-qual-backend-01 + regional disk pb-qual-data-01: all 5 digest-pinned images pulled, org.opencontainers.image.revision=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75 verified, single ext4 writer, regional_owner fencing, data survival across VM resets (boots=2), private TLS :8443 (/health 200, /internal/dispatch 404, /dev-worker/test 404, /webhooks/* 400), scheduler -> worker sweep recorded outcome='ok', monitor published /monitor/health-poll.json and release_readiness exited 0. Torn down with 0 residual drill resources (~$0.25 total spend vs $10 cap).",
       "remaining": [
-        "full lifecycle.sh --apply",
-        "monitor poll/sweep with worker and scheduler",
-        "Cloud Run frontend routed to the private VM"
+        "standing production VM + regional disk provisioning approval (GATE 0, ~$45-60/mo)",
+        "Cloud Run frontend routed to the private VM over VPC Direct Egress (drill used local 127.0.0.1:443 -> :8443 stand-in)"
       ]
     },
     "R03": {
       "status": "BLOCKED",
-      "evidence": "increment receipt backup dry-run",
-      "detail": "encrypted backup dry-run restores with artifacts and records matching (READY_FAKE)",
-      "blocking": "P06 provider objects and the deployed target"
+      "evidence": "docs/verification/r02-target-preflight-2026-11-21.json (r03_backup, r03_restore, r03_quarantine_refusal_exit=4); docs/verification/increment-2026-11-21a.json",
+      "detail": "live regional-disk backup + restore on pb-qual-backend-01 verified artifacts_match=true and records_match=true in 0.042s with RESTORE_QUARANTINE.json written, and proved unmodified deploy/lifecycle.sh deploy --apply refuses quarantined data with exit code 4 while keeping all 5 running containers up. Offline reconciliation dry-run passes (READY_FAKE).",
+      "blocking": "P06 interrupted real Stripe/Lob provider objects to exercise NEEDS_EXTERNAL reconciliation against live/test provider APIs"
     },
     "R04": {
-      "status": "LOCAL",
-      "evidence": "backend/tests/test_r04_intake_pause.py; service-phase and cohort-cap suites",
-      "detail": "all three stop controls exist and are tested locally, including concurrent checkout serialisation protecting the cohort cap",
-      "blocking": "deployed exercise of the switches on the durable target"
+      "status": "LOCAL \u2014 switches and monitor incident loop proven on isolated VM; external outage probe + responder ack remain",
+      "evidence": "docs/verification/r02-target-preflight-2026-11-21.json; backend/tests/test_r04_intake_pause.py; backend/tests/test_paid_cohort_cap.py",
+      "detail": "all three stop controls tested locally (including concurrent cohort-cap serialization); on pb-qual-backend-01, Caddy PB_NEW_INTAKE=paused returned 503 on POST /workspaces while /health (200) and /webhooks/stripe (400) stayed live, and reopening restored POST /workspaces -> 201; durable SQLite set_intake_pause toggled rev 1 (paused=True) -> rev 2 (paused=False); monitor recorded live incident rows in /monitor/incidents.sqlite.",
+      "blocking": "independent external outage probe (<5 min alert on full VM loss) and live alert email delivery + human responder acknowledgment (P07)"
     },
     "R05": {
       "status": "LOCAL",
-      "evidence": "increment receipt r05_retention_inventory_review",
-      "detail": "support tables explicitly classified; 33 operational tables fall back to protected-unknown (non-blocking, never purge-eligible); diagnostic bundles N/A (no export feature)",
-      "blocking": "legal/financial retention periods (owner) and a populated-environment bearer-link check"
+      "evidence": "docs/verification/increment-2026-11-21a.json (r05_retention_inventory_review); backend/tests/test_retention_inventory.py; backend/tests/test_retention_plan.py",
+      "detail": "all support tables, runtime_intake_pause, workspace_lineage, and outcome_follow_up_events explicitly classified in retention_inventory and registered in retention_plan; diagnostic bundles N/A (no customer export endpoint).",
+      "blocking": "owner confirmation of legal/financial retention periods and bearer-link revocation check on the standing target"
     },
     "R06": {
       "status": "BLOCKED",
       "evidence": "this file",
-      "detail": "reconciliation index built",
-      "blocking": "deployed rehearsal requires R02"
+      "detail": "reconciliation board updated with R02/R03/R04 live-VM drill receipts and launch-fixes (24a207d) defect fixes",
+      "blocking": "standing durable target cutover (R02) plus P02, P04, P05, P06, P07 deployed closures"
     },
     "P01": {
       "status": "LOCAL",
@@ -58,80 +58,75 @@
     },
     "P02": {
       "status": "BLOCKED",
-      "evidence": "docs/ROADMAP.md P02 row (corrected to the Foxx A56)",
-      "detail": "budget Android (Foxx A56) is a harsh floor; emulation does not satisfy the gate",
-      "blocking": "physical iPhone and a mid-range Android, or a recorded coverage limitation"
+      "evidence": "docs/ROADMAP.md P02 row (Foxx A56 floor + iPhone Safari); docs/verification/android-curbside-2026-11-18.json",
+      "detail": "no USB/ADB device currently attached (`adb devices` empty); emulation does not satisfy P02. Exact owner check packaged.",
+      "blocking": "physical Foxx A56 + physical iPhone (Safari) run against the deployed candidate (plus mid-range Android or explicit floor limitation note)"
     },
     "P03": {
       "status": "LOCAL",
-      "evidence": "backend/tests/test_p03_assisted_restart.py (2 passed); 254-test regression run",
-      "detail": "stop semantics proven (no charge, hold released, frozen packet and approval untouched, no resubmission). Assisted restart now exists: once the previous case is terminal, POST /workspaces returns a fresh workspace carrying the customer's words, photos and answers with no stale provision selections; a repeated start before submitting replays it; a corrected intake creates a distinct case needing its own tier, authorization, drafting, adoption and exact-packet approval before its own single letter. Capture applies only to the new case; the stopped case stays released. Lineage now records the restarted workspace's parent (asserted in the P03 test).",
-      "blocking": "deployed exercise (needs the durable target)"
+      "evidence": "backend/tests/test_p03_assisted_restart.py (3 passed on launch-fixes @ 24a207d, including same-timestamp smaller-token rowid tie-breaker, atomic lineage, and concurrent-restart replay)",
+      "detail": "truthful stop (STOPPED_NO_CHARGE, hold released, frozen packet untouched, no resubmission) and assisted restart (fresh prefilled workspace, atomic parent_workspace lineage, concurrent start replay, independent authorization/approval/letter for the restarted case) proven.",
+      "blocking": "deployed exercise on the standing target"
     },
     "P04": {
       "status": "BLOCKED",
-      "evidence": "none yet",
-      "detail": "four-case deployed live OCR + .gov research trial",
-      "blocking": "live provider scope plus the durable target"
+      "evidence": "tools/qualification/research_campaign.py --self-test and vision_campaign.py --self-test PASS (offline)",
+      "detail": "four-case deployed live OCR + .gov research trial (clear ticket, ambiguous identifier, unsupported/online-only zero-hold/zero-mail stop, driver correction provenance)",
+      "blocking": "standing target + live OCR/research provider keys (DEEPSEEK_API_KEY / GEMINI_API_KEY / BRAVE_SEARCH_API_KEY)"
     },
     "P05": {
       "status": "LOCAL",
-      "evidence": "API route table review; access-email suites (15-minute TTL, exhaustion, settlement)",
-      "detail": "prefetch safety holds by construction: every state mutation (intake, authorization, answers, adoption, approval, destination address/consent/decline, dispatch) is POST/PUT; GET endpoints are reads, and the only state change a GET can trigger is applying an already-due window expiry, which consumes no consent",
-      "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM) and the 15-minute link expiry against the deployed target; an explicit scanner-replay test is not present and would be added with the live trial",
-      "remaining": [
-        "live Resend delivery + SPF/DKIM",
-        "deployed expiry/regeneration check",
-        "optional explicit prefetch-scanner regression test"
-      ]
+      "evidence": "API route table review; backend/tests/test_access_email*.py",
+      "detail": "GET prefetch cannot consume consent or mutate state; 15-minute TTL and regeneration covered in tests.",
+      "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check"
     },
     "P06": {
       "status": "BLOCKED",
-      "evidence": "none yet",
-      "detail": "joined Stripe+Lob case, signed webhook replay, PDF/envelope proof inspection",
-      "blocking": "Stripe test-mode secret key; Lob test key already validated"
+      "evidence": "docs/verification/expanded-launch-checks-2026-11-18.json; /home/ghostmonday/Workspace/pb-coordination/P06-runbook-DRAFT.md",
+      "detail": "joined Stripe+Lob case, manual authorization (requires_capture, amount_capturable > 0), pre-submission idempotency + frozen PDF/envelope SHA-256, visual proof inspection, signed + tampered webhook callbacks, and provider/commit boundary interruption.",
+      "blocking": "Stripe test key (/home/ghostmonday/.dsh/.stripe-test-key is missing and .env only has sk_live_*/live_*) OR owner authorization for a bounded live-mode self-addressed rehearsal"
     },
     "P07": {
       "status": "BLOCKED",
-      "evidence": "none yet",
-      "detail": "support remedy without delay, responder acknowledgement, support-code routing",
-      "blocking": "deployed target and a named responder"
+      "evidence": "backend/tests/test_support*.py; backend/tests/test_t14_authorization_recovery.py (test_customer_support_code_requires_enabled_channel)",
+      "detail": "automatic wrong-address remedy and support-code gating verified in tests.",
+      "blocking": "named human responder acknowledgment of a live R04 test alert with recorded timestamp + deployed support intake credentials"
     },
     "P08": {
       "status": "PASS",
-      "evidence": "increment receipt p08_rules_modal plus earlier P08 notes",
+      "evidence": "docs/verification/increment-2026-11-21a.json (p08_rules_modal); /home/ghostmonday/Workspace/pb-r01/p08-live-review/P08-review.md",
       "detail": "landing page, Rules modal, Step-4 checkout offer, confirmation/stop emails and price arms agree on clerical scope, no outcome guarantee, and hold/refund terms",
       "blocking": "nothing"
     },
     "J01-J04": {
       "status": "LOCAL",
-      "evidence": "journey event/capture/context/timeline suites, ai spends caps, isolation and idempotency suites",
+      "evidence": "journey event/capture/context/timeline suites, ai spend caps, isolation and idempotency suites",
       "detail": "server milestones distinct from browser observations, pause/budget reasons recorded, idempotent state transitions covered",
       "blocking": "deployed end-to-end walkthrough in R06"
     },
     "J05": {
-      "status": "IMPLEMENTED \u2014 freeze evidence running",
-      "evidence": "backend/tests/test_outcome_follow_up.py (6), test_outcome_follow_up_store.py (8); web lint/type-check clean",
-      "detail": "D+14 and D+30 emails after delivery, one send per window, opt-out honoured and opt-in resumes, rejected/uncertain deferred, UNKNOWN after the final window plus grace, agency and customer outcomes distinct. Private per-case link: opt-out and customer-reported decision endpoints plus the customer page. Scheduler loop calls the sweep beside mailing and a follow-up fault never blocks mailing.",
-      "blocking": "the freeze sequence results (web-check, full suite, three campaigns) and the MiMo review"
+      "status": "LOCAL (frozen on 699b209; 3 production/starvation defects fixed on launch-fixes @ 24a207d)",
+      "evidence": "backend/tests/test_outcome_follow_up.py (8 passed), test_outcome_follow_up_store.py (8 passed), test_api_roles.py (5 passed), test_t22_cloudrun_overlay.py (8 passed); make web-check EXIT 0",
+      "detail": "D+14 and D+30 emails after delivery, one send per window, opt-out/opt-in transitions honored, agency vs customer outcomes distinct, UNKNOWN after final window + grace. Fixed in 24a207d: (1) delivered_cases excludes cases with existing outcomes and OutcomeFollowUpService skips resolved cases (preventing 50-case starvation and post-outcome reminder emails), (2) /outcomes/opt-out and /outcomes/report moved to customer/all roles and exposed through Caddyfile.private + next.config.ts rewrites, (3) app_from_environment() wires follow_ups and outcome_links and compose passes /internal/follow-ups to scheduler-loop.sh.",
+      "blocking": "promote launch-fixes (24a207d) to main and rebuild candidate images"
     },
     "M02": {
       "status": "PASS (owner decision)",
-      "evidence": "owner decision 2026-11-21: keep the ledger strictly two-state RECORDED/PENDING",
+      "evidence": "owner decision 2026-11-21: keep the ledger strictly two-state RECORDED/PENDING; backend/tests/test_paid_beta_report.py",
       "detail": "estimated and reserved values stay in their dedicated stores (AI spend caps, estimated_mailing_cost); the aggregate cohort report runs cleanly and fails safe",
       "blocking": "nothing"
     },
     "B01": {
       "status": "OWNER",
-      "evidence": "none",
-      "detail": "merchant/banking/tax/support ownership",
+      "evidence": "Red 2026-11-21 05:05Z Stripe account match receipt (charges_enabled=true, payouts_enabled=true on activated account)",
+      "detail": "confirm live Stripe settlement bank destination, Lob funding/auto-pay state, bookkeeping/tax owner, and primary + backup support responder schedule",
       "blocking": "owner"
     },
     "R07": {
       "status": "OWNER",
-      "evidence": "R07 draft packet in ~/Workspace/pb-coordination",
-      "detail": "activation packet compiled from receipts once Steps 1-6 close",
-      "blocking": "owner signature and the gates above"
+      "evidence": "/home/ghostmonday/Workspace/pb-coordination/R07-activation-packet-DRAFT.md",
+      "detail": "one-page Paid-Beta Activation Packet + proposed 1-order rollout on a verified route before any cohort expansion",
+      "blocking": "owner signature and closure of Steps 3-6 deployed gates"
     }
   },
   "summary": {
@@ -163,8 +158,6 @@
       "B01",
       "R07"
     ],
-    "in_progress": [
-      "J05"
-    ]
+    "in_progress": []
   }
 }

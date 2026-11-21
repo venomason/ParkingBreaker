@@ -514,7 +514,7 @@ class IntakeStoreMixin:
             self._require_open()
             .execute(
                 "SELECT workspace_token FROM pb_intake_owners WHERE owner=? "
-                "ORDER BY created_at DESC, workspace_token DESC LIMIT 1",
+                "ORDER BY created_at DESC, rowid DESC LIMIT 1",
                 (owner,),
             )
             .fetchone()

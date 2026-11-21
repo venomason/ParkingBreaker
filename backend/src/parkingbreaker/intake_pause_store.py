@@ -231,11 +231,22 @@ class IntakePauseStoreMixin:
         if not child or not parent or child == parent:
             raise IntakePauseConflict("invalid workspace lineage")
         database = self._require_open()
-        database.execute(
-            f"INSERT INTO {LINEAGE_TABLE} (child_workspace, parent_workspace, reason, "
-            "recorded_at) VALUES (?, ?, 'restart', ?)",
-            (child, parent, _utc(now).isoformat()),
-        )
+        database.execute("BEGIN IMMEDIATE")
+        try:
+            database.execute(
+                f"INSERT INTO {LINEAGE_TABLE} (child_workspace, parent_workspace, reason, "
+                "recorded_at) VALUES (?, ?, 'restart', ?)",
+                (child, parent, _utc(now).isoformat()),
+            )
+            database.execute("COMMIT")
+        except sqlite3.IntegrityError as exc:
+            if database.in_transaction:
+                rollback_preserving_error(database)
+            raise IntakePauseConflict("workspace_lineage_conflict") from exc
+        except Exception:
+            if database.in_transaction:
+                rollback_preserving_error(database)
+            raise
 
     def workspace_parent(self: _Connected, child: str) -> str | None:
         row = (

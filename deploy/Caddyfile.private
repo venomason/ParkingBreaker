@@ -14,7 +14,7 @@ https://{$PB_PRIVATE_API_HOST}:8443 {
             not vars {env.PB_NEW_INTAKE} open
         }
         respond @intakePaused "New appeals are temporarily paused." 503
-        @customer path /health /auth /auth/* /workspaces /workspaces/* /cases /cases/* /webhooks /webhooks/*
+        @customer path /health /auth /auth/* /workspaces /workspaces/* /cases /cases/* /outcomes /outcomes/* /webhooks /webhooks/*
         reverse_proxy @customer api:8000
         respond 404
     }

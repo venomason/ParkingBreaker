@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
+from textwrap import dedent
 
 import pytest
 
@@ -607,3 +608,45 @@ def test_private_topology_requires_the_same_reviewed_public_origin(tmp_path: Pat
     result = run_script("lifecycle.sh", "deploy", "--rehearse", str(state), env=env)
     assert result.returncode == 2
     assert commands(tmp_path) == []
+
+
+def test_cloudbuild_backend_requires_full_commit_revision_before_build() -> None:
+    recipe = (ROOT / "cloudbuild-backend.yaml").read_text()
+    dockerfile = (ROOT / "backend/Dockerfile").read_text()
+    assert "^[0-9a-f]{40}$$" in recipe
+    assert recipe.index("^[0-9a-f]{40}$$") < recipe.index("'build'")
+    assert "'PB_BUILD_COMMIT=${_PB_BUILD_COMMIT}'" in recipe
+    assert "LABEL org.opencontainers.image.revision=$PB_BUILD_COMMIT" in dockerfile
+
+
+@pytest.mark.parametrize(
+    ("commit", "tag", "expected"),
+    [
+        ("a" * 40, "reviewed-candidate", 0),
+        ("", "reviewed-candidate", 1),
+        ("a" * 39, "reviewed-candidate", 1),
+        ("A" * 40, "reviewed-candidate", 1),
+        ("a" * 40 + "\n", "reviewed-candidate", 1),
+        ('quoted value " with punctuation', "reviewed-candidate", 1),
+        ("a" * 40, "", 1),
+    ],
+)
+def test_cloudbuild_backend_executes_guard_with_substitutions_as_data(
+    commit: str, tag: str, expected: int
+) -> None:
+    recipe = (ROOT / "cloudbuild-backend.yaml").read_text()
+    assert "'PB_EXPECTED_COMMIT=${_PB_BUILD_COMMIT}'" in recipe
+    assert "'PB_BUILD_IMAGE_TAG=${_IMAGE_TAG}'" in recipe
+    match = re.search(r"      - \|-\n((?: {8}[^\n]*\n)+)", recipe)
+    assert match is not None
+    guard = dedent(match[1])
+    assert "${_PB_BUILD_COMMIT}" not in guard
+    assert "${_IMAGE_TAG}" not in guard
+    result = subprocess.run(
+        ["sh", "-ec", guard.replace("$$", "$")],
+        env={**os.environ, "PB_EXPECTED_COMMIT": commit, "PB_BUILD_IMAGE_TAG": tag},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == expected

@@ -11,7 +11,7 @@ import uuid
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, replace
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, cast
 
@@ -138,6 +138,10 @@ from parkingbreaker.notification_store import (
 )
 from parkingbreaker.oplog.counters import CounterKey, counter_keys, decode_counter_key
 from parkingbreaker.oplog.digest import CounterMilestone, DigestOutcome, LogDigest
+from parkingbreaker.outcome_follow_up_store import (
+    OutcomeFollowUpStoreMixin,
+    initialize_outcome_follow_up,
+)
 from parkingbreaker.overseer_feed import OverseerFeedStoreMixin, initialize_ops_ids
 from parkingbreaker.payment_records import (
     PaymentCursor,
@@ -180,10 +184,6 @@ from parkingbreaker.review_store import ReviewStoreMixin, initialize_review
 from parkingbreaker.service_phase_store import (
     ServicePhaseStoreMixin,
     initialize_runtime_service_phase,
-)
-from parkingbreaker.outcome_follow_up_store import (
-    OutcomeFollowUpStoreMixin,
-    initialize_outcome_follow_up,
 )
 from parkingbreaker.session_window import DEFAULT_WINDOW
 from parkingbreaker.settings_store import SettingsStoreMixin, initialize_settings
@@ -1478,13 +1478,16 @@ class SqliteTransactionStore(
         now: datetime,
         *,
         create_new: bool = False,
+        parent_workspace: str | None = None,
     ) -> WorkspaceRecord:
         """Create the workspace and its owner atomically.
 
         By default one owner workspace is replayed, so a repeated start never forks a
         second transaction. ``create_new`` appends a further workspace to the same owner;
         the caller only does that after the previous transaction is finished, which is how
-        a returning customer buys another appeal.
+        a returning customer buys another appeal. When ``parent_workspace`` is given, the
+        restart happens only while ``parent_workspace`` is still the owner's latest
+        workspace (replaying the concurrent winner otherwise) and records lineage atomically.
         """
         if not owner.strip():
             raise ValueError("owner must not be blank")
@@ -1493,16 +1496,27 @@ class SqliteTransactionStore(
             database.execute("BEGIN IMMEDIATE")
             existing = database.execute(
                 "SELECT workspace_token FROM pb_intake_owners WHERE owner=? "
-                "ORDER BY created_at DESC, workspace_token DESC",
+                "ORDER BY created_at DESC, rowid DESC",
                 (owner,),
             ).fetchall()
-            if not existing or create_new:
+            latest = str(existing[0][0]) if existing else None
+            should_create = not existing or (
+                create_new and (parent_workspace is None or latest == parent_workspace)
+            )
+            if should_create:
                 created = self._save_workspace_in_transaction(workspace_token, workspace, now, None)
                 self._insert_workspace_owner_in_transaction(workspace_token, owner, now)
+                if parent_workspace is not None and parent_workspace != workspace_token:
+                    database.execute(
+                        "INSERT INTO pb_workspace_lineage "
+                        "(child_workspace, parent_workspace, reason, recorded_at) "
+                        "VALUES (?, ?, 'restart', ?)",
+                        (workspace_token, parent_workspace, now.astimezone(UTC).isoformat()),
+                    )
                 database.execute("COMMIT")
                 return created
-            token = str(existing[0][0])
-            replay = self.get_workspace(token)
+            assert latest is not None
+            replay = self.get_workspace(latest)
             if replay is None:
                 raise StorageCorruption("workspace owner has no workspace")
             if replay.workspace.notes != workspace.notes:

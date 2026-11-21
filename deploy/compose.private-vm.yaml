@@ -52,7 +52,7 @@ services:
     ports: !reset []
     networks: !override [worker_control]
     depends_on: !override [worker]
-    command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch']
+    command: !override ['exec sh /pb/scheduler-loop.sh http://worker:8000/internal/dispatch http://worker:8000/internal/follow-ups']
   monitor:
     build: !reset null
     container_name: parkingbreaker-monitor
