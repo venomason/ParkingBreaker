@@ -129,5 +129,35 @@
       "diagnostic-bundle leak check on a populated environment",
       "bearer-link revocation coverage exercised against a live store"
     ]
+  },
+  "p01_ocr_gate_evidence": {
+    "suites": [
+      "test_ticket_recovery",
+      "test_ticket_ocr",
+      "test_photo_upload_boundary",
+      "test_ticket_fact_binding",
+      "test_review_queue",
+      "test_t39_review_expiry",
+      "test_t14_review_regressions",
+      "test_t30_review_regressions"
+    ],
+    "result": "164 passed in 32.03s, exit 0",
+    "anchor_tests": [
+      "test_pending_reading_cannot_be_bypassed_by_customer_supplied_facts (gate cannot be bypassed)",
+      "test_routed_reading_replays_after_restart_without_more_calls (no duplicate provider reads)",
+      "test_valid_image_upload_is_stored_without_starting_reading (reading is a separate gate, not an upload side effect)"
+    ],
+    "limitation": "API-path evidence only; the deployed live-OCR trial is P04 and still needs provider scope"
+  },
+  "j05_outcome_follow_up": {
+    "state": "GAP \u2014 feature not implemented",
+    "evidence": "no follow-up/reminder/outcome-cadence code in backend/src (repo-wide search); pb_* tables contain only pb_setting_proposal_outcomes; tests/test_beta_contact_store.py (17 tests) covers consent/permission evidence and reply flow, not a scheduled outcome cadence under a fake clock",
+    "what_exists": "beta contact permission + reply machinery, access-email flow, outbound Resend adapter",
+    "needs_before_implementation": [
+      "owner decision on cadence (e.g. one nudge at D+14, one at D+30), channel (email only), and stop conditions",
+      "consent basis for contacting a customer about an agency outcome",
+      "retention classification for the new follow-up rows"
+    ],
+    "risk_if_built_unilaterally": "customer-visible messaging with compliance implications; must not ship without the consent language and cadence approved"
   }
 }
