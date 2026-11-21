@@ -7,20 +7,24 @@
     "deployed_revision": "parkingbreaker-frontend-00012-tk6",
     "deployed_mode": "fake (not live)",
     "durable_target": "not provisioned",
-    "freeze_commit": "b3c31d4 (freeze sequence running: web-check, full suite, three campaigns)"
+    "freeze_commit": "699b209 (tagged e4ccce2) \u2014 frozen; suite 13,920 passed; three campaigns passed; MiMo review approved"
   },
   "gates": {
     "R01": {
-      "status": "LOCAL",
+      "status": "PASS (frozen)",
       "evidence": "docs/verification/r01-candidate-2026-11-21.json",
-      "detail": "reconciled candidate committed, cloud build pinned by digest, lint/format/mypy clean, 13,898 tests green on an earlier commit and a rerun in progress on the current production code, 224 browser checks",
-      "blocking": "full suite rerun completes"
+      "detail": "web-check EXIT 0; 13,920 backend tests passed in the single freeze run; three campaigns passed with one shared fingerprint; images built and digest-pinned; MiMo V2.6 Pro review REJECT then fix then APPROVE; ruff/format/mypy clean",
+      "blocking": "nothing"
     },
     "R02": {
-      "status": "BLOCKED",
-      "evidence": "docs/verification/increment-2026-11-21a.json#r02_local_preflight_on_frozen_sha",
-      "detail": "validate, lifecycle deploy/rollback and backup dry-runs pass; 114 t22/readiness tests pass",
-      "blocking": "owner spend approval (~$1 actual, $10 cap) for the qualification target"
+      "status": "LOCAL \u2014 five proofs pass on an isolated target",
+      "evidence": "docs/verification/r02-target-preflight-2026-11-21.json",
+      "detail": "isolated VM with a replicated regional disk: immutable-digest deploy, single attached ext4 writer, production-policy fencing refusing every violation, data survival across a full stop/start, private TLS on 8443, worker routes refused while customer routes reachable",
+      "remaining": [
+        "full lifecycle.sh --apply",
+        "monitor poll/sweep with worker and scheduler",
+        "Cloud Run frontend routed to the private VM"
+      ]
     },
     "R03": {
       "status": "BLOCKED",
@@ -132,26 +136,26 @@
   },
   "summary": {
     "pass": [
+      "R01",
       "P08",
       "M02"
     ],
     "local_evidence_complete": [
-      "R01",
+      "R02",
       "R04",
       "R05",
       "P01",
       "P03",
       "P05",
-      "J01-J04"
+      "J01-J04",
+      "J05"
     ],
     "gap": [],
     "blocked_external": [
-      "R02",
       "R03",
       "R06",
       "P02",
       "P04",
-      "P05",
       "P06",
       "P07"
     ],
