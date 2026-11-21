@@ -96,6 +96,14 @@ Key is restricted (`/v1/accounts` 401): balance and billed packet cost are dashb
 - Email copy operational only; stop replies state "Nothing was charged. Your work is saved."
 - **Structural enforcement**: `appeal/proofread.py` `BANNED_PHRASES` blocks guarantee/win-promise/attorney/strategy language in all service-created text (customer-literal exemption), so the clerical boundary is enforced in code. Evidence: `~/Workspace/pb-r01/p08-live-review/P08-review.md`.
 
+## 7a. Provenance binding (verified after push)
+
+The deployed images were built from tree `ffd1e848…`; a recursive source diff against the pushed
+`main@5bf7921` found **zero code differences** (only generated caches, run output, and the
+Next-generated `next-env.d.ts`). Chain: image digests `b379bba0…` / `b572e4d6…` ← source
+`ffd1e848…` ≡ repo `main` code. `deploy/backup.sh --dry-run` also passes (restore
+artifacts+records match, reconciliation `READY_FAKE`), which is R03's named first step.
+
 ## 8. Coordination and tooling
 
 - A durable mailbox (`~/Workspace/pb-coordination/`) with the supervising agent (RED): 11
