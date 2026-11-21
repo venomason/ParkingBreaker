@@ -105,16 +105,16 @@
       "blocking": "deployed end-to-end walkthrough in R06"
     },
     "J05": {
-      "status": "GAP",
-      "evidence": "increment receipt j05_outcome_follow_up",
-      "detail": "no outcome follow-up cadence exists; consent/permission machinery and Resend adapter do exist",
-      "blocking": "owner cadence + consent wording decision"
+      "status": "IN PROGRESS (owner-approved scope)",
+      "evidence": "none yet",
+      "detail": "email-only D+14 and D+30 post-mailing; consent/opt-out honored; at most one send per window; agency-reported vs customer-reported outcomes distinct; nonresponse recorded UNKNOWN",
+      "blocking": "implementation, then the single full-suite freeze run"
     },
     "M02": {
-      "status": "GAP",
-      "evidence": "increment receipt m02_ledger_state_model",
-      "detail": "ledger distinguishes billed vs unknown only, deliberately never estimating; AI reservations and mail estimates live in their own stores; documented cohort report runs cleanly and fails safe",
-      "blocking": "owner decision A (three-state ledger) or B (align M02 wording)"
+      "status": "PASS (owner decision)",
+      "evidence": "owner decision 2026-11-21: keep the ledger strictly two-state RECORDED/PENDING",
+      "detail": "estimated and reserved values stay in their dedicated stores (AI spend caps, estimated_mailing_cost); the aggregate cohort report runs cleanly and fails safe",
+      "blocking": "nothing"
     },
     "B01": {
       "status": "OWNER",
@@ -131,7 +131,8 @@
   },
   "summary": {
     "pass": [
-      "P08"
+      "P08",
+      "M02"
     ],
     "local_evidence_complete": [
       "R01",
@@ -142,10 +143,7 @@
       "P05",
       "J01-J04"
     ],
-    "gap": [
-      "J05",
-      "M02"
-    ],
+    "gap": [],
     "blocked_external": [
       "R02",
       "R03",
@@ -159,6 +157,9 @@
     "owner_only": [
       "B01",
       "R07"
+    ],
+    "in_progress": [
+      "J05"
     ]
   }
 }
