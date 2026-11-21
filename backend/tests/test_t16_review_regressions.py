@@ -194,7 +194,8 @@ async def test_potentially_sent_create_at_expiry_keeps_hold_until_lookup(
     lob = FakeLobClient([LobResponse(None, error="lost response")])
     api, real, intake_id = await approved(tmp_path, monkeypatch, lob)
     clock = Clock()
-    transport = Transport(fixture("canceled", expiry=int(expiry.timestamp())))
+    active = fixture(expiry=int(expiry.timestamp()))
+    transport = Transport(active, fixture("canceled", expiry=int(expiry.timestamp())))
     adapter = client(transport)
     try:
         token = real._intake(intake_id).case_token
@@ -249,7 +250,8 @@ async def test_expiry_margin_and_both_paths_show_truthful_fixed_stop(
     )
     api, real, intake_id = await approved(tmp_path, monkeypatch, lob)
     clock = Clock()
-    adapter = client(Transport(fixture("canceled", expiry=int(expiry.timestamp()))))
+    responses = [fixture(expiry=int(expiry.timestamp()))] if initial_minutes > 30 else []
+    adapter = client(Transport(*responses, fixture("canceled", expiry=int(expiry.timestamp()))))
     try:
         token = real._intake(intake_id).case_token
         assert token is not None

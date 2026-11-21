@@ -31,6 +31,7 @@ from parkingbreaker.journey_events import (
 )
 from parkingbreaker.mail_attempt_store import StorageCorruption, rollback_preserving_error
 from parkingbreaker.payment_records import mutation_key
+from parkingbreaker.prices import ALLOWED_PRICE_CENTS, PRICE_EXPERIMENT_ID, price_arm
 from parkingbreaker.service_phase import ServicePhase
 from parkingbreaker.transaction_records import WorkspaceRecord
 from parkingbreaker.workspace import Workspace
@@ -99,6 +100,8 @@ _AUTHORIZATION_ATTEMPTS_DDL = """CREATE TABLE pb_intake_authorization_attempts (
 )"""
 
 _INTAKE_DDL = (*_BASE_INTAKE_DDL, _AUTHORIZATION_ATTEMPTS_DDL)
+_AUTHORIZATION_DECLINE_LIMIT = 3
+_AUTHORIZATION_DECLINE_WINDOW = timedelta(hours=24)
 
 
 class IntakeConflict(ValueError):
@@ -190,6 +193,28 @@ def _require_tz_aware(dt: datetime) -> None:
         raise ValueError("datetime must be timezone-aware")
 
 
+def authorization_request_json(
+    intake_id: str, tier: str, amount_cents: int, payment_method_id: str, *, assigned: bool = False
+) -> str:
+    metadata = {"case": intake_id, "tier": tier, "service_amount_cents": str(amount_cents)}
+    if assigned:
+        if tier != "CERTIFIED":
+            raise ValueError("price experiment requires a certified offer")
+        metadata.update(price_experiment_id=PRICE_EXPERIMENT_ID, price_arm=price_arm(amount_cents))
+    return json.dumps(
+        {
+            "amount_cents": amount_cents,
+            "currency": "usd",
+            "metadata": metadata,
+            "payment_method_id": payment_method_id,
+            "tier": tier,
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
 def _validate_authorization_identity(
     intake_id: str,
     key: str,
@@ -215,30 +240,16 @@ def _validate_authorization_identity(
     ):
         raise ValueError("invalid authorization identity")
 
-    expected = {
-        "amount_cents": amount_cents,
-        "currency": "usd",
-        "metadata": {
-            "case": intake_id,
-            "tier": tier,
-            "service_amount_cents": str(amount_cents),
-        },
-        "payment_method_id": payment_method_id,
-        "tier": tier,
-    }
-    try:
-        request = json.loads(request_json)
-    except (TypeError, ValueError, json.JSONDecodeError) as exc:
-        raise ValueError("invalid authorization identity") from exc
-
+    fields = (intake_id, tier, amount_cents, payment_method_id)
+    if request_json == authorization_request_json(*fields):
+        return
     if (
-        not isinstance(request, dict)
-        or request != expected
-        or type(request.get("amount_cents")) is not int
-        or request_json
-        != json.dumps(expected, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        tier == "CERTIFIED"
+        and amount_cents in ALLOWED_PRICE_CENTS
+        and request_json == authorization_request_json(*fields, assigned=True)
     ):
-        raise ValueError("invalid authorization identity")
+        return
+    raise ValueError("invalid authorization identity")
 
 
 def initialize_intake(database: sqlite3.Connection) -> None:
@@ -701,7 +712,15 @@ class IntakeStoreMixin:
                     or attempt.tier != tier
                     or attempt.amount_cents != amount_cents
                     or attempt.payment_method_id != payment_method_id
-                    or attempt.request_json != request_json
+                    # A pre-telemetry reservation always dispatches its original bytes,
+                    # even when its visitor now qualifies for experiment metadata.
+                    or (
+                        attempt.request_json != request_json
+                        and attempt.request_json
+                        != authorization_request_json(
+                            intake_id, tier, amount_cents, payment_method_id
+                        )
+                    )
                 ):
                     raise IntakeConflict("authorization_identity_changed")
                 database.execute("COMMIT")
@@ -732,6 +751,29 @@ class IntakeStoreMixin:
             # The pending insert below reserves the place in this same write transaction.
             if paid_cohort_cap is not None and self.paid_cohort_full(intake_id, paid_cohort_cap):
                 raise IntakeConflict("paid_cohort_full")
+            # Only a fresh intent reaches this gate. Count terminal declines (which
+            # include confirmed cancellations) by immutable server reservation time:
+            # retry/reconciliation timestamps cannot move the window.
+            cutoff = now - _AUTHORIZATION_DECLINE_WINDOW
+            # Validate EVERY decline row before counting, so one valid recent decline can
+            # never mask a corrupt row: a malformed or timezone-less reservation time is
+            # data corruption and stops the decision instead of being treated as recent.
+            recent_declines = 0
+            decline_rows = database.execute(
+                "SELECT created_at FROM pb_intake_authorization_attempts "
+                "WHERE intake_id=? AND state='declined' ORDER BY attempt_number DESC",
+                (intake_id,),
+            ).fetchall()
+            for (reserved_at,) in decline_rows:
+                try:
+                    created_at = datetime.fromisoformat(reserved_at)
+                    _require_tz_aware(created_at)
+                except (TypeError, ValueError):
+                    raise StorageCorruption("invalid decline reservation time") from None
+                if created_at > cutoff:
+                    recent_declines += 1
+            if recent_declines >= _AUTHORIZATION_DECLINE_LIMIT:
+                raise IntakeConflict("authorization_decline_limit")
             attempt_number = int(
                 database.execute(
                     "SELECT COALESCE(MAX(attempt_number), 0) + 1 "

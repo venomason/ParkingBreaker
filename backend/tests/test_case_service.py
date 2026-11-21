@@ -468,7 +468,8 @@ async def researched_case(
 
     monkeypatch.setattr(case_service, "run_research", run)
     unused: Any = object()
-    payments, _transport = stripe(fixture())
+    # One response authorizes; the second is the fresh original pre-mail read.
+    payments, _transport = stripe(fixture(), fixture())
     real = service(tmp_path / "pb.sqlite", payments)
     object.__setattr__(real._deps, "research", ResearchDeps(unused, unused, None, lambda _s: None))
     client = AsyncClient(transport=ASGITransport(app=create_app(real)), base_url="http://real.test")

@@ -277,7 +277,7 @@ async def test_final_gate_stops_without_lob_or_capture_and_releases_hold(
 ) -> None:
     lob = FakeLobClient([LobResponse(200, "must_not_send", evidence=LetterEvidence.PRODUCTION)])
     client, real, case_id = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("canceled"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         token = real._intake(case_id).case_token
@@ -354,7 +354,7 @@ async def test_first_send_stop_copy_is_true_to_whether_lob_was_called(
         else [LobResponse(422, error="provider validation rejected")]
     )
     client, real, case_id = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("canceled"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         if gate:

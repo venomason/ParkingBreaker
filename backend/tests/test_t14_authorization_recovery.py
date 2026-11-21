@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, replace
 from datetime import timedelta
@@ -14,8 +15,11 @@ from parkingbreaker.api import schemas as s
 from parkingbreaker.api.service import ServiceConflict
 from parkingbreaker.case_service import CaseService
 from parkingbreaker.intake_store import AuthorizationAttempt
+from parkingbreaker.mail_attempt_store import StorageCorruption
 from parkingbreaker.payment_fakes import FakePaymentClient, full_outcome
 from parkingbreaker.payment_records import PaymentOutcome, mutation_key
+from parkingbreaker.prices import PRICE_EXPERIMENT_ID
+from parkingbreaker.pricing_store import PricingAssignment
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from test_case_service import INTAKE, PNG_B64, Clock, service
 from test_case_service import fake_resolution as fake_resolution
@@ -148,6 +152,43 @@ class RecoveryCase:
         assert len(self.payments.authorizations) == 1
 
 
+def test_existing_untagged_reservation_replays_after_pricing_rollout(
+    recovery: RecoveryCase, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = recovery.reserve()
+    assignment = PricingAssignment("visitor", PRICE_EXPERIMENT_ID, "P2999", 2999, recovery.clock())
+    monkeypatch.setattr(recovery.real._store, "pricing_for_scope", lambda _: assignment)
+    recovery.assert_one_case(recovery.real.authorize(recovery.case_id, BODY))
+    assert recovery.attempt.request_json == original.request_json
+    assert recovery.payments.requests == [(2999, PM, recovery.key, recovery.metadata)]
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"price_experiment_id": PRICE_EXPERIMENT_ID, "price_arm": "P1999"},
+        {"price_experiment_id": "unrecognized", "price_arm": "P2999"},
+        {"price_arm": "P2999"},
+    ],
+)
+def test_unverified_experiment_metadata_cannot_be_reserved(
+    recovery: RecoveryCase, fields: dict[str, str]
+) -> None:
+    request = json.loads(recovery.request_json)
+    request["metadata"].update(fields)
+    with pytest.raises(ValueError, match="invalid authorization identity"):
+        recovery.real._store.begin_authorization_attempt(
+            recovery.case_id,
+            recovery.key,
+            "CERTIFIED",
+            2999,
+            PM,
+            json.dumps(request, sort_keys=True, separators=(",", ":")),
+            recovery.clock(),
+        )
+    assert recovery.payments.requests == []
+
+
 @pytest.fixture
 def recovery(tmp_path: Path) -> Iterator[RecoveryCase]:
     path = tmp_path / "recovery.sqlite"
@@ -262,6 +303,95 @@ def test_definitive_decline_is_final_without_another_provider_call(recovery: Rec
     assert recovery.payments.calls == calls
     assert recovery.attempt == saved
     recovery.assert_no_case()
+
+
+def _fixture_card(number: int) -> s.StartAuthorization:
+    return BODY.model_copy(update={"payment_method_id": f"pm_fixture_decline_{number}"})
+
+
+def _decline_fixture_card(recovery: RecoveryCase, body: s.StartAuthorization) -> None:
+    recovery.payments.next_response = full_outcome(PaymentOutcome("declined", "auth_declined"))
+    with pytest.raises(ServiceConflict, match=r"^card_not_authorized$"):
+        recovery.real.authorize(recovery.case_id, body)
+
+
+def test_three_definitive_declines_pause_only_new_card_intents(recovery: RecoveryCase) -> None:
+    early = recovery.clock()
+    for num in range(3):
+        _decline_fixture_card(recovery, _fixture_card(num))
+    calls = list(recovery.payments.calls)
+    assert len(calls) == 3
+    recovery.restart()
+
+    # Same request returns its recorded outcome; no new hold or replacement intent.
+    with pytest.raises(ServiceConflict, match=r"^card_not_authorized$"):
+        recovery.real.authorize(recovery.case_id, _fixture_card(2))
+    recovery.clock.now = early + timedelta(hours=24, seconds=-1)
+    with pytest.raises(ServiceConflict, match=r"^authorization_decline_limit$"):
+        recovery.real.authorize(recovery.case_id, _fixture_card(3))
+    assert recovery.payments.calls == calls
+    assert recovery.real._store._require_open().execute(
+        "SELECT COUNT(*) FROM pb_intake_authorization_attempts"
+    ).fetchone() == (3,)
+    recovery.assert_no_case()
+
+    # At the exact boundary, an unchanged case can continue without creating a new appeal.
+    recovery.clock.now = early + timedelta(hours=24)
+    result = recovery.real.authorize(recovery.case_id, _fixture_card(3))
+    assert result.status == "authorized"
+    assert recovery.real.authorize(recovery.case_id, _fixture_card(3)) == result
+    assert len(recovery.payments.calls) == 4
+
+
+def test_confirmed_cancel_counts_from_immutable_reservation_time(
+    recovery: RecoveryCase,
+) -> None:
+    start = recovery.clock()
+    saved = recovery.reserve()
+    recovery.clock.now = start + timedelta(hours=2)
+    recovery.payments.next_response = full_outcome(
+        PaymentOutcome("canceled", "auth_canceled", classification="verified_object")
+    )
+    with pytest.raises(ServiceConflict, match=r"^card_not_authorized$"):
+        recovery.real.authorize(recovery.case_id, BODY)
+    assert recovery.attempt.state == "declined"
+    assert recovery.attempt.authorization_ref == "auth_canceled"
+    assert recovery.attempt.created_at == saved.created_at == start
+    assert recovery.attempt.updated_at == recovery.clock()
+    for num in range(2):
+        _decline_fixture_card(recovery, _fixture_card(num))
+    with pytest.raises(ServiceConflict, match=r"^authorization_decline_limit$"):
+        recovery.real.authorize(recovery.case_id, _fixture_card(2))
+    assert len(recovery.payments.calls) == 3
+
+    # The first row expires from the budget at reservation+24h, not cancellation+24h.
+    recovery.clock.now = start + timedelta(hours=24)
+    assert recovery.real.authorize(recovery.case_id, _fixture_card(2)).status == "authorized"
+
+
+def test_decline_budget_leaves_last_allowed_uncertain_hold_recoverable(
+    recovery: RecoveryCase,
+) -> None:
+    for num in range(2):
+        _decline_fixture_card(recovery, _fixture_card(num))
+    recovery.payments.lose_next_response = True
+    with pytest.raises(ServiceConflict, match=r"^card_not_authorized$"):
+        recovery.real.authorize(recovery.case_id, BODY)
+    assert recovery.attempt.state == "uncertain"
+    original = recovery.payments.authorizations[recovery.key][3]
+    calls = list(recovery.payments.calls)
+    assert len(calls) == 3
+    recovery.restart()
+
+    with pytest.raises(ServiceConflict, match=r"^authorization_outcome_unresolved$"):
+        recovery.real.authorize(recovery.case_id, _fixture_card(3))
+    assert recovery.payments.calls == calls
+    result = recovery.real.authorize(recovery.case_id, BODY)
+    assert result.payment_intent_id == original.authorization_ref
+    assert recovery.attempt.state == "authorized"
+    assert recovery.real.authorize(recovery.case_id, BODY) == result
+    assert recovery.payments.calls == [*calls, calls[-1]]
+    assert len(recovery.payments.authorizations) == 3
 
 
 def test_response_loss_records_uncertainty_and_reuses_the_single_hold(
@@ -387,3 +517,24 @@ def test_persisted_identity_precedes_provider_and_rejects_a_different_card(
         json.loads(observed.request_json)["metadata"],
     )
     recovery.assert_one_case(authorization)
+
+
+def test_corrupt_decline_time_is_not_masked_by_a_valid_recent_decline(
+    recovery: RecoveryCase,
+) -> None:
+    """One valid recent decline must not hide a corrupt reservation time.
+
+    Counting is not the point: any unreadable decline timestamp is data corruption and
+    stops the authorization decision instead of being treated as a recent decline.
+    """
+    for num in range(3):
+        _decline_fixture_card(recovery, _fixture_card(num))
+    with sqlite3.connect(recovery.path) as db:
+        db.execute(
+            "UPDATE pb_intake_authorization_attempts SET created_at='not-a-timestamp' "
+            "WHERE attempt_number=(SELECT MIN(attempt_number) "
+            "FROM pb_intake_authorization_attempts)"
+        )
+        db.commit()
+    with pytest.raises(StorageCorruption):
+        recovery.real.authorize(recovery.case_id, _fixture_card(3))

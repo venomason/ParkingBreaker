@@ -126,7 +126,7 @@ async def test_dispute_webhooks_record_once_and_never_move_money_or_mail(
 ) -> None:
     lob = FakeLobClient([LobResponse(200, "ltr_original", evidence=LetterEvidence.PRODUCTION)])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     object.__setattr__(real._deps, "stripe_webhook_secret", "secret")
     try:

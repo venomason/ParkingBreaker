@@ -4997,3 +4997,55 @@ select:focus {
   border-color: var(--ink);
   background: var(--volt-soft);
 }
+
+.support-case-id {
+  margin-bottom: 16px;
+}
+
+.support-case-id-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-bottom: 10px;
+}
+
+.support-case-id-value {
+  margin: 4px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.support-case-id-compact .support-case-id-value {
+  font-size: 24px;
+}
+
+.support-case-id-note {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.support-case-id-rule {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+

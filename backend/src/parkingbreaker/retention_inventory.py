@@ -189,6 +189,9 @@ _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
         "pb_ticket_ocr_observations",
         "pb_ticket_review_sessions",
         "pb_ticket_review_observations",
+        "pb_support_codes",
+        "pb_support_messages",
+        "pb_support_confirmation_emails",
     }
 )
 _STRUCTURAL_METADATA: Final = frozenset({"pb_store_versions"})

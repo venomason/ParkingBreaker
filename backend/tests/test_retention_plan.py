@@ -719,12 +719,16 @@ def test_restricted_originals_are_retained_under_a_separate_schedule(tmp_path: P
             "CREATE TABLE pb_mail_attempts (case_token TEXT NOT NULL, attempt INTEGER NOT NULL)"
         )
         connection.execute("INSERT INTO pb_mail_attempts VALUES (?, ?)", (CASE, 1))
+        connection.execute("CREATE TABLE pb_support_codes (case_token TEXT PRIMARY KEY)")
+        connection.execute("INSERT INTO pb_support_codes VALUES (?)", (CASE,))
         plan = build_plan(connection)
         scopes = {
             scope: (present, row_count)
             for scope, present, row_count in plan.summary.retained_scopes
         }
         assert scopes["original_mail_attempts"] == (True, 1)
+        assert scopes["support_codes"] == (True, 1)
+        assert PlanBlockedReason.UNKNOWN_SCHEMA_PRESENT not in plan.summary.blocked_reasons
         assert "restricted_originals_retained" in plan.summary.outstanding_scopes
         assert plan.summary.service_purge_complete is False
     finally:

@@ -180,6 +180,7 @@ from parkingbreaker.service_phase_store import (
 from parkingbreaker.session_window import DEFAULT_WINDOW
 from parkingbreaker.settings_store import SettingsStoreMixin, initialize_settings
 from parkingbreaker.submission_records import SubmissionCursor, decode_outcome, outcome_json
+from parkingbreaker.support_store import SupportStoreMixin, initialize_support
 from parkingbreaker.sweep_run_store import SweepRunStoreMixin, initialize_sweep_runs
 from parkingbreaker.ticket_intake_store import initialize_ticket_intake
 from parkingbreaker.ticket_observability import (
@@ -1000,6 +1001,7 @@ class SqliteTransactionStore(
     TicketObservabilityStoreMixin,
     PricingStoreMixin,
     IntakeStoreMixin,
+    SupportStoreMixin,
     WebhookBacklogStoreMixin,
     SqliteMailAttemptStore,
 ):
@@ -1061,6 +1063,7 @@ class SqliteTransactionStore(
             initialize_runtime_service_phase(self._require_open())
             initialize_journey_events(self._require_open())
             initialize_ticket_observability(self._require_open())
+            initialize_support(self._require_open())
         except Exception:
             self.close()
             raise
@@ -1810,6 +1813,7 @@ class SqliteTransactionStore(
             ),
         )
         self._insert_ops_id(case_token)
+        self._insert_support_code(case_token, authorized_at)
         self._queue_counter(workspace_token, CounterKey(), authorized_at)
         result = database.execute(
             """SELECT case_token, workspace_token, authorization_ref, authorized_at,
@@ -2028,6 +2032,57 @@ class SqliteTransactionStore(
             effect_ids,
             new_effect_id=new_effect_id,
         )
+
+    def stop_unsent_expired_authorization(
+        self,
+        case_id: str,
+        expected_revision: int,
+        submit_effect_id: str,
+        *,
+        now: datetime,
+        new_effect_id: Callable[[], str],
+    ) -> CaseRecord:
+        """Close an unsent queued first mail and stop without a possible-send cursor."""
+        now = _aware(now, "now")
+        if not self._submission_locked:
+            raise RevisionConflict("requires submission ownership")
+        database = self._require_open()
+        try:
+            database.execute("BEGIN IMMEDIATE")
+            current = self.get_case(case_id)
+            queued = self.pending_effects(case_id, kinds=(Effect.SUBMIT_LETTER,))
+            if (
+                current is None
+                or current.letter_state is not CaseState.SUBMITTING
+                or current.attempt != 1
+                or current.payment_state is not PaymentState.AUTHORIZED
+                or current.revision != expected_revision
+                or self.submission_cursor(case_id, 1) is not None
+                or len(queued) != 1
+                or queued[0].effect_id != submit_effect_id
+            ):
+                raise RevisionConflict("first mail is no longer queued and unsent")
+            result = self._apply_event(
+                case_id,
+                AuthorizationExpired(),
+                expected_revision,
+                True,
+                now,
+                (),
+                manage_transaction=False,
+                new_effect_id=new_effect_id,
+            )
+            if queued[0].claimed_at is None:
+                self._update_effect(submit_effect_id, now, None, manage_transaction=False)
+            self._update_effect(
+                submit_effect_id, now, "authorization_unusable_no_send", manage_transaction=False
+            )
+            database.execute("COMMIT")
+            return result
+        except Exception:
+            if database.in_transaction:
+                rollback_preserving_error(database)
+            raise
 
     def apply_payment_event(
         self,

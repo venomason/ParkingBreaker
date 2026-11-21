@@ -153,6 +153,7 @@ from parkingbreaker.intake_store import (
     SavedDraft,
     SavedResearch,
     authorization_dispatch_refusal,
+    authorization_request_json,
 )
 from parkingbreaker.llm import LlmBudgetExceeded, LlmProviderError, Usage
 from parkingbreaker.lob_run import production_date
@@ -597,6 +598,8 @@ class CaseServiceDeps:
     ticket_intake: TicketIntakeCoordinator | None = None
     known_records: tuple[Mapping[str, object], ...] = ()
     paid_cohort_cap: int | None = None
+    # The release assembly may expose these only with a qualified support channel.
+    support_codes_enabled: bool = False
 
 
 def prehold_view(
@@ -874,6 +877,11 @@ class CaseService:
     def __init__(self, deps: CaseServiceDeps) -> None:
         self._deps = deps
         self._store = deps.store
+
+    def _public_support_code(self, case_token: str) -> str | None:
+        if not self._deps.support_codes_enabled:
+            return None
+        return self._store.support_code_for_case(case_token)
 
     @property
     def service_phase(self) -> ServicePhase:
@@ -1295,22 +1303,18 @@ class CaseService:
         ):
             raise ServiceConflict("authorization_amount_not_supported")
         assert started_at is not None
-        metadata = {
-            "case": case_id,
-            "tier": tier.tier.value,
-            "service_amount_cents": str(tier.amount_cents),
-        }
-        request_json = json.dumps(
-            {
-                "amount_cents": tier.amount_cents,
-                "currency": "usd",
-                "metadata": metadata,
-                "payment_method_id": body.payment_method_id,
-                "tier": tier.tier.value,
-            },
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
+        assignment = self._store.pricing_for_scope(record.owner)
+        request_json = authorization_request_json(
+            case_id,
+            tier.tier.value,
+            tier.amount_cents,
+            body.payment_method_id,
+            assigned=(
+                tier.tier is s.MailTier.CERTIFIED
+                and assignment is not None
+                and assignment.experiment_id == prices.PRICE_EXPERIMENT_ID
+                and assignment.amount_cents == tier.amount_cents
+            ),
         )
         key = mutation_key(
             "authorization",
@@ -1499,6 +1503,7 @@ class CaseService:
             raise ServiceConflict("not_found")
         return s.Authorization(
             case_id=case_id,
+            support_code=self._public_support_code(case.case_token),
             payment_intent_id=case.authorization_ref,
             amount_cents=case.amount_cents,
             status="authorized",
@@ -1571,6 +1576,7 @@ class CaseService:
             raise ServiceConflict("beta_entitlement_required")
         return s.BetaAcceptanceReceipt(
             case_id=case_id,
+            support_code=self._public_support_code(case.case_token),
             accepted_at=accepted.accepted_at,
             window_started_at=case.authorized_at,
             window_expires_at=case.authorization_expires_at,
@@ -1697,6 +1703,7 @@ class CaseService:
         draft = self._store.get_draft(case_id)
         return s.CaseStatus(
             case_id=case_id,
+            support_code=self._public_support_code(case.case_token),
             workspace_id=record.workspace_token,
             state=case.letter_state,
             payment_state=case.payment_state,

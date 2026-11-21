@@ -27,6 +27,8 @@ from parkingbreaker.api.service import CaseServices, ServiceConflict
 from parkingbreaker.appeal.drafting import CUSTOMER_AUTHORED_MODE_VERSION
 from parkingbreaker.overseer_feed import OPS_ID_PATTERN
 from parkingbreaker.provider_credentials import valid_header_credential
+from parkingbreaker.support_comms import SupportCommsService, SupportIntakeRequest
+from parkingbreaker.support_store import SupportChannel
 from parkingbreaker.sweep_run_store import SweepOutcome, SweepRunRecorder
 
 ACCESS_LOG = logging.getLogger("parkingbreaker.api.access")
@@ -143,6 +145,8 @@ def create_app(
     sweep_runs: SweepRunRecorder | None = None,
     overseer_feed: Callable[[str | None, int], s.OverseerFeed] | None = None,
     overseer_feed_secret: str | None = None,
+    support_comms: SupportCommsService | None = None,
+    support_intake_secret: str | None = None,
 ) -> FastAPI:
     """``role="customer"`` leaves out the /internal worker routes (T31): research, mailing
     and capture sweeps then run only in the separate worker process and cannot hold up
@@ -161,6 +165,14 @@ def create_app(
         raise RuntimeError("overseer_feed_secret_invalid")
     if overseer_feed is None and overseer_feed_secret is not None:
         raise RuntimeError("overseer_feed_not_configured")
+    if support_comms is not None:
+        if not _valid_feed_secret(support_intake_secret, worker_secret) or (
+            overseer_feed_secret is not None
+            and hmac.compare_digest(support_intake_secret or "", overseer_feed_secret)
+        ):
+            raise RuntimeError("support_intake_secret_invalid")
+    elif support_intake_secret is not None:
+        raise RuntimeError("support_intake_not_configured")
     services = services if services is not None else FakeServices()
     verifier = verifier if verifier is not None else FakeBearerVerifier()
     api = FastAPI(
@@ -550,6 +562,42 @@ def create_app(
             body: s.WorkerStep, case: Annotated[str, Depends(worker_case)]
         ) -> s.CaseStatus:
             return services.step(case, body)
+
+        if support_comms is not None:
+            comms = support_comms
+            intake_secret = support_intake_secret or ""
+
+            async def support_auth(request: Request) -> None:
+                presented = bearer_token(request)
+                if not presented.isascii() or not hmac.compare_digest(presented, intake_secret):
+                    raise HTTPException(
+                        401, "invalid_token", headers={"WWW-Authenticate": "Bearer"}
+                    )
+
+            @api.post("/internal/support/intake", response_model=s.SupportIntakeResponse)
+            async def support_intake(
+                body: s.SupportIntakeBody,
+                _auth: Annotated[None, Depends(support_auth)],
+            ) -> s.SupportIntakeResponse:
+                res = comms.handle_intake(
+                    SupportIntakeRequest(
+                        inbound_message_id=body.message_id,
+                        channel=SupportChannel(body.channel),
+                        text=body.text,
+                        support_code=body.support_code,
+                        received_at=body.received_at,
+                    )
+                )
+                return s.SupportIntakeResponse(
+                    outcome=res.outcome.value,
+                    support_code=res.support_code,
+                    intent=res.intent.value,
+                    hold_reason=None if res.hold_reason is None else res.hold_reason.value,
+                    urgent=res.urgent,
+                    email_sent=res.email_sent,
+                    owner_alerted=res.owner_alerted,
+                    duplicate=res.duplicate,
+                )
 
         @api.post("/internal/dispatch")
         async def dispatch(_auth: Annotated[None, Depends(worker_auth)]) -> dict[str, int]:

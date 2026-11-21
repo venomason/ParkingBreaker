@@ -271,7 +271,7 @@ async def test_stripe_webhook_commit_then_dispatch_crash_recovers_from_scheduler
 ) -> None:
     lob = FakeLobClient([LobResponse(200, "ltr_original", evidence=LetterEvidence.PRODUCTION)])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     object.__setattr__(real._deps, "stripe_webhook_secret", "secret")
     try:
@@ -371,7 +371,7 @@ async def test_out_of_order_stripe_events_use_current_original_object(
 ) -> None:
     lob = FakeLobClient([LobResponse(200, "ltr_original")])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    transport = Transport(fixture(), fixture("succeeded"))
+    transport = Transport(fixture(), fixture(), fixture("succeeded"))
     object.__setattr__(real._deps, "payments", client(transport))
     object.__setattr__(real._deps, "stripe_webhook_secret", "secret")
     object.__setattr__(real._deps, "lob_webhook_secret", "secret")
@@ -392,7 +392,7 @@ async def test_out_of_order_stripe_events_use_current_original_object(
         )
         assert real.webhook("lob", scan, scan_headers) is True
         assert real.status(case).payment_state is ps.PaymentState.CAPTURE_PENDING
-        assert transport.calls == []
+        assert [call[:2] for call in transport.calls] == [("get", f"/v1/payment_intents/{REF}")]
         events = (
             ("evt_stale_canceled", "payment_intent.canceled", fixture("canceled")),
             ("evt_stale_failed", "payment_intent.payment_failed", _declined()),
@@ -409,6 +409,7 @@ async def test_out_of_order_stripe_events_use_current_original_object(
         assert real.status(case).state is cs.CaseState.IN_TRANSIT
         assert real.status(case).payment_state is ps.PaymentState.CAPTURED
         assert [call[:2] for call in transport.calls] == [
+            ("get", f"/v1/payment_intents/{REF}"),  # first-mail preflight
             ("get", f"/v1/payment_intents/{REF}"),
             ("post", f"/v1/payment_intents/{REF}/capture"),
         ]

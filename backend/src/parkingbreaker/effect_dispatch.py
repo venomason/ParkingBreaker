@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum, auto
 from functools import partial
 
 from parkingbreaker.case_state import (
@@ -29,6 +30,7 @@ from parkingbreaker.payment_records import PaymentClient
 from parkingbreaker.payment_state import EXPIRY_MARGIN, PaymentEffect, PaymentState
 from parkingbreaker.session_window import WindowStatus, applies_to, window_status
 from parkingbreaker.submission_coordinator import run_submission_step
+from parkingbreaker.transaction_records import CaseRecord
 from parkingbreaker.transaction_store import (
     RevisionConflict,
     SqliteTransactionStore,
@@ -37,6 +39,51 @@ from parkingbreaker.transaction_store import (
 
 _AUTHORIZATION_UNUSABLE = StopReason.AUTHORIZATION_EXPIRED.value
 _UNPAID_REMAIL = "ORIGINAL_PAYMENT_NOT_CAPTURED"
+
+
+class _FirstMailHold(Enum):
+    READY = auto()
+    PENDING = auto()
+    EXPIRED = auto()
+
+
+def _first_mail_hold(
+    case: CaseRecord, payments: PaymentClient, clock: Callable[[], datetime]
+) -> _FirstMailHold:
+    """Read only the original paid authorization; uncertainty never releases it."""
+    if case.payment_state is PaymentState.NO_CHARGE:
+        return _FirstMailHold.READY
+    if clock() >= case.authorization_expires_at - EXPIRY_MARGIN:
+        return _FirstMailHold.EXPIRED
+    if not payments.authorization_evidence_required:
+        # Offline adapters still use the time check, but have no Stripe object evidence.
+        return _FirstMailHold.READY
+    if case.payment_state is not PaymentState.AUTHORIZED:
+        return _FirstMailHold.PENDING
+    try:
+        current = payments.retrieve(case.authorization_ref)
+        if (
+            current.authorization_ref != case.authorization_ref
+            or current.amount_cents != case.amount_cents
+            or current.classification != "verified_object"
+            or current.evidence_version != 1
+            or not current.full_object
+        ):
+            return _FirstMailHold.PENDING
+        if current.status == "canceled":
+            return _FirstMailHold.EXPIRED
+        inspection = current.authorization_inspection
+        if (
+            inspection is None
+            or inspection.authorization_ref != case.authorization_ref
+            or inspection.expires_at != case.authorization_expires_at
+        ):
+            return _FirstMailHold.PENDING
+        if clock() >= inspection.expires_at - EXPIRY_MARGIN:
+            return _FirstMailHold.EXPIRED
+        return _FirstMailHold.READY
+    except Exception:
+        return _FirstMailHold.PENDING
 
 
 def free_remail_allowed(payment_state: PaymentState) -> bool:
@@ -152,6 +199,7 @@ def dispatch_once(
                         occurred_at=now,
                         new_effect_id=new_id,
                     )
+                first_mail_hold = None
                 if case.letter_state is CaseState.FROZEN:
                     expired = (
                         case.payment_state is not PaymentState.NO_CHARGE
@@ -167,7 +215,15 @@ def dispatch_once(
                         # the authorization-expiry and deadline refusals above still ran.
                         event = None
                     else:
-                        event = SubmitRequested()
+                        first_mail_hold = _first_mail_hold(case, payments, clock)
+                        now = clock()
+                        if first_mail_hold is _FirstMailHold.EXPIRED:
+                            event = AuthorizationExpired()
+                        elif first_mail_hold is _FirstMailHold.READY:
+                            event = SubmitRequested()
+                        else:
+                            # Keep the approved case, without even a new submit row.
+                            event = None
                     if event is not None:
                         case = store.apply_letter_event(
                             token,
@@ -232,6 +288,23 @@ def dispatch_once(
                         # Reconcile the original capture below before creating a new
                         # re-mail intent. A restart preserves this wait (H2).
                         continue
+                    if attempt == 1 and cursor is None:
+                        # A restart may leave a queued first send without a Lob cursor.
+                        # Reuse only this sweep's read. A possible previous send still
+                        # takes the original reconciliation path, never this preflight.
+                        if first_mail_hold is None:
+                            first_mail_hold = _first_mail_hold(case, payments, clock)
+                        if first_mail_hold is _FirstMailHold.PENDING:
+                            continue
+                        now = clock()
+                        if first_mail_hold is _FirstMailHold.EXPIRED:
+                            # Do not manufacture a possible-send cursor for a local
+                            # stop. Atomically close the old outbox row with the stop.
+                            case = store.stop_unsent_expired_authorization(
+                                token, case.revision, row.effect_id, now=now, new_effect_id=new_id
+                            )
+                            processed += 1
+                            continue
                     if row.claimed_at is None:
                         store.claim_effect(row.effect_id, now)
                     try:

@@ -439,7 +439,7 @@ def export_reconciliation_inventory(destination: Path, output: Path) -> None:
         payments = []
         for row in db.execute(
             """SELECT c.case_token, c.authorization_ref, c.amount_cents, c.payment_state,
-                      p.payload
+                      c.authorized_at, c.authorization_expires_at, p.payload
                FROM pb_cases c LEFT JOIN pb_payment_cursor p USING (case_token)
                WHERE c.payment_state != ? ORDER BY c.case_token""",
             (PaymentState.NO_CHARGE,),
@@ -450,6 +450,8 @@ def export_reconciliation_inventory(destination: Path, output: Path) -> None:
                     "case_token": row["case_token"],
                     "authorization_ref": row["authorization_ref"],
                     "amount_cents": row["amount_cents"],
+                    "authorized_at": row["authorized_at"],
+                    "authorization_expires_at": row["authorization_expires_at"],
                     "restored_payment_state": row["payment_state"],
                     "charge_ref": (
                         None

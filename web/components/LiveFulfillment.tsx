@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { api, ApiError, type CaseStatus, type PacketPreview, type Tracking } from "../lib/api";
 import { fulfillmentCopy, mailingConfirmed, paymentCopy } from "../lib/fulfillment";
+import { formatSupportCaseId } from "../lib/support-case-id";
 import { PostalEventTrail } from "./CaseVisuals";
+import { SupportCaseIdCard } from "./SupportCaseIdCard";
 
 interface Props { status: CaseStatus; tracking: Tracking | null; busy: boolean; error: string | null; onRefresh: () => void }
 
@@ -80,6 +82,7 @@ function RemailReview({ caseId, onRefresh }: { caseId: string; onRefresh: () => 
 /** Saved postal and payment records remain separate, including returns and delayed capture. */
 export function LiveFulfillment({status, tracking, busy, error, onRefresh}: Props) {
   const copy = fulfillmentCopy(status, tracking);
+  const supportCaseId = formatSupportCaseId(status.support_code);
   const matched = tracking?.case_id === status.case_id ? tracking : null;
   const remedy = status.return_remedy;
   const proof = remedy?.proof_packet;
@@ -126,6 +129,7 @@ export function LiveFulfillment({status, tracking, busy, error, onRefresh}: Prop
       <h2 id="h-s7" tabIndex={-1}>{copy.title}</h2>
       <p className="lead">{copy.detail}</p>
     </div></div>
+    {supportCaseId && <SupportCaseIdCard caseId={supportCaseId} compact />}
     <div className="card state-card payment-card" role="status"><h3>Payment</h3><p>{paymentCopy(status)}</p></div>
     <div className="card state-card postal-card" id={mailed ? "liveTracking" : "mailingEvents"}>
       <div className="postal-head">

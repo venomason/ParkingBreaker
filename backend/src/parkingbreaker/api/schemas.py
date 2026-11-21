@@ -372,6 +372,7 @@ class BetaAcceptanceReceipt(Model):
     """Durable zero-charge acceptance. Replays return the same persisted timestamps."""
 
     case_id: str
+    support_code: str | None = Field(default=None, exclude_if=lambda value: value is None)
     funding: Literal["NO_CHARGE"] = "NO_CHARGE"
     amount_cents: Literal[0] = 0
     currency: Literal["usd"] = "usd"
@@ -383,6 +384,7 @@ class BetaAcceptanceReceipt(Model):
 
 class Authorization(Model):
     case_id: str
+    support_code: str | None = Field(default=None, exclude_if=lambda value: value is None)
     payment_intent_id: str
     # Preview only: the real path confirms server-side with the browser's pm_ id.
     client_secret: str | None = None
@@ -580,6 +582,7 @@ class ReturnedMailRemedy(Model):
 
 class CaseStatus(Model):
     case_id: str
+    support_code: str | None = Field(default=None, exclude_if=lambda value: value is None)
     workspace_id: str
     state: CaseState
     payment_state: PaymentState | None
@@ -604,6 +607,29 @@ class CaseStatus(Model):
         default=None, exclude_if=lambda value: value is None
     )
     fake: bool = True
+
+
+class SupportIntakeBody(Model):
+    """Thin intake payload forwarded from Google Apps Script to the backend."""
+
+    message_id: Annotated[str, Field(min_length=1, max_length=256)]
+    channel: Literal["email", "voicemail"]
+    text: Annotated[str, Field(max_length=20_000)]
+    support_code: str | None = None
+    received_at: AwareDatetime | None = None
+
+
+class SupportIntakeResponse(Model):
+    """Closed-enum intake disposition; never echoes customer text or email."""
+
+    outcome: str
+    support_code: str | None = None
+    intent: str
+    hold_reason: str | None = None
+    urgent: bool = False
+    email_sent: bool = False
+    owner_alerted: bool = False
+    duplicate: bool = False
 
 
 class Draft(Model):

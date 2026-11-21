@@ -160,7 +160,9 @@ async def test_real_form_research_to_inspected_frozen_packet(
         assert frozen is not None
         assert frozen.request.pdf == pdf
         original_manifest = real._store.get_approval_manifest(record.case_token, 1)
-        payments, transport = fixtures.stripe(payment_fixture(), payment_fixture("canceled"))
+        payments, transport = fixtures.stripe(
+            payment_fixture(), payment_fixture(), payment_fixture("canceled")
+        )
         lob = FakeLobClient(
             [
                 LobResponse(None)

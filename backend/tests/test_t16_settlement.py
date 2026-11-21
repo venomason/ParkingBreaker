@@ -124,7 +124,7 @@ async def test_capture_uses_t14_identity_only_after_durable_lob_acceptance(
                     assert real._store.get_authorization_attempt(intake_id, key) == original
                 return super().request(method, url, headers, post_data)
 
-        transport = AcceptedCaptureTransport(fixture(), fixture("succeeded"))
+        transport = AcceptedCaptureTransport(fixture(), fixture(), fixture("succeeded"))
         payments = client(transport)
         with pytest.raises(EffectConflict):
             advance(real._store, payments, token, test_case_service.NOW)

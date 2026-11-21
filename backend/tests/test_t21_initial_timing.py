@@ -147,7 +147,12 @@ def last_safe_moment(send: date) -> datetime:
 
 
 async def timing_case(
-    tmp_path: Path, boundary: Boundary, send: date, *, accepted: bool = False
+    tmp_path: Path,
+    boundary: Boundary,
+    send: date,
+    *,
+    accepted: bool = False,
+    first_preflight: bool = False,
 ) -> tuple[base.Scenario, Clock, FakeLobClient]:
     clock = Clock()
     # The last safe moment: one minute before Lob's effective cutoff on the send date.
@@ -163,7 +168,8 @@ async def timing_case(
     final_charge = final["latest_charge"]
     assert isinstance(final_charge, dict)
     final_charge["created"] = int(clock.now.timestamp())
-    payments, transport = stripe(auth, copy.deepcopy(auth), final)
+    checks = [copy.deepcopy(auth)] if accepted or first_preflight else []
+    payments, transport = stripe(auth, *checks, copy.deepcopy(auth), final)
     database = tmp_path / "timing.sqlite"
     real = service(database, payments, clock)
     fetcher, model = timing_inputs(boundary)
@@ -347,7 +353,9 @@ async def test_midnight_after_committed_first_intent_stops_before_provider_call(
 ) -> None:
     from test_case_service import approve_with_preview
 
-    current, clock, lob = await timing_case(tmp_path, boundary, boundary.latest)
+    current, clock, lob = await timing_case(
+        tmp_path, boundary, boundary.latest, first_preflight=True
+    )
     try:
         adopted = adopt(current)
         current.real.approve(

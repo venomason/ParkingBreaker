@@ -53,7 +53,10 @@ async def test_stripe_outage_at_capture(tmp_path: Path, monkeypatch: pytest.Monk
     lob = FakeLobClient([ACCEPTED])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
     payments, transport = stripe(
-        ConnectionError("stripe down"), payment_fixture(), payment_fixture("succeeded")
+        payment_fixture(),
+        ConnectionError("stripe down"),
+        payment_fixture(),
+        payment_fixture("succeeded"),
     )
     object.__setattr__(real._deps, "payments", payments)
     try:
@@ -80,7 +83,7 @@ async def test_lob_outage_before_any_letter_exists_stops_without_charge(
     down = LobResponse(None, error="timeout") if outage == "timeout" else LobResponse(503)
     lob = FakeLobClient([down, ACCEPTED])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("canceled"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(api)
@@ -106,7 +109,7 @@ async def test_lob_lost_response_after_the_letter_was_made(
 ) -> None:
     lob = FakeLobClient([LobResponse(None, error="timeout")])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(api)

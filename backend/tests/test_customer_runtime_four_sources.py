@@ -126,7 +126,9 @@ async def test_supported_first_stage_keeps_single_fake_submission(
             case, s.AdoptText(text=draft.text, text_sha256=draft.text_sha256)
         )
         real.approve(case, approve_with_preview(real, case, adoption.adopted_sha256))
-        payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+        payments, transport = stripe(
+            payment_fixture(), payment_fixture(), payment_fixture("succeeded")
+        )
         lob = FakeLobClient([LobResponse(200, "ltr_supported", evidence=LetterEvidence.PRODUCTION)])
         object.__setattr__(real._deps, "payments", payments)
         object.__setattr__(real._deps, "lob", lob)

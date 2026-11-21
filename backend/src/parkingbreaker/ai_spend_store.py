@@ -36,6 +36,7 @@ WORKER_CAPS_CENTS: dict[AiWorker, int] = {
     AiWorker.INTAKE_READING: 50,
     AiWorker.RESEARCH: 150,
     AiWorker.DRAFTING: 50,
+    AiWorker.SUPPORT_DRAFT: 25,
 }
 
 

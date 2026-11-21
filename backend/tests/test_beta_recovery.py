@@ -33,12 +33,14 @@ from parkingbreaker.case_state import CaseState, Event
 from parkingbreaker.config import ConfigError, ProviderMode, Settings, build_services
 from parkingbreaker.draft_ownership_store import DraftOutcome
 from parkingbreaker.effect_dispatch import dispatch_once
+from parkingbreaker.intake_store import authorization_request_json
 from parkingbreaker.llm import Usage
 from parkingbreaker.lob_fakes import FakeLobClient
 from parkingbreaker.lob_submission import Accepted, LetterEvidence, LobResponse
 from parkingbreaker.mail_attempt_store import PreparedMailAttempt
 from parkingbreaker.payment_coordinator import run_payment_step
 from parkingbreaker.payment_fakes import FakePaymentClient
+from parkingbreaker.payment_records import mutation_key
 from parkingbreaker.payment_state import PaymentState
 from parkingbreaker.prices import CERTIFIED_CENTS
 from parkingbreaker.submission_coordinator import run_submission_step
@@ -560,6 +562,9 @@ def test_reconciliation_cli_exports_private_original_anchors_without_modifying_r
     assert len(stripe) == 1
     assert stripe[0]["authorization_ref"] == paid.authorization_ref
     assert stripe[0]["case_token"] == paid.case_token
+    assert stripe[0]["amount_cents"] == paid.amount_cents
+    assert stripe[0]["authorized_at"] == paid.authorized_at.isoformat()
+    assert stripe[0]["authorization_expires_at"] == paid.authorization_expires_at.isoformat()
     assert stripe[0]["restored_payment_state"] == "CAPTURE_PENDING"
     assert snapshot.case.authorization_ref not in contents
     assert snapshot.packet.key not in contents
@@ -576,6 +581,52 @@ def test_reconciliation_cli_exports_private_original_anchors_without_modifying_r
     refused = subprocess.run(command, capture_output=True, text=True, check=False)
     assert refused.returncode == 1
     assert output.read_text() == contents
+
+
+def test_reconciliation_inventory_preserves_unresolved_pre_case_attempt(tmp_path: Path) -> None:
+    data, bundle, _, _ = _beta_ready(tmp_path)
+    with SqliteTransactionStore(data / recovery.DATABASE) as store:
+        store.create_owned_workspace("pending-owner", "pending-workspace", Workspace(), NOW)
+        intake = store.record_intake("pending-intake", "pending-workspace", "{}", "{}", NOW)
+        store.update_intake(
+            intake.intake_id, intake.revision, selected_tier="CERTIFIED", case_token=None
+        )
+        request_json = authorization_request_json(
+            intake.intake_id, "CERTIFIED", CERTIFIED_CENTS, "pm_Original"
+        )
+        key = mutation_key(
+            "authorization", intake.intake_id, f"CERTIFIED:{CERTIFIED_CENTS}", "pm_Original"
+        )
+        attempt = store.begin_authorization_attempt(
+            intake.intake_id,
+            key,
+            "CERTIFIED",
+            CERTIFIED_CENTS,
+            "pm_Original",
+            request_json,
+            NOW,
+        )
+        store.record_authorization_outcome(intake.intake_id, key, "uncertain", "pi_Original", NOW)
+        recovery.backup(data, bundle)
+
+    restored = tmp_path / "restored"
+    recovery.restore(bundle, restored)
+    output = tmp_path / "operator.json"
+    recovery.export_reconciliation_inventory(restored, output)
+    report = json.loads(output.read_text())
+
+    assert report["status"] == "NEEDS_EXTERNAL"
+    assert report["stripe_payment_intents"] == []
+    assert report["unresolved_intake_authorizations"] == [
+        {
+            "intake_id": intake.intake_id,
+            "attempt_number": attempt.attempt_number,
+            "authorization_ref": "pi_Original",
+            "amount_cents": CERTIFIED_CENTS,
+            "state": "uncertain",
+            "created_at": NOW.isoformat(),
+        }
+    ]
 
 
 def test_reconciliation_inventory_requires_completed_quarantine(tmp_path: Path) -> None:

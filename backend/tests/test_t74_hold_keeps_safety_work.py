@@ -49,7 +49,7 @@ async def test_lookup_and_capture_keep_running_on_a_held_case(
 ) -> None:
     lob = FakeLobClient([LobResponse(None, error="timeout")])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(api)
@@ -78,7 +78,7 @@ async def test_the_stop_and_its_release_keep_running_on_a_held_case(
 ) -> None:
     lob = FakeLobClient([LobResponse(503), ACCEPTED])
     api, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("canceled"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(api)

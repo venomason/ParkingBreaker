@@ -736,6 +736,8 @@ export interface components {
         Authorization: {
             /** Case Id */
             case_id: string;
+            /** Support Code */
+            support_code?: string | null;
             /** Payment Intent Id */
             payment_intent_id: string;
             /** Client Secret */
@@ -770,6 +772,8 @@ export interface components {
         BetaAcceptanceReceipt: {
             /** Case Id */
             case_id: string;
+            /** Support Code */
+            support_code?: string | null;
             /**
              * Funding
              * @default NO_CHARGE
@@ -961,6 +965,8 @@ export interface components {
         CaseStatus: {
             /** Case Id */
             case_id: string;
+            /** Support Code */
+            support_code?: string | null;
             /** Workspace Id */
             workspace_id: string;
             state: components["schemas"]["CaseState"];

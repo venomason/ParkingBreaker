@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
@@ -16,6 +17,7 @@ from parkingbreaker.api.customer_auth import CSRF_COOKIE, PRICING_COOKIE, SESSIO
 from parkingbreaker.config import ProviderMode, Settings, build_services
 from parkingbreaker.config_fakes import FakeStripeTransport
 from parkingbreaker.customer_access import AccessService, token_digest
+from parkingbreaker.price_funnel import price_funnel
 from parkingbreaker.prices import ALLOWED_PRICE_CENTS, assigned_price
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from test_config import test_fake_mode_runs_one_transaction_offline as run_existing_flow
@@ -176,6 +178,23 @@ async def test_each_real_browser_assignment_follows_original_flow_through_captur
             assert payment["amount"] == price
             assert payment["amount_received"] == price
             assert payment["status"] == "succeeded"
+            (request_json,) = (
+                store._require_open()
+                .execute("SELECT request_json FROM pb_intake_authorization_attempts")
+                .fetchone()
+            )
+            metadata = json.loads(request_json)["metadata"]
+            assert metadata["price_arm"] == shown.json()["arm"]
+            assert metadata["price_experiment_id"] == shown.json()["experiment_id"]
+            rows = price_funnel(tmp_path / "flow.db")
+            assert len(rows) == 3
+            for row in rows:
+                enrolled = int(row["arm"] == metadata["price_arm"])
+                assert row["assigned_visitors"] == row["recorded_offers"] == enrolled
+                assert row["checkout_appeals"] == row["held_appeals"] == enrolled
+                assert row["captured_appeals"] == enrolled
+                assert row["refunded_appeals"] == 0
+                assert row["gross_captured_cents"] == enrolled * price
             cases = store._require_open().execute("SELECT amount_cents FROM pb_cases").fetchall()
             assert cases == [(price,)]
             offers = (
@@ -183,8 +202,6 @@ async def test_each_real_browser_assignment_follows_original_flow_through_captur
                 .execute("SELECT prehold_json FROM pb_intake_records")
                 .fetchall()
             )
-            import json
-
             assert [tier["amount_cents"] for tier in json.loads(offers[0][0])["tiers"]] == [price]
             assert (
                 await client.post("/auth/pricing", headers=headers(client), json={})

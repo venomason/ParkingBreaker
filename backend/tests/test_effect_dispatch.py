@@ -125,7 +125,7 @@ async def test_full_api_transaction_captures_only_after_lob_acceptance(
         ]
     )
     client, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         first = await client.post(
@@ -134,10 +134,10 @@ async def test_full_api_transaction_captures_only_after_lob_acceptance(
         assert first.status_code == 200
         assert first.json()["state"] == "IN_TRANSIT"
         assert len(lob.calls) == 1
-        assert transport.calls[0][0] == "get"
+        assert [call[0] for call in transport.calls] == ["get", "get"]
         assert real.status(case).payment_state is PaymentState.CAPTURE_PENDING
         await dispatch(client)
-        assert transport.calls[1][1].endswith("/capture")
+        assert transport.calls[2][1].endswith("/capture")
         status = (await client.get(f"/cases/{case}/status", headers=ALICE)).json()
         assert (status["state"], status["payment_state"]) == ("IN_TRANSIT", "CAPTURED")
         track = (await client.get(f"/cases/{case}/tracking", headers=ALICE)).json()
@@ -146,7 +146,7 @@ async def test_full_api_transaction_captures_only_after_lob_acceptance(
         assert track["events"][0]["event"] == "accepted"
         await dispatch(client)
         assert len(lob.calls) == 1
-        assert len(transport.calls) == 2
+        assert len(transport.calls) == 3
         token = real._intake(case).case_token
         assert token is not None
         frozen = real._store.get(token, 1)
@@ -164,18 +164,18 @@ async def test_lob_5xx_then_metadata_lookup_never_mails_twice(
     client, real, case = await approved(tmp_path, monkeypatch, lob)
     clock = Clock()
     object.__setattr__(real._deps, "clock", clock)
-    payments, transport = stripe(payment_fixture())
+    payments, transport = stripe(payment_fixture(), payment_fixture())
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(client)
-        assert not transport.calls
+        assert [call[0] for call in transport.calls] == ["get"]
         token = real._intake(case).case_token
         assert token is not None
         prepared = real._store.get(token, 1)
         assert prepared is not None
         lob.letters[prepared.request.submission_token] = "ltr_lost_response"
         clock.now += timedelta(hours=23)
-        await dispatch(client)  # same key final replay, then lookup branch
+        await dispatch(client)  # past the safe repeat cutoff: reconcile the original
         cursor = real._store.submission_cursor(token, 1)
         assert cursor is not None
         clock.now = max(clock.now, cursor.next_at)
@@ -185,7 +185,7 @@ async def test_lob_5xx_then_metadata_lookup_never_mails_twice(
         assert real.tracking(case).events[0].occurred_at == clock.now
         assert len({key for key, _ in lob.calls}) == 1
         assert len(lob.letters) == 1
-        assert len(transport.calls) == 1
+        assert [call[0] for call in transport.calls] == ["get", "get"]
     finally:
         await client.aclose()
 
@@ -195,7 +195,7 @@ async def test_definitive_lob_reject_stops_and_releases_without_capture(
 ) -> None:
     lob = FakeLobClient([LobResponse(422)])
     client, real, case = await approved(tmp_path, monkeypatch, lob)
-    payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("canceled"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(client)
@@ -206,7 +206,7 @@ async def test_definitive_lob_reject_stops_and_releases_without_capture(
         assert not any(call[1].endswith("/capture") for call in transport.calls)
         await dispatch(client)
         assert len(lob.calls) == 1
-        assert len(transport.calls) == 2
+        assert len(transport.calls) == 3
     finally:
         await client.aclose()
 
@@ -239,7 +239,9 @@ async def test_crash_between_outbox_claim_and_complete_recovers(
     client, real, case = await approved(tmp_path, monkeypatch, lob)
     token = real._intake(case).case_token
     assert token is not None
-    payments, _transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, _transport = stripe(
+        payment_fixture(), payment_fixture(), payment_fixture("succeeded")
+    )
     object.__setattr__(real._deps, "payments", payments)
     original = real._store.complete_effect
 
@@ -275,7 +277,7 @@ async def test_crash_after_claim_before_provider_call_is_recoverable(
         raise KeyboardInterrupt("simulated process exit")
 
     monkeypatch.setattr(real._store, "claim_effect", crash)
-    payments, _transport = stripe(payment_fixture())
+    payments, _transport = stripe(payment_fixture(), payment_fixture(), payment_fixture())
     object.__setattr__(real._deps, "payments", payments)
     try:
         with pytest.raises(KeyboardInterrupt):
@@ -296,7 +298,9 @@ async def test_bad_webhook_signature_refused_and_event_replay_ignored(
     client, real, case = await approved(tmp_path, monkeypatch, lob)
     object.__setattr__(real._deps, "stripe_webhook_secret", "secret")
     object.__setattr__(real._deps, "lob_webhook_secret", "secret")
-    payments, _transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, _transport = stripe(
+        payment_fixture(), payment_fixture(), payment_fixture("succeeded")
+    )
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(client)
@@ -398,7 +402,7 @@ async def test_webhook_reconciles_capture_through_existing_coordinator(
     lob = FakeLobClient([LobResponse(200, "ltr_original", evidence=LetterEvidence.PRODUCTION)])
     client, real, case = await approved(tmp_path, monkeypatch, lob)
     object.__setattr__(real._deps, "stripe_webhook_secret", "secret")
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(client)
@@ -456,7 +460,7 @@ async def test_certified_return_and_free_remail_never_capture_again(
     )
     client, real, case = await approved(tmp_path, monkeypatch, lob)
     object.__setattr__(real._deps, "lob_webhook_secret", "secret")
-    payments, transport = stripe(payment_fixture(), payment_fixture("succeeded"))
+    payments, transport = stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
     object.__setattr__(real._deps, "payments", payments)
     try:
         await dispatch(client)
@@ -508,13 +512,13 @@ async def test_certified_return_and_free_remail_never_capture_again(
         await dispatch(client)
         assert real.status(case).state is CaseState.IN_TRANSIT
         assert real.status(case).payment_state is PaymentState.CAPTURED
-        assert len(transport.calls) == 2
+        assert len(transport.calls) == 3
         assert len(lob.calls) == 2
         assert lob.calls[0][0] != lob.calls[1][0]
         await returned("evt_late_first_attempt_return")
         assert real.status(case).state is CaseState.IN_TRANSIT
         await dispatch(client)
         assert len(lob.calls) == 2
-        assert len(transport.calls) == 2
+        assert len(transport.calls) == 3
     finally:
         await client.aclose()

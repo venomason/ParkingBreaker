@@ -1,12 +1,15 @@
 "use client";
 
 import { CERTIFIED_CENTS } from "../lib/prices";
+import { formatSupportCaseId } from "../lib/support-case-id";
 import React, { useEffect } from "react";
 import { ConciergeMark } from "./ConciergeMark";
+import { SupportCaseIdCard } from "./SupportCaseIdCard";
 
 interface Step5WindowProps {
   live?: boolean;
   beta?: boolean;
+  supportCaseId?: string | null;
   amountCents?: number | null;
   tier: "certified" | "standard";
   timerEnd: number | null;
@@ -21,6 +24,7 @@ interface Step5WindowProps {
 export function Step5Window({
   live = false,
   beta = false,
+  supportCaseId = null,
   amountCents,
   tier,
   timerEnd,
@@ -31,6 +35,7 @@ export function Step5Window({
   onDemoWarn,
   onDemoLapse,
 }: Step5WindowProps) {
+  const displayCaseId = formatSupportCaseId(supportCaseId) ?? (!live ? "PB-48213" : null);
   const price = live ? (amountCents == null ? null : amountCents / 100) : CERTIFIED_CENTS / 100;
   const free = beta || (live && amountCents === 0);
   const tierName = tier === "standard" ? "Standard Mail" : "Certified Mail";
@@ -75,6 +80,8 @@ export function Step5Window({
           </p>
         </div>
       </div>
+
+      {displayCaseId && <SupportCaseIdCard caseId={displayCaseId} />}
 
       <div className="card">
         <p className={`window-time ${isWarn ? "warn" : ""}`} id="ring">

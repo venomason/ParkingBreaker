@@ -81,7 +81,9 @@ async def test_historical_unsent_frozen_packet_refuses_create_and_releases_hold(
         save_customer_instruction(real._store, case, record.owner)
         frozen = real._store.get(record.case_token or "", 1)
         history = real._store.destination_decision_history(case, record.owner)
-        payments, transport = stripe(payment_fixture(), payment_fixture("canceled"))
+        payments, transport = stripe(
+            payment_fixture(), payment_fixture(), payment_fixture("canceled")
+        )
         object.__setattr__(real._deps, "payments", payments)
         real.dispatch(case)
         real.dispatch(case)
