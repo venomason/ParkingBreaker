@@ -181,6 +181,10 @@ from parkingbreaker.service_phase_store import (
     ServicePhaseStoreMixin,
     initialize_runtime_service_phase,
 )
+from parkingbreaker.outcome_follow_up_store import (
+    OutcomeFollowUpStoreMixin,
+    initialize_outcome_follow_up,
+)
 from parkingbreaker.session_window import DEFAULT_WINDOW
 from parkingbreaker.settings_store import SettingsStoreMixin, initialize_settings
 from parkingbreaker.submission_records import SubmissionCursor, decode_outcome, outcome_json
@@ -984,6 +988,7 @@ class SqliteTransactionStore(
     ApprovalManifestStoreMixin,
     ServicePhaseStoreMixin,
     IntakePauseStoreMixin,
+    OutcomeFollowUpStoreMixin,
     RequiredCopyStoreMixin,
     AddressStoreMixin,
     AccessEmailStoreMixin,
@@ -1067,6 +1072,7 @@ class SqliteTransactionStore(
             initialize_settings(self._require_open())
             initialize_runtime_service_phase(self._require_open())
             initialize_runtime_intake_pause(self._require_open())
+            initialize_outcome_follow_up(self._require_open())
             initialize_journey_events(self._require_open())
             initialize_ticket_observability(self._require_open())
             initialize_support(self._require_open())
