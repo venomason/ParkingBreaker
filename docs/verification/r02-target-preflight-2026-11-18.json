@@ -707,6 +707,20 @@
       "managed_authentication_target": "Managed Cloud Run OIDC check did not establish a healthy baseline and was removed",
       "policy_armed": true,
       "authorized_recipient_acknowledgment": null,
+      "gmail_delivery": {
+        "source": "Google Cloud Alerting notifications received by the designated Gmail mailbox",
+        "incident": "projects/neuraldraft-parkingbreaker/alerts/0.of6x4762oizc",
+        "policy": "projects/neuraldraft-parkingbreaker/alertPolicies/6931330991521502068",
+        "alert_received_utc": "2026-11-19T05:38:42Z",
+        "recovery_received_utc": "2026-11-19T05:43:11Z",
+        "alert_seconds_after_vm_stop_approx": 259,
+        "matched_on": [
+          "incident ID",
+          "alert policy ID"
+        ],
+        "timestamp_basis": "Latest Gmail Received header for each message, with second precision",
+        "responder_acknowledgment": null
+      },
       "fallback": "One independent workstation polling the exact authenticated public TLS health endpoint once per minute",
       "policy_name": "projects/neuraldraft-parkingbreaker/alertPolicies/6931330991521502068",
       "approved_recipient_only": true,

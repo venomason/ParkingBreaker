@@ -77,6 +77,58 @@ not a new issuer-specific production database. Do not stamp the rows automatical
 The previously proposed $62 research / $8 image budgets are **unapproved**; refresh
 account rates and run bounds before presenting any exact spending request.
 
+### Three-price checkout report
+
+ParkingBreaker assigns one certified-mail price per recognized visitor. The three
+one-time USD prices are $19.99 (`P1999`), $24.99 (`P2499`) and $29.99 (`P2999`).
+The server authorizes the frozen offer amount on a manual-capture PaymentIntent.
+For a matching, recorded assignment, a new authorization carries `price_arm` and
+`price_experiment_id=t56-price-test-2026-10-30`. A retry uses the original metadata.
+
+In the correct Stripe account and mode, search `is:payment metadata:price_arm=P1999`.
+Substitute `P2499` or `P2999` to see the other prices. Add `is:captured` for collected
+payments or `is:refunded` for payments with a refund. [Stripe Dashboard search](https://docs.stripe.com/dashboard/search)
+
+Run the following from the checkout root with the path to the verified transaction
+database for the environment being measured.
+
+```bash
+backend/.venv/bin/python -m parkingbreaker.price_funnel /path/to/parkingbreaker.sqlite
+```
+
+The read-only report counts browser assignments, matching certified offers recorded
+by the server, appeals with a tagged authorization attempt, confirmed holds,
+captures, refunded appeals and gross captured cents before refunds and fees. A
+repeat attempt on an appeal counts once. Assignment and offer counts can predate
+the Stripe labels. A recorded offer provides no evidence that the customer saw it.
+Use the production database for customer results and the sandbox database for drills.
+
+### Paid cohort payment and mailing review
+
+Use the launch window's authorized start time and the transaction database for
+the environment being reviewed. Run this read-only report from the checkout root.
+
+```bash
+backend/.venv/bin/python -m parkingbreaker.paid_beta_report /path/to/parkingbreaker.sqlite \
+  --since 2026-11-20T17:00:00-08:00
+```
+
+The cohort includes paid cases whose confirmed authorization began on or after
+the provided time. Its totals reflect one current SQLite snapshot. It includes
+recorded gross captures and exact confirmed refunds, cases with unfinished payment
+or mailing work, and local authorization deadlines. It also reports unresolved
+pre-case authorizations across all dates, so older uncertain effects stay visible.
+Use the prior window's actual start time when reviewing a different cohort.
+
+Check unknown capture outcomes, unknown refund amounts and expired holds against
+the original provider records before closing the review. The aggregates contain no
+customer or provider identifiers. Fees, payouts, disputes, attribution and other
+operating costs require separate evidence to calculate contribution.
+
+Three terminal declines or confirmed cancellations on an appeal within 24 hours
+pause new card attempts for that appeal. Existing intent replay and reconciliation
+continue. The window starts from each intent's original reservation time.
+
 ## Target security acceptance
 
 Historical November 15 GCP inventory (not refreshed for this publication):
@@ -232,8 +284,10 @@ python -m parkingbreaker.recovery_cli reconcile \
 
 The command exits 3 with `NEEDS_EXTERNAL`. Use the restricted report to match the
 Stripe PaymentIntent and Lob submission token or letter ID against the approved
-provider accounts. Compare the exact PDF, envelope and approval fingerprints to the
-joined payment and mail rehearsal. The report only covers records in the backup.
+provider accounts. Compare the saved authorization amount and expiry with the
+original Stripe objects. Track the customer review deadline separately. Compare the
+exact PDF, envelope and approval fingerprints to the joined payment and mail
+rehearsal. The report only covers records in the backup.
 Account identity, post-backup effects and attempts with missing anchors require
 independent evidence. Keep the report private because it contains original references.
 Never restore over the current database or remove quarantine to make startup pass.

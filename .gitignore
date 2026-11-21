@@ -30,6 +30,12 @@ service-account*.json
 **/.pb-demo/
 .playwright-cli/
 output/
+# Local agent-tool state (never publication inputs)
+.codex/
+.claude/
+.agents-scratch/
+*.tmp
+
 # Local verification receipts and mutable stores are never publication inputs.
 /build-kit/evidence/checks/
 *.sqlite

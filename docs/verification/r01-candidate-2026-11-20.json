@@ -1,0 +1,104 @@
+{
+  "observed_utc": "2026-11-20T11:01:12Z",
+  "source_base_commit": "f0a0bf83ca1359efa25c6abb508109593fb436df",
+  "uncommitted_working_tree_files": [
+    "backend/src/parkingbreaker/case_service.py",
+    "backend/src/parkingbreaker/intake_store.py",
+    "backend/src/parkingbreaker/price_funnel.py",
+    "backend/tests/test_pricing_http.py",
+    "backend/tests/test_t14_authorization_recovery.py",
+    "docs/BETA-READINESS.md",
+    "docs/operations/controlled-beta.md"
+  ],
+  "application_fingerprint": "97fffcc53501bc0ca31de600736e7cbd1c3c0c925544eb2a68373fde72110163",
+  "scope": "Local R01 candidate verification with offline providers against the working tree (f0a0bf8 plus uncommitted three-price checkout/reporting changes). No cloud build, deployment, live charge, or physical mailing.",
+  "paid_beta_activated": false,
+  "backend": {
+    "collected": 13853,
+    "passed": 13853,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "runner": "TMPDIR=/var/tmp PB_PROVIDER_MODE=preview uv run --offline --with pytest-xdist pytest -n 6 --dist=loadfile --basetemp=/var/tmp/pbt -q",
+    "log": "/var/tmp/pb-r01-20261120-r2/backend.log",
+    "log_sha256": "fee8fb3ce59d28996e5260372e4601705eb4a3f0e7fa47949f527a39b51d14eb",
+    "ruff_check": true,
+    "ruff_format_files": 492,
+    "mypy_files": 492
+  },
+  "qualification_self_tests": {
+    "research_campaign": {
+      "routing_self_test_passed": true,
+      "provider_called": false
+    },
+    "vision_campaign": {
+      "passed": true,
+      "provider_called": false,
+      "model": "deepseek-flash",
+      "manifest_sha256": "e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6"
+    }
+  },
+  "web": {
+    "lint": true,
+    "type_check": true,
+    "production_build": true,
+    "browser_campaigns": [
+      {
+        "suite": "paid-ocr",
+        "command_flags": "--service-phase paid --ticket-reading-preview",
+        "receipt": "/var/tmp/pb-r01-20261120/paid-ocr/rehearsal.json",
+        "receipt_sha256": "d8766fd4a180795457337768b444a8486601bd30022e11f009452c6755c1da42",
+        "passed": true,
+        "tests": 14,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "duration_ms": 23863.063,
+        "code_unchanged_during_rehearsal": true,
+        "harness_unchanged_during_rehearsal": true
+      },
+      {
+        "suite": "mobile-ocr",
+        "command_flags": "--service-phase controlled_free_beta --browser-project chromium-mobile375x812 --ticket-reading-preview",
+        "receipt": "/var/tmp/pb-r01-20261120-r2/mobile-ocr/rehearsal.json",
+        "receipt_sha256": "3e37bc37f0289ddb8817ff5888ffde536c5819973b7daff29e65b44d94463042",
+        "passed": true,
+        "tests": 55,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "duration_ms": 76486.691,
+        "code_unchanged_during_rehearsal": true,
+        "harness_unchanged_during_rehearsal": true
+      },
+      {
+        "suite": "paid-browser",
+        "command_flags": "--service-phase paid",
+        "receipt": "/var/tmp/pb-r01-20261120-r2/paid-browser/rehearsal.json",
+        "receipt_sha256": "b79e4ee3c26f42e2b50c5e1bd858b13c7482311701d984d3e913e53e36067b73",
+        "passed": true,
+        "tests": 155,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0,
+        "duration_ms": 246383.487,
+        "code_unchanged_during_rehearsal": true,
+        "harness_unchanged_during_rehearsal": true
+      }
+    ],
+    "total_browser_tests": 224
+  },
+  "deploy_dry_runs": {
+    "validate_sh": true,
+    "lifecycle_deploy_cloudrun_private_vm": true,
+    "lifecycle_rollback_cloudrun_private_vm": true
+  },
+  "remaining_blockers": [
+    "gcloud authentication expired (requires interactive `gcloud auth login`) before Cloud Build immutable container digests can be built and pinned",
+    "Commit/freeze working tree changes onto main before building final release digests",
+    "Deployed cloudrun-private-vm sandbox rehearsal (P06/R03 joined Stripe/Lob test case + webhook delivery + restore reconciliation out of NEEDS_EXTERNAL)",
+    "Deployed real-OCR/research/email journey on physical Android A56 and iPhone/Safari (P01/P02/P04/P05)",
+    "Human responder alert delivery and acknowledgment plus support coverage (R04/P07)",
+    "Signed R07/B01 activation decision packet (PB_PAID_COHORT_CAP, dates, pricing, reserve, merchant/banking, stop owners)"
+  ]
+}

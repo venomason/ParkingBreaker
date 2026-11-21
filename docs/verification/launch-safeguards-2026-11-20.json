@@ -1,0 +1,73 @@
+{
+  "recorded_at_utc": "2026-11-21T02:07:17.821787+00:00",
+  "source_base_commit": "f0a0bf83ca1359efa25c6abb508109593fb436df",
+  "working_tree_application_fingerprint": "9893eefbadb181bfc2d9bedb5b0a5643b5c4751d2b1ef85a54280c44f69bcf02",
+  "scope": "Uncommitted integrated worktree. Local tests and synthetic providers. Google Cloud inventory reads only.",
+  "implemented": [
+    "Three terminal declines or confirmed cancellations pause new authorization reservations for one appeal within 24 hours. Existing payment identity and recovery still run.",
+    "Read-only paid cohort report uses one database snapshot and preserves unknown outcomes separately from known gross captures and exact refunds.",
+    "Separate support intake credential. The Apps Script forwarder requires an HTTPS endpoint and refuses redirects.",
+    "Customer replies omit support codes until the support channel is enabled. Support records appear under restricted retention scopes."
+  ],
+  "checks": {
+    "initial_backend": {
+      "tests": 13883,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0
+    },
+    "initial_failures": "Legacy no-charge response added a support code. Three retention and restore checks treated support tables as unknown.",
+    "final_backend": {
+      "tests": 13885,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "focused_rerun": {
+      "tests": 174,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend_ruff_format_and_mypy_files": 498,
+    "browser_campaigns": {
+      "paid-final": {
+        "valid": true,
+        "tests": 155,
+        "results": 155
+      },
+      "paid-ocr-final": {
+        "valid": true,
+        "tests": 14,
+        "results": 14
+      }
+    },
+    "support_component_browser_tests_passed": 2,
+    "apps_script_intake_tests_passed": 2,
+    "frontend_lint_and_typecheck_passed": true,
+    "offline_qualification_self_tests_passed": true
+  },
+  "cloud_preflight": {
+    "cloud_build_inventory_read": true,
+    "regional_registries": [
+      "parkingbreaker"
+    ],
+    "qualification_prefix_service_accounts_found": 0,
+    "cloud_build_submitted": false
+  },
+  "artifact_sha256": {
+    "backend-final.log": "b6aa5bd4a361e62c3d6c3534f9bbb4b9139777cc3c451d15c8cabb54ee8ca8a9",
+    "backend-final.xml": "e5b7780ab63d3600e214d055760dbc1abed64fde53ba6c208e5561fcc8b0cb43",
+    "regression-final.log": "485092f91165a069d93cc58e29cc3e779e2e90838b30652ff72bc5a6889ea8ad",
+    "regression-final.xml": "272b0fcc781662168f616d31b1fbca12900719f5c048e5f68fb8e82ee7c2a731",
+    "support-browser.log": "f4ea407c55603e9293447f3e9962efaa017cffadf800de939024de31eafeb470",
+    "paid-final/rehearsal.json": "c81251766a393269a5699e403b76801f32130ba8aece1a9e9d67baed006bb796",
+    "paid-ocr-final/rehearsal.json": "61f1f8c3082f6f68a1932a6383c67e6861aa72bb003ecb1ec6b3703e99665b8d"
+  },
+  "remaining": [
+    "Freeze and approve the signed candidate and authorized cloud build scope.",
+    "Qualify deployed provider callbacks and original-object recovery using a joined Stripe and Lob test case.",
+    "Wire and qualify the support service and named human coverage before public support codes are enabled.",
+    "Record live paid-cohort limits, funding, deployment and activation authority."
+  ]
+}

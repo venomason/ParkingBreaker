@@ -1,6 +1,6 @@
 # Controlled-beta readiness
 
-Updated November 19, 2026 (Pacific). **NO-GO for live paid beta.**
+Updated November 20, 2026 (Pacific). **NO-GO for live paid beta.**
 
 **Preview deployed:** [parkingbreaker.com](https://parkingbreaker.com) serves application commit `0bf011b7c243bed1b864bdb1739438469fdacb58` on `parkingbreaker-frontend-preview-0bf011b`. Both container digests, 100% traffic, page/assets and ticket-upload/synthetic-OCR checks are recorded in [the deployment receipt](verification/deployment-preview-2026-11-17.json). It uses fake providers, the paid product flow and temporary preview storage; no real payments or mailing were activated.
 
@@ -19,6 +19,25 @@ The product remains clerical. Essential unknown facts block charge/dispatch; the
 OCR selection is configurable. [OCR routing](OCR-ROUTING.md) documents the primary and optional secondary routes; a selectable model does not establish that it is configured or qualified in production. [Customer Choice Rules](CUSTOMER-CHOICE-RULES.md) owns guarantee/causation semantics.
 
 ## Evidence and its limits
+
+On November 20, Stripe's ParkingBreaker sandbox returned three active one-time USD
+prices on one certified-mail product. Three synthetic appeals used the local checkout
+and Stripe's test card. Each assigned offer matched its manual hold ($19.99, $24.99
+or $29.99). The PaymentIntent and Charge carried the matching experiment and arm.
+Stripe search found all three originals. All three holds were released with zero
+captured. The ParkingBreaker live account also returned all three active one-time
+USD prices with matching experiment and arm labels. Stripe reported charges and
+payouts enabled on that account. The live catalog setup made no payment requests.
+Deployment of the payment labels, deployed provider qualification and paid
+admission remain open. [Three-price reporting procedure](operations/controlled-beta.md#three-price-checkout-report)
+
+The November 20 integrated worktree passed 13,885 backend tests and 169 paid
+browser checks with synthetic providers. It limits new card attempts after repeated
+declines, preserves original payment recovery, and reports recorded money and
+unfinished fulfillment work. Support intake uses a separate credential. Customer
+support codes stay hidden until the channel is qualified, and the retention planner
+accounts for the support tables. A signed candidate, deployed provider checks and
+staffed support coverage remain open. [Launch safeguards receipt](verification/launch-safeguards-2026-11-20.json)
 
 | Evidence | What it supports | What it does not establish |
 | --- | --- | --- |
@@ -57,12 +76,12 @@ Task IDs resolve to the authoritative roadmap.
 
 | Gate | Current state | Next evidence |
 | --- | --- | --- |
-| Current candidate / CI | November 18 WebKit reproduced a redundant draft save. After the fix, all 13 existing paid-flow WebKit checks passed, including interrupted reading and confirmation. [WebKit evidence](verification/expanded-launch-checks-2026-11-18.json). The later paid-cap checkout rebuilt offline from 430 archived inputs. The API, homepage and curbside asset passed loopback HTTP checks. [Build and checkout evidence](verification/paid-cohort-2026-11-18.json) | R01 still requires CI promotion and immutable images for this source |
+| Current candidate / CI | November 20 local R01 pass on `f0a0bf8` plus the uncommitted three-price checkout slice (`97fffcc53501`): `13,853/13,853` backend tests, `ruff`/`mypy` across `492` files, both qualification self-tests, `make web-check`, `cloudrun-private-vm` deploy dry-runs, and `224/224` browser checks (`14` paid-OCR, `55` mobile-OCR, `155` paid, zero skips/flakes). [R01 local candidate receipt](verification/r01-candidate-2026-11-20.json). Earlier Nov 18 WebKit and paid-cap evidence in [WebKit evidence](verification/expanded-launch-checks-2026-11-18.json) and [Build and checkout evidence](verification/paid-cohort-2026-11-18.json). | R01 still requires a reviewed candidate freeze, a scoped build window and the immutable image digests. Read-only Cloud Build and registry inventory access succeeded on November 20. |
 | Hurtle customer journey | Ticket photos and OCR come first. The family sample shows five curbside illustrations under the shared photo prompt. The A56 traversed all five and returned to the sample scan. [Family preview evidence](verification/family-preview-2026-11-18.json) | Local review only. The signed cloud rehearsal predates this frontend. |
 | OCR / research | Four real DeepSeek Flash reads through local intake matched all expected field states and values across four synthetic tickets. Each result was still unconfirmed on readback. [Clear-ticket receipt](verification/p04-deepseek-single-2026-11-18.json) and [expanded checks](verification/expanded-launch-checks-2026-11-18.json) | P01/P04 still require deployed configuration, customer correction and confirmation, and source-backed filing or refusal in the same case. |
 | Official evidence | 23 qualification rows retain uncertainties; 109 saved quotes historically checked | P04: resolve relevant procedure/evidence gaps; no fabricated source facts |
 | Physical devices / access | WebKit 26.0 saved and restored all eight repository fixture scenarios in mobile emulation. Portrait and landscape layout checks passed. Android hardware evidence is source-specific. [Browser evidence](verification/expanded-launch-checks-2026-11-18.json) | P02/P05 require current physical iPhone and Android camera, rotation, network recovery and delivered access-email checks. |
-| Target / security / recovery | The corrected signed gateway served the original pinned fake build over trusted private TLS and authenticated public ingress. It passed lifecycle readiness, three intake-pause refusals, and a full VM stop/start with one disk attachment and the synthetic workspace intact. The enabled backup service copied exact live test assets off host when manually started. The independent restore matched SQLite and artifact hashes and kept quarantine. An external workstation probe recorded failure and recovery and Cloud Monitoring opened the incident. [Target receipt](verification/r02-target-preflight-2026-11-18.json) and [local cutover checks](verification/r02-cutover-2026-11-18.json) | Alert delivery and responder acknowledgment remain unverified. Original Stripe/Lob reconciliation is open. The $25 rehearsal covered synthetic data only. |
+| Target / security / recovery | The corrected signed gateway served the original pinned fake build over trusted private TLS and authenticated public ingress. It passed lifecycle readiness, three intake-pause refusals, and a full VM stop/start with one disk attachment and the synthetic workspace intact. The enabled backup service copied exact live test assets off host when manually started. The independent restore matched SQLite and artifact hashes and kept quarantine. An external workstation probe recorded failure and recovery. Gmail received the matching Cloud Monitoring outage alert about 4 minutes 19 seconds after the VM stopped and also received the recovery notification. [Target receipt](verification/r02-target-preflight-2026-11-18.json) and [local cutover checks](verification/r02-cutover-2026-11-18.json) | Responder acknowledgment and support coverage remain unverified. Original Stripe/Lob reconciliation is open. The $25 rehearsal covered synthetic data only. |
 | Printing / webhooks / money | Stripe replay returned the same sandbox hold. Two Stripe CLI–forwarded events passed signature and duplicate checks after case binding. All test holds were released with zero captured. One Lob test letter rendered a six-page certified proof. The four approved content pages and their order were verified. [Provider evidence](verification/expanded-launch-checks-2026-11-18.json) | P06 still requires a Lob-signed callback, deployed callback delivery, hold expiry and payment/mail reconciliation on a joined case. Physical print and delivery remain unobserved. |
 | Outcomes / support | Local mechanisms exist; coverage and real operation unqualified | J05/P07: all-appeal follow-up, primary/backup support, real alert receipt and acknowledgment |
 | Privacy / telemetry | Journey ledger is restricted; full coverage/retention/export policies open | J01/J06/R05: coverage reconciliation and governed data lifecycle |
