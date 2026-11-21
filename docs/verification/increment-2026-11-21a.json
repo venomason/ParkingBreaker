@@ -203,5 +203,34 @@
     },
     "recommendation": "B unless a report must show un-billed money in one table; A risks estimated numbers reading as fact in a financial view",
     "tests": "tests/test_disputes_ledger.py, test_ai_spend_cap.py, test_paid_beta_report.py (all in the 308-test gate run)"
+  },
+  "worktree_unification": {
+    "registered_worktrees": 8,
+    "stale_worktrees": 7,
+    "state": "ARCHIVED, NOT REMOVED (owner decision pending)",
+    "finding": "every stale worktree is dirty; content is not provably redundant \u2014 pb-integrated-1117 carries a 3,161-line tracked diff and the three pb-sol-overseer copies carry ~1,043 lines each",
+    "per_tree": {
+      "pb-stripe-20261116@332b838": "0 tracked diff lines, 1 untracked file",
+      "pb-inc1-1117@678dec0": "244 tracked diff lines, 1 untracked file",
+      "pb-integrated-1117@678dec0": "3161 tracked diff lines, 5 untracked files",
+      "pb-mobile-candidate repo@f0a0bf8": "0 tracked diff lines, 1 untracked file",
+      "pb-sol-overseer recovery@f0a0bf8": "1147 tracked diff lines, 13 untracked files",
+      "pb-sol-overseer release@f0a0bf8": "1043 tracked diff lines, 13 untracked files",
+      "pb-sol-overseer support@f0a0bf8": "1043 tracked diff lines, 13 untracked files"
+    },
+    "archive": "/home/ghostmonday/Workspace/pb-r01/worktree-archives (patches + untracked tarballs + MANIFEST.sha256)",
+    "next": "review the two large patches before any git worktree remove; nothing deleted by this step"
+  },
+  "p08_rules_modal": {
+    "state": "PASS",
+    "source": "web/components/CustomerChoiceRules.tsx",
+    "observed_copy": [
+      "Customer choices and our correct-office guarantee",
+      "If we cannot establish the required submission details, we stop without charging for mailing",
+      "The exclusion applies only to the failure caused by your choice; an unknown cause is not covered by it",
+      "You can correct your details or stop before approving mailing",
+      "We do not guarantee that the agency will open, read or agree with an appeal"
+    ],
+    "consistency": "matches CUSTOMER-CHOICE-RULES semantics and the landing/checkout/email copy already verified (clerical scope, no outcome guarantee, hold/refund terms)"
   }
 }
