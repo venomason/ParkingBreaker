@@ -189,6 +189,9 @@ async def test_follow_up_copy_is_clerical_and_carries_a_verifiable_opt_out_link(
         assert "do not give legal advice" in message.text
         assert "do not promise any outcome" in message.text
         assert "dismiss" not in message.text.lower()
+        assert "guarantee" not in message.text.lower()
+        assert "promise" not in message.text.lower().replace("do not promise", "")
+        assert "we do not give legal advice" in message.text.lower()
         match = re.search(r"[?&]token=([0-9a-f]{64})", message.text)
         assert match is not None
         assert verify_follow_up_token(LINK_KEY, token, match.group(1)) is True
@@ -219,5 +222,36 @@ async def test_private_link_opts_out_and_reports_decisions(
         assert outcome.kind == "OUTCOME_CUSTOMER"
         assert outcome.detail == "customer_reported:dismissed"
         assert links.report(token, good, "not-a-decision") is False
+        # The same decision again is a satisfied request, never a crash or a rewrite.
+        assert links.report(token, good, "dismissed") is True
+        assert links.report(token, good, "upheld") is False
+        assert real._store.outcome_for(token) == outcome
+    finally:
+        await client.aclose()
+
+
+async def test_opt_out_after_a_later_opt_in_is_a_new_decision_not_a_replay(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, real, _case_id, token, clock = await _delivered_case(tmp_path, monkeypatch)
+    try:
+        links = OutcomeLinkService(real._store, key=LINK_KEY, clock=clock)
+        good = derive_follow_up_token(LINK_KEY, token)
+        address = "alex@example.test"
+        assert links.opt_out(token, good) is True
+        assert real._store.follow_up_allowed(address) is False
+        assert links.opt_out(token, good) is True  # idempotent while already opted out
+        real._store.set_follow_up_consent(
+            address, True, "support-optin", "support", "customer asked to resume", now=clock.now
+        )
+        assert real._store.follow_up_allowed(address) is True
+        # A third click is a fresh decision: the response must match the stored state.
+        assert links.opt_out(token, good) is True
+        assert real._store.follow_up_allowed(address) is False
+        email = FakeEmailClient([_accepted(), _accepted()])
+        clock.now = DELIVERED_AT + timedelta(days=31)
+        report = _service(real, email, clock).run()
+        assert report.sent == 0
+        assert email.call_count == 0
     finally:
         await client.aclose()

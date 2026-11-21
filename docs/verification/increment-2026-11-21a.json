@@ -238,5 +238,22 @@
       "We do not guarantee that the agency will open, read or agree with an appeal"
     ],
     "consistency": "matches CUSTOMER-CHOICE-RULES semantics and the landing/checkout/email copy already verified (clerical scope, no outcome guarantee, hold/refund terms)"
+  },
+  "mimo_v26_pro_review": {
+    "model": "mimo-v2.6-pro via headless DSH (provider xiaomi-token-plan-sgp, high effort, read-only)",
+    "scope": "diff a477104..HEAD, focused on restart, intake kill-switch, follow-up sender, invariants, copy, PII, tests",
+    "verdict": "REJECT \u2014 one blocking defect, fixed before freeze",
+    "blocking_finding": {
+      "defect": "the opt-out command id was deterministic (optout:{case}), so after a later opt-in a repeated opt-out click replayed the old event: the API answered opted_out while the stored consent stayed OPT_IN and email continued",
+      "fix": "the command id now carries the consent transition (optout:{case}:{revision+1}) and an already-opted-out click is a no-op that returns success; a regression test covers opt-out -> opt-in -> re-opt-out and proves no email is sent afterwards",
+      "second_fix": "a duplicate customer report with a different decision previously raised an uncaught conflict (HTTP 500); it now returns false and never rewrites the recorded outcome"
+    },
+    "non_blocking_findings_accepted": [
+      "follow-up send is at-least-once across a crash between provider acceptance and the recorded send; the stable idempotency key pb-followup-{window}-{case} lets the provider deduplicate, and a missed reminder is considered worse than a repeat",
+      "store initialisation validates the follow-up table DDL but not that its unique indexes still exist on a pre-existing database; no deployed database uses the component yet",
+      "two concurrent POST /workspaces right after a terminal case can create two fresh workspaces (work fork, no charge until a separate intake and authorization); sequential requests replay correctly",
+      "the test that checks copy is word-based and would not catch a promised outcome phrased in new words; strengthened with explicit negation assertions, still not exhaustive"
+    ],
+    "evidence": "~/tmp/freeze2-20261121/mimo-review.log"
   }
 }

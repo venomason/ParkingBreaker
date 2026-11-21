@@ -217,6 +217,8 @@ def initialize_outcome_follow_up(database: sqlite3.Connection) -> None:
 class FollowUpStoreProtocol(Protocol):
     """The slice of the store the follow-up service needs."""
 
+    def follow_up_consent_state(self, email: str) -> tuple[bool | None, int]: ...
+
     def delivered_cases(self, limit: int = 100) -> list[tuple[str, datetime]]: ...
 
     def intake_json_for_case(self, case_token: str) -> str | None: ...
@@ -371,6 +373,22 @@ class OutcomeFollowUpStoreMixin:
             reason=reason,
             now=now,
         )
+
+    def follow_up_consent_state(self: _Connected, email: str) -> tuple[bool | None, int]:
+        """The latest consent value and its revision; absent means never recorded."""
+        key = canonical_email_key(email)
+        row = (
+            self._require_open()
+            .execute(
+                "SELECT kind, revision FROM " + TABLE + " WHERE email_key=? "
+                "ORDER BY revision DESC LIMIT 1",
+                (key,),
+            )
+            .fetchone()
+        )
+        if row is None:
+            return None, 0
+        return str(row[0]) == "OPT_IN", int(row[1])
 
     def follow_up_allowed(self: _Connected, email: str) -> bool:
         """Strictly the latest recorded choice; no record means allowed (transactional)."""

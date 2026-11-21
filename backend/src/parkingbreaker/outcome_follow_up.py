@@ -79,10 +79,16 @@ class OutcomeLinkService:
         email = self._email_for(case_token)
         if email is None:
             return False
+        allowed, revision = self._store.follow_up_consent_state(email)
+        if allowed is False:
+            # Already opted out: the request is satisfied, and no new row is needed.
+            return True
+        # The command id carries the transition, so re-clicking after a later opt-in is a
+        # new decision rather than a replay that would leave the old opt-in in force.
         self._store.set_follow_up_consent(
             email,
             False,
-            f"optout:{case_token}",
+            f"optout:{case_token}:{revision + 1}",
             "customer",
             "customer opted out through the private link",
             now=self._clock(),
@@ -100,15 +106,21 @@ class OutcomeLinkService:
         email = self._email_for(case_token)
         if email is None:
             return False
-        self._store.record_outcome(
-            case_token,
-            "OUTCOME_CUSTOMER",
-            f"customer_reported:{decision}",
-            f"report:{case_token}:{decision}",
-            "customer",
-            "customer reported the agency decision",
-            now=self._clock(),
-        )
+        try:
+            self._store.record_outcome(
+                case_token,
+                "OUTCOME_CUSTOMER",
+                f"customer_reported:{decision}",
+                f"report:{case_token}:{decision}",
+                "customer",
+                "customer reported the agency decision",
+                now=self._clock(),
+            )
+        except FollowUpConflict:
+            # One outcome per case is structural; a repeat with the same decision is a
+            # satisfied request, a different decision cannot overwrite the record.
+            existing = self._store.outcome_for(case_token)
+            return existing is not None and existing.detail == f"customer_reported:{decision}"
         return True
 
     def _email_for(self, case_token: str) -> str | None:
