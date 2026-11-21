@@ -52,23 +52,20 @@
     "MiMo key rotation outstanding"
   ],
   "p03_assisted_restart": {
-    "state": "GAP CONFIRMED \u2014 implementation blocked on an owner data-model decision",
-    "evidence": "backend/tests/test_p03_assisted_restart.py: 1 passed (rejected first mailing stops without charge, hold released, workspace + frozen packet + approval manifest intact) and 1 strict xfail documenting the missing restart path",
-    "observed_refusals": [
-      "POST /workspaces/{id}/intake after a stopped case -> 409 intake_already_submitted_create_new_workspace",
-      "a second workspace for the same owner is also refused -> appeal_already_started (create_owned_workspace replays the single owner workspace)"
+    "state": "IMPLEMENTED (option B: fresh prefilled workspace) and tested",
+    "why_b": "the intake table keeps one intake per workspace (UNIQUE workspace_token), so a same-workspace second transaction needs a table rebuild; pb_intake_owners.owner is not unique, so a further workspace for the same owner is schema-legal and needs no migration",
+    "change": [
+      "create_owned_workspace gains create_new=True and replays the latest owner workspace otherwise",
+      "CaseService.create_workspace creates a prefilled fresh workspace once the previous case is terminal (restart_prefill keeps words/photos/answers, drops provision selections); repeated starts replay the live workspace so a double click never forks work",
+      "CaseService.appeal_workspace returns the latest workspace instead of failing on an ambiguous legacy scope",
+      "store helper latest_owned_workspace for the owner's most recent workspace"
     ],
-    "store_facts": {
-      "pb_intake_records": "one row per workspace_token",
-      "intake_for_workspace": "returns a single record",
-      "workspace_snapshot": "customer_statement/photo_refs/provision_selections are per workspace, so a second transaction would overwrite the shared snapshot",
-      "workspace_py": "restart_prefill() exists and is unit-tested but unwired"
-    },
-    "options": {
-      "A": "allow a second transaction in the same workspace after a terminal stop: relax the one-intake guard for STOPPED_NO_CHARGE/CLOSED_RETURNED, make intake_for_workspace return the latest, reset provision selections via restart_prefill; affects cohort counting and workspace views",
-      "B": "keep one intake per workspace and add an explicit restart that registers a new workspace for the same owner with lineage to the stopped case; needs owner/workspace identity changes and retention coverage"
-    },
-    "needs": "owner choice between A and B before implementation"
+    "revenue_impact": "returning customers can buy another appeal; previously POST /workspaces replayed the one workspace whose intake was refused with 409, so a second purchase was impossible and the stop copy ('you can review your saved details and try again') was untrue",
+    "evidence": {
+      "tests": "test_p03_assisted_restart.py: 2 passed (stop semantics; restart carries the customer, needs its own tier/authorization/drafting/adoption/approval, one new letter, old case stays released and its packet untouched)",
+      "regression": "254 passed across intake atomicity, case service, api, cohort cap, intake pause, retention and mail gate",
+      "lint_types": "ruff clean, format clean, mypy Success in 502 files"
+    }
   },
   "r02_local_preflight_on_frozen_sha": {
     "commit": "c19f4da48b458e29fd906a7e2d6c407a8496faf4",

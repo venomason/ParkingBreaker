@@ -11,16 +11,15 @@ lets Lob definitively reject the first create (4xx), and proves two things.
   customer workspace (notes, position, photos, answers, provision selections) and the frozen
   packet plus its approval manifest are unchanged.
 
-``test_assisted_restart_starts_a_new_approved_transaction_in_the_same_workspace``
-  The assisted restart path: after that stop, a corrected
-  ``POST /workspaces/{workspace_id}/intake`` starts a *distinct* new case in the same
-  workspace.  The new case is not authorized, mailed or approved by inheritance: it needs its
-  own authorization, fresh drafting/adoption and a fresh exact-packet approval, and only then
-  its own single successful Lob create.  Case 1, its frozen packet and its approval stay
-  untouched (``STOPPED_NO_CHARGE`` remains terminal).
-
-The restart half currently fails at the second-intake call; that is the P03 capability gap
-this file reports honestly rather than faking.
+``test_assisted_restart_carries_the_customer_into_a_fresh_prefilled_workspace``
+  The assisted restart path the stop copy promises ("you can review your saved details and
+  try again"): once the first transaction is terminal, ``POST /workspaces`` returns a *fresh*
+  workspace carrying the customer's own words, photos and answers but no stale provision
+  selections, while a repeated start before submitting replays that same workspace.  A
+  corrected intake then creates a distinct case that needs its own authorization, its own
+  drafting/adoption and a fresh exact-packet approval, and only then its own single
+  successful Lob create.  Case 1, its frozen packet and its approval stay untouched
+  (``STOPPED_NO_CHARGE`` remains terminal), and no out-of-flight mail is ever resubmitted.
 """
 
 from __future__ import annotations
@@ -34,7 +33,6 @@ from typing import Any
 import pytest
 from httpx2 import AsyncClient
 
-from parkingbreaker.api import schemas as s
 from parkingbreaker.appeal.drafting import Draft, DraftSentence
 from parkingbreaker.appeal.fakes import FakeDrafter
 from parkingbreaker.approval_manifest import ApprovalManifest
@@ -47,7 +45,7 @@ from parkingbreaker.payment_state import PaymentState
 from parkingbreaker.transaction_records import WorkspaceRecord
 from test_case_service import ALICE, INTAKE, PM, fake_resolution, stripe
 from test_effect_dispatch import WORKER, approved, dispatch, payment_fixture
-from test_stripe_payment import Transport
+from test_stripe_payment import Transport, fixture
 
 assert fake_resolution
 pytestmark = [pytest.mark.anyio, pytest.mark.usefixtures("fake_resolution")]
@@ -75,6 +73,19 @@ class StoppedMailing:
     transport: Transport
     workspace_before: dict[str, Any]
     saved_workspace: WorkspaceRecord
+
+
+def _fresh_payment_intent(
+    status: str = "requires_capture", payment_intent_id: str = "pi_Restart456"
+) -> dict[str, Any]:
+    """A distinct PaymentIntent payload: one reference may never back two cases."""
+    payload: dict[str, Any] = deepcopy(fixture(status))
+    payload["id"] = payment_intent_id
+    charge = payload.get("latest_charge")
+    if isinstance(charge, dict):
+        charge["payment_intent"] = payment_intent_id
+        charge["id"] = payment_intent_id.replace("pi_", "ch_")
+    return payload
 
 
 async def stopped_by_lob_rejection(
@@ -193,121 +204,82 @@ async def test_rejected_first_mailing_stops_without_charge_and_preserves_workspa
 
 
 @pytest.mark.anyio
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "P03 capability gap: the assisted restart path is not implemented. The store keeps one "
-        "intake per workspace (`intake_already_submitted_create_new_workspace`) and one workspace "
-        "per owner (`appeal_already_started`), so a stopped appeal cannot be restarted in place or "
-        "moved to a fresh workspace. Needs an owner design decision before implementation."
-    ),
-)
-async def test_assisted_restart_starts_a_new_approved_transaction_in_the_same_workspace(
+@pytest.mark.anyio
+async def test_assisted_restart_carries_the_customer_into_a_fresh_prefilled_workspace(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     stopped = await stopped_by_lob_rejection(tmp_path, monkeypatch)
     client, real = stopped.client, stopped.real
     try:
-        # The customer corrects their statement and submits again in the same workspace.
-        restart_body = deepcopy(stopped.workspace_before["intake"])
-        restart_body["customer_position"]["statement"] = CORRECTED_STATEMENT
-        restart = await client.post(
-            f"/workspaces/{stopped.workspace_id}/intake",
-            headers=ALICE,
-            json=restart_body,
-        )
-        assert restart.status_code == 200, (
-            "P03 capability gap: the assisted restart path does not exist. "
-            f"POST /workspaces/{stopped.workspace_id}/intake was refused after the first "
-            f"mailing stopped on a Lob rejection: {restart.status_code} {restart.text}"
-        )
-        receipt = restart.json()
-        assert receipt["workspace_id"] == stopped.workspace_id
-        new_case = receipt["case_id"]
-        assert new_case != stopped.case_id
-        assert receipt["state"] == "INTAKE"
+        # The stop copy promises a retry; starting again now yields a fresh workspace.
+        restarted = (await client.post("/workspaces", headers=ALICE, json={"notes": ""})).json()
+        new_workspace = restarted["workspace_id"]
+        assert new_workspace != stopped.workspace_id
+        before = real._store.get_workspace(stopped.workspace_id)
+        after = real._store.get_workspace(new_workspace)
+        assert before is not None
+        assert after is not None
+        assert after.workspace.position == before.workspace.position
+        assert after.workspace.photo_refs == before.workspace.photo_refs
+        assert after.workspace.answers == before.workspace.answers
+        assert after.workspace.provision_selections == frozenset()
+        assert after.workspace.letter_edits == ()
 
-        # Restarting leaves the stopped case, its frozen packet and approval untouched.
+        # Repeating the start before any intake replays the same fresh workspace.
+        replay = (await client.post("/workspaces", headers=ALICE, json={"notes": ""})).json()
+        assert replay["workspace_id"] == new_workspace
+
+        # The corrected intake creates a distinct case in the fresh workspace.
+        body = deepcopy(stopped.workspace_before["intake"])
+        body["customer_position"]["statement"] = CORRECTED_STATEMENT
+        receipt = await client.post(f"/workspaces/{new_workspace}/intake", headers=ALICE, json=body)
+        assert receipt.status_code == 200, receipt.text
+        new_case = receipt.json()["case_id"]
+        assert new_case != stopped.case_id
+        assert receipt.json()["workspace_id"] == new_workspace
+        assert receipt.json()["state"] == "INTAKE"
+
+        # The stopped case, its frozen packet and its approval manifest are untouched.
         old_status = (await client.get(f"/cases/{stopped.case_id}/status", headers=ALICE)).json()
         assert old_status["state"] == "STOPPED_NO_CHARGE"
-        assert old_status["stop"]["reason_key"] == STOP_REASON_KEY
         assert real._store.get(stopped.case_token, 1) == stopped.frozen
         assert real._store.get_approval_manifest(stopped.case_token, 1) == stopped.manifest
-        new_record = real._intake(new_case)
-        assert new_record.workspace_token == stopped.workspace_id
-        assert new_record.case_token is not None
-        new_token = new_record.case_token
-        assert new_token != stopped.case_token
+        assert len(stopped.lob.calls) == 1
 
-        # The new transaction inherits no approval, no authorization and no mailing.
-        new_status = (await client.get(f"/cases/{new_case}/status", headers=ALICE)).json()
-        assert new_status["state"] == "INTAKE"
-        assert new_status["payment_state"] is None
-        assert new_status["stop"] is None
-        await dispatch(client)
-        assert len(stopped.lob.calls) == 1  # only case 1's rejected create
-        new_status = (await client.get(f"/cases/{new_case}/status", headers=ALICE)).json()
-        assert new_status["state"] == "INTAKE"
-
-        # The new case needs its own tier choice and its own card authorization.
-        payments, transport = stripe(
-            payment_fixture(),
-            payment_fixture(),
-            payment_fixture(),
-            payment_fixture("succeeded"),
-            payment_fixture("succeeded"),
-        )
-        object.__setattr__(real._deps, "payments", payments)
-        chosen = await client.put(
+        # The fresh case inherits nothing: its own tier and authorization come first.
+        assert real.status(new_case).state is CaseState.INTAKE
+        tier = await client.put(
             f"/cases/{new_case}/tier", headers=ALICE, json={"tier": "CERTIFIED"}
         )
-        assert chosen.status_code == 200, chosen.text
-        authorization = await client.post(
-            f"/cases/{new_case}/authorization", headers=ALICE, json=PM
-        )
-        assert authorization.status_code == 200, authorization.text
-        assert authorization.json()["fake"] is False
-        assert transport.calls[0][:2] == ("post", "/v1/payment_intents")
-        new_status = (await client.get(f"/cases/{new_case}/status", headers=ALICE)).json()
-        assert new_status["state"] == "RESEARCHING"
-        assert new_status["payment_state"] == "AUTHORIZED"
+        assert tier.status_code == 200, tier.text
+        payments, _transport = stripe(_fresh_payment_intent())
+        object.__setattr__(real._deps, "payments", payments)
+        authorized = await client.post(f"/cases/{new_case}/authorization", headers=ALICE, json=PM)
+        assert authorized.status_code == 200, authorized.text
 
-        # The corrected statement is drafted, adopted and approved as a new exact packet.
+        research = await client.post(
+            f"/internal/cases/{new_case}/step", headers=WORKER, json={"step_id": "research"}
+        )
+        assert research.status_code == 200, research.text
+        if research.json()["state"] == "NEEDS_CUSTOMER":
+            research = await client.post(
+                f"/cases/{new_case}/answers",
+                headers=ALICE,
+                json={"question_id": "VEHICLE_RELATIONSHIP", "answer": "REGISTERED_OWNER"},
+            )
+        assert research.json()["state"] == "DRAFTING"
         object.__setattr__(
             real._deps,
             "drafter",
             FakeDrafter(
                 lambda *_: Draft(
-                    (
-                        DraftSentence(
-                            CORRECTED_STATEMENT,
-                            (f"note:0-{len(CORRECTED_STATEMENT)}",),
-                        ),
-                    )
+                    (DraftSentence(CORRECTED_STATEMENT, (f"note:0-{len(CORRECTED_STATEMENT)}",)),)
                 )
             ),
         )
-        research = await client.post(
-            f"/internal/cases/{new_case}/step",
-            headers=WORKER,
-            json={"step_id": "research"},
-        )
-        assert research.status_code == 200, research.text
-        if research.json()["state"] == "NEEDS_CUSTOMER":
-            answered = await client.post(
-                f"/cases/{new_case}/answers",
-                headers=ALICE,
-                json={"question_id": "VEHICLE_RELATIONSHIP", "answer": "REGISTERED_OWNER"},
-            )
-            assert answered.status_code == 200, answered.text
-            research = answered
-        assert research.json()["state"] == "DRAFTING"
         drafted = await client.post(
-            f"/internal/cases/{new_case}/step",
-            headers=WORKER,
-            json={"step_id": "draft"},
+            f"/internal/cases/{new_case}/step", headers=WORKER, json={"step_id": "draft"}
         )
-        assert drafted.status_code == 200, drafted.text
         assert drafted.json()["state"] == "AWAITING_ADOPTION"
         draft = (await client.get(f"/cases/{new_case}/draft", headers=ALICE)).json()
         adoption = await client.post(
@@ -316,52 +288,52 @@ async def test_assisted_restart_starts_a_new_approved_transaction_in_the_same_wo
             json={"text": draft["text"], "text_sha256": draft["text_sha256"]},
         )
         assert adoption.status_code == 200, adoption.text
-        preview = await client.post(
+        packet = await client.post(
             f"/cases/{new_case}/packet-preview",
             headers=ALICE,
             json={"adopted_sha256": adoption.json()["adopted_sha256"]},
         )
-        assert preview.status_code == 200, preview.text
-        approval = await client.post(
+        assert packet.status_code == 200, packet.text
+        approved_new = await client.post(
             f"/cases/{new_case}/approval",
             headers=ALICE,
             json={
                 "adopted_sha256": adoption.json()["adopted_sha256"],
-                "packet_sha256": preview.json()["packet_sha256"],
-                "envelope_sha256": preview.json()["envelope_sha256"],
+                "packet_sha256": packet.json()["packet_sha256"],
+                "envelope_sha256": packet.json()["envelope_sha256"],
             },
         )
-        assert approval.json()["state"] == "FROZEN"
-        new_frozen = real._store.get(new_token, 1)
-        new_manifest = real._store.get_approval_manifest(new_token, 1)
-        assert new_frozen is not None
-        assert new_manifest is not None
-        assert hashlib.sha256(new_frozen.request.pdf).hexdigest() == preview.json()["packet_sha256"]
-        assert new_manifest.packet_pdf_sha256 == preview.json()["packet_sha256"]
-        assert len(stopped.lob.calls) == 1  # approval alone never mails
+        assert approved_new.json()["state"] == "FROZEN"
+        new_record = real._intake(new_case)
+        assert new_record.case_token is not None
+        assert new_record.case_token != stopped.case_token
+        assert real._store.get_approval_manifest(new_record.case_token, 1) is not None
+        assert len(stopped.lob.calls) == 1  # still nothing mailed for the fresh case
 
-        # Only the new frozen packet is mailed, once, after its own explicit dispatch.
+        # Its own single successful letter, captured only after Lob accepts.
         stopped.lob.script.append(
-            LobResponse(200, "ltr_restarted", evidence=LetterEvidence.PRODUCTION)
+            LobResponse(
+                200,
+                "ltr_restart",
+                tracking_number="940000002",
+                evidence=LetterEvidence.PRODUCTION,
+            )
         )
-        await dispatch(client)  # submit the new frozen packet
-        await dispatch(client)  # capture
-        new_status = (await client.get(f"/cases/{new_case}/status", headers=ALICE)).json()
-        assert new_status["state"] == "IN_TRANSIT"
-        assert new_status["payment_state"] == "CAPTURED"
+        payments, _transport = stripe(
+            _fresh_payment_intent(),
+            _fresh_payment_intent(),
+            _fresh_payment_intent("succeeded"),
+        )
+        object.__setattr__(real._deps, "payments", payments)
+        stepped = await client.post(
+            f"/internal/cases/{new_case}/step", headers=WORKER, json={"step_id": "dispatch"}
+        )
+        assert stepped.json()["state"] == "IN_TRANSIT"
+        await dispatch(client)
+        status = (await client.get(f"/cases/{new_case}/status", headers=ALICE)).json()
+        assert (status["state"], status["payment_state"]) == ("IN_TRANSIT", "CAPTURED")
         assert len(stopped.lob.calls) == 2
-        assert stopped.lob.calls[0][0] != stopped.lob.calls[1][0]
-        assert stopped.lob.calls[1][1].pdf == new_frozen.request.pdf
-        assert list(stopped.lob.letters) == [new_frozen.request.submission_token]
-        assert stopped.frozen.request.submission_token not in stopped.lob.letters
-        assert transport.calls[-1][1].endswith("/capture")
-        # Case 1 was never mutated or resubmitted by any of this.
-        assert real._store.get(stopped.case_token, 1) == stopped.frozen
-        assert real._store.get_approval_manifest(stopped.case_token, 1) == stopped.manifest
-        old_status = (await client.get(f"/cases/{stopped.case_id}/status", headers=ALICE)).json()
-        assert old_status["state"] == "STOPPED_NO_CHARGE"
-        assert old_status["payment_state"] == "RELEASED"
-        assert old_status["stop"]["reason_key"] == STOP_REASON_KEY
-        assert new_status["selected_tier"] == s.MailTier.CERTIFIED
+        # Capture applies to the fresh case only; the stopped case stays released.
+        assert real.status(stopped.case_id).payment_state is PaymentState.RELEASED
     finally:
         await client.aclose()

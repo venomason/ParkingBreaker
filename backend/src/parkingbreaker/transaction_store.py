@@ -1465,38 +1465,48 @@ class SqliteTransactionStore(
             raise
 
     def create_owned_workspace(
-        self, owner: str, workspace_token: str, workspace: Workspace, now: datetime
+        self,
+        owner: str,
+        workspace_token: str,
+        workspace: Workspace,
+        now: datetime,
+        *,
+        create_new: bool = False,
     ) -> WorkspaceRecord:
-        """Create the workspace and its owner atomically, replaying one owner workspace."""
+        """Create the workspace and its owner atomically.
+
+        By default one owner workspace is replayed, so a repeated start never forks a
+        second transaction. ``create_new`` appends a further workspace to the same owner;
+        the caller only does that after the previous transaction is finished, which is how
+        a returning customer buys another appeal.
+        """
         if not owner.strip():
             raise ValueError("owner must not be blank")
         database = self._require_open()
         try:
             database.execute("BEGIN IMMEDIATE")
             existing = database.execute(
-                "SELECT workspace_token FROM pb_intake_owners WHERE owner=? ORDER BY created_at",
+                "SELECT workspace_token FROM pb_intake_owners WHERE owner=? "
+                "ORDER BY created_at DESC, workspace_token DESC",
                 (owner,),
             ).fetchall()
-            if len(existing) > 1:
-                raise IntakeConflict("ambiguous_legacy_scope")
-            if existing:
-                token = str(existing[0][0])
-                saved = self.get_workspace(token)
-                if saved is None:
-                    raise StorageCorruption("workspace owner has no workspace")
-                if saved.workspace.notes != workspace.notes:
-                    raise IntakeConflict("appeal_already_started")
+            if not existing or create_new:
+                created = self._save_workspace_in_transaction(workspace_token, workspace, now, None)
+                self._insert_workspace_owner_in_transaction(workspace_token, owner, now)
                 database.execute("COMMIT")
-                return saved
-
-            saved = self._save_workspace_in_transaction(workspace_token, workspace, now, None)
-            self._insert_workspace_owner_in_transaction(workspace_token, owner, now)
+                return created
+            token = str(existing[0][0])
+            replay = self.get_workspace(token)
+            if replay is None:
+                raise StorageCorruption("workspace owner has no workspace")
+            if replay.workspace.notes != workspace.notes:
+                raise IntakeConflict("appeal_already_started")
             database.execute("COMMIT")
+            return replay
         except Exception:
             if database.in_transaction:
                 rollback_preserving_error(database)
             raise
-        return saved
 
     def _insert_workspace_owner_in_transaction(
         self, workspace_token: str, owner: str, now: datetime

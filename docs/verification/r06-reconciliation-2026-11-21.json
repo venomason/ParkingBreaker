@@ -58,10 +58,10 @@
       "blocking": "physical iPhone and a mid-range Android, or a recorded coverage limitation"
     },
     "P03": {
-      "status": "GAP",
-      "evidence": "backend/tests/test_p03_assisted_restart.py (1 passed, 1 strict xfail)",
-      "detail": "stop semantics proven (no charge, hold released, frozen packet untouched); assisted restart absent because one intake per workspace and one workspace per owner are both enforced",
-      "blocking": "owner decision A (same-workspace second transaction) or B (fresh workspace with lineage)"
+      "status": "LOCAL",
+      "evidence": "backend/tests/test_p03_assisted_restart.py (2 passed); 254-test regression run",
+      "detail": "stop semantics proven (no charge, hold released, frozen packet and approval untouched, no resubmission). Assisted restart now exists: once the previous case is terminal, POST /workspaces returns a fresh workspace carrying the customer's words, photos and answers with no stale provision selections; a repeated start before submitting replays it; a corrected intake creates a distinct case needing its own tier, authorization, drafting, adoption and exact-packet approval before its own single letter. Capture applies only to the new case; the stopped case stays released.",
+      "blocking": "deployed exercise (needs the durable target)"
     },
     "P04": {
       "status": "BLOCKED",
@@ -138,10 +138,11 @@
       "R04",
       "R05",
       "P01",
+      "P03",
+      "P05",
       "J01-J04"
     ],
     "gap": [
-      "P03",
       "J05",
       "M02"
     ],

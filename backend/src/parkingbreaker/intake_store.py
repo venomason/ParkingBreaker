@@ -508,6 +508,19 @@ class IntakeStoreMixin:
                 rollback_preserving_error(database)
             raise
 
+    def latest_owned_workspace(self: _Connected, owner: str) -> str | None:
+        """The owner's most recent workspace; a returning customer may have several."""
+        row = (
+            self._require_open()
+            .execute(
+                "SELECT workspace_token FROM pb_intake_owners WHERE owner=? "
+                "ORDER BY created_at DESC, workspace_token DESC LIMIT 1",
+                (owner,),
+            )
+            .fetchone()
+        )
+        return None if row is None else str(row[0])
+
     def workspace_owner(self: _Connected, workspace_token: str) -> str | None:
         row = (
             self._require_open()

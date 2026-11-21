@@ -276,7 +276,7 @@ from parkingbreaker.webhook_backlog_store import (
     BacklogRow,
     WebhookEnvelopeConflict,
 )
-from parkingbreaker.workspace import Workspace
+from parkingbreaker.workspace import Workspace, restart_prefill
 
 LOG = logging.getLogger(__name__)
 # T74: escalate a held case this long before the card authorization's expiry stop.
@@ -923,18 +923,38 @@ class CaseService:
 
     # Workspaces --------------------------------------------------------------------------
     def appeal_workspace(self, owner: str) -> s.WorkspaceView | None:
-        rows = (
-            self._store._require_open()
-            .execute("SELECT workspace_token FROM pb_intake_owners WHERE owner=?", (owner,))
-            .fetchall()
-        )
-        if len(rows) > 1:
-            raise ServiceConflict("ambiguous_legacy_scope")
-        return None if not rows else self.workspace_view(str(rows[0][0]))
+        """The owner's current workspace; repeat customers keep earlier ones too."""
+        latest = self._store.latest_owned_workspace(owner)
+        return None if latest is None else self.workspace_view(latest)
 
     def create_workspace(self, owner: str, body: s.CreateWorkspace) -> s.WorkspaceView:
-        token = f"ws_{self._deps.new_id()}"
+        """Start the customer's transaction, prefilled from a finished one.
+
+        While a transaction is still live, a repeated start replays the same workspace so a
+        double click never forks work. Once its case is terminal the customer is starting
+        another appeal: a fresh workspace is created carrying their own words, photos and
+        answers, with provision selections dropped because no new research has run.
+        """
         now = self._deps.clock()
+        previous = self._store.latest_owned_workspace(owner)
+        if previous is not None and self._finished_transaction(previous):
+            saved_previous = self._store.get_workspace(previous)
+            if saved_previous is None:
+                raise ServiceConflict("not_found")
+            carried = restart_prefill(saved_previous.workspace, ())
+            if body.notes:
+                carried = replace(carried, notes=body.notes)
+            token = f"ws_{self._deps.new_id()}"
+            try:
+                created = self._store.create_owned_workspace(
+                    owner, token, carried, now, create_new=True
+                )
+            except IntakeConflict as exc:
+                raise ServiceConflict(str(exc)) from None
+            return s.WorkspaceView(
+                workspace_id=created.workspace_token, notes=created.workspace.notes
+            )
+        token = f"ws_{self._deps.new_id()}"
         try:
             saved = self._store.create_owned_workspace(
                 owner, token, Workspace(notes=body.notes), now
@@ -942,6 +962,14 @@ class CaseService:
         except IntakeConflict as exc:
             raise ServiceConflict(str(exc)) from None
         return s.WorkspaceView(workspace_id=saved.workspace_token, notes=saved.workspace.notes)
+
+    def _finished_transaction(self, workspace_id: str) -> bool:
+        """Whether this workspace's transaction reached a terminal case state."""
+        intake = self._store.intake_for_workspace(workspace_id)
+        if intake is None or intake.case_token is None:
+            return False
+        case = self._store.get_case(intake.case_token)
+        return case is not None and case.letter_state in TERMINAL_STATES
 
     def workspace_view(self, workspace_id: str) -> s.WorkspaceView:
         saved = self._store.get_workspace(workspace_id)
