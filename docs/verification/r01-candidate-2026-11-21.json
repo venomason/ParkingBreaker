@@ -3,11 +3,12 @@
   "gate": "R01 (BETA) \u2014 unified candidate, CI gates, Cloud Build provenance",
   "candidate": {
     "branch": "main",
-    "commit": "c19f4da48b458e29fd906a7e2d6c407a8496faf4",
+    "commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
     "tree": "785edcaf84e4654cbd491f8492062c74e4d1c55b",
     "working_tree": "clean (0 entries)",
     "code_content_equivalent_to_deployed_build_source": "ffd1e848b9ed1feea3911f52075ca12743b38937 (verified by recursive diff; only generated caches/run output differ)",
-    "reconciliation": "the prior provisional guarded-paid line and the review-corrected decline-window rule are merged into this commit; docs/ROADMAPlegacy.md keeps the previous plan"
+    "reconciliation": "the prior provisional guarded-paid line and the review-corrected decline-window rule are merged into this commit; docs/ROADMAPlegacy.md keeps the previous plan",
+    "note": "docs commit ed793bf follows this SHA and changes only receipts; code content is identical. The freeze sequence ran on 699b209."
   },
   "acceptance_item_1_clean_commit": {
     "state": "done",
@@ -99,6 +100,17 @@
         "model": "deepseek-flash"
       },
       "log": "/home/ghostmonday/tmp/qualification-check.log"
+    },
+    "backend_suite_final_freeze_run": {
+      "result": "13920 passed, 1 warning, exit 0, 19m59s",
+      "candidate": "699b209",
+      "log": "/home/ghostmonday/tmp/freeze3-20261121/freeze.log",
+      "scope": "complete P03 + R04 + J05 tree; one run by owner sequencing",
+      "supersedes": "the earlier 13,898 run on the pre-J05 tree"
+    },
+    "make_web_check_final": {
+      "result": "EXIT 0 on the freeze candidate (lint, strict types, production build)",
+      "log": "/home/ghostmonday/tmp/freeze3-20261121/freeze.log"
     }
   },
   "acceptance_item_4_record": "this file",
@@ -115,9 +127,14 @@
     "health": "GET https://parkingbreaker.com/api/health -> 200, status ok, build_commit ffd1e848b9ed1feea3911f52075ca12743b38937"
   },
   "remaining_before_freeze": [
-    "full backend suite on this commit (in progress)",
-    "short-path socket fixture run",
-    "read-only MiMo Pro review of the frozen diff and receipts",
-    "frontend candidate-tagged build (optional; content already pinned by digest)"
-  ]
+    "three campaigns (running)",
+    "R02 drill on the durable target"
+  ],
+  "independent_review": {
+    "model": "MiMo V2.6 Pro, read-only, high effort",
+    "first_verdict": "REJECT \u2014 consent replay defect and duplicate-report 500",
+    "fix_commit": "699b209",
+    "re_review": "APPROVE \u2014 verified both fixes and that the regression tests fail on pre-fix code",
+    "evidence": "~/tmp/freeze3-20261121/mimo-fix-review.log"
+  }
 }
