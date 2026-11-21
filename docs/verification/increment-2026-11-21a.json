@@ -69,5 +69,33 @@
       "B": "keep one intake per workspace and add an explicit restart that registers a new workspace for the same owner with lineage to the stopped case; needs owner/workspace identity changes and retention coverage"
     },
     "needs": "owner choice between A and B before implementation"
+  },
+  "r02_local_preflight_on_frozen_sha": {
+    "commit": "c19f4da48b458e29fd906a7e2d6c407a8496faf4",
+    "validate_sh_dry_run": "offline syntax checks passed (exit 0)",
+    "lifecycle_deploy_dry_run": "topology=cloudrun-private-vm; OWNER PLAN printed: lock, fresh regional disk, reviewed digests + commit check, refuse quarantined restore, stop scheduler, down old, verify no prior owners, snapshot, migration, start, health, scheduler, monitor sweep",
+    "lifecycle_rollback_dry_run": "same plan rendered for rollback",
+    "backup_sh_dry_run": {
+      "restore": {
+        "artifacts_match": true,
+        "records_match": true
+      },
+      "reconciliation": "READY_FAKE"
+    },
+    "target_tests": {
+      "files": [
+        "test_t22_disk_policy",
+        "test_t22_cloudrun_overlay",
+        "test_t22_lifecycle",
+        "test_release_readiness"
+      ],
+      "result": "114 passed in 33.32s"
+    }
+  },
+  "m02_local_cohort_report": {
+    "command": "backend/.venv/bin/python -m parkingbreaker.paid_beta_report <db> --since 2026-11-20T17:00:00-08:00",
+    "observed": "runs cleanly and fails safe: empty DB -> {\"status\": \"unavailable\", \"reason\": \"window_or_transaction_store_invalid\"} with exit 0 (no traceback)",
+    "populated_behaviour": "covered by tests/test_paid_beta_report.py (part of the 308-test gate run)",
+    "limitation": "no live cohort data exists yet; aggregation correctness is test-established, not measured on real cases"
   }
 }
