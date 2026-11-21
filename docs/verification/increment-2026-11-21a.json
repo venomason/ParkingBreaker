@@ -219,7 +219,16 @@
       "pb-sol-overseer support@f0a0bf8": "1043 tracked diff lines, 13 untracked files"
     },
     "archive": "/home/ghostmonday/Workspace/pb-r01/worktree-archives (patches + untracked tarballs + MANIFEST.sha256)",
-    "next": "review the two large patches before any git worktree remove; nothing deleted by this step"
+    "next": "review the two large patches before any git worktree remove; nothing deleted by this step",
+    "uniqueness_review": {
+      "method": "materialised each archived patch and tested whether its added lines already exist in main",
+      "pb-integrated-1117": "44 files; unique lines only in docs/ROADMAP.md (an older roadmap, superseded) and 6 lines of a browser-spec helper -> no unique product code",
+      "pb-inc1-1117": "7 files; 0 unique lines",
+      "pb-sol-overseer recovery/release/support": "22/20/20 files; unique lines in intake_store.py are the superseded decline-window loop, and in test_t14 a support-code test that main lacked",
+      "finding": "COVERAGE LOSS FOUND: the desktop line tested support_codes_enabled (authorization.support_code is None when the channel is disabled); my merge resolution took the candidate test file wholesale and dropped it",
+      "action": "restored as test_customer_support_code_requires_enabled_channel (parametrised over enabled) in tests/test_t14_authorization_recovery.py; 23 passed in that file",
+      "remaining_decision": "the archived trees are now provably superseded except for that restored test; safe to prune once the owner agrees (archives keep every patch and untracked file with checksums)"
+    }
   },
   "p08_rules_modal": {
     "state": "PASS",

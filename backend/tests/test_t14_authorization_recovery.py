@@ -538,3 +538,22 @@ def test_corrupt_decline_time_is_not_masked_by_a_valid_recent_decline(
         db.commit()
     with pytest.raises(StorageCorruption):
         recovery.real.authorize(recovery.case_id, _fixture_card(3))
+
+
+# Ported from the desktop line that was reconciled away: the public support code is only
+# exposed on the authorization when the support channel is enabled. The gateway behaviour
+# was covered elsewhere, but this gate had no test on main.
+@pytest.mark.parametrize("enabled", [False, True])
+def test_customer_support_code_requires_enabled_channel(
+    recovery: RecoveryCase, enabled: bool
+) -> None:
+    recovery.real._deps = replace(recovery.real._deps, support_codes_enabled=enabled)
+    authorization = recovery.real.authorize(recovery.case_id, BODY)
+    intake = recovery.real._store.get_intake(recovery.case_id)
+    assert intake is not None
+    assert intake.case_token is not None
+    allocated = recovery.real._store.support_code_for_case(intake.case_token)
+    assert allocated is not None
+    expected = allocated if enabled else None
+    assert authorization.support_code == expected
+    assert recovery.real.status(recovery.case_id).support_code == expected
