@@ -76,6 +76,10 @@ from parkingbreaker.draft_ownership_store import (
     initialize_draft_ownership,
 )
 from parkingbreaker.identity_store import IdentityStoreMixin, initialize_identity
+from parkingbreaker.intake_pause_store import (
+    IntakePauseStoreMixin,
+    initialize_runtime_intake_pause,
+)
 from parkingbreaker.intake_store import IntakeConflict, IntakeStoreMixin, initialize_intake
 from parkingbreaker.journey_context import (
     ContextFunding,
@@ -979,6 +983,7 @@ def _case_record(row: tuple[object, ...]) -> CaseRecord:
 class SqliteTransactionStore(
     ApprovalManifestStoreMixin,
     ServicePhaseStoreMixin,
+    IntakePauseStoreMixin,
     RequiredCopyStoreMixin,
     AddressStoreMixin,
     AccessEmailStoreMixin,
@@ -1061,6 +1066,7 @@ class SqliteTransactionStore(
             initialize_tracking_email(self._require_open())
             initialize_settings(self._require_open())
             initialize_runtime_service_phase(self._require_open())
+            initialize_runtime_intake_pause(self._require_open())
             initialize_journey_events(self._require_open())
             initialize_ticket_observability(self._require_open())
             initialize_support(self._require_open())

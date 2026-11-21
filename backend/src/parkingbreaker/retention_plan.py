@@ -361,6 +361,7 @@ _KNOWN_TABLES: Final[frozenset[str]] = frozenset(
         "pb_return_remedies",
         "pb_review_resolution_expiries",
         "pb_review_resolutions",
+        "pb_runtime_intake_pause",
         "pb_runtime_service_phase",
         "pb_setting_changes",
         "pb_setting_proposal_expiries",

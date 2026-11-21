@@ -1089,6 +1089,10 @@ class CaseService:
         if owner is None or any(self._deps.photos.get(owner, ref) is None for ref in refs):
             raise ServiceConflict("unknown_photo_ref")
         existing = self._store.intake_for_workspace(workspace_id)
+        if existing is None and self._store.intake_paused():
+            # Emergency kill-switch: no new intake starts. Replaying an intake that was
+            # already accepted stays allowed, because nothing new is created.
+            raise ServiceConflict("intake_paused")
         if existing is not None and existing.intake_json != intake_json:
             raise ServiceConflict("intake_already_submitted_create_new_workspace")
         if existing is not None:
@@ -1537,6 +1541,8 @@ class CaseService:
         """Read one selected entitlement without selecting, reserving or charging."""
         if self._store.get_intake(case_id) is None:
             raise ServiceConflict("not_found")
+        if self._store.intake_paused():
+            raise ServiceConflict("intake_paused")
         entitlement = self._store.beta_entitlement(case_id)
         if entitlement is None:
             raise ServiceConflict("beta_entitlement_required")

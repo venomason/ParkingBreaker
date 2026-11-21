@@ -194,7 +194,7 @@ _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
         "pb_support_confirmation_emails",
     }
 )
-_STRUCTURAL_METADATA: Final = frozenset({"pb_store_versions"})
+_STRUCTURAL_METADATA: Final = frozenset({"pb_store_versions", "pb_runtime_intake_pause"})
 _KNOWN_TABLES: Final[dict[str, TableClass]] = {
     **dict.fromkeys(_PROTECTED_CUSTOMER_CONTENT, TableClass.PROTECTED_CUSTOMER_CONTENT),
     **dict.fromkeys(
