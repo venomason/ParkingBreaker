@@ -1,0 +1,202 @@
+{
+  "date_pacific": "2026-11-22",
+  "base_commit": "e27e151fe72c6fafde79f2488aa91ef07b74233f",
+  "coverage": {
+    "baseline_tracked": {
+      "backend_python_modules": 201,
+      "backend_source_lines": 79216,
+      "web_ts_tsx_app_components_and_lib_excluding_generated_types": 79,
+      "web_source_lines_in_that_group": 11049,
+      "backend_test_files": 305,
+      "support_apps_script_modules": 4
+    },
+    "methods": "Repository inventory and static checks, targeted manual and independent source reviews, local fake-provider scenarios, regression tests and release checks. Dependency trees, historical exports and individual lines were not exhaustively audited.",
+    "areas": [
+      "Payments, ledger and idempotent recovery",
+      "Ticket image intake and workspace autosave",
+      "Pricing, checkout and outcome UI",
+      "Print timing, submission, eligibility evidence and receipt deadlines",
+      "Backups, restore, health alerts and scheduler",
+      "Support intake, retention, diagnostic and AI spend records",
+      "Build and deployment tooling"
+    ]
+  },
+  "fixes": [
+    {
+      "area": "Checkout recovery",
+      "before": "After an uncertain authorization, retry could create a new PaymentMethod and leave the existing attempt unresolved. The saved case did not tell a reloaded checkout to resume it.",
+      "after": "The authenticated recovery route uses the original persisted identity and the existing provider idempotency and expiry controls. The UI can resume after reload, allow another card after a definite decline, and show a fresh eligibility stop before offering another card.",
+      "tests": [
+        "backend/tests/test_t14_authorization_recovery.py",
+        "web/tests/beta-phase-gate.spec.ts"
+      ]
+    },
+    {
+      "area": "Available review time",
+      "before": "A short verified card hold could start a review window extending beyond the last safe instant for mailing.",
+      "after": "Paid status and the review screen use the earlier of review expiry and the existing capture safety cutoff. A hold already inside that margin queues release. The existing frozen-case event and no-charge rules are preserved.",
+      "tests": [
+        "backend/tests/test_t14_authorization_recovery.py",
+        "backend/tests/test_t16_settlement.py"
+      ]
+    },
+    {
+      "area": "Saved ticket facts and photos",
+      "before": "The OCR action could overwrite a newer draft after a revision conflict. After replacing a photo, reload could reuse the original OCR request ID for the new file.",
+      "after": "Only an acknowledged revision can be used for a write. Current photo and review evidence controls ID reuse. Delayed status reads cannot reinstate replaced inputs.",
+      "tests": [
+        "web/tests/beta-ticket-vision.spec.ts"
+      ]
+    },
+    {
+      "area": "OCR request limits and AI spend",
+      "before": "Local pre-transport input rejection could be reported as an unavailable provider and retain a reservation from the case allowance.",
+      "after": "A known pre-transport input refusal settles at zero with a skipped AI journal entry. The saved photos remain available for customer-supplied facts. Uncertain transport still retains the reservation.",
+      "tests": [
+        "backend/tests/test_ticket_intake_service.py"
+      ]
+    },
+    {
+      "area": "Mail timing",
+      "before": "The postmark estimate counted November 27, 2026 as an available printing day. An independent hold estimator also disagreed with the print calendar at the exact daily cutoff.",
+      "after": "Printing dates, latest safe send and hold estimates use the existing Lob production calendar. USPS transit uses its separate calendar. For a Nov 24 send the conservative postmark moved to Nov 30. For a Nov 27 postmark deadline Nov 23 is the latest safe send.",
+      "source": "https://help.lob.com/resources/getting-support",
+      "tests": [
+        "backend/tests/test_mail_timing.py",
+        "backend/tests/test_submit_gate.py"
+      ]
+    },
+    {
+      "area": "Off-host backup integrity and alerting",
+      "before": "An interrupted replication could copy a completion marker before the durable payload. An up-to-date local backup could hide a failed replica.",
+      "after": "Only verified recovery payloads are copied. Replicas retain an incomplete marker until verified writes and directory entries are synced. Private monitoring measures source snapshot age from successful replication receipts. The private timer schedules two attempts per hour.",
+      "tests": [
+        "backend/tests/test_t22_replication.py",
+        "backend/tests/test_t23_recovery.py",
+        "backend/tests/test_t24_health.py"
+      ]
+    },
+    {
+      "area": "Outcome links",
+      "before": "Private link material appeared in the request URL. A transient reporting error left the customer with no available retry.",
+      "after": "New links use fragments and the browser removes the credential from the address bar. Existing links remain usable. Opening the page is passive, and a failed action can be retried.",
+      "tests": [
+        "backend/tests/test_outcome_follow_up.py",
+        "web/tests/ingress.spec.ts"
+      ]
+    },
+    {
+      "area": "Support inbox",
+      "before": "Once the first message in an unprocessed thread was marked complete, another already-read request in that thread could be skipped. Self-only conversations could keep reentering the work queue.",
+      "after": "Intake forwards the messages in each selected conversation using stable Gmail message IDs. The backend suppresses duplicate effects. The poll applies saved dispositions, marks a completed batch and discounts duplicate acknowledgments. Self-only threads leave the queue.",
+      "tests": [
+        "support-system/tests/thin_intake.test.js"
+      ]
+    },
+    {
+      "area": "Scheduler",
+      "before": "A truncated follow-up response could be accepted based on an HTTP 200, and the private worker credential appeared in curl arguments.",
+      "after": "Both sweeps pass the authorization header on stdin and require transport success. An incomplete follow-up records the transport and HTTP status.",
+      "tests": [
+        "backend/tests/test_t24_health.py"
+      ]
+    }
+  ],
+  "open": [
+    {
+      "issue": "Single-source business-day deadline",
+      "finding": "One explicit business-day sentence can support the period, trigger and receipt requirement yet fail the guard checking whether the rule specifies a fixed calendar date. This can stop intake before payment.",
+      "state": "Tested candidate held outside the application checkout. The sampled captured Austin source concerns a hearing decision at a later stage. A captured official filing procedure demonstrating this exact in-scope failure is still needed for the research-guard exception.",
+      "candidate_patch": "business-day-source-guard.patch",
+      "candidate_patch_sha256": "7a804d9235bd9df18ed0f1ec2e3cff0e1b64920b70e345e497b708ca6d9703f3",
+      "isolated_tests_passed": 691,
+      "additional_source_review": [
+        {
+          "url": "https://smithfieldutah.gov/DocumentCenter/View/351/Civil-Citation-or-Parking-Notice-Appeal-Form-PDF",
+          "result": "First-stage form with a business-day period and mailing instructions. The deadline sentence does not specify postmark versus receipt."
+        },
+        {
+          "url": "https://ris.dls.virginia.gov/uploads/8VAC50/forms/ce4bc003757~1.pdf",
+          "result": "Longwood University form with a received-by sentence, a signature line and an instruction to attach the citation. This form does not establish eligible municipal mail fulfillment."
+        }
+      ]
+    },
+    {
+      "issue": "Research guard baseline already diverged at HEAD",
+      "file": "backend/src/parkingbreaker/research/support.py",
+      "pinned_sha256": "7ecd2b1d6a547af57e09aad5672728d17c63a7b9406b6a8bf32ff6d3f53475c8",
+      "head_sha256": "52d22b8a3255da714918ca7b4c6c2a6469f4d34b92cb101e92cd9cce54aa9135",
+      "first_change": "3b166cf",
+      "state": "The local Cambridge HTML and text match both recorded hashes. The historical rehearsal documents the pre-fix refusal, the post-fix result and the Georgia Tech online-only negative control. The November 18 commit signature verifies. The freeze manifest still names the November 15 exception. Reconcile the owner exception record before rolling the pin forward. The legacy kit doctor also needs the archived task ledger. Its guard hash check was invoked directly.",
+      "capture_evidence": {
+        "url": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
+        "html_path": "backend/tests/fixtures/unfamiliar_issuers/cambridge.html",
+        "html_sha256": "75cd79ab79dfbf0eb5ac18ba91b5e941be90e6d11ea3b4d8b4802d41e3b12046",
+        "text_sha256": "fb52e770358ada4e56d14d634654c0888a3aefb8c30d063aab14ea83c45ee895",
+        "historical_rehearsal": "docs/verification/android-curbside-2026-11-18.json",
+        "frozen_inputs": "docs/verification/unfamiliar-issuer-rehearsal-2026-11-18.json",
+        "signed_change": "3b166cfae7504948ab002bf6db83630caf1afeff"
+      },
+      "comparison": {
+        "receipt": "cambridge-guard-comparison.json",
+        "sha256": "ed7992d434857df925e1fca00eb8fc6f668d70300087922545be10569a1c8b45",
+        "result": "The recorded code rejected the captured Cambridge filing sentence. Current code accepts it. Payment wording and an explicit prohibition stayed rejected on both versions."
+      }
+    }
+  ],
+  "operator_evidence_directory": "~/Vault/Ops/runs/pb-repo-audit-20261122",
+  "operational_boundary": "Local source and synthetic verification. No deployment, live payment, mail, customer-data use, or off-host RPO certification.",
+  "negative_finding": {
+    "scope": "Frozen and remailed packets",
+    "result": "Source review found case ownership checks, exact inspected PDF and envelope hash binding, renewed approval for remail and an independent provider attempt key. The actual mailer path uses the frozen bytes.",
+    "tests": [
+      "backend/tests/test_t30_remedy.py",
+      "backend/tests/test_lob_client.py"
+    ],
+    "outstanding": "Joined provider rendering, actual target recovery and physical delivery remain operational qualification work."
+  },
+  "local_verification": {
+    "focused_backend": [
+      {
+        "area": "mail calendars, replica health, recovery and existing submission controls",
+        "passed": 195,
+        "log": "first-focused.log",
+        "sha256": "0cf9374edcf38aea423c6a131019d60867afb40082e619fb7e069ea544d250de"
+      },
+      {
+        "area": "checkout authorization recovery, settlement, ingress and OCR spend",
+        "passed": 133,
+        "log": "checkout-ocr.log",
+        "sha256": "509641a6b03aa5c2a6cff2670d29988b4c00c7b5301edb19d3140bdd9f70e49c"
+      },
+      {
+        "area": "frozen provider bytes, packet approval and returned-mail remedies",
+        "passed": 183,
+        "log": "frozen-packet.log",
+        "sha256": "e7588bea8e724fb7af92bd2a13bf0c3e5fd791890994b767a1c3ba4bc71155e9"
+      },
+      {
+        "area": "API contract, customer ownership on the recovery endpoint, monitor readiness and dispatch cutoff",
+        "passed": 74,
+        "log": "integration-regression-after.log",
+        "sha256": "e2186aa8673d72e6dba904db6fee482c5b605bb7c375b972694d026654c5589f"
+      }
+    ],
+    "support_inbox": {
+      "passed": 7,
+      "runner": "node --test support-system/tests/thin_intake.test.js"
+    },
+    "build_kit_cli": {
+      "passed": 3,
+      "runner": "python3 -m unittest discover -s tools/tests"
+    },
+    "provider_self_tests": "make qualification-check passed research and vision self-tests offline.",
+    "dry_runs": "Provisioning validation and private lifecycle plan passed locally. The backup dry-run preserved records and artifacts through restoration and fake-provider reconciliation.",
+    "systemd": "systemd-analyze calendar verified private timer at each hour and half-hour.",
+    "first_browser_run": {
+      "expected": 154,
+      "unexpected": 6,
+      "details": "Two outcome-link tests selected both the customer alert and the Next.js route announcer. Four viewport tests simulated a definitive decline with a 402 instead of the 409 returned by the application after verification. Both test issues were corrected."
+    }
+  }
+}

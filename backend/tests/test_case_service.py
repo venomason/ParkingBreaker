@@ -400,8 +400,8 @@ async def test_tier_must_be_chosen_first(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("status", "reason"),
     [
-        ("requires_action", "card_not_authorized"),
-        ("requires_payment_method", "card_not_authorized"),
+        ("requires_action", "authorization_outcome_unresolved"),
+        ("requires_payment_method", "authorization_outcome_unresolved"),
     ],
 )
 async def test_unfinished_hold_starts_no_case(tmp_path: Path, status: str, reason: str) -> None:

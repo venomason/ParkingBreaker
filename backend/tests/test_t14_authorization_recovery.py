@@ -10,10 +10,13 @@ from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from httpx2 import ASGITransport, AsyncClient
 
 from parkingbreaker.api import schemas as s
+from parkingbreaker.api.app import create_app
 from parkingbreaker.api.service import ServiceConflict
 from parkingbreaker.case_service import CaseService
+from parkingbreaker.case_state import Effect
 from parkingbreaker.intake_store import AuthorizationAttempt
 from parkingbreaker.mail_attempt_store import StorageCorruption
 from parkingbreaker.payment_fakes import FakePaymentClient, full_outcome
@@ -21,7 +24,7 @@ from parkingbreaker.payment_records import PaymentOutcome, mutation_key
 from parkingbreaker.prices import PRICE_EXPERIMENT_ID
 from parkingbreaker.pricing_store import PricingAssignment
 from parkingbreaker.transaction_store import SqliteTransactionStore
-from test_case_service import INTAKE, PNG_B64, Clock, service
+from test_case_service import ALICE, BOB, INTAKE, PNG_B64, Clock, service
 from test_case_service import fake_resolution as fake_resolution
 
 PM = "pm_recovery_original"
@@ -197,7 +200,7 @@ def recovery(tmp_path: Path) -> Iterator[RecoveryCase]:
     real = service(path, payments, clock)
     case: RecoveryCase | None = None
     try:
-        workspace = real.create_workspace("owner_recovery", s.CreateWorkspace(notes=""))
+        workspace = real.create_workspace("alice", s.CreateWorkspace(notes=""))
         photo = real.upload_photo(
             workspace.workspace_id,
             s.PhotoUpload(content_type="image/png", data_base64=PNG_B64),
@@ -419,6 +422,95 @@ def test_response_loss_records_uncertainty_and_reuses_the_single_hold(
     assert recovery.real.authorize(recovery.case_id, BODY) == authorization
     assert len(recovery.payments.calls) == 2
     recovery.assert_one_case(authorization)
+
+
+@pytest.mark.anyio
+async def test_checkout_recovery_uses_only_the_saved_attempt_after_restart(
+    recovery: RecoveryCase,
+) -> None:
+    case = f"/cases/{recovery.case_id}"
+    recovery.payments.lose_next_response = True
+    async with AsyncClient(
+        transport=ASGITransport(app=create_app(recovery.real)), base_url="http://real.test"
+    ) as client:
+        response = await client.post(f"{case}/authorization", headers=ALICE, json=BODY.model_dump())
+        assert response.status_code == 409
+        assert response.json() == {"detail": "authorization_outcome_unresolved"}
+        pending = (await client.get(f"{case}/status", headers=ALICE)).json()
+        assert pending["authorization_pending"] is True
+        assert PM not in json.dumps(pending)
+
+    recovery.restart()
+    async with AsyncClient(
+        transport=ASGITransport(app=create_app(recovery.real)), base_url="http://real.test"
+    ) as client:
+        assert (await client.post(f"{case}/authorization/recovery", headers=BOB)).status_code == 404
+        assert len(recovery.payments.calls) == 1
+        response = await client.post(f"{case}/authorization/recovery", headers=ALICE)
+        assert response.status_code == 200, response.text
+        assert response.json()["payment_state"] == "AUTHORIZED"
+        assert not response.json().get("authorization_pending")
+        assert PM not in response.text
+        assert (await client.post(f"{case}/authorization/recovery", headers=ALICE)).json() == (
+            response.json()
+        )
+    assert recovery.payments.requests == [(2999, PM, recovery.key, recovery.metadata)] * 2
+    assert len(recovery.payments.authorizations) == 1
+    recovery.assert_one_case(recovery.real.authorize(recovery.case_id, BODY))
+
+
+@pytest.mark.anyio
+async def test_verified_checkout_decline_allows_another_card(recovery: RecoveryCase) -> None:
+    case = f"/cases/{recovery.case_id}"
+    recovery.payments.next_response = full_outcome(PaymentOutcome("declined", "auth_declined"))
+    async with AsyncClient(
+        transport=ASGITransport(app=create_app(recovery.real)), base_url="http://real.test"
+    ) as client:
+        response = await client.post(f"{case}/authorization", headers=ALICE, json=BODY.model_dump())
+        assert response.status_code == 409
+        assert response.json() == {"detail": "card_not_authorized"}
+        result = await client.post(f"{case}/authorization/recovery", headers=ALICE)
+        assert result.status_code == 200
+        assert result.json()["state"] == "INTAKE"
+        assert not result.json().get("authorization_pending")
+        assert len(recovery.payments.calls) == 1
+        replacement = _fixture_card(1)
+        result = await client.post(
+            f"{case}/authorization", headers=ALICE, json=replacement.model_dump()
+        )
+        assert result.status_code == 200, result.text
+    assert len(recovery.payments.calls) == 2
+    assert recovery.payments.calls[-1][1] == replacement.payment_method_id
+
+
+@pytest.mark.parametrize("remaining_minutes", [10, 45])
+def test_short_hold_review_uses_the_capture_safety_cutoff(
+    recovery: RecoveryCase, remaining_minutes: int
+) -> None:
+    start = recovery.clock()
+    expires = start + timedelta(minutes=remaining_minutes)
+    recovery.payments.next_response = replace(
+        recovery.payments.object,
+        evidence_version=1,
+        original_charge_ref="ch_recovery",
+        capture_before=int(expires.timestamp()),
+    )
+    auth = recovery.real.authorize(recovery.case_id, BODY)
+    expected_minutes = max(0, remaining_minutes - 30)
+    assert auth.window_expires_at == start + timedelta(minutes=expected_minutes)
+    status = recovery.real.status(recovery.case_id)
+    if expected_minutes:
+        assert status.seconds_remaining == expected_minutes * 60
+        recovery.clock.now = auth.window_expires_at
+        recovery.real.refresh(recovery.case_id)
+        status = recovery.real.status(recovery.case_id)
+    assert status.state == "STOPPED_NO_CHARGE"
+    assert status.stop is not None
+    assert status.stop.reason_key == "stop.transaction_failure.window_expired"
+    intake = recovery.real._store.get_intake(recovery.case_id)
+    assert intake is not None
+    assert intake.case_token is not None
+    assert recovery.real._store.pending_effects(intake.case_token, kinds=(Effect.RELEASE_HOLD,))
 
 
 def test_clock_before_creation_refuses_without_calling_provider(recovery: RecoveryCase) -> None:

@@ -99,10 +99,14 @@ def test_once_publishes_only_after_a_completed_observation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     data, state, now = setup(tmp_path)
+    monkeypatch.setenv("PB_REQUIRE_OFF_HOST_REPLICA", "1")
     observed: list[datetime] = []
 
-    def fake_observe(data: Path, backups: Path, now: datetime) -> HealthSnapshot:
+    def fake_observe(
+        data: Path, backups: Path, now: datetime, *, require_off_host: bool
+    ) -> HealthSnapshot:
         assert not (state / RECEIPT).exists()  # the old receipt is invalidated up front
+        assert require_off_host
         observed.append(now)
         return complete(now)
 
@@ -121,7 +125,7 @@ def test_interrupted_observation_removes_prior_receipt(
     data, state, now = setup(tmp_path)
     prior_receipt(data, state, now)
 
-    def boom(data: Path, backups: Path, now: datetime) -> HealthSnapshot:
+    def boom(data: Path, backups: Path, now: datetime, *, require_off_host: bool) -> HealthSnapshot:
         raise RuntimeError("observer crashed")
 
     monkeypatch.setattr(health_cli, "observe", boom)
@@ -136,7 +140,9 @@ def test_blind_poll_removes_prior_receipt(tmp_path: Path, monkeypatch: pytest.Mo
     data, state, now = setup(tmp_path)
     prior_receipt(data, state, now)
 
-    def fake_observe(data: Path, backups: Path, now: datetime) -> HealthSnapshot:
+    def fake_observe(
+        data: Path, backups: Path, now: datetime, *, require_off_host: bool
+    ) -> HealthSnapshot:
         return blind()
 
     monkeypatch.setattr(health_cli, "observe", fake_observe)
@@ -153,7 +159,9 @@ def test_notifier_error_does_not_reuse_obsolete_healthy_evidence(
     data, state, now = setup(tmp_path)
     prior_receipt(data, state, now)
 
-    def fake_observe(data: Path, backups: Path, now: datetime) -> HealthSnapshot:
+    def fake_observe(
+        data: Path, backups: Path, now: datetime, *, require_off_host: bool
+    ) -> HealthSnapshot:
         return complete(now, no_backup=True)
 
     def raising_notifier(environ: dict[str, str]) -> tuple[Notifier, str]:

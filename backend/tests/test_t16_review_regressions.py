@@ -236,8 +236,8 @@ async def test_expiry_margin_and_both_paths_show_truthful_fixed_stop(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, path: str, minutes_left: int
 ) -> None:
     # The guard sees time cross the margin after the initial FROZEN precheck.
-    initial_minutes = 31 if path == "guard" else minutes_left
-    expiry = test_case_service.NOW + timedelta(minutes=initial_minutes)
+    # Finish approval with a usable hold, then advance time at the boundary under test.
+    expiry = test_case_service.NOW + timedelta(minutes=31)
     monkeypatch.setattr(
         test_case_service, "fixture", lambda: fixture(expiry=int(expiry.timestamp()))
     )
@@ -250,7 +250,11 @@ async def test_expiry_margin_and_both_paths_show_truthful_fixed_stop(
     )
     api, real, intake_id = await approved(tmp_path, monkeypatch, lob)
     clock = Clock()
-    responses = [fixture(expiry=int(expiry.timestamp()))] if initial_minutes > 30 else []
+    if path == "frozen":
+        clock.now = expiry - timedelta(minutes=minutes_left)
+    responses = (
+        [fixture(expiry=int(expiry.timestamp()))] if path == "guard" or minutes_left > 30 else []
+    )
     adapter = client(Transport(*responses, fixture("canceled", expiry=int(expiry.timestamp()))))
     try:
         token = real._intake(intake_id).case_token

@@ -26,6 +26,7 @@ CAPTURE_LOW_VOLUME = 20
 DISK_MIN_FREE_FRACTION = 0.10
 DISK_MIN_FREE_BYTES = 2 * 1024**3
 BACKUP_STALE_AFTER = timedelta(hours=26)
+OFF_HOST_STALE_AFTER = timedelta(minutes=60)
 WEBHOOK_BACKLOG_AFTER = timedelta(minutes=30)
 
 
@@ -38,6 +39,7 @@ class AlertKind(StrEnum):
     CAPTURE_FAILURES = "capture_failures"
     DISK_LOW = "disk_low"
     BACKUP_STALE = "backup_stale"
+    OFF_HOST_REPLICA_STALE = "off_host_replica_stale"
     WEBHOOK_BACKLOG = "webhook_backlog"
     HOLD_REVIEW_DUE = "hold_review_due"
 
@@ -109,6 +111,8 @@ class HealthSnapshot:
     webhook_backlog_known: bool
     # Cases under a T74 incident hold; ``None`` means unknown.
     holds: tuple[HoldObservation, ...] | None = ()
+    require_off_host_replica: bool = False
+    last_off_host_replica_at: datetime | None = None
 
 
 def _unknown(name: str) -> Alert:
@@ -207,6 +211,17 @@ def evaluate(snapshot: HealthSnapshot, now: datetime) -> tuple[Alert, ...]:
                 "the newest completed backup is over 26 hours old",
             )
         )
+    if snapshot.require_off_host_replica:
+        replica_at = snapshot.last_off_host_replica_at
+        if replica_at is None or not timedelta(0) <= now - replica_at <= OFF_HOST_STALE_AFTER:
+            alerts.append(
+                Alert(
+                    AlertKind.OFF_HOST_REPLICA_STALE,
+                    Severity.CRITICAL,
+                    "off_host_replica",
+                    "no verified off-host replica with a source snapshot in the past 60 minutes",
+                )
+            )
     if not snapshot.webhook_backlog_known:
         alerts.append(_unknown("webhooks"))
     elif (

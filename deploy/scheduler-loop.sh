@@ -9,10 +9,14 @@ url="$1"
 follow_url="${2:-}"
 interval="${PB_SCHEDULER_INTERVAL:-60}"
 calls=0
+call_worker() {
+  printf 'Authorization: Bearer %s\n' "$PB_WORKER_SECRET" |
+    curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time "$1" \
+      -X POST -H @- "$2"
+}
 while :; do
   calls=$((calls + 1))
-  status=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 300 \
-    -X POST -H "Authorization: Bearer ${PB_WORKER_SECRET}" "$url")
+  status=$(call_worker 300 "$url")
   code=$?
   if [ "$code" -ne 0 ] || [ "$status" != 200 ]; then
     printf '{"event":"sweep_call_failed","curl_exit":%s,"http_status":"%s"}\n' "$code" "${status:-000}" >&2
@@ -21,10 +25,10 @@ while :; do
   fi
   if [ -n "$follow_url" ]; then
     # The follow-up sweep is independent: its failure never blocks the mailing sweep.
-    fstatus=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 60 \
-      -X POST -H "Authorization: Bearer ${PB_WORKER_SECRET}" "$follow_url")
-    if [ "$fstatus" != 200 ]; then
-      printf '{"event":"follow_up_call_failed","http_status":"%s"}\n' "${fstatus:-000}" >&2
+    fstatus=$(call_worker 60 "$follow_url")
+    fcode=$?
+    if [ "$fcode" -ne 0 ] || [ "$fstatus" != 200 ]; then
+      printf '{"event":"follow_up_call_failed","curl_exit":%s,"http_status":"%s"}\n' "$fcode" "${fstatus:-000}" >&2
     fi
   fi
   if [ -n "${PB_SCHEDULER_CALLS:-}" ] && [ "$calls" -ge "$PB_SCHEDULER_CALLS" ]; then

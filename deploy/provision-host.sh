@@ -37,7 +37,9 @@ fi
 if [[ ${1:-} == --install-backup-timer ]]; then
   [[ $EUID == 0 && $(stat -c '%u:%a' /etc/parkingbreaker/ops.env) == 0:600 ]] || exit 2
   install -m 0644 "$here/systemd/parkingbreaker-backup.service" /etc/systemd/system/
-  install -m 0644 "$here/systemd/parkingbreaker-backup.timer" /etc/systemd/system/
+  timer=parkingbreaker-backup.timer
+  if [[ $topology == cloudrun-private-vm ]]; then timer=parkingbreaker-backup-private.timer; fi
+  install -m 0644 "$here/systemd/$timer" /etc/systemd/system/parkingbreaker-backup.timer
   systemctl daemon-reload
   systemctl enable --now parkingbreaker-backup.timer
   exit 0

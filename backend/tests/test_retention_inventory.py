@@ -8,11 +8,16 @@ import socket
 import sqlite3
 import subprocess
 import sys
+from contextlib import closing
 from pathlib import Path
 
 import pytest
 
 from parkingbreaker import retention_inventory as ri
+from parkingbreaker import retention_purge
+from parkingbreaker.beta_contact_store import initialize_beta_contact
+from parkingbreaker.beta_notice_triage import initialize_beta_notice_triage
+from parkingbreaker.health_service import IncidentLog
 from parkingbreaker.retention_inventory import (
     FileClass,
     InventoryRefusal,
@@ -20,9 +25,50 @@ from parkingbreaker.retention_inventory import (
     TableClass,
     inventory_snapshot,
 )
+from parkingbreaker.retention_state import initialize_retention_state
+from parkingbreaker.transaction_store import SqliteTransactionStore
 
 SENTINEL = "SENTINEL-CUSTOMER-TEXT-7f3a9c"
 ID_SENTINEL = "CUSTOMER-ID-8472"
+
+
+def test_all_application_tables_have_an_explicit_snapshot_class(tmp_path: Path) -> None:
+    source = tmp_path / "parkingbreaker.sqlite"
+    monitor = tmp_path / "incidents.sqlite"
+    with SqliteTransactionStore(source) as store:
+        database = store._require_open()
+        initialize_beta_contact(database)
+        initialize_beta_notice_triage(database)
+        initialize_retention_state(database)
+        for ddl in retention_purge._DDL.values():
+            database.execute(ddl)
+    IncidentLog(monitor).close()
+    tables: set[str] = set()
+    internal_count = 0
+    for path in (source, monitor):
+        with closing(sqlite3.connect(path)) as database:
+            for (name,) in database.execute("SELECT name FROM sqlite_schema WHERE type='table'"):
+                if name.startswith("sqlite_"):
+                    internal_count += 1
+                else:
+                    tables.add(name)
+    assert tables == ri._KNOWN_TABLES.keys()
+    assert ri._KNOWN_TABLES["pb_ticket_intake_operations"] is TableClass.PROTECTED_CUSTOMER_CONTENT
+    assert ri._KNOWN_TABLES["pb_beta_notice_triage"] is TableClass.PROTECTED_CUSTOMER_CONTENT
+    assert ri._KNOWN_TABLES["pb_workspace_lineage"] is TableClass.RESTRICTED_IDENTITY_OPERATIONAL
+    assert ri._KNOWN_TABLES["pb_runtime_intake_pause"] is TableClass.RESTRICTED_IDENTITY_OPERATIONAL
+    assert (
+        ri._KNOWN_TABLES["pb_approval_manifests"]
+        is TableClass.RESTRICTED_FINANCIAL_PROVIDER_EVIDENCE
+    )
+    report = inventory_snapshot(tmp_path, database_paths=(source.name, monitor.name))
+    assert report.inspected_database_count == 2
+    assert report.unknown_table_count == internal_count
+    assert report.table_count_for(TableClass.PROTECTED_CUSTOMER_CONTENT) == len(
+        ri._PROTECTED_CUSTOMER_CONTENT
+    )
+    assert report.retention_policy_activated is False
+    assert report.purge_eligible is False
 
 
 def make_db(path: Path, *, rows: int = 0, unknown_rows: int = 0, wal: bool = False) -> None:

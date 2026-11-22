@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "./api";
+import { api, ApiError } from "./api";
 import type { IntakeForm, WorkspaceView } from "./api";
 
 /** One serialized writer to the existing private workspace; a conflict never overwrites it. */
@@ -12,6 +12,7 @@ export function useWorkspaceAutosave(form: IntakeForm, enabled: boolean, ready: 
   const workspace = useRef<WorkspaceView | null>(null);
   const opening = useRef<Promise<WorkspaceView> | null>(null);
   const writing = useRef<Promise<void> | null>(null);
+  const conflict = useRef<ApiError | null>(null);
   const attempted = useRef<{ view: WorkspaceView; form: IntakeForm; signature: string } | null>(null);
   const [state, setState] = useState<"saved" | "saving" | "error">("saved");
 
@@ -30,6 +31,7 @@ export function useWorkspaceAutosave(form: IntakeForm, enabled: boolean, ready: 
     workspace.current = null;
     opening.current = null;
     attempted.current = null;
+    conflict.current = null;
     saved.current = "";
     setState("saved");
   }, []);
@@ -49,6 +51,7 @@ export function useWorkspaceAutosave(form: IntakeForm, enabled: boolean, ready: 
     if (!enabled) return null;
     if (snapshot) latest.current = snapshot;
     while (writing.current) await writing.current;
+    if (conflict.current) throw conflict.current;
     if (!attempted.current && JSON.stringify(latest.current) === saved.current) {
       return workspace.current ?? await ensureWorkspace();
     }
@@ -71,6 +74,9 @@ export function useWorkspaceAutosave(form: IntakeForm, enabled: boolean, ready: 
         setState("saved");
         return workspace.current;
       } catch (error) {
+        if (error instanceof ApiError && error.status === 409 && error.detail === "workspace_changed_reload_required") {
+          conflict.current = error;
+        }
         setState("error");
         throw error;
       }

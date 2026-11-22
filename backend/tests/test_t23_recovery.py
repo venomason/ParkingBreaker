@@ -272,3 +272,44 @@ def test_backup_reserve_is_configurable_for_the_owner_cli(tmp_path: Path) -> Non
     )
     assert allowed.returncode == 0, allowed.stderr
     assert (tmp_path / "yes" / "COMPLETE").is_file()
+
+
+def test_replica_publication_waits_for_durable_payload_and_omits_sidecars(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    data = tmp_path / "authority"
+    data.mkdir()
+    with SqliteTransactionStore(data / recovery.DATABASE) as store:
+        prepared(store)
+    bundle = tmp_path / "bundle"
+    recovery.backup(data, bundle)
+    (bundle / "private-sidecar.json").write_text("keep on authority")
+    remote = tmp_path / "remote"
+    remote.mkdir()
+    failed = remote / "failed"
+    original_sync = recovery._sync_dir
+
+    def interrupt(path: Path) -> None:
+        if path == failed:
+            assert not (failed / "COMPLETE").exists()
+            raise OSError("interrupted before replica publication")
+        original_sync(path)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(recovery, "_sync_dir", interrupt)
+        with pytest.raises(OSError, match="interrupted"):
+            recovery.replicate(bundle, failed, record_off_host=True)
+    assert (failed / "INCOMPLETE").exists()
+    assert not (bundle / recovery.OFF_HOST_RECEIPT).exists()
+    with pytest.raises(ValueError, match="incomplete"):
+        recovery.verify(failed)
+
+    retry = remote / "retry"
+    recovery.replicate(bundle, retry, record_off_host=True)
+    assert recovery.verify(retry) == recovery.verify(bundle)
+    assert not (retry / "private-sidecar.json").exists()
+    assert not (retry / recovery.OFF_HOST_RECEIPT).exists()
+    assert json.loads((bundle / recovery.OFF_HOST_RECEIPT).read_text()) == {
+        "snapshot_at": (bundle / recovery.SNAPSHOT_TIME).read_text(),
+        "manifest_sha256": hashlib.sha256((retry / "manifest.json").read_bytes()).hexdigest(),
+    }

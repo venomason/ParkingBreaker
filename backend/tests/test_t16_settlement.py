@@ -241,8 +241,9 @@ def test_changed_case_amount_cannot_reach_provider(
 async def test_recorded_authorization_expiry_before_send_stops_and_releases(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    expiry = test_case_service.NOW + timedelta(minutes=5)
-    # Use real T14 parsing/persistence of a short provider hold, inside the session window.
+    # A 45-minute hold allows approval before the 30-minute payment safety margin.
+    # It still expires within the default review window before dispatch can create mail.
+    expiry = test_case_service.NOW + timedelta(minutes=45)
     monkeypatch.setattr(
         test_case_service, "fixture", lambda: fixture(expiry=int(expiry.timestamp()))
     )
@@ -254,6 +255,7 @@ async def test_recorded_authorization_expiry_before_send_stops_and_releases(
         case = real._store.get_case(token)
         assert case is not None
         assert case.authorization_expires_at == expiry
+        assert case.letter_state is cs.CaseState.FROZEN
         clock = Clock()
         clock.now = expiry + timedelta(seconds=1)
         transport = Transport(fixture("canceled", expiry=int(expiry.timestamp())))

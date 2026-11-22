@@ -125,6 +125,9 @@ def main() -> int:
         action="store_true",
         help="run a seeded local rehearsal in a new temp directory",
     )
+    parser.add_argument(
+        "--record-off-host", action="store_true", help="record a verified off-host replication"
+    )
     args = parser.parse_args()
     os.umask(0o077)
     try:
@@ -139,8 +142,14 @@ def main() -> int:
         elif args.action == "restore" and args.data is not None and args.output is not None:
             result = recovery.restore(args.data, args.output)
         elif args.action == "replicate" and args.data is not None and args.output is not None:
-            recovery.replicate(args.data, args.output)
-            result = {"status": "verified local replica; off-site storage NEEDS_EXTERNAL"}
+            recovery.replicate(args.data, args.output, record_off_host=args.record_off_host)
+            result = {
+                "status": (
+                    "verified off-host replica"
+                    if args.record_off_host
+                    else "verified local replica; off-site storage NEEDS_EXTERNAL"
+                )
+            }
         elif args.action == "reconcile":
             if args.data is not None or args.output is not None:
                 if args.data is None or args.output is None:

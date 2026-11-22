@@ -1,0 +1,8 @@
+[Unit]
+Description=ParkingBreaker half-hourly off-host recovery bundle
+[Timer]
+OnCalendar=*-*-* *:00,30:00
+Persistent=true
+Unit=parkingbreaker-backup.service
+[Install]
+WantedBy=timers.target

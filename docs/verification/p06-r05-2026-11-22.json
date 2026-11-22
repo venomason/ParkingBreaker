@@ -1,0 +1,190 @@
+{
+  "observed_date_pacific": "2026-11-22",
+  "base_commit": "e27e151fe72c6fafde79f2488aa91ef07b74233f",
+  "inputs_sha256": {
+    "backend/src/parkingbreaker/llm_gemini.py": "20c0701bb68dcc1b73bb5ba9402e74d1ac6f40db17a41deb10b828b143448f69",
+    "backend/src/parkingbreaker/retention_inventory.py": "e13a4bb68653923e7f08936d40a94bb87f711516e0af6561920c0b1bd3f77d01",
+    "backend/tests/test_llm_gemini.py": "79075f0dd36b2bc5e435d786d03ee3d51088bf6383b1809128e0f35d1ed2e30f",
+    "backend/tests/test_retention_inventory.py": "226b4d3de0dbafb1e0ce2daba41795e9ea2cd3ab38470b3866f0bf538ed6eaf9",
+    "web/tests/configuration.spec.ts": "6510202fac7e4e66682224bb8046bf9eb5e3a75da5f461d24823641f0f343716"
+  },
+  "handoff": {
+    "signed_integration": "1d8205858fefc87eeefc3924b17b1b07fc0010c0",
+    "comparison": "Before edits, git -C ~/Workspace/pb-launch-fixes diff main -- backend web deploy cloudbuild-backend.yaml was empty. The archived worktree, including its two unstaged files, differed from main only in the older R06 receipt."
+  },
+  "gemini": {
+    "account_basis": "The owner identified this as the Default Gemini Project free-tier key. Observed the authenticated model list and generation. Project billing and active quota were not independently measured.",
+    "model_catalog": "HTTP 200. Both gemini-3.8-flash and gemini-3.5-flash-lite were listed.",
+    "openai_compatible_endpoint": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "text_probes": {
+      "gemini-3.8-flash": "Timed out at 30 seconds.",
+      "gemini-3.5-flash-lite": "HTTP 200 with the expected JSON boolean."
+    },
+    "ocr_budget_regression": "The unmodified Flash-Lite reader rejected the 1300 x 1100 clear synthetic PNG locally at the 25-cent ceiling. The corrected reader verified the original bytes, reserved 8192 visual tokens per image, retained the cap and context check, and bounded the complete inline body at 20 MB.",
+    "local_provider_probe": "Initial patched extraction returned a retryable provider error. A separate synthetic probe read 11/11 fields (2731 input tokens, 303 output tokens). The following model review returned HTTP 503 UNAVAILABLE. The adapter made no automatic retry.",
+    "data_use": "US unpaid Gemini is limited here to synthetic fixtures. https://ai.google.dev/gemini-api/terms#unpaid-services",
+    "quota": "Google applies project/model-specific limits. No 1500 requests/day guarantee or measured customer throughput. https://ai.google.dev/gemini-api/docs/rate-limits"
+  },
+  "p06": {
+    "state": "PARTIAL. Joined supportable case, frozen packet, sandbox provider callbacks bound to that case, and interrupted provider reconciliation still open.",
+    "target": "Existing private pb-qual-backend-01 in neuraldraft-parkingbreaker, us-west1-a. /health reported ok, mode=test, customer_authored_mode=true.",
+    "running_backend_digest": "sha256:f3dc3602b907ad76c78cd6018b6f9acc9a0c567e59c45247d56abbf5f348a6c1",
+    "running_configuration": "API and worker were running. The API had gemini-3.8-flash for OCR and research, placeholder Brave and Resend values, and a one-row registry fixture.",
+    "scope": "Scratch Python process inside the existing test image, corrected adapter and explicit Flash-Lite OCR selection, disposable SQLite and an in-process synthetic mailbox. Requests used production customer, origin and CSRF checks. The live-serving process was not redeployed by these checks.",
+    "clear_fixture": {
+      "input": "tools/qualification/vision-data/clear_png.png",
+      "sha256": "0b15fc04ab90a7c08447fd4152f1e3d57e9d2b8d2d232e39ba1e5ce279384173",
+      "extraction_http": 200,
+      "exact_fields": 11,
+      "expected_fields": 11,
+      "model_review_http": 409,
+      "detail": "ticket_review_provider_unavailable"
+    },
+    "san_francisco_fixture": {
+      "input_png_sha256": "2ed5a5ab68e537793f102d43ea4308a623bca5ccfdf836ac254481600b7e6730",
+      "extraction_http": 409,
+      "stored_reading": "unknown",
+      "review_basis": "customer-supplied facts; no model comparison",
+      "confirmation": "current, generation 1",
+      "intake_http": 200,
+      "state": "STOPPED_NO_CHARGE",
+      "reason": "stop.not_yet_verified.not_yet_verified.s2.no_pages",
+      "payment_operations": 0,
+      "mail_attempts": 0,
+      "submission_operations": 0
+    },
+    "cisa_registry": {
+      "source": "https://github.com/cisagov/dotgov-data/blob/e0b93728560ed2ea53a0126fa443879381d6d1ce/current-full.csv",
+      "date": "2026-11-21",
+      "sha256": "aa5f1a63ec51b19f38cc0f6e4816302ec73a82f85b7d92414095cd722c6b3d44",
+      "san_francisco_registry_only": {
+        "verified_registry_rows": 17129,
+        "outcome": "NOT_YET_VERIFIED",
+        "veto": "NO_PAGES",
+        "official_page_count": 0,
+        "search": "disabled for registry-only check",
+        "fetch_attempts": [
+          {
+            "host": "sfmta.gov",
+            "reason": "not on the allowlist: https://www.sfmta.com/"
+          }
+        ]
+      },
+      "san_diego_registry_only": "Reached LlmIssuerAssessor with fetched pages and stopped on Gemini LlmProviderError. No verified issuer or office was produced."
+    },
+    "next": "Qualify source discovery and model assessment on a genuine official procedure, then rehearse a supported synthetic case on the exact release image. Preserve the existing source, approval, payment and mail checks.",
+    "previous_standalone_stripe_hold_readback": {
+      "livemode": false,
+      "status": "canceled",
+      "amount": 2999,
+      "amount_capturable": 0,
+      "amount_received": 0,
+      "currency": "usd"
+    }
+  },
+  "r05": {
+    "previous_unclassified_application_tables": 33,
+    "classified_application_tables": 98,
+    "service_and_monitor_counts": {
+      "protected_customer_content": 18,
+      "restricted_financial_provider_evidence": 11,
+      "restricted_identity_operational": 68,
+      "structural_metadata": 1
+    },
+    "vm_service_schema_metadata_only": {
+      "restricted_identity_operational": 55,
+      "restricted_financial_provider_evidence": 11,
+      "protected_customer_content": 15,
+      "sqlite_internal": 1,
+      "structural_metadata": 1
+    },
+    "inspection": "Read-only metadata query against the running sandbox service database. 82 application tables and one SQLite internal table. Tests initialize the optional contact, notice, retention and purge tables and the separate monitor database.",
+    "remaining": "Owner retention decisions, legal and financial schedules, external and backup copies, and access checks on the standing production candidate. Snapshot classification does not authorize purge.",
+    "sandbox_access_drill": {
+      "scope": "Isolated app auth routes in the running test image, empty SQLite, synthetic in-process mailbox, controlled clock. No external delivery.",
+      "http_statuses": {
+        "expired_at_16min": 401,
+        "prefetch": 200,
+        "confirm_after_prefetch": 200,
+        "used_link_replay": 401,
+        "session_before_logout": 200,
+        "logout": 200,
+        "revoked_session": 401
+      }
+    }
+  },
+  "checks": {
+    "focused_backend": {
+      "passed": 443
+    },
+    "gemini_final_assertion": {
+      "passed": 27
+    },
+    "ruff_lint_format": "passed, 506 files",
+    "strict_mypy": "passed, 506 files",
+    "offline_qualification": "research and vision self-tests passed",
+    "web_check": "lint, type-check and production build passed",
+    "browser_proxy_regression": {
+      "observed": "154/155 passed on initial paid browser run. Exact public route list in configuration.spec.ts omitted /api/outcomes/:path* added with follow-up reporting.",
+      "verified_contract": "OutcomeLink.tsx calls opt-out and report, both implemented by the customer API and included in private Caddy ingress. Restored the exact route-list expectation and checked both destinations. All 3 configuration specs passed independently."
+    },
+    "local_browser_campaigns": {
+      "application_fingerprint": "6f73f02901f03fff66bcdf415fe0b6a53668eb8ca906c9627e5c11f365d0684e",
+      "provider_mode": "fake",
+      "all_services_stopped": true,
+      "runs": [
+        {
+          "campaign": "paid-candidate",
+          "passed": 155,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0,
+          "report_sha256": "864c98e0f66a750fee7093f0fd4cdcfef3ac9d16a6091fbf308e9c73797c1a22",
+          "local_receipt_sha256": "763530ee1b830eef9d48351cb1bb3232f56a155d3b7ba436f975d3757c802d7f"
+        },
+        {
+          "campaign": "paid-ocr-candidate",
+          "passed": 14,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0,
+          "report_sha256": "be1087b2d9447802598934af68bda43b1361f8e6dab9593cf1e51e88becd685b",
+          "local_receipt_sha256": "85a730d4cea65db56f0ec5d4657e62dad82438e2d81eadc81a30d32cf922e3a7"
+        },
+        {
+          "campaign": "mobile-ocr-candidate",
+          "passed": 55,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0,
+          "report_sha256": "184aec49a8d710f43b4f10a0eae2c2f5b8f6ed2ce95503f8ee1806e7287388ea",
+          "local_receipt_sha256": "663b6555371137202745adb5ade1c926fb4dd6cf5e9c297861416657156bff6d"
+        }
+      ]
+    },
+    "backend_suite": {
+      "passed": 13934,
+      "skipped": 0,
+      "failures": 0,
+      "warnings": 1,
+      "warning": "Starlette TestClient uses a deprecated AnyIO BlockingPortal alias.",
+      "log_sha256": "73520509553bc43374c2541e79ddabb8c8a0bc02ef45dac082d41d4bc0871d77",
+      "timing": "Full run began before the final two table reclassifications and tightened image-budget assertion. Affected suites were rechecked with 443 focused passes and a final 27 Gemini passes.",
+      "elapsed_seconds": 1208.67
+    },
+    "web_check_log_sha256": "9c44665d7d7fb9022cb2e441361d5b63bb03a7309d370b34d8ec90798b92d085"
+  },
+  "operator_evidence_directory": "~/Vault/Ops/runs/pb-handoff-20261122-qualification",
+  "production_activation": "NO-GO",
+  "public_preview": {
+    "initial_check": "Timed out after 10 seconds.",
+    "retry": {
+      "http": 200,
+      "status": "ok",
+      "mode": "fake",
+      "customer_authored_mode": true,
+      "build_commit": "ffd1e848b9ed1feea3911f52075ca12743b38937",
+      "elapsed_seconds": 1.42
+    }
+  }
+}

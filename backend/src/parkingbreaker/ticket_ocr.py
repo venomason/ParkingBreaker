@@ -126,7 +126,7 @@ class RoutedTicketReader(TicketVisionReader):
             p_end = self._monotonic()
             if isinstance(exc, LlmBudgetExceeded):
                 p_status = "budget_refused"
-            elif isinstance(exc, TicketVisionInputError):
+            elif isinstance(exc, (TicketVisionInputError, UnboundableRequestError)):
                 p_status = "input_error"
             else:
                 p_status = "provider_error"
@@ -194,7 +194,7 @@ class RoutedTicketReader(TicketVisionReader):
                     status = "failed"
                     if isinstance(exc, LlmBudgetExceeded):
                         escalation_exc_kind = "budget_exhausted"
-                    elif isinstance(exc, TicketVisionInputError):
+                    elif isinstance(exc, (TicketVisionInputError, UnboundableRequestError)):
                         escalation_exc_kind = "input_error"
                     else:
                         escalation_exc_kind = "provider_error"

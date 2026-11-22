@@ -37,6 +37,7 @@ from enum import StrEnum
 
 from parkingbreaker.holidays import add_business_days, previous_business_day
 from parkingbreaker.json_types import JsonValue
+from parkingbreaker.lob_run import next_production_day
 from parkingbreaker.mail_config import MAIL_TIMING, MailClass
 
 
@@ -148,7 +149,10 @@ def deadline_for_period(
 
 
 def mailing_date(send_date: date, mail_class: MailClass) -> date:
-    return add_business_days(send_date, MAIL_TIMING[mail_class].production_business_days)
+    day = send_date
+    for _ in range(MAIL_TIMING[mail_class].production_business_days):
+        day = next_production_day(day)
+    return day
 
 
 def arrival_date(send_date: date, mail_class: MailClass) -> date:

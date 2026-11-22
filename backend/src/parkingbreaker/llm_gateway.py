@@ -9,6 +9,7 @@ from typing import Protocol
 
 from parkingbreaker.json_types import JsonValue
 from parkingbreaker.llm import ImageAttachment, LlmBudgetExceeded, LlmClient, Usage
+from parkingbreaker.llm_input_budget import UnboundableRequestError
 from parkingbreaker.oplog.ai_journal import AiCall, AiCallStatus, AiWorker
 
 AppendCall = Callable[[str, AiCall, datetime], object]
@@ -112,6 +113,10 @@ class CallLoggingLlmClient:
             # Refused before any provider request (LlmClient contract): nothing was spent.
             self._settle(reservation, 0)
             self._record(AiCallStatus.BUDGET_EXCEEDED, Usage())
+            raise
+        except UnboundableRequestError:
+            self._settle(reservation, 0)
+            self._record(AiCallStatus.SKIPPED, Usage())
             raise
         except Exception:
             # Cost unknown: the reservation stays counted in full.

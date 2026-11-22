@@ -880,6 +880,20 @@ class IntakeStoreMixin:
         )
         return None if row is None else _authorization_attempt(row)
 
+    def pending_authorization_attempt(
+        self: _Connected, intake_id: str
+    ) -> AuthorizationAttempt | None:
+        row = (
+            self._require_open()
+            .execute(
+                _AUTHORIZATION_SELECT + "WHERE intake_id=? AND state IN ('pending', 'uncertain') "
+                "ORDER BY attempt_number DESC LIMIT 1",
+                (intake_id,),
+            )
+            .fetchone()
+        )
+        return None if row is None else _authorization_attempt(row)
+
     def has_active_authorization_attempt(self: _Connected, intake_id: str) -> bool:
         """An existing financial intent must retain its original request and recovery path."""
         return (

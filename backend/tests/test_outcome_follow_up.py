@@ -192,6 +192,8 @@ async def test_follow_up_copy_is_clerical_and_carries_a_verifiable_opt_out_link(
         assert "guarantee" not in message.text.lower()
         assert "promise" not in message.text.lower().replace("do not promise", "")
         assert "we do not give legal advice" in message.text.lower()
+        assert "/outcomes/opt-out#case=" in message.text
+        assert "/outcomes/opt-out?" not in message.text
         match = re.search(r"[?&]token=([0-9a-f]{64})", message.text)
         assert match is not None
         assert verify_follow_up_token(LINK_KEY, token, match.group(1)) is True

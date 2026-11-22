@@ -399,7 +399,18 @@ def create_app(
     async def authorization(
         body: s.StartAuthorization, case: Annotated[str, Depends(owned_case)]
     ) -> s.Authorization:
-        return services.authorize(case, body)
+        try:
+            return services.authorize(case, body)
+        except ServiceConflict as exc:
+            if str(exc) == "card_not_authorized":
+                saved = services.status(case)
+                if saved.authorization_pending or saved.payment_state is not None:
+                    raise ServiceConflict("authorization_outcome_unresolved") from None
+            raise
+
+    @api.post("/cases/{case_id}/authorization/recovery", response_model=s.CaseStatus)
+    async def authorization_recovery(case: Annotated[str, Depends(owned_case)]) -> s.CaseStatus:
+        return services.recover_authorization(case)
 
     @api.get("/cases/{case_id}/beta-offer", response_model=s.BetaOffer)
     async def beta_offer(case: Annotated[str, Depends(owned_case)]) -> s.BetaOffer:

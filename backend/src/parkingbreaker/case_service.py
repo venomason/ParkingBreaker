@@ -119,6 +119,7 @@ from parkingbreaker.case_hold_store import (
 )
 from parkingbreaker.case_state import (
     TERMINAL_STATES,
+    AuthorizationExpired,
     CaseState,
     CustomerAnswered,
     CustomerApproved,
@@ -871,6 +872,14 @@ class _OriginalCreateConfirmationGuard:
         return self.client.cancel_letter(letter_id)
 
 
+def _review_deadline(case: CaseRecord) -> datetime:
+    deadline = case.authorized_at + DEFAULT_WINDOW
+    if case.payment_state is PaymentState.NO_CHARGE:
+        return deadline
+    safe_hold_deadline = case.authorization_expires_at - EXPIRY_MARGIN
+    return max(case.authorized_at, min(deadline, safe_hold_deadline))
+
+
 class CaseService:
     """CaseServices over SqliteTransactionStore, through the frozen packet."""
 
@@ -902,20 +911,19 @@ class CaseService:
         return None if record is None else record.owner
 
     def refresh(self, case_id: str) -> None:
-        """Expire the 30-minute window: the letter stops and the hold release is queued."""
+        """Expire an elapsed review window and queue release of any hold."""
         record = self._store.get_intake(case_id)
         if record is None or record.case_token is None:
             return
         case = self._store.get_case(record.case_token)
         now = self._deps.clock()
-        if (
-            case is not None
-            and applies_to(case.letter_state)
-            and window_status(case.authorized_at, now) is WindowStatus.EXPIRED
-        ):
+        if case is not None and applies_to(case.letter_state) and now >= _review_deadline(case):
+            event: WindowExpired | AuthorizationExpired = WindowExpired()
+            if case.letter_state is CaseState.FROZEN and now < case.authorized_at + DEFAULT_WINDOW:
+                event = AuthorizationExpired()
             self._store.apply_letter_event(
                 case.case_token,
-                WindowExpired(),
+                event,
                 case.revision,
                 occurred_at=now,
                 new_effect_id=lambda: f"eff_{self._deps.new_id()}",
@@ -1377,6 +1385,24 @@ class CaseService:
                 return self._authorization(case_id, current.case_token)
             raise ServiceConflict(str(exc)) from None
 
+        return self._dispatch_authorization(case_id, key)
+
+    def recover_authorization(self, case_id: str) -> s.CaseStatus:
+        """Resolve the original attempt using only its persisted payment identity."""
+        self._intake(case_id)
+        attempt = self._store.pending_authorization_attempt(case_id)
+        if attempt is not None:
+            try:
+                self._dispatch_authorization(case_id, attempt.idempotency_key)
+            except ServiceConflict as exc:
+                if str(exc) != "card_not_authorized":
+                    raise
+                if self._store.pending_authorization_attempt(case_id) is not None:
+                    raise ServiceConflict("authorization_outcome_unresolved") from None
+        self.refresh(case_id)
+        return self.status(case_id)
+
+    def _dispatch_authorization(self, case_id: str, key: str) -> s.Authorization:
         now = self._deps.clock()
         try:
             intent = self._store.claim_authorization_dispatch(
@@ -1487,6 +1513,8 @@ class CaseService:
                     )
                 except IntakeConflict as exc:
                     raise ServiceConflict(str(exc)) from None
+                if _review_deadline(case) <= case.authorized_at:
+                    self.refresh(case_id)
                 return self._authorization(case_id, case.case_token)
 
         amount_matches = (
@@ -1545,7 +1573,7 @@ class CaseService:
             amount_cents=case.amount_cents,
             status="authorized",
             window_started_at=case.authorized_at,
-            window_expires_at=case.authorized_at + DEFAULT_WINDOW,
+            window_expires_at=_review_deadline(case),
             fake=False,
         )
 
@@ -1727,6 +1755,9 @@ class CaseService:
                 workspace_id=record.workspace_token,
                 state=CaseState.STOPPED_NO_CHARGE if stopped else CaseState.INTAKE,
                 payment_state=None,
+                authorization_pending=(
+                    True if self._store.pending_authorization_attempt(case_id) is not None else None
+                ),
                 selected_tier=tier,
                 window_started_at=None,
                 window_expires_at=None,
@@ -1738,6 +1769,9 @@ class CaseService:
             )
         now = self._deps.clock()
         windowed = applies_to(case.letter_state)
+        window_deadline = _review_deadline(case)
+        window = window_deadline - case.authorized_at
+        expired = now >= window_deadline
         saved = self._store.get_research(case_id)
         draft = self._store.get_draft(case_id)
         return s.CaseStatus(
@@ -1749,9 +1783,15 @@ class CaseService:
             selected_tier=tier,
             amount_cents=case.amount_cents,
             window_started_at=case.authorized_at,
-            window_expires_at=case.authorized_at + DEFAULT_WINDOW,
-            seconds_remaining=seconds_remaining(case.authorized_at, now) if windowed else None,
-            window_status=window_status(case.authorized_at, now) if windowed else None,
+            window_expires_at=window_deadline,
+            seconds_remaining=(0 if expired else seconds_remaining(case.authorized_at, now, window))
+            if windowed
+            else None,
+            window_status=(
+                WindowStatus.EXPIRED if expired else window_status(case.authorized_at, now, window)
+            )
+            if windowed
+            else None,
             question=self._open_question(case.case_token)
             if case.letter_state is CaseState.NEEDS_CUSTOMER
             else None,

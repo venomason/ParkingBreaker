@@ -98,6 +98,7 @@ def test_private_backup_and_replica_use_the_active_private_stack(tmp_path: Path)
     assert f"-v {replica}:/replica" in copy
     assert "findmnt --noheadings --mountpoint /replica" in copy
     assert "recovery_cli replicate" in copy
+    assert "--record-off-host" in copy
 
 
 def test_private_backup_keeps_local_bundle_and_alerts_without_offhost_mount(tmp_path: Path) -> None:
@@ -141,6 +142,7 @@ def test_scheduled_backup_replicates_the_verified_bundle_to_an_independent_direc
     name = backup.split("--output /data/recovery/")[1]
     assert f"-v {replica}:/replica" in copy
     assert f"recovery_cli replicate --data /data/recovery/{name} --output /replica/{name}" in copy
+    assert "--record-off-host" not in copy
 
     link = tmp_path / "link"
     link.symlink_to(replica)
@@ -199,3 +201,8 @@ def test_scheduled_backup_unit_cannot_hold_the_host_lock_forever() -> None:
     assert "ExecStart=/bin/bash ${PB_RELEASE}/deploy/backup.sh --apply" in service
     timer = (ROOT / "deploy/systemd/parkingbreaker-backup.timer").read_text()
     assert "Persistent=true" in timer
+    assert "OnCalendar=hourly" in timer
+    private = (ROOT / "deploy/systemd/parkingbreaker-backup-private.timer").read_text()
+    assert "OnCalendar=*-*-* *:00,30:00" in private
+    assert "Unit=parkingbreaker-backup.service" in private
+    assert "Persistent=true" in private

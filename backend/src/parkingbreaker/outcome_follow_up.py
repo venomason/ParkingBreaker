@@ -19,6 +19,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Final
+from urllib.parse import urlencode
 
 from parkingbreaker.customer_access import token_digest
 from parkingbreaker.email_client import EmailClient, EmailMessage, EmailOutcome, EmailReason
@@ -44,7 +45,7 @@ def derive_follow_up_token(key: str, case_token: str) -> str:
 
 
 def verify_follow_up_token(key: str, case_token: str, presented: str) -> bool:
-    if not isinstance(presented, str) or len(presented) != 64:
+    if not isinstance(presented, str) or len(presented) != 64 or not presented.isascii():
         return False
     try:
         expected = derive_follow_up_token(key, case_token)
@@ -252,6 +253,7 @@ class OutcomeFollowUpService:
 
     def _message(self, email: str, case_token: str, window: str) -> EmailMessage:
         token = derive_follow_up_token(self._key, case_token)
+        fragment = urlencode({"case": case_token, "token": token})
         return EmailMessage(
             email,
             "Did the agency answer your ParkingBreaker appeal?",
@@ -261,7 +263,7 @@ class OutcomeFollowUpService:
             "If you have not heard back, there is nothing you need to do.\n\n"
             "We send this reminder once at day 14 and once at day 30 after delivery. "
             "To stop these reminders, open this private link:\n"
-            f"{self._origin}/outcomes/opt-out?case={case_token}&token={token}\n\n"
+            f"{self._origin}/outcomes/opt-out#{fragment}\n\n"
             "ParkingBreaker prepares your appeal clerically and mails it by USPS Certified "
             "Mail. We do not give legal advice and do not promise any outcome.\n\n"
             "ParkingBreaker",

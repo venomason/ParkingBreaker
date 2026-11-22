@@ -447,6 +447,9 @@ class FakeServices:
     def authorize(self, case_id: str, body: s.StartAuthorization) -> s.Authorization:
         return self._authorize(self.cases[case_id])
 
+    def recover_authorization(self, case_id: str) -> s.CaseStatus:
+        return self.status(case_id)
+
     def beta_offer(self, case_id: str) -> s.BetaOffer:
         raise ServiceConflict("beta_requires_durable_service")
 

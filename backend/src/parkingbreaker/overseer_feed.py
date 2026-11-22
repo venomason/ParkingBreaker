@@ -271,6 +271,7 @@ _ALERT_DOMAIN = {
     AlertKind.CAPTURE_FAILURES: HealthDomain.CAPTURES,
     AlertKind.DISK_LOW: HealthDomain.DISK,
     AlertKind.BACKUP_STALE: HealthDomain.BACKUP,
+    AlertKind.OFF_HOST_REPLICA_STALE: HealthDomain.BACKUP,
     AlertKind.WEBHOOK_BACKLOG: HealthDomain.WEBHOOKS,
     AlertKind.HOLD_REVIEW_DUE: HealthDomain.HOLDS,
 }

@@ -203,7 +203,7 @@ async function proof(page: Page, caseId: string) {
 }
 
 async function workspaceStatus(page: Page, workspaceId: string) {
-  return call(page, "GET", `/workspaces/${workspaceId}/ticket-reading`) as Promise<Record<string, unknown>>;
+  return call(page, "GET", `/workspaces/${workspaceId}/ticket-reading`) as Promise<TicketReadingStatus>;
 }
 
 test.describe("actual photo upload boundary", () => {
@@ -660,6 +660,75 @@ test("a lost reading response replays the exact request id and never starts a se
   const second = JSON.parse(bodies[1]) as { request_id: string };
   expect(second.request_id).toBe(first.request_id);
   await page.unroute("**/api/workspaces/*/ticket-reading");
+});
+
+test("a stale tab cannot overwrite a newer saved draft when comparing ticket facts", async ({ page, context }) => {
+  await beginVision(page);
+  await uploadAndRead(page);
+  await fillFacts(page);
+  await expect.poll(async () => factDraftFromValues(((await appeal(page))?.intake_form as IntakeForm)?.values ?? {}).license_plate).toBe(FACTS.license_plate);
+
+  const stale = await context.newPage();
+  await stale.goto(base!);
+  await expect(stale.locator("#fact-license_plate")).toHaveValue(FACTS.license_plate);
+  await page.locator("#fact-license_plate").fill("NEWER123");
+  await expect.poll(async () => factDraftFromValues(((await appeal(page))?.intake_form as IntakeForm)?.values ?? {}).license_plate).toBe("NEWER123");
+  const saved = await appeal(page);
+
+  const mutations: string[] = [];
+  stale.on("request", request => {
+    const path = new URL(request.url()).pathname;
+    if (request.method() === "PUT" || (request.method() === "POST" && path.endsWith("/ticket-review"))) mutations.push(path);
+  });
+  await stale.locator("#fact-license_plate").fill("STALE123");
+  await stale.locator("#visionReviewBtn").click();
+  await expect(stale.locator("#ticketVision [role=alert]")).toContainText("This appeal was changed in another tab");
+  await expect(stale.locator("#fact-license_plate")).toHaveValue("STALE123");
+  expect(mutations).toEqual([`/api/workspaces/${saved?.workspace_id}/intake-form`]);
+  expect(await appeal(page)).toEqual(saved);
+  await stale.close({ runBeforeUnload: false });
+});
+
+test("reloading after replacing a photo starts a new exact-photo reading", async ({ page }) => {
+  await beginVision(page);
+  await uploadAndRead(page);
+  const before = (await appeal(page))!;
+  const id = String(before.workspace_id);
+  const prior = (await workspaceStatus(page, id)).extraction;
+  expect(prior.current).toBe(true);
+  await page.locator("#visionFrontPhoto").setInputFiles({ name: "replacement.png", mimeType: "image/png", buffer: syntheticPng(120) });
+  await expect.poll(async () => ((await appeal(page))?.intake_form as IntakeForm)?.ticket_photo_ref).not.toEqual((before.intake_form as IntakeForm).ticket_photo_ref);
+  await expect(page.locator("#visionFrontSaved")).toBeVisible();
+  await expect.poll(async () => Boolean(((await appeal(page))?.intake_form as IntakeForm)?.ticket_photo_ref)).toBe(true);
+  expect((await workspaceStatus(page, id)).extraction).toMatchObject({ current: false, request_id: prior.request_id });
+
+  await page.reload();
+  await expect(page.locator("#visionSuggestions")).toHaveCount(0);
+  const responsePromise = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname.endsWith("/ticket-reading"));
+  await page.locator("#visionReadBtn").click();
+  const response = await responsePromise;
+  expect(response.status()).toBe(200);
+  expect(response.request().postDataJSON().request_id).not.toBe(prior.request_id);
+  expect(await response.json()).toMatchObject({ current: true, status: "success" });
+  await expect(page.locator("#visionSuggestions")).toBeVisible();
+});
+
+test("a restored review reuses its request id for the same review basis", async ({ page }) => {
+  await beginVision(page);
+  await uploadAndRead(page);
+  await fillFacts(page);
+  await reviewFacts(page);
+  const id = String((await appeal(page))?.workspace_id);
+  const prior = (await workspaceStatus(page, id)).review;
+  expect(prior).toMatchObject({ current: true, basis: "customer-supplied facts; no model comparison" });
+
+  await page.reload();
+  await expect(page.locator("#visionReview")).toContainText("No AI comparison was performed.");
+  const responsePromise = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname.endsWith("/ticket-review"));
+  await page.locator("#visionReviewBtn").click();
+  const response = await responsePromise;
+  expect(response.status()).toBe(200);
+  expect(response.request().postDataJSON().request_id).toBe(prior.request_id);
 });
 
 test("optional dates stay unconfirmed through draft autosave and reload", async ({ page }) => {

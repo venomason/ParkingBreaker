@@ -45,12 +45,16 @@ test("saved-appeal, pricing and fresh-appeal routes use the configured backend",
 });
 
 test("public API proxy contains only public routes and no worker catch-all", () => {
-  const result = config("fake", "");
+  const result = config("fake", "", "https://backend.example.test");
   expect(result.status).toBe(0);
   const routes = JSON.parse(result.stdout) as Array<{ source: string; destination: string }>;
   expect(routes.map((route) => route.source)).toEqual([
-    "/api/health", "/api/auth/:path*", "/api/workspaces/:path*", "/api/cases/:path*", "/api/webhooks/:path*",
+    "/api/health", "/api/auth/:path*", "/api/workspaces/:path*", "/api/cases/:path*", "/api/outcomes/:path*", "/api/webhooks/:path*",
   ]);
+  const outcomes = routes.find((route) => route.source === "/api/outcomes/:path*");
+  for (const action of ["opt-out", "report"]) {
+    expect(outcomes?.destination.replace(":path*", action)).toBe(`https://backend.example.test/outcomes/${action}`);
+  }
   for (const route of routes) {
     expect(route.source).not.toContain("internal");
     expect(route.destination).not.toContain("internal");

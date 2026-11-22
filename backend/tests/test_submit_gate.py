@@ -268,7 +268,7 @@ def test_hold_gate_blocks_friday_post_cutoff_and_holiday_slip() -> None:
     assert res_fri.status == SubmitGateStatus.BLOCKED_INDUCTION_EXCEEDS_CAPTURE_LEAD
 
     # Wednesday before Thanksgiving (2026-11-25) at 19:00 UTC (11:00 AM PT - missed Wed cutoff).
-    # Thursday 2026-11-26 is a holiday, so induction slips to Friday 18:00 PT (Saturday 02:00 UTC).
+    # Both Thanksgiving and the following Friday are print closures.
     now_wed = datetime(2026, 11, 25, 19, 0, tzinfo=UTC)
     res_hol = evaluate_pre_send_hold_gate(
         now_utc=now_wed,
@@ -277,6 +277,18 @@ def test_hold_gate_blocks_friday_post_cutoff_and_holiday_slip() -> None:
     )
     assert res_hol.allowed is False
     assert res_hol.status == SubmitGateStatus.BLOCKED_INDUCTION_EXCEEDS_CAPTURE_LEAD
+
+
+def test_hold_estimate_uses_print_calendar_at_exact_cutoff() -> None:
+    from datetime import date, datetime
+
+    from parkingbreaker.submit_gate import estimate_lob_induction_utc
+
+    cutoff = datetime(2026, 11, 25, 14, tzinfo=UTC)  # releases at 10am Pacific
+    assert estimate_lob_induction_utc(cutoff) == datetime(2026, 12, 1, 2, tzinfo=UTC)
+    assert estimate_lob_induction_utc(cutoff, usps_holidays=frozenset({date(2026, 11, 30)})) == (
+        datetime(2026, 12, 2, 2, tzinfo=UTC)
+    )
 
 
 def test_check_submit_gate_accumulates_hold_horizon_failure() -> None:

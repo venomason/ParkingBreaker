@@ -1,11 +1,15 @@
 # ParkingBreaker Execution Roadmap
 
-Updated November 21, 2026 (Pacific). This is the authoritative execution plan for completing software qualification, activating the live paid service, and operating the first customer cohort. Product boundaries remain governed by [Customer Choice Rules](CUSTOMER-CHOICE-RULES.md) and [OCR routing](OCR-ROUTING.md); release evidence lives in [beta readiness](BETA-READINESS.md) and `docs/verification/`.
+Updated November 22, 2026 (Pacific). This is the authoritative execution plan for completing software qualification, activating the live paid service, and operating the first customer cohort. Product boundaries remain governed by [Customer Choice Rules](CUSTOMER-CHOICE-RULES.md) and [OCR routing](OCR-ROUTING.md); release evidence lives in [beta readiness](BETA-READINESS.md) and `docs/verification/`.
 
 **Current release state: NO-GO for live paid customer activation.**
 A fake-provider preview is deployed at [parkingbreaker.com](https://parkingbreaker.com), but its Cloud Run `/data` volume is ephemeral in-memory storage and its providers are set to `fake`. Live customer charging, physical Certified Mail dispatch, and paid advertising remain unauthorized until every Phase 1 (`BETA` and `PAID`) gate below has inspectable evidence on the exact shipping commit and an owner-signed `R07` activation packet.
 
+**Next sandbox step.** Qualify official-source discovery and issuer assessment on a supported synthetic case before repeating the joined Stripe/Lob drill. The November 22 San Francisco case reached intake and stopped before a hold. The project’s supported Gemini Flash-Lite preset could read the clear synthetic ticket, but automated review and issuer assessment had provider failures. R05 now has explicit local snapshot classifications for all 98 application tables. Retention schedules, external copies and standing-target access checks remain open. [November 22 qualification receipt](verification/p06-r05-2026-11-22.json)
+
 ---
+
+The November 22 [repository review](verification/code-review-2026-11-22.json) also found a mismatch between the research guard at `main@e27e151` and its recorded hash. The Cambridge source and signed November 18 change are verified. Reconcile that change with the recorded owner exception before freezing the release. A separate tested change for business-day deadlines awaits evidence from an applicable official filing procedure.
 
 ## 1. Non-Negotiable Product, Legal & Financial Rules
 

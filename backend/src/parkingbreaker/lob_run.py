@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import calendar
 from datetime import UTC, date, datetime, time, timedelta
+from functools import cache
 
 from parkingbreaker.holidays import nth_weekday, observed_holidays
 from parkingbreaker.mail_config import LOB_CANCELLATION_WINDOW
@@ -41,6 +42,7 @@ def pacific(moment: datetime) -> datetime:
     return utc + (_PDT if start <= utc < end else _PST)
 
 
+@cache
 def no_production_days(year: int) -> frozenset[date]:
     thanksgiving = nth_weekday(year, 11, calendar.THURSDAY, 4)
     extra = {thanksgiving + timedelta(days=1), date(year, 12, 24), date(year, 12, 31)}
@@ -51,17 +53,24 @@ def is_production_day(day: date) -> bool:
     return day.weekday() < calendar.SATURDAY and day not in no_production_days(day.year)
 
 
+def next_production_day(day: date) -> date:
+    """First printing day strictly after day."""
+    day += timedelta(days=1)
+    while not is_production_day(day):
+        day += timedelta(days=1)
+    return day
+
+
 def production_date(
     submitted_at: datetime, cancellation_window: timedelta = LOB_CANCELLATION_WINDOW
 ) -> date:
     """The Pacific civil date of the Lob production run this submission joins."""
     if cancellation_window < timedelta(0):
         raise ValueError("cancellation window cannot be negative")
-    released = pacific(submitted_at + cancellation_window)
+    if submitted_at.utcoffset() is None:
+        raise ValueError("moment must be timezone-aware")
+    released = pacific(submitted_at.astimezone(UTC) + cancellation_window)
     day = released.date()
     if is_production_day(day) and released.time() < LOB_DAILY_CUTOFF:
         return day
-    day += timedelta(days=1)
-    while not is_production_day(day):
-        day += timedelta(days=1)
-    return day
+    return next_production_day(day)

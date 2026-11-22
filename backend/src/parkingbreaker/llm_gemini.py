@@ -9,6 +9,7 @@ Paid Standard terms exclude prompts/responses from training data.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
 from typing import Protocol, cast
 
@@ -24,9 +25,12 @@ from parkingbreaker.llm import (
     schema_json,
 )
 from parkingbreaker.llm_input_budget import (
+    MIN_TOKENS_PER_IMAGE,
     SCHEMA_INSTRUCTION,
+    UnboundableRequestError,
     ensure_request_fits_context,
-    request_input_tokens,
+    image_attachment_tokens,
+    text_request_tokens,
 )
 from parkingbreaker.llm_models import (
     GEMINI_BASE_URL,
@@ -39,6 +43,7 @@ from parkingbreaker.llm_models import (
 from parkingbreaker.provider_credentials import valid_header_credential
 
 MAX_TEXT_BYTES = 1_048_576
+MAX_INLINE_REQUEST_BYTES = 20_000_000
 
 
 class ChatTransport(Protocol):
@@ -152,7 +157,20 @@ class GeminiLlmClient:
         images: Sequence[ImageAttachment] | None = None,
     ) -> tuple[JsonValue, Usage]:
         schema_text = schema_json(schema)
-        input_tokens = request_input_tokens(system, user, schema_text, images)
+        input_tokens = text_request_tokens(system, user, schema_text)
+        if images:
+            inline_chars = 0
+            for image in images:
+                if not isinstance(image, ImageAttachment) or not isinstance(image.data_base64, str):
+                    raise UnboundableRequestError("invalid Gemini image attachment")
+                inline_chars += len(image.data_base64)
+            if inline_chars > MAX_INLINE_REQUEST_BYTES:
+                raise UnboundableRequestError("Gemini inline request exceeds the size limit")
+            # Validate the original files. Gemini 3 uses about 1120 tokens per default
+            # image (2240 at ultra-high resolution). Reserve 8192 per image for framing
+            # and headroom. https://ai.google.dev/gemini-api/docs/media-resolution
+            image_attachment_tokens(images)
+            input_tokens += len(images) * MIN_TOKENS_PER_IMAGE
         output_tokens = request_output_tokens(self._config, input_tokens, max_cost_cents)
         ensure_request_fits_context(input_tokens, output_tokens, GEMINI_CONTEXT_TOKENS)
         instructions = SCHEMA_INSTRUCTION + schema_text
@@ -181,6 +199,8 @@ class GeminiLlmClient:
             "max_completion_tokens": output_tokens,
             "stream": False,
         }
+        if images and len(json.dumps(payload, ensure_ascii=True)) > MAX_INLINE_REQUEST_BYTES:
+            raise UnboundableRequestError("Gemini inline request exceeds the size limit")
         try:
             response = self._transport.create(payload)
         except openai.APIError as exc:

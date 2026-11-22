@@ -18,13 +18,13 @@ from datetime import UTC, date, datetime, time, timedelta
 from enum import StrEnum
 from zoneinfo import ZoneInfo
 
+from parkingbreaker.lob_run import next_production_day, production_date
 from parkingbreaker.mail_config import LOB_CANCELLATION_WINDOW
 from parkingbreaker.research.resolution import ResearchAnswers
 from parkingbreaker.research.run import ResearchResult
 from parkingbreaker.session_window import WindowStatus
 
 LOB_CUTOFF_TZ = ZoneInfo("America/Los_Angeles")
-LOB_DAILY_CUTOFF_TIME = time(10, 0)  # 10:00 AM PT daily SLA cutoff
 MIN_HOLD_REMAINING_BEFORE_SEND = timedelta(hours=48)
 CAPTURE_FALLBACK_LEAD = timedelta(hours=6)
 
@@ -77,19 +77,9 @@ def estimate_lob_induction_utc(
     and receive an initial USPS induction scan, accounting for the cancellation
     window, 10:00 AM PT daily cutoff, weekends, and USPS holidays.
     """
-    release_utc = now_utc + cancellation_window
-    release_pt = release_utc.astimezone(LOB_CUTOFF_TZ)
-
-    candidate_date = release_pt.date()
-    cutoff_today_pt = datetime.combine(candidate_date, LOB_DAILY_CUTOFF_TIME, tzinfo=LOB_CUTOFF_TZ)
-
-    def _is_non_production_day(d: date) -> bool:
-        return d.weekday() >= 5 or d in usps_holidays
-
-    if release_pt > cutoff_today_pt or _is_non_production_day(candidate_date):
-        candidate_date += timedelta(days=1)
-        while _is_non_production_day(candidate_date):
-            candidate_date += timedelta(days=1)
+    candidate_date = production_date(now_utc, cancellation_window)
+    while candidate_date in usps_holidays:
+        candidate_date = next_production_day(candidate_date)
 
     induction_pt = datetime.combine(candidate_date, time(18, 0), tzinfo=LOB_CUTOFF_TZ)
     return induction_pt.astimezone(UTC)

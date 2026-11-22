@@ -334,6 +334,28 @@
   },
   {
     "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/authorization/recovery",
+    "request": null,
+    "status": 200,
+    "response": {
+      "case_id": "case_00000000000000000000000000000001",
+      "workspace_id": "ws_00000000000000000000000000000001",
+      "state": "INTAKE",
+      "payment_state": null,
+      "selected_tier": "CERTIFIED",
+      "amount_cents": 2999,
+      "window_started_at": null,
+      "window_expires_at": null,
+      "seconds_remaining": null,
+      "window_status": null,
+      "question": null,
+      "stop": null,
+      "research": null,
+      "fake": true
+    }
+  },
+  {
+    "method": "POST",
     "path": "/internal/cases/case_00000000000000000000000000000001/step",
     "request": {
       "step_id": "hold-confirmed"

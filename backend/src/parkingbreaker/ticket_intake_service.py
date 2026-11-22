@@ -39,6 +39,7 @@ from parkingbreaker.api import schemas as s
 from parkingbreaker.blob_store import BlobStore
 from parkingbreaker.intake_store import IntakeRecord
 from parkingbreaker.llm import ImageAttachment, LlmBudgetExceeded, Usage
+from parkingbreaker.llm_input_budget import UnboundableRequestError
 from parkingbreaker.mail_attempt_store import StorageCorruption
 from parkingbreaker.ticket_fact_binding import (
     TicketFactBinding,
@@ -598,7 +599,7 @@ class TicketIntakeCoordinator:
                 ocr_observation=obs,
             )
             raise _error("ticket_reading_budget_exhausted") from None
-        except TicketVisionInputError:
+        except (TicketVisionInputError, UnboundableRequestError) as exc:
             coord_end = self._deps.monotonic()
             obs = build_ocr_observation_from_reader(
                 reader,
@@ -614,7 +615,12 @@ class TicketIntakeCoordinator:
                 _usage_json(Usage()),
                 ocr_observation=obs,
             )
-            raise _error("ticket_photo_not_supported") from None
+            reason = (
+                "ticket_photo_reading_limit"
+                if isinstance(exc, UnboundableRequestError)
+                else "ticket_photo_not_supported"
+            )
+            raise _error(reason) from None
         except Exception:
             coord_end = self._deps.monotonic()
             obs = build_ocr_observation_from_reader(
@@ -821,9 +827,14 @@ class TicketIntakeCoordinator:
         except LlmBudgetExceeded:
             self._finish(claim, ClaimStatus.REFUSED, None, _usage_json(Usage()))
             raise _error("ticket_review_budget_exhausted") from None
-        except TicketVisionInputError:
+        except (TicketVisionInputError, UnboundableRequestError) as exc:
             self._finish(claim, ClaimStatus.REFUSED, None, _usage_json(Usage()))
-            raise _error("ticket_photo_not_supported") from None
+            reason = (
+                "ticket_photo_reading_limit"
+                if isinstance(exc, UnboundableRequestError)
+                else "ticket_photo_not_supported"
+            )
+            raise _error(reason) from None
         except Exception:
             self._finish(claim, ClaimStatus.UNKNOWN, None, None)
             raise _error("ticket_review_provider_unavailable") from None

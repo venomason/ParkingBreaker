@@ -277,6 +277,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cases/{case_id}/authorization/recovery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Authorization Recovery */
+        post: operations["authorization_recovery_cases__case_id__authorization_recovery_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cases/{case_id}/beta-offer": {
         parameters: {
             query?: never;
@@ -971,6 +988,8 @@ export interface components {
             workspace_id: string;
             state: components["schemas"]["CaseState"];
             payment_state: components["schemas"]["PaymentState"] | null;
+            /** Authorization Pending */
+            authorization_pending?: boolean | null;
             selected_tier: components["schemas"]["MailTier"] | null;
             /** Amount Cents */
             amount_cents?: number | null;
@@ -3306,6 +3325,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Authorization"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    authorization_recovery_cases__case_id__authorization_recovery_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseStatus"];
                 };
             };
             /** @description Unauthorized */

@@ -57,6 +57,20 @@ import { customerStage, fulfillmentCopy, mailingConfirmed, offlinePaymentAllowed
 // The real flow against the API (fake, test or live providers behind it). Off: the prototype.
 const LIVE = process.env.NEXT_PUBLIC_LIVE_API === "1";
 
+async function ticketReadingStatusFor(view: WorkspaceView): Promise<TicketReadingStatus> {
+  const status = await api.ticketReadingStatus(view.workspace_id);
+  // Status has no revision of its own. Verify the acknowledged form before
+  // associating the status with its photos or ticket facts.
+  const latest = await api.workspace(view.workspace_id);
+  if (latest.draft_revision !== view.draft_revision) {
+    throw new ApiError(409, "workspace_changed_reload_required");
+  }
+  return status.extraction.current ? status : {
+    ...status,
+    extraction: { status: "missing", current: false, synthetic: status.extraction.synthetic, fields: [] },
+  };
+}
+
 function plainError(error: unknown): string {
   const detail = error instanceof ApiError ? error.detail : "request_failed";
   const known: Record<string, string> = {
@@ -66,6 +80,7 @@ function plainError(error: unknown): string {
     photo_type_not_supported: "That file was not uploaded. This beta accepts JPEG or PNG only. For a PDF or HEIC file, export a clear JPEG/PNG copy or photograph the paper original, keeping all printed details visible.",
     photo_size_invalid: "That file was not uploaded. Choose a non-empty JPEG or PNG up to 10 MB. Export a smaller image without making the printed details unreadable.",
     customer_statement_not_printable: "Edit the statement to replace characters the letter cannot print, such as curly quotes or long dashes. Then save it again.",
+    authorization_outcome_unresolved: "We couldn’t confirm this card hold yet. Check the original authorization before trying another card.",
     card_not_authorized: "The card wasn't authorized. Nothing was charged. Try another card.",
     authorization_decline_limit: "Card attempts are temporarily paused for this appeal. No new hold was placed. Your appeal is saved. Wait up to 24 hours before trying again. If your deadline is sooner, follow the agency’s official appeal instructions.",
     choose_tier_first: "Choose how your letter should be mailed first.",
@@ -97,6 +112,7 @@ function plainError(error: unknown): string {
     ticket_form_required: "Add and save your ticket photos before this step.",
     ticket_photo_required: "Add a front photo of your ticket before reading it.",
     ticket_photo_not_found: "Your saved ticket photo is unavailable. Add it again.",
+    ticket_photo_reading_limit: "These photos exceed the automatic reading limit. Enter the ticket facts yourself below.",
     ticket_photo_not_supported: "That file is not a readable JPEG or PNG photo. Choose another photo.",
     ticket_facts_required: "Confirm your ticket facts before comparing or continuing.",
     ticket_facts_incomplete: "The reading did not provide enough visible text to compare. Read your ticket photos again.",
@@ -302,6 +318,30 @@ function ControlledBetaWaiting({
   );
 }
 
+function AuthorizationRecovery({
+  busy, onRetry, setActionBar,
+}: {
+  busy: boolean;
+  onRetry: () => void;
+  setActionBar: (sub: React.ReactNode, buttons: React.ReactNode) => void;
+}) {
+  useEffect(() => {
+    setActionBar(
+      "Checking the original card hold",
+      <button className="btn btn-primary" type="button" onClick={onRetry} disabled={busy}>
+        {busy ? "Checking…" : "Check card hold"}
+      </button>,
+    );
+  }, [busy, onRetry, setActionBar]);
+
+  return (
+    <section className="screen on" id="s4" aria-labelledby="h-s4">
+      <h2 id="h-s4" tabIndex={-1}>Check your original card hold.</h2>
+      <p className="lead">Your appeal is saved. Check the status of the authorization you already requested before entering another card.</p>
+    </section>
+  );
+}
+
 function Journey() {
   // Local simulated flow, matching the prototype. Fixtures enter only through lib/api.
   const resolvedAccess = useServicePhase();
@@ -345,6 +385,7 @@ function Journey() {
   const [visionResolutions, setVisionResolutions] = useState<Record<string, TicketDiscrepancyResolution>>({});
   const [visionConfirmed, setVisionConfirmed] = useState<{ commandId: string; reviewRequestId: string; generation: number } | null>(null);
   const [visionDirty, setVisionDirty] = useState(false);
+  const visionInputVersion = useRef(0);
   const visionReadingRequest = useRef<{ id: string; signature: string } | null>(null);
   const visionReviewRequest = useRef<{ id: string; signature: string } | null>(null);
   const visionCommandRequest = useRef<{ id: string; signature: string } | null>(null);
@@ -362,6 +403,8 @@ function Journey() {
   const accessRequest = useRef<{ workspace: string; email: string; id: string } | null>(null);
   const restored = useRef(false);
   const cardRef = useRef<CardFieldHandle>(null);
+  const [authorizationRecoveryCase, setAuthorizationRecoveryCase] = useState<string | null>(null);
+  const authorizationInFlight = useRef(false);
   const [liveStatus, setLiveStatus] = useState<CaseStatus | null>(null);
   const [liveDraft, setLiveDraft] = useState<Draft | null>(null);
   const [liveLetterText, setLiveLetterText] = useState<string | null>(null);
@@ -585,8 +628,15 @@ function Journey() {
     return `${photoRefs.ticket ?? ""}|${photoRefs.back ?? ""}`;
   }, [photoRefs]);
 
-  const visionBindingSignatureFor = useCallback((binding: TicketFactBindingPayload | null, view?: WorkspaceView | null) =>
-    `${JSON.stringify([binding?.literal ?? null, binding?.adopted ?? null])}|${visionPhotoSignatureFor(view)}`, [visionPhotoSignatureFor]);
+  const visionBindingSignatureFor = useCallback((binding: TicketFactBindingPayload | null, view?: WorkspaceView | null) => {
+    const fields = binding ? [Object.entries(binding.literal).sort(), Object.entries(binding.adopted).sort()] : null;
+    return `${JSON.stringify(fields)}|${visionPhotoSignatureFor(view)}`;
+  }, [visionPhotoSignatureFor]);
+
+  const visionReviewSignatureFor = useCallback((binding: TicketFactBindingPayload, view: WorkspaceView, customerSupplied: boolean) => {
+    const customerOnly = customerSupplied || Object.values(binding.literal).every((value) => value === null);
+    return `${customerOnly ? "customer" : "compare"}|${visionBindingSignatureFor(binding, view)}`;
+  }, [visionBindingSignatureFor]);
 
   const restoreVisionForm = useCallback((view: WorkspaceView) => {
     const form = view.intake_form;
@@ -615,12 +665,15 @@ function Journey() {
     setVisionDirty(false);
     const binding = view.intake_form?.ticket_fact_binding ?? null;
     setVisionLiteral(literalFromSnapshot(status.extraction));
-    visionReadingRequest.current = status.extraction.request_id
-      ? { id: status.extraction.request_id, signature: visionPhotoSignatureFor(view) }
-      : null;
-    visionReviewRequest.current = status.review.request_id
-      ? { id: status.review.request_id, signature: visionBindingSignatureFor(binding, view) }
-      : null;
+    if (status.extraction.current && status.extraction.request_id) {
+      visionReadingRequest.current = { id: status.extraction.request_id, signature: visionPhotoSignatureFor(view) };
+    }
+    if (status.review.current && status.review.request_id && binding) {
+      visionReviewRequest.current = {
+        id: status.review.request_id,
+        signature: visionReviewSignatureFor(binding, view, status.review.basis === "customer-supplied facts; no model comparison"),
+      };
+    }
     setVisionReview(status.review.request_id ? status.review : null);
     if (status.confirmation.state === "current" && status.confirmation.command_id) {
       setVisionConfirmed({
@@ -628,84 +681,70 @@ function Journey() {
         reviewRequestId: status.confirmation.review_request_id ?? status.review.request_id ?? "",
         generation: status.confirmation.generation,
       });
-      visionCommandRequest.current = {
-        id: status.confirmation.command_id,
-        signature: `${status.confirmation.review_request_id ?? ""}|${visionBindingSignatureFor(binding, view)}`,
-      };
+      visionCommandRequest.current = null;
     } else {
       setVisionConfirmed(null);
-      visionCommandRequest.current = null;
     }
-  }, [visionBindingSignatureFor, visionPhotoSignatureFor]);
+  }, [visionPhotoSignatureFor, visionReviewSignatureFor]);
 
   const discoverVision = useCallback(async (existing?: WorkspaceView): Promise<{ view: WorkspaceView; status: TicketReadingStatus } | null> => {
     if (!LIVE || PREVIEW_AUTH) { setVisionMode("legacy"); return null; }
+    if (!existing && photoUploads) return null;
+    const inputVersion = visionInputVersion.current;
     setVisionChecking(true); setVisionError(null);
     try {
       const view = existing ?? await ensureWorkspace();
       setWorkspaceId(view.workspace_id);
       setWorkspaceTicketReadingRequired(Boolean(view.ticket_reading_required));
       if (view.ticket_reading_required) setVisionMode("vision");
-      // Restore saved input even when the separate status request is unavailable.
-      restoreVisionForm(view);
+      // Preserve the initially saved input even if the status request fails.
+      if (existing) restoreVisionForm(view);
+      else if (visionBindingSignatureFor(visionBinding) !== visionBindingSignatureFor(view.intake_form?.ticket_fact_binding ?? null, view)) {
+        throw new ApiError(409, "workspace_changed_reload_required");
+      }
       setVisionConfirmed(null);
-      const status = await api.ticketReadingStatus(view.workspace_id);
+      const status = await ticketReadingStatusFor(view);
+      if (visionInputVersion.current !== inputVersion) return null;
       applyRestoredVision(view, status);
       return { view, status };
     } catch (error) {
-      setVisionError(plainError(error));
+      if (visionInputVersion.current === inputVersion) setVisionError(plainError(error));
       return null;
     } finally {
       setVisionChecking(false);
     }
-  }, [ensureWorkspace, applyRestoredVision, restoreVisionForm]);
+  }, [ensureWorkspace, applyRestoredVision, restoreVisionForm, visionBinding, visionBindingSignatureFor, photoUploads]);
 
-  const refreshVisionStatusOnly = useCallback(async (workspace?: string): Promise<TicketReadingStatus | null> => {
-    const id = workspace ?? workspaceId;
-    if (!id) return null;
-    const view = await api.workspace(id);
-    const status = await api.ticketReadingStatus(id);
-    setVisionStatus(status);
-    setVisionMode(view.ticket_reading_required || status.enabled ? "vision" : "legacy");
-    setWorkspaceTicketReadingRequired(Boolean(view.ticket_reading_required));
-    setVisionLiteral(literalFromSnapshot(status.extraction));
-    setVisionReview(status.review.request_id ? status.review : null);
-    if (status.confirmation.state === "current" && status.confirmation.command_id) {
-      setVisionConfirmed({
-        commandId: status.confirmation.command_id,
-        reviewRequestId: status.confirmation.review_request_id ?? "",
-        generation: status.confirmation.generation,
-      });
-    } else {
-      setVisionConfirmed(null);
+  const refreshVisionStatusOnly = useCallback(async () => {
+    if (!workspaceId || visionBusy || photoUploads) return;
+    setVisionBusy("reading");
+    setVisionError(null);
+    try {
+      const view = await ensureWorkspace();
+      if (visionBindingSignatureFor(visionBinding) !== visionBindingSignatureFor(view.intake_form?.ticket_fact_binding ?? null, view)) {
+        throw new ApiError(409, "workspace_changed_reload_required");
+      }
+      applyRestoredVision(view, await ticketReadingStatusFor(view));
+    } catch (error) {
+      setVisionError(plainError(error));
+    } finally {
+      setVisionBusy(null);
     }
-    setVisionBinding(view.intake_form?.ticket_fact_binding ?? null);
-    return status;
-  }, [workspaceId]);
+  }, [workspaceId, visionBusy, photoUploads, ensureWorkspace, visionBinding, visionBindingSignatureFor, applyRestoredVision]);
 
   const flushVisionForm = useCallback(async (overrides: Partial<IntakeForm>): Promise<WorkspaceView> => {
     const form = ticketFormWithDraft({
       ...intakeForm,
       ...overrides,
     }, visionDraft, overrides.ticket_fact_binding ?? visionBinding);
-    let view: WorkspaceView;
-    try {
-      const saved = await flushWorkspace(form);
-      if (!saved) throw new ApiError(503, "workspace_unavailable");
-      view = await api.workspace(saved.workspace_id);
-      restoreWorkspace(view);
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 409) throw error;
-      const id = workspaceId ?? (await ensureWorkspace()).workspace_id;
-      const latest = await api.workspace(id);
-      view = await api.saveIntakeForm(id, latest.draft_revision ?? 1, form);
-      restoreWorkspace(view);
-    }
+    const view = await flushWorkspace(form);
+    if (!view) throw new ApiError(503, "workspace_unavailable");
     setWorkspaceId(view.workspace_id);
     return view;
-  }, [intakeForm, visionDraft, visionBinding, flushWorkspace, restoreWorkspace, workspaceId, ensureWorkspace]);
+  }, [intakeForm, visionDraft, visionBinding, flushWorkspace]);
 
   const updateVisionDraft = useCallback((next: FactDraft) => {
+    visionInputVersion.current++;
     const hadReview = Boolean(visionReview) || Boolean(visionConfirmed);
     setVisionDraft(next);
     setVisionBinding(null);
@@ -715,13 +754,14 @@ function Journey() {
   }, [visionReview, visionConfirmed]);
 
   const invalidateVisionPhotos = useCallback(() => {
+    visionInputVersion.current++;
     const hadReview = Boolean(visionReview) || Boolean(visionConfirmed);
     setVisionLiteral(null);
     setVisionBinding(null);
     setVisionReview(null); setVisionConfirmed(null); setVisionResolutions({});
     visionReadingRequest.current = null;
     visionReviewRequest.current = null; visionCommandRequest.current = null;
-    setVisionStatus((previous) => previous ? { ...previous, extraction: { ...previous.extraction, current: false } } : previous);
+    setVisionStatus((previous) => previous ? { ...previous, extraction: { status: "missing", current: false, synthetic: previous.extraction.synthetic, fields: [] } } : previous);
     if (hadReview) setVisionDirty(true);
   }, [visionReview, visionConfirmed]);
 
@@ -735,14 +775,15 @@ function Journey() {
       });
       const form = view.intake_form;
       if (!form?.ticket_photo_ref) throw new ApiError(409, "ticket_photo_required");
+      const currentStatus = visionStatus ?? await ticketReadingStatusFor(view);
       const signature = visionPhotoSignatureFor(view);
       const existing = visionReadingRequest.current;
       // A lost response replays the same request id; changed photos start a new one.
       const requestId = existing && existing.signature === signature ? existing.id : crypto.randomUUID();
       visionReadingRequest.current = { id: requestId, signature };
       const snapshot = await api.requestTicketReading(view.workspace_id, requestId, view.draft_revision ?? 1);
-      setVisionStatus((previous) => previous ? { ...previous, extraction: snapshot } : previous);
-      if (snapshot.status === "success") {
+      setVisionStatus((previous) => ({ ...(previous ?? currentStatus), extraction: snapshot }));
+      if (snapshot.current && snapshot.status === "success") {
         const literal = literalFromReading(snapshot.fields);
         if (literal) {
           setVisionLiteral(literal);
@@ -760,7 +801,7 @@ function Journey() {
     } finally {
       setVisionBusy(null);
     }
-  }, [visionBusy, flushVisionForm, photoRefs, visionPhotoSignatureFor]);
+  }, [visionBusy, visionStatus, flushVisionForm, photoRefs, visionPhotoSignatureFor]);
 
   const saveAndReviewVision = useCallback(async (facts: AdoptedFacts, customerSupplied = false) => {
     if (!LIVE || PREVIEW_AUTH || visionBusy) return;
@@ -770,7 +811,7 @@ function Journey() {
         ticket_photo_ref: photoRefs.ticket,
         ticket_back_photo_ref: photoRefs.back,
       });
-      const currentStatus = await api.ticketReadingStatus(currentView.workspace_id);
+      const currentStatus = await ticketReadingStatusFor(currentView);
       const literal = literalFromSnapshot(currentStatus.extraction);
       setVisionLiteral(literal);
       setVisionStatus(currentStatus);
@@ -798,7 +839,7 @@ function Journey() {
       });
       const canonical = view.intake_form?.ticket_fact_binding ?? binding;
       setVisionBinding(canonical);
-      const signature = `${customerSupplied ? "customer" : "compare"}|${visionBindingSignatureFor(canonical, view)}`;
+      const signature = visionReviewSignatureFor(canonical, view, customerSupplied);
       const existing = visionReviewRequest.current;
       // The same saved envelope replays the same request id after a lost response.
       const requestId = existing && existing.signature === signature ? existing.id : crypto.randomUUID();
@@ -817,7 +858,7 @@ function Journey() {
     } finally {
       setVisionBusy(null);
     }
-  }, [visionBusy, flushVisionForm, visionBindingSignatureFor, photoRefs]);
+  }, [visionBusy, flushVisionForm, visionReviewSignatureFor, photoRefs]);
 
   const confirmTicketVision = useCallback(async () => {
     if (!LIVE || PREVIEW_AUTH || visionBusy || !visionReview) return;
@@ -844,7 +885,7 @@ function Journey() {
         ticket_fact_binding: visionBinding ?? undefined,
       });
       // Observe the actual previous generation; never send an assumed next value.
-      const observed = await api.ticketReadingStatus(view.workspace_id);
+      const observed = await ticketReadingStatusFor(view);
       setVisionStatus(observed);
       const generation = observed.confirmation?.generation ?? 0;
       const signature = `${reviewRequestId}|${visionBindingSignatureFor(visionBinding, view)}|${JSON.stringify(resolved)}`;
@@ -995,13 +1036,74 @@ function Journey() {
     return phaseOk;
   }, [liveCase, refreshPricing, beginFundingRefresh, applyFunding, applySavedStatus, goTo]);
 
+  const needsAuthorizationRecovery = Boolean(LIVE && liveCase && (
+    authorizationRecoveryCase === liveCase.caseId ||
+    (liveStatus?.case_id === liveCase.caseId && liveStatus.authorization_pending)
+  ));
+
+  const handleAuthorizationRecovery = useCallback(async () => {
+    if (!liveCase || authorizationInFlight.current) return;
+    const caseId = liveCase.caseId;
+    authorizationInFlight.current = true;
+    setAuthorizationRecoveryCase(caseId);
+    setLiveBusy(true);
+    setLiveError(null);
+    try {
+      const saved = await api.recoverAuthorization(caseId);
+      if (liveCaseIdRef.current !== caseId) return;
+      applySavedStatus(saved);
+      if (saved.authorization_pending) return;
+      if (saved.state === "INTAKE") {
+        const decision = await api.preHold(caseId);
+        if (liveCaseIdRef.current !== caseId) return;
+        if (decision.kind === "stop") {
+          setLiveOffer(null);
+          setLiveStop(decision);
+          setAuthorizationRecoveryCase(null);
+          goTo(8);
+          return;
+        }
+        setLiveOffer(decision);
+      }
+      setAuthorizationRecoveryCase(null);
+      if (saved.state === "RESEARCHING") {
+        setWarned(false);
+        goTo(5);
+      } else if (customerStage(saved) !== 4 && !saved.stop) {
+        await refreshCurrentCase();
+      }
+    } catch {
+      if (liveCaseIdRef.current === caseId) {
+        setLiveError(plainError(new ApiError(409, "authorization_outcome_unresolved")));
+      }
+    } finally {
+      authorizationInFlight.current = false;
+      setLiveBusy(false);
+    }
+  }, [liveCase, applySavedStatus, refreshCurrentCase, goTo]);
+
   const handleStep4Complete = useCallback(async (selectedTier: "certified" | "standard") => {
     if (LIVE) {
-      if (!liveCase || newPaidBlocked || phase !== "paid") return;
+      if (!liveCase || newPaidBlocked || phase !== "paid" || needsAuthorizationRecovery ||
+          authorizationInFlight.current) return;
       const caseId = liveCase.caseId;
+      authorizationInFlight.current = true;
+      let requested = false;
       setLiveError(null);
       try {
+        const current = await api.status(caseId);
+        if (liveCaseIdRef.current !== caseId) return;
+        if (current.authorization_pending) {
+          applySavedStatus(current);
+          setAuthorizationRecoveryCase(caseId);
+          return;
+        }
+        if (customerStage(current) !== 4) {
+          await refreshCurrentCase();
+          return;
+        }
         await api.chooseTier(caseId, selectedTier === "standard" ? "STANDARD" : "CERTIFIED");
+        if (liveCaseIdRef.current !== caseId) return;
         let paymentMethod: string;
         if (CARD_FORM_AVAILABLE && cardRef.current) {
           paymentMethod = await cardRef.current.paymentMethod();
@@ -1014,15 +1116,18 @@ function Journey() {
         } else {
           throw new ApiError(503, "card_form_unavailable");
         }
+        if (liveCaseIdRef.current !== caseId) return;
+        requested = true;
         const auth = await api.authorize(caseId, paymentMethod);
+        const saved = await api.status(caseId);
+        if (liveCaseIdRef.current !== caseId) return;
         setTier(selectedTier);
         setLiveAmount(auth.amount_cents);
-        const saved = await api.status(caseId);
-        setLiveStatus(saved);
-        setTimerEnd(saved.seconds_remaining == null ? null : Date.now() + saved.seconds_remaining * 1000);
-        setWarned(false); setLapsed(false);
-        goTo(5);
+        applySavedStatus(saved);
+        setWarned(false);
+        if (!saved.stop) goTo(5);
       } catch (error) {
+        if (liveCaseIdRef.current !== caseId) return;
         // The server gate refused a stale paid attempt. Remove every new-paid
         // affordance immediately (header, sidebar, card), then reread the actual
         // server phase/status/offer in place. The mounted Journey and unsaved
@@ -1035,14 +1140,23 @@ function Journey() {
           await refreshCurrentCase();
           return;
         }
+        const confirmedRefusal = error instanceof ApiError && error.status === 409 &&
+          ["card_not_authorized", "authorization_decline_limit"].includes(error.detail);
+        if (requested && !confirmedRefusal) {
+          setAuthorizationRecoveryCase(caseId);
+          setLiveError(plainError(new ApiError(409, "authorization_outcome_unresolved")));
+          return;
+        }
         setLiveError(plainError(error)); showToast(plainError(error));
+      } finally {
+        authorizationInFlight.current = false;
       }
       return;
     }
     setTier(selectedTier);
     if (!timerEnd) { setTimerEnd(Date.now() + 30 * 60 * 1000); setWarned(false); setLapsed(false); }
     goTo(5);
-  }, [goTo, timerEnd, liveCase, showToast, blockNewPaid, refreshCurrentCase, newPaidBlocked, phase]);
+  }, [goTo, timerEnd, liveCase, showToast, blockNewPaid, refreshCurrentCase, newPaidBlocked, phase, needsAuthorizationRecovery, applySavedStatus]);
 
   const handleBetaAccept = useCallback(async () => {
     if (!LIVE || !liveCase || !liveBeta || betaBusy) return;
@@ -1145,7 +1259,7 @@ function Journey() {
         if (betaAccepted) {
           // The saved case proves the accepted funding even if the offer read fails.
           try { restoredBeta = await api.betaOffer(workspace.case_id); } catch { restoredBeta = null; }
-        } else {
+        } else if (!status.authorization_pending) {
           restoredBeta = await fetchBetaOffer(workspace.case_id);
           if (restoredBeta?.accepted_at) betaAccepted = true;
         }
@@ -1169,7 +1283,7 @@ function Journey() {
         } else if (customerStage(status) === 6) {
           setLiveDraft(await api.draft(workspace.case_id));
           setStep(6);
-        } else if (restoredBeta && !betaAccepted) {
+        } else if (status.authorization_pending || (restoredBeta && !betaAccepted)) {
           setStep(4);
         } else if (betaAccepted && !status.window_started_at) {
           setStep(3);
@@ -1303,7 +1417,7 @@ function Journey() {
         if (!form?.ticket_photo_ref) throw new ApiError(409, "ticket_photo_required");
         const binding = form.ticket_fact_binding;
         if (!binding) throw new ApiError(409, "ticket_confirmation_required");
-        const observed = await api.ticketReadingStatus(saved.workspace_id);
+        const observed = await ticketReadingStatusFor(saved);
         if (observed.confirmation.state !== "current" || !observed.confirmation.command_id) {
           throw new ApiError(409, "ticket_confirmation_stale");
         }
@@ -1422,7 +1536,7 @@ function Journey() {
   // payment+window is separate and keeps its truthful existing-paid recovery.
   const savedKind = LIVE ? savedFundingKind(liveStatus) : "none";
   const admittedPaid = savedKind === "admitted_paid";
-  const savedPending = savedKind === "saved_pending";
+  const savedPending = needsAuthorizationRecovery || savedKind === "saved_pending";
   const newPaidAccess = !newPaidBlocked && !admittedPaid && !savedPending && phase === "paid" && funding === "paid";
   const betaFunding = !admittedPaid && !savedPending && (funding === "beta" || savedKind === "beta");
 
@@ -1733,7 +1847,7 @@ function Journey() {
     },
     onPickPhoto: (kind, file) => { void selectPhoto(kind, file); },
     onRead: () => { void readTicketVision(); },
-    onCheckReading: () => { void refreshVisionStatusOnly().catch((error) => setVisionError(plainError(error))); },
+    onCheckReading: () => { void refreshVisionStatusOnly(); },
     onSaveFacts: (facts, customerSupplied) => { void saveAndReviewVision(facts, customerSupplied); },
     onConfirm: () => { void confirmTicketVision(); },
     onContinue: handleVisionContinue,
@@ -1768,9 +1882,10 @@ function Journey() {
           {step === 2 && (<Step2YourSide story={story} setStory={setStory} owner={owner} setOwner={setOwner} photo={photo} setPhoto={setPhoto} onComplete={handleStep2Complete} setActionBar={setActionBar} onRulesClick={openRules} liveSlot={LIVE ? <LiveDetails busy={liveBusy || photoUploads > 0} submitting={liveBusy} error={liveError} onSubmit={handleLiveDetails} values={contactValues} onChange={setContactValues} ticketPhoto={photoFiles.ticket} ticketBackPhoto={photoFiles.back} evidencePhotos={evidencePhotos} ticketPhotoRef={photoRefs.ticket} ticketBackPhotoRef={photoRefs.back} onSelectPhoto={(kind,file) => {void selectPhoto(kind,file);}} onAddEvidencePhotos={addEvidencePhotos} onRemoveEvidencePhoto={removeEvidencePhoto} onMoveEvidencePhoto={moveEvidencePhoto} visionRequired={visionRequired} visionFacts={visionAdoptedFacts ? { issuedCity: visionAdoptedFacts.issued_city, issuedState: visionAdoptedFacts.issued_state, issuerKind: visionAdoptedFacts.issuer_kind } : null} /> : undefined} />)}
           {step === 3 && LIVE && (<LiveResearch issuerName={liveOffer?.issuer.issuer_name} status={liveStatus} busy={liveBusy} onDraft={handleLiveDraft} onRetry={handleStep5Complete} caseId={liveCase?.caseId} onStatus={handleDestinationStatus} error={liveError} onAnswer={async answer => { if (!liveCase || liveBusy) return; setLiveBusy(true); setLiveError(null); try { handleDestinationStatus(await api.answer(liveCase.caseId,answer)); } catch (error) { setLiveError(plainError(error)); } finally { setLiveBusy(false); } }} setActionBar={setActionBar} />)}
           {step === 3 && !LIVE && (<Step3Research onProgress={setEvidenceCount} onComplete={completeResearch} setActionBar={setActionBar} onOpenFact={(f) => { setSheetFactData(f); setSheetFact(true); }} onOpenChecklist={() => setSheetChk(true)} onGoConflict={openConflict} />)}
-          {step === 4 && LIVE && liveBeta && (<Step4BetaOffer offer={liveBeta} caseId={liveCase?.caseId ?? ""} busy={liveBusy || betaBusy} blocked={betaBlocked} error={betaError} onAccept={handleBetaAccept} onRefresh={() => { void refreshBetaOffer(); }} setActionBar={setActionBar} />)}
-          {step === 4 && LIVE && !liveBeta && (!liveOffer || phase !== "paid" || paidPaused || newPaidBlocked) && (<ControlledBetaWaiting paused={paidPaused} admittedPaid={admittedPaid} savedPending={savedPending} phaseRefreshFailed={pricingRefreshFailed} busy={liveBusy} onRetry={checkSavedStatus} setActionBar={setActionBar} />)}
-          {step === 4 && !(LIVE && (liveBeta || !liveOffer || phase !== "paid" || paidPaused || newPaidBlocked)) && (<Step4Offer liveOffer={LIVE && liveOffer ? { issuerName: liveOffer.issuer.issuer_name, decidingBody: liveOffer.issuer.deciding_body, standardOffered: liveOffer.tiers.some((t) => t.tier === "STANDARD"), testMode: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_") ?? false, certifiedCents: liveOffer.tiers.find(t => t.tier === "CERTIFIED")?.amount_cents ?? null, standardCents: liveOffer.tiers.find(t => t.tier === "STANDARD")?.amount_cents ?? null } : undefined} cardSlot={LIVE ? CARD_FORM_AVAILABLE ? <CardField ref={cardRef} /> : <p className="small" role="status">The secure card form is unavailable. Please try again later.</p> : undefined} selectedTier={tier} setSelectedTier={setTier} onComplete={handleStep4Complete} setActionBar={setActionBar} onOpenTerms={openTerms} onOpenSample={openSample} />)}
+          {step === 4 && needsAuthorizationRecovery && <AuthorizationRecovery busy={liveBusy} onRetry={handleAuthorizationRecovery} setActionBar={setActionBar} />}
+          {step === 4 && !needsAuthorizationRecovery && LIVE && liveBeta && (<Step4BetaOffer offer={liveBeta} caseId={liveCase?.caseId ?? ""} busy={liveBusy || betaBusy} blocked={betaBlocked} error={betaError} onAccept={handleBetaAccept} onRefresh={() => { void refreshBetaOffer(); }} setActionBar={setActionBar} />)}
+          {step === 4 && !needsAuthorizationRecovery && LIVE && !liveBeta && (!liveOffer || phase !== "paid" || paidPaused || newPaidBlocked) && (<ControlledBetaWaiting paused={paidPaused} admittedPaid={admittedPaid} savedPending={savedPending} phaseRefreshFailed={pricingRefreshFailed} busy={liveBusy} onRetry={checkSavedStatus} setActionBar={setActionBar} />)}
+          {step === 4 && !needsAuthorizationRecovery && !(LIVE && (liveBeta || !liveOffer || phase !== "paid" || paidPaused || newPaidBlocked)) && (<Step4Offer liveOffer={LIVE && liveOffer ? { issuerName: liveOffer.issuer.issuer_name, decidingBody: liveOffer.issuer.deciding_body, standardOffered: liveOffer.tiers.some((t) => t.tier === "STANDARD"), testMode: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_") ?? false, certifiedCents: liveOffer.tiers.find(t => t.tier === "CERTIFIED")?.amount_cents ?? null, standardCents: liveOffer.tiers.find(t => t.tier === "STANDARD")?.amount_cents ?? null } : undefined} cardSlot={LIVE ? CARD_FORM_AVAILABLE ? <CardField ref={cardRef} /> : <p className="small" role="status">The secure card form is unavailable. Please try again later.</p> : undefined} selectedTier={tier} setSelectedTier={setTier} onComplete={handleStep4Complete} setActionBar={setActionBar} onOpenTerms={openTerms} onOpenSample={openSample} />)}
           {step === 5 && (<Step5Window live={LIVE} beta={Boolean(LIVE && (liveStatus?.payment_state === "NO_CHARGE" || liveBeta?.accepted_at))} supportCaseId={LIVE ? liveStatus?.support_code : undefined} amountCents={liveAmount} now={now} tier={tier ?? "certified"} timerEnd={timerEnd} lapsed={lapsed} onComplete={handleStep5Complete} setActionBar={setActionBar} onDemoWarn={() => { setTimerEnd(Date.now() + 5 * 60 * 1000); setWarned(false); setLapsed(false); }} onDemoLapse={() => { setTimerEnd(Date.now()); setWarned(true); setLapsed(false); }} />)}
           {step === 6 && LIVE && liveDraft && (<LiveLetter key={liveDraft.text_sha256 + (liveDraft.adopted_sha256 ?? "")} draft={liveDraft} value={liveLetterText ?? liveDraft.text} onTextChange={setLiveLetterText} autoSave busy={liveBusy || (lapsed && !liveSubmissionPending && !liveApprovalUncertain)} error={liveError} submissionPending={liveSubmissionPending} approvalUncertain={liveApprovalUncertain} preview={livePacketPreview?.packet ?? null} previewUrl={livePacketPreview?.url ?? null} onInvalidatePreview={invalidateLivePreview} onSave={saveLiveLetter} onAdopt={() => liveDraftAction((c) => api.adopt(c, liveDraft.text, liveDraft.text_sha256))} onPreview={handleLivePreview} onApprove={handleLiveApprove} onOpenRules={openTerms} />)}
           {LIVE && step !== 6 && liveLetterText != null && liveLetterText !== liveDraft?.text && <div className="card"><p role="alert">These letter edits have not been saved. Keep this page open and copy your text before leaving.</p><textarea aria-label="Unsaved letter edits" value={liveLetterText} readOnly /></div>}

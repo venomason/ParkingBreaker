@@ -55,6 +55,14 @@ def test_worked_example_postmark_rule() -> None:
     assert result.reachable
 
 
+@pytest.mark.parametrize("mail_class", list(MailClass))
+def test_postmark_skips_lob_closure_during_printing(mail_class: MailClass) -> None:
+    assert mailing_date(date(2026, 11, 24), mail_class) == date(2026, 11, 30)
+    assert latest_safe_send_date(date(2026, 11, 27), DeadlineRule.POSTMARK, mail_class) == date(
+        2026, 11, 23
+    )
+
+
 def test_notice_date_clock() -> None:
     assert deadline_date(
         date(2026, 3, 1), 21, ClockStart.NOTICE_DATE, notice_date=date(2026, 3, 10)

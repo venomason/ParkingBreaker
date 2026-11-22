@@ -15,10 +15,11 @@ import re
 import shutil
 import sqlite3
 import sys
+import tempfile
 import time
 from collections.abc import Callable
 from contextlib import closing
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, TypedDict, cast
 
@@ -59,6 +60,8 @@ from parkingbreaker.transaction_store import SqliteTransactionStore
 
 DATABASE = "parkingbreaker.sqlite"
 QUARANTINE = "RESTORE_QUARANTINE.json"
+SNAPSHOT_TIME = "snapshot-at"
+OFF_HOST_RECEIPT = "off-host-replica.json"
 DEFAULT_RESERVE_BYTES = 1 << 30  # the owner CLI's default; library callers choose their own
 
 
@@ -253,6 +256,10 @@ def _manifest(root: Path) -> Manifest:
 def verify(root: Path) -> Manifest:
     if not (root / "COMPLETE").is_file() or (root / "INCOMPLETE").exists():
         raise ValueError("incomplete snapshot")
+    return _verify_payload(root)
+
+
+def _verify_payload(root: Path) -> Manifest:
     manifest = _manifest(root)
     if _hash((root / DATABASE).read_bytes()) != manifest["database_sha256"]:
         raise ValueError("database hash mismatch")
@@ -320,6 +327,7 @@ def backup(data: Path, output: Path, *, reserve_bytes: int = 0) -> Manifest:
             (output / DATABASE).chmod(0o600)
             # Establish the read view before copying immutable artifacts.
             source.execute("BEGIN")
+            snapshot_at = datetime.now(UTC)
             source.execute("SELECT count(*) FROM sqlite_master").fetchone()
             source.backup(dest, pages=256)
             dest.execute("PRAGMA journal_mode=DELETE")
@@ -351,6 +359,7 @@ def backup(data: Path, output: Path, *, reserve_bytes: int = 0) -> Manifest:
             "artifacts": artifacts,
         }
         _write(output / "manifest.json", json.dumps(manifest, sort_keys=True).encode())
+        _write(output / SNAPSHOT_TIME, snapshot_at.isoformat().encode())
         _write(output / "COMPLETE", b"verified snapshot; never synchronous authority\n")
         (output / "INCOMPLETE").unlink()
         for directory in sorted((p for p in output.rglob("*") if p.is_dir()), reverse=True):
@@ -400,18 +409,74 @@ def restore(bundle: Path, destination: Path) -> RestoreReport:
         raise
 
 
-def replicate(bundle: Path, replica: Path) -> None:
-    """Local transport rehearsal. Real off-site storage/credentials are NEEDS_EXTERNAL."""
+def _record_replica(bundle: Path, snapshot_at: str, manifest_digest: str) -> None:
+    receipt = {"snapshot_at": snapshot_at, "manifest_sha256": manifest_digest}
+    with tempfile.NamedTemporaryFile(dir=bundle, delete=False) as out:
+        staged = Path(out.name)
+        try:
+            out.write(json.dumps(receipt, sort_keys=True).encode())
+            out.flush()
+            os.fsync(out.fileno())
+            os.replace(staged, bundle / OFF_HOST_RECEIPT)
+            _sync_dir(bundle)
+        finally:
+            staged.unlink(missing_ok=True)
+
+
+def replicate(bundle: Path, replica: Path, *, record_off_host: bool = False) -> None:
+    """Publish only the verified recovery files to a new, independent destination."""
+    created = False
     try:
-        verify(bundle)
-        if replica.exists() or replica.resolve().is_relative_to(bundle.resolve()):
+        manifest = verify(bundle)
+        if replica.resolve().is_relative_to(bundle.resolve()):
             raise ValueError("new independent replica required")
-        shutil.copytree(bundle, replica)
-        verify(replica)
+        paths = [DATABASE, "manifest.json", *manifest["artifacts"]]
+        snapshot_at: str | None = None
+        if (bundle / SNAPSHOT_TIME).exists() or record_off_host:
+            if (bundle / SNAPSHOT_TIME).is_symlink():
+                raise ValueError("regular snapshot timestamp required")
+            snapshot_at = (bundle / SNAPSHOT_TIME).read_text()
+            at = datetime.fromisoformat(snapshot_at)
+            if at.utcoffset() != UTC.utcoffset(None) or at > datetime.now(UTC):
+                raise ValueError("invalid snapshot timestamp")
+        if replica.exists() or replica.is_symlink():
+            raise ValueError("new independent replica required")
+        replica.mkdir(parents=True, mode=0o700)
+        created = True
+        _write(replica / "INCOMPLETE", b"replication pending\n")
+        for name in paths:
+            source = bundle / name
+            if not source.is_file() or source.is_symlink():
+                raise ValueError("regular snapshot file required")
+            _write(replica / name, source.read_bytes())
+        if snapshot_at is not None:
+            _write(replica / SNAPSHOT_TIME, snapshot_at.encode())
+        if _verify_payload(replica) != manifest:
+            raise ValueError("replica differs from source snapshot")
+        for directory in sorted((p for p in replica.rglob("*") if p.is_dir()), reverse=True):
+            _sync_dir(directory)
+        _sync_dir(replica)
+        _sync_dir(replica.parent)
+        _write(replica / "COMPLETE", b"verified snapshot; never synchronous authority\n")
+        _sync_dir(replica)
+        (replica / "INCOMPLETE").unlink()
         _sync_dir(replica)
     except Exception:
+        if created:
+            try:
+                _write(replica / "INCOMPLETE", b"replication failed\n")
+                _sync_dir(replica)
+            except OSError:
+                pass
         _alert(bundle.parent / "recovery-alerts.jsonl", "replication_failed")
         raise
+    if record_off_host:
+        assert snapshot_at is not None
+        try:
+            _record_replica(bundle, snapshot_at, _hash((replica / "manifest.json").read_bytes()))
+        except Exception:
+            _alert(bundle.parent / "recovery-alerts.jsonl", "replication_receipt_failed")
+            raise
 
 
 class ReconciliationReport(TypedDict):

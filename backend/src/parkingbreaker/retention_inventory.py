@@ -27,7 +27,7 @@ _HEX64: Final = re.compile(r"[0-9a-f]{64}")
 _PHOTO: Final = re.compile(r"photo_[0-9a-f]{64}")
 _PDF: Final = re.compile(r"[0-9a-f]{64}\.pdf")
 _SQLITE_SUFFIXES: Final = (".sqlite", ".sqlite3", ".db", ".db3")
-_PERMITTED_DATABASE_BASENAME: Final = "parkingbreaker.sqlite"
+_PERMITTED_DATABASE_BASENAMES: Final = frozenset({"parkingbreaker.sqlite", "incidents.sqlite"})
 _TEMP_SUFFIXES: Final = (
     ".tmp",
     ".temp",
@@ -137,6 +137,10 @@ _PROTECTED_CUSTOMER_CONTENT: Final = frozenset(
         "pb_address_decisions",
         "pb_mail_destination_bindings",
         "pb_beta_feedback_notices",
+        "pb_beta_notice_triage",
+        "pb_beta_contact_targets",
+        "pb_beta_contact_commands",
+        "pb_ticket_intake_operations",
     }
 )
 _RESTRICTED_FINANCIAL_PROVIDER_EVIDENCE: Final = frozenset(
@@ -151,13 +155,42 @@ _RESTRICTED_FINANCIAL_PROVIDER_EVIDENCE: Final = frozenset(
         "pb_return_remedies",
         "pb_submission_cursors",
         "pb_submission_operations",
+        "pb_approval_manifests",
     }
 )
 _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
     {
         "pb_outcome_follow_up_events",
-    }
-    | {
+        "pb_beta_contact_evidence",
+        "pb_beta_contact_replies",
+        "pb_case_ops_ids",
+        "pb_coverage_counters",
+        "pb_incidents",
+        "pb_notices",
+        "pb_overseer_key_versions",
+        "pb_purge_cases",
+        "pb_purge_targets",
+        "pb_purge_blobs",
+        "pb_retention_case_closures",
+        "pb_retention_closure_commands",
+        "pb_retention_hold_commands",
+        "pb_retention_holds",
+        "pb_retention_policies",
+        "pb_retention_policy_commands",
+        "pb_review_resolutions",
+        "pb_review_resolution_expiries",
+        "pb_runtime_service_phase",
+        "pb_runtime_intake_pause",
+        "pb_workspace_lineage",
+        "pb_setting_changes",
+        "pb_setting_proposals",
+        "pb_setting_proposal_outcomes",
+        "pb_setting_proposal_expiries",
+        "pb_sweep_runs",
+        "pb_ticket_intake_reservations",
+        "pb_ticket_intake_operation_aliases",
+        "pb_ticket_intake_confirmations",
+        "pb_trick_sightings",
         "pb_identity_accounts",
         "pb_identity_links",
         "pb_identity_sessions",
@@ -197,9 +230,7 @@ _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(
         "pb_support_confirmation_emails",
     }
 )
-_STRUCTURAL_METADATA: Final = frozenset(
-    {"pb_store_versions", "pb_runtime_intake_pause", "pb_workspace_lineage"}
-)
+_STRUCTURAL_METADATA: Final = frozenset({"pb_store_versions"})
 _KNOWN_TABLES: Final[dict[str, TableClass]] = {
     **dict.fromkeys(_PROTECTED_CUSTOMER_CONTENT, TableClass.PROTECTED_CUSTOMER_CONTENT),
     **dict.fromkeys(
@@ -388,7 +419,7 @@ def _validated_paths(database_paths: tuple[str, ...]) -> tuple[str, ...]:
             raise _refuse(InventoryRefused.INVALID_DATABASE_PATH)
         if posixpath.normpath(raw) != raw:
             raise _refuse(InventoryRefused.INVALID_DATABASE_PATH)
-        if parts[-1] != _PERMITTED_DATABASE_BASENAME:
+        if parts[-1] not in _PERMITTED_DATABASE_BASENAMES:
             raise _refuse(InventoryRefused.UNSUPPORTED_DATABASE_BASENAME)
         if raw in seen:
             raise _refuse(InventoryRefused.DUPLICATE_DATABASE_PATH)

@@ -17,6 +17,20 @@ reader (`gemini-3.5-flash-lite` or `none` are also supported). It needs a usable
 server-side `GEMINI_API_KEY`/`GOOGLE_API_KEY`. Google Cloud Vision OCR is a different
 API and is not used by this setting. A Gemini primary is not escalated to itself.
 
+For a US rehearsal with wholly synthetic tickets, set
+`PB_TICKET_OCR_PRESET=gemini-3.5-flash-lite` to select Gemini as the primary reader.
+The adapter validates JPEG/PNG files and sends the original image bytes. It reserves
+8,192 input tokens per image, checks the 20 MB inline request limit and applies the
+existing per-call ceiling. Google documents approximately 1,120 tokens per default
+Gemini 3 image. [Media resolution](https://ai.google.dev/gemini-api/docs/media-resolution)
+and [inline image limits](https://ai.google.dev/gemini-api/docs/image-understanding).
+
+Use synthetic material on the unpaid US project. Google's unpaid terms permit human
+review and direct developers to exclude personal information. Real customer tickets
+require a provider account qualified for that data. Daily capacity depends on the
+project and model. [Google's terms](https://ai.google.dev/gemini-api/terms#unpaid-services)
+and [rate limits](https://ai.google.dev/gemini-api/docs/rate-limits).
+
 ## Decision rule
 
 The latest owner thresholds are interpreted per field:

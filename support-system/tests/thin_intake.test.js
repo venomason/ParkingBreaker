@@ -245,3 +245,43 @@ test('a 2xx response without a recognized intake disposition leaves the message 
   assert.deepEqual([...thread._labels], ['PB-Support/Intake-Retry']);
   assert.ok(thread.getMessages()[0].isUnread());
 });
+
+test('first poll forwards every already-read message in an unprocessed thread', () => {
+  const { ctx, addThread, fetchCalls } = createThinIntakeSandbox({
+    urlFetchHandler: () => ({ body: { outcome: 'NO_ID_NO_RESPONSE' } })
+  });
+  addThread({ id: 'multi', messages: ['first', 'second'].map((id) => ({
+    id, from: 'driver@example.com', body: id, unread: false
+  })) });
+  assert.equal(ctx.pollSupportInbox().forwarded, 2);
+  assert.equal(ctx.pollSupportInbox().threadsScanned, 0);
+  assert.deepEqual(fetchCalls.map(({ params }) => JSON.parse(params.payload).message_id), ['first', 'second']);
+});
+
+test('a self-only conversation leaves the work queue after one poll', () => {
+  const { ctx, addThread, fetchCalls } = createThinIntakeSandbox();
+  addThread({ id: 'self', messages: [{ id: 'sent', from: 'support@parkingbreaker.com' }] });
+  assert.equal(ctx.pollSupportInbox().ignored, 1);
+  assert.equal(ctx.pollSupportInbox().threadsScanned, 0);
+  assert.equal(fetchCalls.length, 0);
+});
+
+test('a previously seen thread forwards a read follow-up and discounts confirmed duplicates', () => {
+  const { ctx, addThread, fetchCalls } = createThinIntakeSandbox({
+    urlFetchHandler: (_url, params) => ({ body: {
+      outcome: 'HELD_FOR_OWNER', duplicate: JSON.parse(params.payload).message_id === 'earlier'
+    } })
+  });
+  const thread = addThread({ id: 'conversation', messages: [
+    { id: 'earlier', from: 'driver@example.com', unread: false },
+    { id: 'read-follow-up', from: 'driver@example.com', unread: false },
+    { id: 'newest', from: 'driver@example.com', unread: true }
+  ] });
+  thread._labels.add('PB-Support/Processed');
+  const summary = ctx.pollSupportInbox();
+  assert.deepEqual(fetchCalls.map(({ params }) => JSON.parse(params.payload).message_id),
+    ['earlier', 'read-follow-up', 'newest']);
+  assert.equal(summary.forwarded, 2);
+  assert.equal(summary.heldForOwner, 2);
+  assert.equal(ctx.pollSupportInbox().threadsScanned, 0);
+});

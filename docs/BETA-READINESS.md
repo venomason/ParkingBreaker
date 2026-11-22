@@ -1,6 +1,6 @@
 # Controlled-beta readiness
 
-Updated November 21, 2026 (Pacific). **NO-GO for live paid beta.**
+Updated November 22, 2026 (Pacific). **NO-GO for live paid beta.**
 Paid activation requires the R07 owner packet; the roadmap gates own it.
 
 **Preview deployed:** [parkingbreaker.com](https://parkingbreaker.com) serves application source `ffd1e848b9ed1feea3911f52075ca12743b38937` (code-identical to `main@d139c39`, verified by recursive diff) on revision `parkingbreaker-frontend-00012-tk6`, 100% traffic. Both container images are pinned by immutable digest (backend `b379bba0…`, frontend `b572e4d6…`). It uses fake providers, the paid product flow and temporary in-memory storage; no real payments or mailing are activated. Backend provider/consumer secrets now resolve from Secret Manager, so no plaintext consumer secret remains in the deployed environment. Evidence: the host-local deployment receipt (`~/Workspace/pb-r01/deploy-20261121T070749Z/receipt.json`) and [increment receipt](verification/increment-2026-11-21a.json).
@@ -12,6 +12,14 @@ The [temporary family preview receipt](verification/family-preview-2026-11-18.js
 The [execution roadmap](ROADMAP.md) owns remaining tasks and acceptance criteria. This page owns the evidence summary and release decision. The [controlled-beta operating packet](operations/controlled-beta.md) owns the activation/recovery procedure. No source export, test run, GitHub publication or roadmap is itself deployment authority.
 
 ## Current source status
+
+**November 22 code review.** The customer checkout can recover an uncertain card hold after reload. The mail deadline calculation now skips printer closures throughout production, and the private backup monitor measures the age of the last replicated source snapshot. The [repository review](verification/code-review-2026-11-22.json) records fixes, regression checks and outstanding evidence. Paid release still requires deployed qualification.
+
+**November 22 handoff.** The launch-fixes checkout's application and deployment files matched `main@e27e151` before this increment. A corrected Gemini image-token estimate let Flash-Lite read all 11 printed fields on the original synthetic ticket through the customer API in a scratch process on the P06 VM. The experiment used an isolated database and an in-process test mailbox. Automated review failed. On a separate San Francisco fixture, the customer-supplied review path confirmed the supplied facts and intake stopped before payment with no verified official page. The full CISA registry reproduced the San Francisco redirect refusal. A San Diego registry-only probe reached the model and stopped on a provider error. The joined sandbox hold, letter and recovery drill remain open. [Rehearsal and local verification](verification/p06-r05-2026-11-22.json)
+
+R05 inventory now covers 98 explicitly classified application tables across service and monitor snapshots. All 82 application tables present in the sandbox service database had a classification. In an isolated access test on the VM, prefetch left a fresh link usable, expired and consumed links returned 401, and logout revoked the session. The test used a local mailbox. Retention periods, provider and backup copies, actual email delivery and revocation on the standing target still require evidence. [R05 verification](verification/p06-r05-2026-11-22.json)
+
+The full backend suite passed 13,934 tests with one dependency deprecation warning. The affected suites also passed after the final edits. The three fake-provider browser campaigns passed 155 paid-flow checks, 14 paid OCR checks and 55 mobile OCR checks, with zero skips, retries or failures reported. All three ran on application fingerprint `6f73f029…`. Lint, type checks, offline qualification and the production web build passed. [November 22 test evidence](verification/p06-r05-2026-11-22.json)
 
 **November 21 candidate (`main@d139c39`):** the provisional guarded-paid line is merged, and the
 decline-window rule is review-corrected — every in-scope decline timestamp must parse as

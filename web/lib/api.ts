@@ -352,7 +352,9 @@ export const api = {
     call<Authorization>("POST", `/cases/${c}/authorization`, {
       terms_accepted: true,
       payment_method_id: paymentMethodId,
-    }),
+    }, false, ACCESS_TIMEOUT_MS),
+  recoverAuthorization: (c: string) =>
+    call<CaseStatus>("POST", `/cases/${c}/authorization/recovery`, undefined, false, ACCESS_TIMEOUT_MS),
   status: (c: string) => call<CaseStatus>("GET", `/cases/${c}/status`, undefined, false, ACCESS_TIMEOUT_MS),
   saveRequiredCopies: (c: string, request: SaveRequiredCopies) => call<CaseStatus>("PUT", `/cases/${c}/required-copies`, request),
   requiredCopyPageUrl: (c: string, id: string, page: number) => `${API_BASE}/cases/${encodeURIComponent(c)}/required-copies/${encodeURIComponent(id)}/pages/${page}`,

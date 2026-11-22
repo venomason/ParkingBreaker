@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
 
 type Status =
+  | "loading"
   | "ready"
   | "opted_out"
   | "recorded"
@@ -23,14 +24,25 @@ async function post(path: string, body: Record<string, string>): Promise<number>
   return response.status;
 }
 
-export function OutcomeLink({ caseId, token }: { caseId: string; token: string }) {
-  const [status, setStatus] = useState<Status>(() =>
-    caseId && token ? "ready" : "invalid",
-  );
+export function OutcomeLink() {
+  const link = useRef<{ caseId: string; token: string } | null>(null);
+  const [status, setStatus] = useState<Status>("loading");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (link.current) return;
+    // Older emails used a query string. New links keep both values in the fragment.
+    const params = new URLSearchParams(window.location.hash.slice(1) || window.location.search);
+    const caseId = params.get("case") ?? "";
+    const token = params.get("token") ?? "";
+    link.current = { caseId, token };
+    window.history.replaceState(window.history.state, "", window.location.pathname);
+    setStatus(caseId && token ? "ready" : "invalid");
+  }, []);
+
   async function act(kind: "opt-out" | "dismissed" | "upheld" | "pending") {
-    if (busy || !caseId || !token) return;
+    if (busy || !link.current) return;
+    const { caseId, token } = link.current;
     setBusy(true);
     try {
       const path = kind === "opt-out" ? "/outcomes/opt-out" : "/outcomes/report";
@@ -78,7 +90,7 @@ export function OutcomeLink({ caseId, token }: { caseId: string; token: string }
         {status === "pending" && (
           <p>Thank you. We will leave the outcome unrecorded until you hear back.</p>
         )}
-        {status === "ready" && (
+        {(status === "ready" || status === "error") && (
           <>
             <p>
               If you have heard from the agency, tell us what it said. If you have not heard back,

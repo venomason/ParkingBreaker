@@ -59,8 +59,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             command.add_argument("--once", action="store_true")
     args = parser.parse_args(argv)
     backups = args.backups if args.backups is not None else args.data / "recovery"
+    require_replica = os.environ.get("PB_REQUIRE_OFF_HOST_REPLICA") == "1"
     if args.command == "check":
-        alerts = evaluate(observe(args.data, backups, datetime.now(UTC)), datetime.now(UTC))
+        now = datetime.now(UTC)
+        alerts = evaluate(observe(args.data, backups, now, require_off_host=require_replica), now)
         print(json.dumps([asdict(alert) for alert in alerts], indent=2))
         return 1 if alerts else 0
     notify, to = _notifier(dict(os.environ))
@@ -71,7 +73,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             # A poll that is in progress, blind or interrupted must never leave the
             # previous healthy receipt behind; only a completed poll republishes.
             invalidate_monitor_poll(args.state)
-            snapshot = observe(args.data, backups, now)
+            snapshot = observe(args.data, backups, now, require_off_host=require_replica)
             alerts = evaluate(snapshot, now)
             log.deliver(alerts, now, notify, to)
             record_monitor_poll(snapshot, args.data, args.state, now, datetime.now(UTC))

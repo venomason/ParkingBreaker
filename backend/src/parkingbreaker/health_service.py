@@ -13,6 +13,7 @@ provider does not accept is retried on the next poll under the same idempotency 
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import shutil
 import sqlite3
@@ -208,7 +209,38 @@ def _last_backup(backups: Path) -> tuple[datetime | None, bool]:
     return newest, newest is None
 
 
-def observe(data: Path, backups: Path, now: datetime) -> HealthSnapshot:
+def _last_off_host_replica(backups: Path, now: datetime) -> datetime | None:
+    # Recovery imports the store, which itself uses the monitor incident types.
+    from parkingbreaker.recovery import OFF_HOST_RECEIPT, SNAPSHOT_TIME
+
+    newest: datetime | None = None
+    for bundle in backups.iterdir():
+        if (
+            bundle.is_symlink()
+            or not (bundle / "COMPLETE").is_file()
+            or (bundle / "INCOMPLETE").exists()
+            or not (bundle / OFF_HOST_RECEIPT).is_file()
+        ):
+            continue
+        with suppress(OSError, ValueError):
+            receipt = json.loads((bundle / OFF_HOST_RECEIPT).read_text())
+            if not isinstance(receipt, dict):
+                continue
+            snapshot_at = (bundle / SNAPSHOT_TIME).read_text()
+            if receipt.get("snapshot_at") != snapshot_at:
+                continue
+            at = _time(snapshot_at)
+            if at > now or (newest is not None and at <= newest):
+                continue
+            digest = hashlib.sha256((bundle / "manifest.json").read_bytes()).hexdigest()
+            if receipt.get("manifest_sha256") == digest:
+                newest = at
+    return newest
+
+
+def observe(
+    data: Path, backups: Path, now: datetime, *, require_off_host: bool = False
+) -> HealthSnapshot:
     """Gather each observation independently; a failure leaves only that one unknown."""
     database = data / DATABASE
     sweep = stuck = captures = None
@@ -239,8 +271,22 @@ def observe(data: Path, backups: Path, now: datetime) -> HealthSnapshot:
     no_backup = False
     with suppress(OSError, ValueError):
         last_backup, no_backup = _last_backup(backups)
+    last_replica = None
+    if require_off_host:
+        with suppress(OSError):
+            last_replica = _last_off_host_replica(backups, now)
     return HealthSnapshot(
-        sweep, stuck, captures, disk, last_backup, no_backup, backlog, backlog_known, holds
+        sweep,
+        stuck,
+        captures,
+        disk,
+        last_backup,
+        no_backup,
+        backlog,
+        backlog_known,
+        holds,
+        require_off_host_replica=require_off_host,
+        last_off_host_replica_at=last_replica,
     )
 
 
@@ -282,6 +328,7 @@ _DOMAIN = {
     AlertKind.CAPTURE_FAILURES: "captures",
     AlertKind.DISK_LOW: "disk",
     AlertKind.BACKUP_STALE: "backup",
+    AlertKind.OFF_HOST_REPLICA_STALE: "off_host_replica",
     AlertKind.WEBHOOK_BACKLOG: "webhooks",
     AlertKind.HOLD_REVIEW_DUE: "holds",
 }

@@ -61,6 +61,7 @@ if [[ $topology == cloudrun-private-vm ]]; then
   # directory can still exist (including between the host check and container start).
   network_types=nfs,nfs4,cifs,fuse.sshfs
   findmnt --noheadings --mountpoint "$PB_REPLICA_DIRECTORY" --types "$network_types" >/dev/null
+  copy_command+=(--record-off-host)
   copy_command=(sh -ec "findmnt --noheadings --mountpoint /replica --types $network_types >/dev/null; exec \"\$@\"" verify-mount "${copy_command[@]}")
 fi
 if [[ -n ${PB_REPLICA_DIRECTORY:-} ]]; then

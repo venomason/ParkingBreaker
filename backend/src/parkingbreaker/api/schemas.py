@@ -586,6 +586,7 @@ class CaseStatus(Model):
     workspace_id: str
     state: CaseState
     payment_state: PaymentState | None
+    authorization_pending: bool | None = Field(default=None, exclude_if=lambda value: value is None)
     selected_tier: MailTier | None
     amount_cents: int | None = Field(default=None, exclude_if=lambda value: value is None)
     window_started_at: datetime | None

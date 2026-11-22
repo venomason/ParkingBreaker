@@ -323,11 +323,13 @@ def test_incidents_notify_once_retry_same_key_escalate_and_send_one_recovery(
 
 
 FAKE_CURL = """#!/bin/sh
+IFS= read -r header && [ "$header" = "Authorization: Bearer $PB_WORKER_SECRET" ] || exit 9
 printf '%s\\n' "$*" >> "$PB_CURL_ARGS"
 n=$(wc -l < "$PB_CURL_ARGS")
 mode=$(printf '%s' "$PB_FAKE" | cut -d, -f"$n")
 case "$mode" in
   ok) printf 200 ;;
+  truncated) printf 200; exit 18 ;;
   error) printf 500 ;;
   down) printf 000; echo 'curl: (7) Failed to connect' >&2; exit 7 ;;
   hang) printf 000; echo 'curl: (28) Operation timed out' >&2; exit 28 ;;
@@ -383,6 +385,7 @@ def test_scheduler_logs_failures_and_hangs_with_bounded_curl_and_keeps_going(
     assert "synthetic-secret" not in result.stdout + result.stderr
     lines = args_file.read_text().splitlines()
     assert len(lines) == calls
+    assert all("synthetic-secret" not in line and "-H @-" in line for line in lines)
     assert all("--connect-timeout 5" in line and "--max-time 300" in line for line in lines)
     for compose in ("compose.yaml", "deploy/compose.production.yaml"):
         text = (REPO / compose).read_text()
@@ -395,3 +398,72 @@ def test_scheduler_logs_failures_and_hangs_with_bounded_curl_and_keeps_going(
     assert "api worker web caddy monitor" in lifecycle
     assert "exec -T monitor" in lifecycle
     assert "mkdir -p /data /monitor" in (REPO / "backend/Dockerfile").read_text()
+
+
+def test_follow_up_reports_transport_failure_even_after_http_200(tmp_path: Path) -> None:
+    shim = tmp_path / "curl"
+    shim.write_text(FAKE_CURL)
+    shim.chmod(0o755)
+    result = subprocess.run(
+        [
+            "sh",
+            str(REPO / "deploy/scheduler-loop.sh"),
+            "http://worker/dispatch",
+            "http://worker/follow-ups",
+        ],
+        env={
+            "PATH": f"{tmp_path}:{os.environ['PATH']}",
+            "PB_WORKER_SECRET": "synthetic-secret",
+            "PB_SCHEDULER_CALLS": "1",
+            "PB_CURL_ARGS": str(tmp_path / "args"),
+            "PB_FAKE": "ok,truncated",
+        },
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=15,
+    )
+    assert json.loads(result.stderr) == {
+        "event": "follow_up_call_failed",
+        "curl_exit": 18,
+        "http_status": "200",
+    }
+    assert "synthetic-secret" not in (tmp_path / "args").read_text()
+
+
+def test_private_monitor_ages_verified_replica_by_source_snapshot(tmp_path: Path) -> None:
+    from hashlib import sha256
+
+    from parkingbreaker.recovery import OFF_HOST_RECEIPT, SNAPSHOT_TIME
+
+    backups = tmp_path / "recovery"
+    old = backups / "scheduled-20261103T110000Z-1"
+    fresh = backups / "scheduled-20261103T120000Z-2"
+    for bundle in (old, fresh):
+        bundle.mkdir(parents=True)
+        (bundle / "COMPLETE").touch()
+        (bundle / "manifest.json").write_text("{}")
+    snapshot_at = NOW - timedelta(hours=1)
+    (old / SNAPSHOT_TIME).write_text(snapshot_at.isoformat())
+    (old / OFF_HOST_RECEIPT).write_text(
+        json.dumps(
+            {"snapshot_at": snapshot_at.isoformat(), "manifest_sha256": sha256(b"{}").hexdigest()}
+        )
+    )
+    assert (
+        observe(tmp_path, backups, NOW, require_off_host=True).last_off_host_replica_at
+        == snapshot_at
+    )
+    assert AlertKind.OFF_HOST_REPLICA_STALE not in {
+        alert.kind
+        for alert in evaluate(observe(tmp_path, backups, NOW, require_off_host=True), NOW)
+    }
+    late = NOW + timedelta(seconds=1)
+    private_alerts = evaluate(observe(tmp_path, backups, late, require_off_host=True), late)
+    assert AlertKind.OFF_HOST_REPLICA_STALE in {alert.kind for alert in private_alerts}
+    assert AlertKind.BACKUP_STALE not in {alert.kind for alert in private_alerts}
+    assert AlertKind.OFF_HOST_REPLICA_STALE not in {
+        alert.kind for alert in evaluate(observe(tmp_path, backups, late), late)
+    }
+    (old / "manifest.json").write_text("changed after acknowledgement")
+    assert observe(tmp_path, backups, NOW, require_off_host=True).last_off_host_replica_at is None

@@ -161,6 +161,12 @@ The provisioning dry run prints the rules used by apply. Verify the cloud firewa
 effective Docker-published port, trusted TLS and real frontend/service identity on
 the isolated target. A host firewall rule alone cannot establish those facts.
 
+With the private topology selected, the backup timer installer schedules replication
+at minutes 00 and 30. The monitor checks the source snapshot time recorded after a
+verified off-host copy and raises a critical alert once that snapshot is over 60
+minutes old. Record the installed cadence and measure the actual restore point in
+the recovery drill. The single-VM timer runs hourly.
+
 Build the backend from the reviewed commit using the `PB_BUILD_COMMIT` build
 argument (`_PB_BUILD_COMMIT` in Cloud Build). Build the qualification frontend
 with `_PB_API_ORIGIN` set to the trusted private HTTPS origin on port 8443.

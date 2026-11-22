@@ -15,6 +15,7 @@ import openai
 import pytest
 from PIL import Image
 
+from parkingbreaker import llm_gemini
 from parkingbreaker.json_types import JsonValue
 from parkingbreaker.llm import (
     ImageAttachment,
@@ -27,8 +28,7 @@ from parkingbreaker.llm_gemini import GeminiLlmClient
 from parkingbreaker.llm_input_budget import (
     MIN_TOKENS_PER_IMAGE,
     UnboundableRequestError,
-    image_attachment_tokens,
-    request_input_tokens,
+    text_request_tokens,
 )
 from parkingbreaker.llm_models import (
     GEMINI_CONTEXT_TOKENS,
@@ -111,11 +111,11 @@ def input_bound(
     images: list[ImageAttachment] | None = None,
 ) -> int:
     schema_text = schema_json(schema)
-    return request_input_tokens(system, user, schema_text, images)
+    return text_request_tokens(system, user, schema_text) + len(images or []) * MIN_TOKENS_PER_IMAGE
 
 
-def output_for(ceiling: int | None, images: list[ImageAttachment] | None = None) -> int:
-    return request_output_tokens(config(), input_bound(images=images), ceiling)
+def output_for(ceiling: int | None) -> int:
+    return request_output_tokens(config(), input_bound(), ceiling)
 
 
 def usage_obj(
@@ -248,53 +248,60 @@ def test_payload_multimodal_with_image_attachments() -> None:
     }
 
 
-def test_structural_image_succeeds_at_25_cent_ceiling() -> None:
-    # A real, noisy PNG (not a MIME label): encoded bytes dominate the reservation.
-    img = image(media_type="image/png", payload=noisy_png_bytes((128, 128)))
+@pytest.mark.parametrize("model", ["gemini-3.8-flash", "gemini-3.5-flash-lite"])
+def test_original_ticket_image_fits_existing_ceiling(model: str) -> None:
+    img = image(media_type="image/png", size=(1300, 1100))
     transport = Transport()
-    client = GeminiLlmClient(config(), "offline-key", transport=transport)
-    result, _ = client.complete_json(SYSTEM, USER, SCHEMA, images=[img], max_cost_cents=25)
-    assert result == {"citation_number": "12345"}
+    cfg = config(model)
+    GeminiLlmClient(cfg, "offline-key", transport=transport).complete_json(
+        SYSTEM, USER, SCHEMA, images=[img], max_cost_cents=25
+    )
     (payload,) = transport.payloads
     sent = cast(int, payload["max_completion_tokens"])
     assert sent >= 1024
-    assert sent == output_for(25, [img])
-    expected_bound = input_bound(images=[img])
-    reservation = image_attachment_tokens([img])
-    assert expected_bound >= reservation
-    assert reservation >= len(img.data_url()) > 128 * 128
-    assert reservation >= MIN_TOKENS_PER_IMAGE
-    assert worst_case_cents(config(), expected_bound, sent) <= 25
+    assert worst_case_cents(cfg, input_bound(images=[img]), sent) <= 25
+    messages = cast(list[dict[str, object]], payload["messages"])
+    content = cast(list[dict[str, object]], messages[1]["content"])
+    assert content[1]["image_url"] == {"url": img.data_url()}
 
 
-def test_pixel_count_dominates_image_reservation_at_adapter() -> None:
-    # A highly compressible image whose pixel count far exceeds encoded bytes.
-    img = image(media_type="image/png", size=(512, 512))
-    assert len(img.data_url()) < 512 * 512
-    assert image_attachment_tokens([img]) == 512 * 512
-    transport = Transport()
-    client = GeminiLlmClient(config(), "offline-key", transport=transport)
-    client.complete_json(SYSTEM, USER, SCHEMA, images=[img], max_cost_cents=25)
-    assert len(transport.payloads) == 1
-
-
-def test_oversized_image_unfundable_refused_before_transport() -> None:
-    img = image(media_type="image/png", payload=noisy_png_bytes((400, 400)))
+def test_each_image_is_reserved_before_transport() -> None:
+    img = image()
+    funded = Transport()
+    GeminiLlmClient(config(), "offline-key", transport=funded).complete_json(
+        SYSTEM, USER, SCHEMA, images=[img, img], max_cost_cents=2
+    )
+    sent = cast(int, funded.payloads[0]["max_completion_tokens"])
+    assert sent == request_output_tokens(config(), input_bound(images=[img, img]), 2)
+    assert sent < request_output_tokens(config(), input_bound(images=[img]), 2)
     transport = Transport()
     client = GeminiLlmClient(config(), "offline-key", transport=transport)
     with pytest.raises(LlmBudgetExceeded):
-        client.complete_json("s", "u", {}, images=[img], max_cost_cents=25)
+        client.complete_json(SYSTEM, USER, SCHEMA, images=[img, img], max_cost_cents=1)
     assert transport.payloads == []
 
 
-def test_unbounded_image_refused_before_transport() -> None:
-    img = image(media_type="image/png", payload=noisy_png_bytes((600, 600)))
+def test_image_batch_that_exceeds_context_is_refused_before_transport() -> None:
+    images = [image()] * (GEMINI_CONTEXT_TOKENS // MIN_TOKENS_PER_IMAGE)
     transport = Transport()
     client = GeminiLlmClient(config(), "offline-key", transport=transport)
     with pytest.raises(UnboundableRequestError, match="context"):
-        client.complete_json("s", "u", {}, images=[img])
+        client.complete_json(SYSTEM, USER, SCHEMA, images=images)
     assert transport.payloads == []
-    assert input_bound("s", "u", {}, [img]) > GEMINI_CONTEXT_TOKENS
+
+
+@pytest.mark.parametrize("include_json_overhead", [False, True])
+def test_inline_size_limit_covers_wire_bytes_before_transport(
+    monkeypatch: pytest.MonkeyPatch, *, include_json_overhead: bool
+) -> None:
+    img = image(media_type="image/png", payload=noisy_png_bytes((128, 128)))
+    limit = len(img.data_base64) + (1 if include_json_overhead else -1)
+    monkeypatch.setattr(llm_gemini, "MAX_INLINE_REQUEST_BYTES", limit)
+    transport = Transport()
+    client = GeminiLlmClient(config(), "offline-key", transport=transport)
+    with pytest.raises(UnboundableRequestError, match="size limit"):
+        client.complete_json(SYSTEM, USER, SCHEMA, images=[img])
+    assert transport.payloads == []
 
 
 def test_compressible_large_dimension_image_refused_before_transport() -> None:

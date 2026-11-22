@@ -82,19 +82,16 @@ function pollSupportInbox() {
     for (var t = 0; t < threads.length; t++) {
       var thread = threads[t];
       var messages = thread.getMessages();
+      var complete = true;
 
       for (var m = 0; m < messages.length; m++) {
         var rawMsg = messages[m];
-        if (typeof rawMsg.isUnread === 'function' && !rawMsg.isUnread() &&
-            thread.getLabels().some(function (l) { return l.getName() === PB_INTAKE_CONFIG.LABELS.PROCESSED; })) {
-          continue;
-        }
-
+        // Gmail returns whole conversations. Read state and thread labels cannot prove
+        // that this message was delivered. The backend deduplicates its Gmail message ID.
         var parsed = parseInboundForBackend(rawMsg, cfg);
         if (parsed.ignoreReason) {
           if (parsed.ignoreReason !== 'IGNORED_SELF_SENT') {
             applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.IGNORED);
-            applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.PROCESSED);
           }
           if (typeof rawMsg.markRead === 'function') rawMsg.markRead();
           summary.ignored++;
@@ -103,27 +100,29 @@ function pollSupportInbox() {
 
         var res = postToBackendIntake(parsed.payload, cfg);
         if (!res.ok) {
+          complete = false;
           applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.DELIVERY_ERROR);
           rawMsg.markUnread();
           summary.deliveryErrors++;
           continue;
         }
 
-        summary.forwarded++;
+        var newlyForwarded = res.data.duplicate === true ? 0 : 1;
+        summary.forwarded += newlyForwarded;
         var outcome = res.data && res.data.outcome ? String(res.data.outcome) : '';
         if (outcome === 'NO_ID_NO_RESPONSE') {
           applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.NO_ID_NO_RESPONSE);
-          summary.noIdNoResponse++;
+          summary.noIdNoResponse += newlyForwarded;
         } else if (outcome === 'AUTO_REPLIED' || outcome === 'FIXED_REPLIED') {
           applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.AUTO_REPLIED);
-          summary.autoReplied++;
+          summary.autoReplied += newlyForwarded;
         } else {
           applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.HELD_FOR_OWNER);
-          summary.heldForOwner++;
+          summary.heldForOwner += newlyForwarded;
         }
-        applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.PROCESSED);
         if (typeof rawMsg.markRead === 'function') rawMsg.markRead();
       }
+      if (complete) applyIntakeLabel(thread, PB_INTAKE_CONFIG.LABELS.PROCESSED);
     }
 
     Logger.log('pollSupportInbox complete: ' + JSON.stringify(summary));

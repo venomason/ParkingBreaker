@@ -36,7 +36,8 @@ from parkingbreaker.llm import (
     Usage,
 )
 from parkingbreaker.llm_gateway import CallLoggingLlmClient, SpendLedger
-from parkingbreaker.oplog.ai_journal import AiWorker
+from parkingbreaker.llm_input_budget import UnboundableRequestError
+from parkingbreaker.oplog.ai_journal import AiCallStatus, AiWorker
 from parkingbreaker.payment_records import PaymentClient
 from parkingbreaker.prehold import PreholdDeps
 from parkingbreaker.prices import CERTIFIED_CENTS
@@ -598,6 +599,32 @@ def test_schema_provider_and_budget_failures_retain_usage_truth(tmp_path: Path) 
     assert claim.usage_json is not None
     assert '"cost_cents":0' in claim.usage_json
     assert budget_client.calls == 1
+
+
+def test_pretransport_photo_limit_preserves_allowance_and_records_refusal(tmp_path: Path) -> None:
+    client = FailingVisionClient(UnboundableRequestError("inline body too large"))
+    harnessed = harness(tmp_path / "input-limit.sqlite", client, gateway=True)
+    customer_binding = binding_for({field.value: None for field in FIELD_ORDER})
+    workspace, _binding, _front, _back = ready(harnessed, binding=customer_binding, back=True)
+
+    with pytest.raises(TicketIntakeServiceError, match="ticket_photo_reading_limit"):
+        harnessed.coordinator.request_reading(workspace, "req-input-limit", 2)
+
+    claim = harnessed.intake.operation_claim("req-input-limit")
+    assert claim is not None
+    assert claim.status is ClaimStatus.REFUSED
+    assert claim.usage_json is not None
+    assert json.loads(claim.usage_json)["cost_cents"] == 0
+    assert harnessed.store.ai_spent_cents(claim.intake_id, AiWorker.INTAKE_READING) == 0
+    (call,) = harnessed.store.ai_calls(claim.intake_id)
+    assert call.status is AiCallStatus.SKIPPED
+    assert call.cost_cents == 0
+
+    review = harnessed.coordinator.request_review(workspace, "req-review", 2)
+    assert review.status == "success"
+    assert review.current
+    assert review.basis == "customer-supplied facts; no model comparison"
+    assert client.calls == 1
 
 
 # ---------------------------------------------------------------------------

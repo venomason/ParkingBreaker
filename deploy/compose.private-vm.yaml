@@ -59,6 +59,8 @@ services:
     deploy: {replicas: 1}
     ports: !reset []
     networks: !override [monitor_egress]
+    environment:
+      PB_REQUIRE_OFF_HOST_REPLICA: "1"
     # Production monitor uses SQLite mode=ro. WAL readers need its existing RW mount.
     volumes: !override
       - type: bind

@@ -52,6 +52,10 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/outcomes/opt-out",
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+      },
     ];
   },
   async rewrites() {

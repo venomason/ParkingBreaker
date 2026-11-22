@@ -274,6 +274,7 @@ async def _contract_examples(
             f"/cases/{case}/authorization",
             {"terms_accepted": True, "payment_method_id": "pm_card_visa"},
         )
+        await call("POST", f"/cases/{case}/authorization/recovery")
         await call(
             "POST", f"/internal/cases/{case}/step", {"step_id": "hold-confirmed"}, worker=True
         )
@@ -431,6 +432,7 @@ CUSTOMER_ROUTES = [
     ("GET", "/pre-hold", None),
     ("PUT", "/tier", {"tier": "CERTIFIED"}),
     ("POST", "/authorization", {"terms_accepted": True, "payment_method_id": "pm_card_visa"}),
+    ("POST", "/authorization/recovery", None),
     ("GET", "/beta-offer", None),
     (
         "POST",
