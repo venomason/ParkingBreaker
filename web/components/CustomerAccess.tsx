@@ -93,6 +93,7 @@ export function CustomerGate({ children }: { children: ReactNode }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
+  const [hasExistingAppeal, setHasExistingAppeal] = useState(false);
   const [recovery, setRecovery] = useState<string | null>(null);
   // Funding is resolved separately from price assignment: a server-confirmed beta
   // case must never depend on, or display, a paid price for this case.
@@ -177,6 +178,7 @@ export function CustomerGate({ children }: { children: ReactNode }) {
     queueMicrotask(() => { if (token === fundingToken.current) { setFunding("checking"); setSavedFunding("none"); } });
     api.currentAppeal().then(async (current) => {
       if (token !== fundingToken.current) return;
+      setHasExistingAppeal(Boolean(current?.workspace_id));
       setRecovery(workspace && current?.workspace_id !== workspace ? workspace : null);
       if (!current?.case_id) { setFunding("paid"); return; }
       try {
@@ -198,7 +200,7 @@ export function CustomerGate({ children }: { children: ReactNode }) {
     }).catch((error: unknown) => {
       if (token !== fundingToken.current) return;
       // 401 is the ordinary no-session visitor; anything else stays unresolved.
-      if (error instanceof ApiError && error.status === 401) setRecovery(workspace);
+      if (error instanceof ApiError && error.status === 401) { setHasExistingAppeal(false); setRecovery(workspace); }
       setFunding(error instanceof ApiError && error.status === 401 ? "paid" : "unknown");
     });
   }, []);
@@ -276,7 +278,7 @@ export function CustomerGate({ children }: { children: ReactNode }) {
       <span>Each ticket has its own private appeal</span>
       {priceVisible && <span aria-label="Assigned certified mailing price">Early beta price: ${(pricing / 100).toFixed(2)} · Certified Mail, everything included</span>}
       {/* Creating a private appeal scope does not authorize payment or mailing. */}
-      <button className="chip" type="button" onClick={startAnother} disabled={busy}>{busy ? "Opening…" : "Start another appeal"}</button>
+      <button className="chip" type="button" onClick={startAnother} disabled={busy}>{busy ? "Opening…" : hasExistingAppeal ? "Start another appeal" : "Start an appeal"}</button>
       {hasAccess && <button className="chip" type="button" onClick={closeAccess} disabled={busy}>Close private access</button>}
       {error && <span role="alert">We couldn’t change appeal access. Check your connection and try again.</span>}
     </div>
