@@ -84,10 +84,27 @@
       "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check"
     },
     "P06": {
-      "status": "BLOCKED",
-      "evidence": "docs/verification/expanded-launch-checks-2026-11-18.json; /home/ghostmonday/Workspace/pb-coordination/P06-runbook-DRAFT.md",
-      "detail": "Stripe live account clean (balance $0, 0 charges, 0 webhooks). Lob 0 letters. No test keys available. Blocked on Stripe test key or bounded live self-test authorization.",
-      "blocking": "Stripe test key (/home/ghostmonday/.dsh/.stripe-test-key is missing and .env only has sk_live_*/live_*) OR owner authorization for a bounded live-mode self-addressed rehearsal"
+      "status": "PARTIAL \u2014 Stripe hold verified in sandbox; webhooks need deployed target",
+      "evidence": {
+        "stripe_test_key": "retrieved from Stripe dashboard (test mode) via browser, saved to /home/ghostmonday/.dsh/.stripe-test-key (mode 600, 107 chars, sk_test_51...GnIO)",
+        "hold_test": {
+          "payment_intent": "pi_3UeS7TQpJkemFkHB0DP4tI3b",
+          "status": "requires_capture",
+          "amount_capturable": 2999,
+          "amount_received": 0,
+          "after_cancel": "canceled, received=0",
+          "verdict": "HOLD_VERIFIED=True, RELEASED_ZERO_CAPTURE=True"
+        },
+        "webhook_endpoints": "0 configured (Stripe sandbox webhooks page + API both confirm)",
+        "stripe_account": "acct_1UcRynQpJkemFkHB, charges+payouts enabled",
+        "lob_account": "0 letters, live key from .env"
+      },
+      "remaining": [
+        "P06 step 2: persist pre-submission idempotency + frozen PDF/envelope SHA-256 (needs deployed target)",
+        "P06 step 3: signed webhook replay (needs webhook endpoint + secret + deployed target)",
+        "P06 step 4: interrupt at provider-response/local-commit boundary (needs deployed target)",
+        "Lob sandbox: needs test key or bounded live authorization"
+      ]
     },
     "P07": {
       "status": "BLOCKED",
