@@ -195,7 +195,24 @@
       "B01",
       "R07"
     ],
-    "in_progress": []
+    "in_progress": [],
+    "owner_actions_needed": [
+      "1. ONE LLM API KEY (e.g. DEEPSEEK_API_KEY) \u2014 unblocks P06 full journey (OCR gate in test mode)",
+      "2. Business checking account (Monday) \u2014 payout destination for first paid order",
+      "3. GATE 0 approval (~$50/mo standing VM) \u2014 unblocks P04-P07 + first paid order",
+      "4. Alert responder name + channel \u2014 unblocks P07",
+      "5. Physical phone test (P02) \u2014 when rehearsal site is ready",
+      "6. R05 retention periods sign-off \u2014 see ~/Workspace/pb-coordination/R05-RETENTION-SIGNOFF.md"
+    ],
+    "evidence_this_session": {
+      "p06_sandbox_auth": "email link \u2192 token derivation \u2192 session cookie \u2192 CSRF (202\u2192200)",
+      "p06_stripe_hold": "requires_capture, capturable=2999, received=0 \u2192 canceled, received=0",
+      "p06_signed_callbacks": "valid passes, tampered 400, stale 400, replay idempotent (both Stripe and Lob)",
+      "p06_workspace_flow": "workspace + photo + intake-form + ticket_fact_binding all 201/200",
+      "r05_retention": "all tables classified; 33 operational tables protected-unknown; sign-off doc prepared",
+      "p02_test_kit": "synthetic ticket + 5-step checklist prepared for FOXXD A56 + iPhone",
+      "test_suites": "174 tests pass (recovery, dispatch, phases, cohort, retention, API)"
+    }
   },
   "payout_eligibility": {
     "entity": "NeuralDraft LLC (business_type: company, single-member LLC per Stripe guidance)",
