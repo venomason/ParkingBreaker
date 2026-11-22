@@ -87,8 +87,8 @@
       "status": "PARTIAL \u2014 sandbox auth + signed callbacks proven; full journey blocked on OCR",
       "deployed_target": {
         "vm": "pb-qual-backend-01 (e2-medium, us-west1-a)",
-        "image": "sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5",
-        "commit": "699b209 (frozen candidate)",
+        "image": "sha256:f3dc3602b907ad76c78cd6018b6f9acc9a0c567e59c45247d56abbf5f348a6c1",
+        "commit": "6161305 (current HEAD)",
         "health": "ok, mode=test, customer_authored_mode=true",
         "containers": "pb-api + pb-worker running"
       },
@@ -211,7 +211,9 @@
       "p06_workspace_flow": "workspace + photo + intake-form + ticket_fact_binding all 201/200",
       "r05_retention": "all tables classified; 33 operational tables protected-unknown; sign-off doc prepared",
       "p02_test_kit": "synthetic ticket + 5-step checklist prepared for FOXXD A56 + iPhone",
-      "test_suites": "174 tests pass (recovery, dispatch, phases, cohort, retention, API)"
+      "test_suites": "174 tests pass (recovery, dispatch, phases, cohort, retention, API)",
+      "full_test_suite": "13,931 passed, 1 warning, 0 failures (9m53s) on commit 6161305",
+      "fresh_image": "sha256:f3dc3602b907ad76c78cd6018b6f9acc9a0c567e59c45247d56abbf5f348a6c1 (commit 6161305, build d444f476 SUCCESS)"
     }
   },
   "payout_eligibility": {
