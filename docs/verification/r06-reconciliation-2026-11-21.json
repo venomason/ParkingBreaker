@@ -85,7 +85,7 @@
       "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check"
     },
     "P06": {
-      "status": "PARTIAL \u2014 auth+OCR+intake proven with real Gemini; research gate blocks tier/hold/dispatch",
+      "status": "PARTIAL \u2014 full state machine + dedup proven on deployed target; joined real-provider run blocked on search",
       "deployed_target": {
         "vm": "pb-qual-backend-01 (e2-medium, us-west1-a)",
         "image": "sha256:f3dc3602b907ad76c78cd6018b6f9acc9a0c567e59c45247d56abbf5f348a6c1",
@@ -133,6 +133,38 @@
         "binding_review_confirmation": "form binding 200, ticket-review 200, ticket-confirmation 200 (generation 1, discrepancy none)",
         "auth": "email link -> session cookie -> CSRF (200)",
         "callbacks": "Stripe/Lob valid signature passes; tampered 400; stale 400; replay idempotent"
+      },
+      "proven_on_deployed_target_2026_11_22": {
+        "environment": "pb-qual-backend-01, image sha256:f3dc3602\u2026 (commit 6161305)",
+        "fake_mode_full_state_machine": {
+          "flow": "auth 200 -> workspace 201 -> photo 201 -> intake 200 (case created) -> tier 200 CERTIFIED -> authorization 200 -> research 200 DRAFTING -> draft 200 AWAITING_ADOPTION -> adoption 200 -> packet 200 -> approval 200 FROZEN -> dispatch 200 IN_TRANSIT",
+          "final_state": "IN_TRANSIT",
+          "payment_state": "CAPTURE_PENDING (capture deliberately after mailing)",
+          "selected_tier": "CERTIFIED",
+          "amount_cents": 2999,
+          "mail_attempts": 1,
+          "payment_operations": 1,
+          "pdf_sha256": "4b3fd8aaeb34ed7d4dac3dd0a6a06abd3826e0e17e09ab88612319924e540b23",
+          "submission_token": "sub_6386fff89a6a4ad6955141bf4ec83b54",
+          "idempotency_key_present": true,
+          "envelope": "certified mail class with recipient attention block"
+        },
+        "signed_callbacks_on_live_case": {
+          "stripe_valid_first": "200 {received:true, duplicate:false}",
+          "stripe_tampered": "400 invalid_signature",
+          "stripe_replay": "200 {received:true, duplicate:true}",
+          "stripe_stale_400s": "400 invalid_signature",
+          "pb_webhooks_rows": 1,
+          "no_double_charge": "replay incremented nothing"
+        },
+        "real_stripe_sandbox_hold": "pi_3UeS7TQpJkemFkHB0DP4tI3b requires_capture, capturable 2999, received 0 -> canceled (earlier, test mode)",
+        "real_gemini_ocr": "gemini-3.5-flash-lite free tier: 11/11 fields, confidence 1.0, 1 cent (test mode)"
+      },
+      "remaining_blocker": {
+        "what": "joined real-provider run (Stripe test capture + Lob test piece) cannot proceed because real-mode research stops before tier/hold",
+        "why": "pre-hold issuer resolution needs the official citations page; Brave search fails HTTP 422 on the placeholder key, and site homepages never state the deciding body",
+        "fix": "BRAVE_SEARCH_API_KEY free tier (2,000 queries/month) \u2014 see ~/Workspace/pb-coordination/BRAVE-SEARCH-ASK.md",
+        "not_a_code_defect": "the strict evidence gate is intended; no code change is needed"
       }
     },
     "P07": {
