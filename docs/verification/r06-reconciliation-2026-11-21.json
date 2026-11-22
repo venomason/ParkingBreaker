@@ -88,7 +88,8 @@
         },
         "remaining": "review and merge the branch before the standing launch candidate; the qualification VM currently runs the fix-branch image"
       },
-      "blocking": "review + merge of the fix branch (MiMo review), then rebuild the candidate image"
+      "blocking": "review + merge of the fix branch (MiMo review), then rebuild the candidate image",
+      "fix_branch": "fix/p03-prehold-stop-restart @ d31aff0 (rebased onto main 5c79af9; 106 related tests, ruff clean)"
     },
     "P04": {
       "status": "BLOCKED",
@@ -314,5 +315,13 @@
     "recommendation": "Open business checking in LLC name (e.g., Chase Business Complete Banking); satisfies Stripe name-match and bank business-use permission",
     "no_details_exposed": true,
     "no_settings_changed": true
+  },
+  "integration_2026_11_22": {
+    "commit": "5c79af9 (main)",
+    "content": "nine reviewed launch fixes committed from uncommitted work left in this checkout: checkout recovery, available review time, saved ticket facts/photos, OCR request limits and AI spend, mail timing, off-host backup integrity/alerting, outcome links, support inbox, scheduler",
+    "evidence": "docs/verification/code-review-2026-11-22.json, docs/verification/p06-r05-2026-11-22.json",
+    "verification": "full backend suite 13,946 passed 0 failed (13m57s); ruff check and format clean on 506 files; focused suites listed in the journals",
+    "boundary": "local source and synthetic verification only - no deployment, live payment, mail, customer-data use or off-host RPO certification",
+    "note": "the qualification images built earlier from this directory included these working-tree fixes because Cloud Build uploads the working directory"
   }
 }
