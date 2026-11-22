@@ -84,26 +84,43 @@
       "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check"
     },
     "P06": {
-      "status": "PARTIAL \u2014 Stripe hold verified in sandbox; webhooks need deployed target",
-      "evidence": {
-        "stripe_test_key": "retrieved from Stripe dashboard (test mode) via browser, saved to /home/ghostmonday/.dsh/.stripe-test-key (mode 600, 107 chars, sk_test_51...GnIO)",
-        "hold_test": {
-          "payment_intent": "pi_3UeS7TQpJkemFkHB0DP4tI3b",
-          "status": "requires_capture",
-          "amount_capturable": 2999,
-          "amount_received": 0,
-          "after_cancel": "canceled, received=0",
-          "verdict": "HOLD_VERIFIED=True, RELEASED_ZERO_CAPTURE=True"
-        },
-        "webhook_endpoints": "0 configured (Stripe sandbox webhooks page + API both confirm)",
-        "stripe_account": "acct_1UcRynQpJkemFkHB, charges+payouts enabled",
-        "lob_account": "0 letters, live key from .env"
+      "status": "PARTIAL \u2014 sandbox auth + signed callbacks proven; full journey blocked on OCR",
+      "deployed_target": {
+        "vm": "pb-qual-backend-01 (e2-medium, us-west1-a)",
+        "image": "sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5",
+        "commit": "699b209 (frozen candidate)",
+        "health": "ok, mode=test, customer_authored_mode=true",
+        "containers": "pb-api + pb-worker running"
       },
-      "remaining": [
-        "P06 step 2: persist pre-submission idempotency + frozen PDF/envelope SHA-256 (needs deployed target)",
-        "P06 step 3: signed webhook replay (needs webhook endpoint + secret + deployed target)",
-        "P06 step 4: interrupt at provider-response/local-commit boundary (needs deployed target)",
-        "Lob sandbox: needs test key or bounded live authorization"
+      "proven": {
+        "stripe_sandbox_hold": "pi_3UeS7TQpJkemFkHB0DP4tI3b \u2192 requires_capture, capturable=2999, received=0 \u2192 canceled, received=0",
+        "customer_auth": "email link flow: POST /auth/link 202 \u2192 derive token from PB_AUTH_LINK_KEY + nonce \u2192 POST /auth/confirm 200 \u2192 session + CSRF cookies",
+        "signed_callbacks": {
+          "stripe_valid_signature": "passes verification, reaches case matching (409 webhook_case_not_ready = no matching case)",
+          "stripe_tampered_payload": "400 invalid_signature",
+          "stripe_stale_timestamp": "400 invalid_signature",
+          "stripe_replay": "same 409 as first delivery (idempotent)",
+          "lob_valid_signature": "passes verification",
+          "lob_tampered_payload": "400 invalid_signature"
+        },
+        "workspace_photo_intake_form": "all 201/200 (with unique PNG, correct Origin header, ticket_fact_binding)"
+      },
+      "blocked": {
+        "reason": "test mode always activates the OCR gate (ticket_intake coordinator created unconditionally). Placeholder LLM keys cause extraction to fail \u2192 ticket_reading_provenance_mismatch. Full journey to mail dispatch, capture timing, and recovery require a working OCR extraction.",
+        "fix": "provide one real LLM API key (e.g. DEEPSEEK_API_KEY) for OCR extraction, or run in fake mode (but then Stripe/Lob are fake too)",
+        "affects": [
+          "P06 steps 2-4 (dispatch, capture timing, recovery)",
+          "P04 (live OCR trial)"
+        ]
+      },
+      "env_requirements_discovered": [
+        "PB_PROVIDER_MODE=test requires: sk_test_, test_ Lob, pk_test_, whsec_, LOB_WEBHOOK_SECRET, PB_AUTH_MODE=email, PB_AUTH_LINK_KEY (43-char base64url), PB_PUBLIC_ORIGIN (https), RESEND_FROM_EMAIL (nonblank)",
+        "PB_OVERSEER_FEED_SECRET \u2265 16 chars, valid header credential, \u2260 worker secret",
+        "PB_OVERSEER_OPS_ID_KEY = 64-char hex, version 1-65535",
+        "PB_TICKET_OCR_MANUAL_BELOW < PB_TICKET_OCR_ESCALATE_BELOW \u2264 1",
+        "PB_DOTGOV_SNAPSHOT = dotgov-YYYY-MM-DD.csv (with CISA header)",
+        "RESEND_FROM_EMAIL must be nonblank",
+        "Unique PNG content required (same bytes \u2192 409)"
       ]
     },
     "P07": {
