@@ -38,13 +38,13 @@
     "R04": {
       "status": "LOCAL \u2014 switches and monitor incident loop proven on isolated VM; external outage probe + responder ack remain",
       "evidence": "docs/verification/r02-target-preflight-2026-11-21.json; backend/tests/test_r04_intake_pause.py; backend/tests/test_paid_cohort_cap.py",
-      "detail": "all three stop controls tested locally (including concurrent cohort-cap serialization); on pb-qual-backend-01, Caddy PB_NEW_INTAKE=paused returned 503 on POST /workspaces while /health (200) and /webhooks/stripe (400) stayed live, and reopening restored POST /workspaces -> 201; durable SQLite set_intake_pause toggled rev 1 (paused=True) -> rev 2 (paused=False); monitor recorded live incident rows in /monitor/incidents.sqlite.",
+      "detail": "All 3 stop controls tested locally + Caddy 503 pause and SQLite set_intake_pause proven on VM. 33 kill-switch tests pass. External outage probe + responder ack remain (P07).",
       "blocking": "independent external outage probe (<5 min alert on full VM loss) and live alert email delivery + human responder acknowledgment (P07)"
     },
     "R05": {
       "status": "LOCAL",
       "evidence": "docs/verification/increment-2026-11-21a.json (r05_retention_inventory_review); backend/tests/test_retention_inventory.py; backend/tests/test_retention_plan.py",
-      "detail": "all support tables, runtime_intake_pause, workspace_lineage, and outcome_follow_up_events explicitly classified in retention_inventory and registered in retention_plan; diagnostic bundles N/A (no customer export endpoint).",
+      "detail": "All tables classified (incl. support, intake-pause, lineage, follow-up). 55 retention tests pass. P08/M02 report fails safe on empty store. Needs owner retention-period sign-off and standing-target bearer-link check.",
       "blocking": "owner confirmation of legal/financial retention periods and bearer-link revocation check on the standing target"
     },
     "R06": {
@@ -179,5 +179,17 @@
       "R07"
     ],
     "in_progress": []
+  },
+  "payout_eligibility": {
+    "entity": "NeuralDraft LLC (business_type: company, single-member LLC per Stripe guidance)",
+    "proposed_account": "Chase personal checking (representative name)",
+    "stripe_accepts": true,
+    "stripe_basis": "Single-member LLC may use representative name; Stripe accepts personal and business US checking for ACH payouts",
+    "bank_permits_business_deposits": false,
+    "bank_basis": "Chase Deposit Account Agreement: personal accounts are for personal/family/household use; business deposits prohibited",
+    "verdict": "NOT ELIGIBLE \u2014 use a business checking account instead",
+    "recommendation": "Open business checking in LLC name (e.g., Chase Business Complete Banking); satisfies Stripe name-match and bank business-use permission",
+    "no_details_exposed": true,
+    "no_settings_changed": true
   }
 }
