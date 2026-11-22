@@ -108,11 +108,13 @@ test("the five photo illustrations use the owner's exact statement and keep tick
   await expect(previous).toBeDisabled();
   for (const index of [0, 1, 2, 3, 4]) {
     if (index > 0) await next.click();
+    await expect(intro.getByRole("status")).toHaveText(`Illustration ${index + 1} of 5`);
     await expect(pictures.nth(index)).toBeInViewport({ ratio: 0.9 });
     await expect.poll(() => pictures.nth(index).evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
   }
   await expect(next).toBeDisabled();
   await previous.click();
+  await expect(intro.getByRole("status")).toHaveText("Illustration 4 of 5");
   await expect(pictures.nth(3)).toBeInViewport({ ratio: 0.9 });
   await expect(page.locator("#sceneCamera")).toHaveAttribute("capture", "environment");
   await expect(page.locator("#sceneLibrary")).toHaveAttribute("multiple", "");
