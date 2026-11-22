@@ -71,10 +71,24 @@
       "blocking": "physical Foxx A56 + physical iPhone (Safari) run against the deployed candidate (plus mid-range Android or explicit floor limitation note)"
     },
     "P03": {
-      "status": "LOCAL",
-      "evidence": "backend/tests/test_p03_assisted_restart.py (3 passed on launch-fixes @ 24a207d, including same-timestamp smaller-token rowid tie-breaker, atomic lineage, and concurrent-restart replay)",
-      "detail": "truthful stop (STOPPED_NO_CHARGE, hold released, frozen packet untouched, no resubmission) and assisted restart (fresh prefilled workspace, atomic parent_workspace lineage, concurrent start replay, independent authorization/approval/letter for the restarted case) proven.",
-      "blocking": "deployed exercise on the standing target"
+      "status": "LOCAL code/tests + DEPLOYED fix verified (branch fix/p03-prehold-stop-restart @ 8d9927e, pending review/merge)",
+      "evidence": "backend/tests/test_p03_assisted_restart.py (post-authorization Lob-reject stop) plus new backend/tests/test_p03_prehold_stop_restart.py (pre-hold stop, bearer path and cookie-auth route path; both fail without the fix)",
+      "detail": "truthful stop (STOPPED_NO_CHARGE, hold released, frozen packet untouched, no resubmission) and assisted restart (fresh prefilled workspace, atomic parent_workspace lineage, concurrent start replay) proven.",
+      "defect_found_on_deployed_target_2026_11_22": {
+        "symptom": "A stop decided before issuer research (unknown issuer, ticket too old, or rental-company paid) left the customer unable to appeal again: POST /workspaces -> 409 appeal_already_started and a corrected intake -> 409 intake_already_submitted_create_new_workspace (whose remedy is 'start a new workspace').",
+        "root_cause_1": "CaseService._finished_transaction only inspected case rows; a pre-hold stop never creates one, so the workspace looked live forever.",
+        "root_cause_2": "With cookie auth, POST /workspaces returned the owner's existing workspace before create_workspace() ran, so the assisted restart path was unreachable for every authenticated customer.",
+        "fix": "treat a saved pre-hold Stop as a finished transaction and let the auth route fall through to create_workspace() when the transaction is finished",
+        "fix_branch": "fix/p03-prehold-stop-restart @ 8d9927e (2 files src + 1 new test file; ruff/mypy clean; 129 related tests pass)",
+        "deployed_verification": {
+          "image": "sha256:6c25a72bc7d8810776286826bf3ce07e4ae9ddfa3cf82f82aabf4faf221cdb99",
+          "build_commit": "8d9927ef2ef42435c8bf176b54249a56a7f95ce8",
+          "run": "intake -> 200 STOPPED_NO_CHARGE; restart -> 201 fresh workspace ws_2c7161dde05845f58cade7b6bbaf3b62; lineage child=ws_2c71..., parent=ws_df0c..., reason=restart",
+          "conclusion": "dead end closed on the deployed target"
+        },
+        "remaining": "review and merge the branch before the standing launch candidate; the qualification VM currently runs the fix-branch image"
+      },
+      "blocking": "review + merge of the fix branch (MiMo review), then rebuild the candidate image"
     },
     "P04": {
       "status": "BLOCKED",
