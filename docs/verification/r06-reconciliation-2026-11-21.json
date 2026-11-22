@@ -2,25 +2,28 @@
   "observed_utc": "2026-11-21T16:35:00Z",
   "purpose": "R06 reconciliation: every Phase 1 gate, its evidence on the current candidate, and the single thing blocking it. Statuses: PASS (evidence on the candidate), LOCAL (evidence complete except deployed exercise), GAP (capability or coverage missing), BLOCKED (needs a credential, spend approval, device or owner decision), OWNER (owner action only).",
   "candidate": {
-    "branch": "main (frozen at 699b209 / receipt HEAD 75121bf); post-freeze defect fixes verified in isolated worktree /home/ghostmonday/Workspace/pb-launch-fixes (branch launch-fixes @ 24a207d)",
-    "frozen_code_commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
-    "fix_worktree_commit": "24a207dd9df99919ea0fd5b4e6cc201cc609de03",
-    "backend_image_digest_699b209": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5 (build 35782f20, org.opencontainers.image.revision=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75)",
-    "frontend_image_digest_699b209": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend@sha256:977bfa98df778eac6978f63d69e83bde5394630bfbfb49375ecedbbbaead43f4 (build b14d91fc)",
-    "deployed_revision": "parkingbreaker-frontend-00012-tk6 (fake mode preview on Cloud Run)",
-    "durable_target": "qualified in isolated R02 drill (lifecycle.sh deploy --apply EXIT 0) and torn down per window rules; not yet standing in production"
+    "branch": "main",
+    "signed_integration_commit": "1d8205858fefc87eeefc3924b17b1b07fc0010c0",
+    "freeze_commit": "699b209bab3bfd8002cc7a775eb5ec56ae1cdf75",
+    "launch_fixes_commit": "24a207dd9df99919ea0fd5b4e6cc201cc609de03",
+    "runtime_code_equivalence": "1d82058 vs 24a207d: zero diff in backend/src, web/, deploy/ (only cloudbuild-backend.yaml guard + test_t22_lifecycle.py differ)",
+    "r02_lifecycle_images": {
+      "backend": "sha256:616894c00311e6b1b41d4747bc716888e4b77dfa1ddeed379f61ba11df677cd5",
+      "frontend": "sha256:977bfa98df778eac6978f63d69e83bde5394630bfbfb49375ecedbbbaead43f4"
+    },
+    "deployed_revision": "parkingbreaker-frontend-00012-tk6 (fake mode, ephemeral /data)"
   },
   "gates": {
     "R01": {
       "status": "PASS (frozen on 699b209; post-freeze fixes verified on launch-fixes @ 24a207d)",
       "evidence": "docs/verification/r01-candidate-2026-11-21.json",
-      "detail": "699b209 passed web-check, 13,920 backend tests, 3 synthetic browser campaigns (fingerprint 38756d47...), MiMo V2.6 Pro review APPROVE, and rebuilt backend image sha256:616894c0... with verified OCI revision label. Post-freeze audit in launch-fixes (24a207d) fixed cloudbuild-backend.yaml empty-_PB_BUILD_COMMIT guard, J05 production routing/wiring/starvation, and P03 same-timestamp restart tie-breaker + atomic lineage (ruff/format/mypy clean on 506 files, web-check EXIT 0, qualification-check EXIT 0, 1,600+ focused regression tests across 64 files EXIT 0).",
+      "detail": "Frozen on 699b209; signed integration at 1d82058 preserves all code changes. 147 targeted tests pass on integration; ruff/format/mypy clean; web-check EXIT 0; qualification self-tests pass without provider calls.",
       "blocking": "merge launch-fixes (24a207d) to main and build its candidate image digest when ready for final cutover"
     },
     "R02": {
       "status": "LOCAL \u2014 isolated-target full lifecycle.sh deploy --apply EXIT 0 + all 6 target proofs pass",
       "evidence": "docs/verification/r02-target-preflight-2026-11-21.json; /home/ghostmonday/tmp/r02-drill2-20261121T112652Z/serial13-verify.log; /home/ghostmonday/tmp/r02-drill2-20261121T112652Z/residual-checks.txt",
-      "detail": "unmodified deploy/lifecycle.sh deploy --apply exited 0 on pb-qual-backend-01 + regional disk pb-qual-data-01: all 5 digest-pinned images pulled, org.opencontainers.image.revision=699b209bab3bfd8002cc7a775eb5ec56ae1cdf75 verified, single ext4 writer, regional_owner fencing, data survival across VM resets (boots=2), private TLS :8443 (/health 200, /internal/dispatch 404, /dev-worker/test 404, /webhooks/* 400), scheduler -> worker sweep recorded outcome='ok', monitor published /monitor/health-poll.json and release_readiness exited 0. Torn down with 0 residual drill resources (~$0.25 total spend vs $10 cap).",
+      "detail": "Full lifecycle.sh deploy --apply EXIT 0 on pb-qual-backend-01 (all 5 containers, TLS :8443, sweep ok, monitor receipt). R03 backup/restore artifacts_match + records_match proven. Teardown clean. Remaining: standing prod VM/disk approval (GATE 0) + Cloud Run frontend VPC route.",
       "remaining": [
         "standing production VM + regional disk provisioning approval (GATE 0, ~$45-60/mo)",
         "Cloud Run frontend routed to the private VM over VPC Direct Egress (drill used local 127.0.0.1:443 -> :8443 stand-in)"
@@ -29,7 +32,7 @@
     "R03": {
       "status": "BLOCKED",
       "evidence": "docs/verification/r02-target-preflight-2026-11-21.json (r03_backup, r03_restore, r03_quarantine_refusal_exit=4); docs/verification/increment-2026-11-21a.json",
-      "detail": "live regional-disk backup + restore on pb-qual-backend-01 verified artifacts_match=true and records_match=true in 0.042s with RESTORE_QUARANTINE.json written, and proved unmodified deploy/lifecycle.sh deploy --apply refuses quarantined data with exit code 4 while keeping all 5 running containers up. Offline reconciliation dry-run passes (READY_FAKE).",
+      "detail": "Live regional-disk backup + restore verified (artifacts_match=true, records_match=true) and lifecycle quarantine refusal (exit 4) proven on VM. Blocked on P06 real Stripe/Lob interrupted objects for NEEDS_EXTERNAL reconciliation.",
       "blocking": "P06 interrupted real Stripe/Lob provider objects to exercise NEEDS_EXTERNAL reconciliation against live/test provider APIs"
     },
     "R04": {
@@ -83,13 +86,13 @@
     "P06": {
       "status": "BLOCKED",
       "evidence": "docs/verification/expanded-launch-checks-2026-11-18.json; /home/ghostmonday/Workspace/pb-coordination/P06-runbook-DRAFT.md",
-      "detail": "joined Stripe+Lob case, manual authorization (requires_capture, amount_capturable > 0), pre-submission idempotency + frozen PDF/envelope SHA-256, visual proof inspection, signed + tampered webhook callbacks, and provider/commit boundary interruption.",
+      "detail": "Stripe live account clean (balance $0, 0 charges, 0 webhooks). Lob 0 letters. No test keys available. Blocked on Stripe test key or bounded live self-test authorization.",
       "blocking": "Stripe test key (/home/ghostmonday/.dsh/.stripe-test-key is missing and .env only has sk_live_*/live_*) OR owner authorization for a bounded live-mode self-addressed rehearsal"
     },
     "P07": {
       "status": "BLOCKED",
       "evidence": "backend/tests/test_support*.py; backend/tests/test_t14_authorization_recovery.py (test_customer_support_code_requires_enabled_channel)",
-      "detail": "automatic wrong-address remedy and support-code gating verified in tests.",
+      "detail": "Support workflow and automatic remedies tested locally. Blocked on named human responder acknowledgement of R04 test alert.",
       "blocking": "named human responder acknowledgment of a live R04 test alert with recorded timestamp + deployed support intake credentials"
     },
     "P08": {
