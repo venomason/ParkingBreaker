@@ -977,12 +977,27 @@ class CaseService:
         return s.WorkspaceView(workspace_id=saved.workspace_token, notes=saved.workspace.notes)
 
     def _finished_transaction(self, workspace_id: str) -> bool:
-        """Whether this workspace's transaction reached a terminal case state."""
+        """Whether this workspace's transaction reached a terminal state.
+
+        A pre-hold stop is terminal too. It never creates a case row, so checking
+        only the case left the customer stuck: a new start was refused as
+        ``appeal_already_started`` while a corrected intake was refused with
+        ``intake_already_submitted_create_new_workspace`` (which tells them to
+        start a new workspace). Treating the saved pre-hold Stop as finished lets
+        the assisted restart path carry their words and photos into a fresh
+        workspace.
+        """
         intake = self._store.intake_for_workspace(workspace_id)
-        if intake is None or intake.case_token is None:
+        if intake is None:
             return False
+        if intake.case_token is None:
+            return isinstance(self.pre_hold(intake.intake_id), s.Stop)
         case = self._store.get_case(intake.case_token)
         return case is not None and case.letter_state in TERMINAL_STATES
+
+    def workspace_finished(self, workspace_id: str) -> bool:
+        """Whether this workspace's transaction is terminal, so a new one may start."""
+        return self._finished_transaction(workspace_id)
 
     def workspace_view(self, workspace_id: str) -> s.WorkspaceView:
         saved = self._store.get_workspace(workspace_id)

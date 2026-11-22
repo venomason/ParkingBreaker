@@ -105,6 +105,10 @@ class FakeServices:
             raise FakeConflict("ambiguous_legacy_scope")
         return views[0] if views else None
 
+    def workspace_finished(self, workspace_id: str) -> bool:
+        """Preview workspaces never resume into a durable transaction."""
+        return False
+
     def create_workspace(self, owner: str, body: s.CreateWorkspace) -> s.WorkspaceView:
         workspace_id = f"ws_{uuid4().hex}"
         view = s.WorkspaceView(

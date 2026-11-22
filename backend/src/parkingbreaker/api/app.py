@@ -276,7 +276,7 @@ def create_app(
     ) -> s.WorkspaceView:
         if customer_auth is not None:
             existing = services.appeal_workspace(customer.customer_id)
-            if existing is not None:
+            if existing is not None and not services.workspace_finished(existing.workspace_id):
                 if existing.notes != body.notes:
                     raise HTTPException(409, "appeal_already_started")
                 return existing
