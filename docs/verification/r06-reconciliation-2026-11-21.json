@@ -107,11 +107,12 @@
       },
       "blocked": {
         "reason": "test mode always activates the OCR gate (ticket_intake coordinator created unconditionally). Placeholder LLM keys cause extraction to fail \u2192 ticket_reading_provenance_mismatch. Full journey to mail dispatch, capture timing, and recovery require a working OCR extraction.",
-        "fix": "provide one real LLM API key (e.g. DEEPSEEK_API_KEY) for OCR extraction, or run in fake mode (but then Stripe/Lob are fake too)",
+        "fix": "Provide one real LLM API key (DEEPSEEK_API_KEY, GEMINI_API_KEY, MINIMAX_API_KEY, or OPENAI_API_KEY). This unblocks OCR extraction (test mode) AND research verification (both modes).",
         "affects": [
           "P06 steps 2-4 (dispatch, capture timing, recovery)",
           "P04 (live OCR trial)"
-        ]
+        ],
+        "finding": "In test mode: OCR gate blocks intake (placeholder LLM keys \u2192 extraction fails \u2192 provenance mismatch). In fake mode: intake succeeds (case created) but research stops with S7 stage_mismatch \u2014 the fake research cannot verify the issuer's process for SFMTA. Both paths need real verification data (LLM key for OCR+research, or known-records for the issuer)."
       },
       "env_requirements_discovered": [
         "PB_PROVIDER_MODE=test requires: sk_test_, test_ Lob, pk_test_, whsec_, LOB_WEBHOOK_SECRET, PB_AUTH_MODE=email, PB_AUTH_LINK_KEY (43-char base64url), PB_PUBLIC_ORIGIN (https), RESEND_FROM_EMAIL (nonblank)",
