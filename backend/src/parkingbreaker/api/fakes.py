@@ -106,7 +106,7 @@ class FakeServices:
         return views[0] if views else None
 
     def workspace_finished(self, workspace_id: str) -> bool:
-        """Preview workspaces never resume into a durable transaction."""
+        """Preview has no durable transaction, so a start always replays its workspace."""
         return False
 
     def create_workspace(self, owner: str, body: s.CreateWorkspace) -> s.WorkspaceView:

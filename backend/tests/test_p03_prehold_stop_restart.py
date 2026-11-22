@@ -2,16 +2,19 @@
 
 A stop decided before issuer research (too old, rental-company paid, or an
 unverifiable issuer) saves a Stop pre-hold view and never creates a case row.
-Before this fix the restart gate only looked at case rows, so:
+Before this fix:
 
 * ``POST /workspaces`` answered 409 ``appeal_already_started``, while
 * a corrected ``POST /workspaces/{id}/intake`` answered 409
   ``intake_already_submitted_create_new_workspace`` (which tells the customer
   to start a new workspace).
 
-That pair left the customer unable to appeal at all. The fix treats the saved
-pre-hold Stop as a finished transaction so the assisted restart path can carry
-their words and photos into a fresh workspace.
+With cookie auth the route returned the existing workspace before the restart
+path could run, so every authenticated customer hit the same dead end.
+
+These tests cover the bearer path, the deployed cookie-auth route path, the
+carried-notes replay rule, and the negative case where a live intake must
+replay instead of restarting.
 """
 
 from __future__ import annotations
@@ -37,96 +40,100 @@ def _client(tmp_path: Path) -> AsyncClient:
     )
 
 
-async def _submit_stopped_intake(client: AsyncClient) -> str:
-    """Submit a rental-company-paid ticket: a pre-hold stop with no case row."""
-    workspace = (await client.post("/workspaces", headers=ALICE, json={"notes": ""})).json()
-    path = f"/workspaces/{workspace['workspace_id']}"
-    photo = await client.post(
-        f"{path}/photos",
-        headers=ALICE,
+async def _photo(client: AsyncClient, workspace_id: str, auth: dict[str, str]) -> str:
+    response = await client.post(
+        f"/workspaces/{workspace_id}/photos",
+        headers=auth,
         json={"content_type": "image/png", "data_base64": PNG_B64},
     )
-    assert photo.status_code == 201, photo.text
-    ref = photo.json()["photo_ref"]
+    assert response.status_code == 201, response.text
+    return response.json()["photo_ref"]
+
+
+async def _submit(
+    client: AsyncClient, workspace_id: str, auth: dict[str, str], *, rental_paid: bool
+) -> dict[str, Any]:
+    ref = await _photo(client, workspace_id, auth)
     body: dict[str, Any] = {
         **INTAKE,
-        "rental_company_paid": True,
         "photo_refs": [ref],
         "citation_photo_ref": ref,
     }
-    receipt = await client.post(f"{path}/intake", headers=ALICE, json=body)
+    if rental_paid:
+        body["rental_company_paid"] = True
+    receipt = await client.post(f"/workspaces/{workspace_id}/intake", headers=auth, json=body)
     assert receipt.status_code == 200, receipt.text
-    assert receipt.json()["state"] == "STOPPED_NO_CHARGE"
-    return receipt.json()["workspace_id"]
+    return receipt.json()
 
 
-async def test_prehold_stop_restart_creates_a_fresh_prefilled_workspace(tmp_path: Path) -> None:
+async def test_prehold_stop_restart_carries_into_a_fresh_workspace(tmp_path: Path) -> None:
     async with _client(tmp_path) as client:
-        stopped_workspace = await _submit_stopped_intake(client)
+        started = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        assert started.status_code == 201, started.text
+        stopped_workspace = started.json()["workspace_id"]
+        receipt = await _submit(client, stopped_workspace, ALICE, rental_paid=True)
+        assert receipt["state"] == "STOPPED_NO_CHARGE"
+        stopped_case = (await client.get(f"/workspaces/{stopped_workspace}", headers=ALICE)).json()[
+            "case_id"
+        ]
+        assert stopped_case is not None
+
         restarted = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
         assert restarted.status_code == 201, restarted.text
         fresh = restarted.json()["workspace_id"]
         assert fresh != stopped_workspace
-        # A repeated start before submitting replays the same fresh workspace.
+        # A repeated start before submitting replays the fresh (still live) workspace.
         replay = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
         assert replay.status_code == 201, replay.text
         assert replay.json()["workspace_id"] == fresh
-        # The dead end is gone: the customer can now submit a corrected appeal.
-        uploaded = await client.post(
-            f"/workspaces/{fresh}/photos",
-            headers=ALICE,
-            json={"content_type": "image/png", "data_base64": PNG_B64},
-        )
-        assert uploaded.status_code == 201, uploaded.text
-        ref = uploaded.json()["photo_ref"]
-        corrected = await client.post(
-            f"/workspaces/{fresh}/intake",
-            headers=ALICE,
-            json={**INTAKE, "photo_refs": [ref], "citation_photo_ref": ref},
-        )
-        assert corrected.status_code == 200, corrected.text
-        assert corrected.json()["case_id"] != stopped_workspace
+
+        # The dead end is gone: a corrected intake creates a distinct live case.
+        corrected = await _submit(client, fresh, ALICE, rental_paid=False)
+        assert corrected["state"] == "INTAKE"
+        assert corrected["case_id"] != stopped_case
+        assert stopped_case != fresh
         # The stopped workspace keeps its own truthful stop and intake record.
         stopped_view = (await client.get(f"/workspaces/{stopped_workspace}", headers=ALICE)).json()
         assert stopped_view["intake"] is not None
 
 
-async def test_email_auth_restart_after_prehold_stop(tmp_path: Path) -> None:
-    """The deployed email-auth route must not short-circuit a finished transaction.
+async def test_live_intake_replays_instead_of_restarting(tmp_path: Path) -> None:
+    async with _client(tmp_path) as client:
+        started = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        workspace = started.json()["workspace_id"]
+        receipt = await _submit(client, workspace, ALICE, rental_paid=False)
+        assert receipt["state"] == "INTAKE"
+        replay = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        assert replay.status_code == 201, replay.text
+        assert replay.json()["workspace_id"] == workspace
 
-    With cookie auth, ``POST /workspaces`` used to return the owner's existing
-    workspace unconditionally, so the pre-hold-stop restart never ran there even
-    though the service could restart. This drives the auth route itself.
-    """
+
+async def test_email_auth_restart_carried_notes_replay(tmp_path: Path) -> None:
+    """The deployed cookie-auth route must restart, then replay with carried notes."""
     with SqliteTransactionStore(tmp_path / "auth.sqlite") as store:
         mail = RecordingEmail()
         app = app_for(store, tmp_path, mail)
         async with AsyncClient(transport=ASGITransport(app=app), base_url=ORIGIN) as client:
             await sign_in(client, mail, "restart@example.test")
-            started = await client.post("/workspaces", headers=headers(client), json={"notes": ""})
+            auth = headers(client)
+            started = await client.post("/workspaces", headers=auth, json={"notes": "keep me"})
             assert started.status_code == 201, started.text
             stopped_workspace = started.json()["workspace_id"]
-            path = f"/workspaces/{stopped_workspace}"
-            photo = await client.post(
-                f"{path}/photos",
-                headers=headers(client),
-                json={"content_type": "image/png", "data_base64": PNG_B64},
-            )
-            assert photo.status_code == 201, photo.text
-            ref = photo.json()["photo_ref"]
-            body: dict[str, Any] = {
-                **INTAKE,
-                "rental_company_paid": True,
-                "photo_refs": [ref],
-                "citation_photo_ref": ref,
-            }
-            receipt = await client.post(f"{path}/intake", headers=headers(client), json=body)
-            assert receipt.status_code == 200, receipt.text
-            assert receipt.json()["state"] == "STOPPED_NO_CHARGE"
+            receipt = await _submit(client, stopped_workspace, auth, rental_paid=True)
+            assert receipt["state"] == "STOPPED_NO_CHARGE"
 
-            restarted = await client.post(
-                "/workspaces", headers=headers(client), json={"notes": ""}
-            )
+            # An empty notes body after a restart carries the earlier notes, so a
+            # second start must replay the fresh workspace instead of 409.
+            restarted = await client.post("/workspaces", headers=auth, json={"notes": ""})
             assert restarted.status_code == 201, restarted.text
             fresh = restarted.json()["workspace_id"]
             assert fresh != stopped_workspace
+            assert restarted.json()["notes"] == "keep me"
+            replay = await client.post("/workspaces", headers=auth, json={"notes": ""})
+            assert replay.status_code == 201, replay.text
+            assert replay.json()["workspace_id"] == fresh
+
+            # A different non-empty note is still refused while the workspace is live.
+            conflict = await client.post("/workspaces", headers=auth, json={"notes": "other"})
+            assert conflict.status_code == 409, conflict.text
+            assert conflict.json()["detail"] == "appeal_already_started"

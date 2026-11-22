@@ -326,9 +326,16 @@ class IdentityStoreMixin:
             or session.expires_at <= now
         ):
             return None
+        # Legacy accounts could own several unlinked workspaces before identity
+        # existed; that ambiguity must not be consumed. A legitimate assisted
+        # restart records parent lineage, so count only unlineaged roots: a
+        # restart chain keeps exactly one root and the session stays valid.
         if (
             database.execute(
-                "SELECT count(*) FROM pb_intake_owners WHERE owner=?", (session.customer_id,)
+                "SELECT count(*) FROM pb_intake_owners o WHERE o.owner=? "
+                "AND NOT EXISTS (SELECT 1 FROM pb_workspace_lineage l "
+                "WHERE l.child_workspace=o.workspace_token)",
+                (session.customer_id,),
             ).fetchone()[0]
             > 1
         ):
