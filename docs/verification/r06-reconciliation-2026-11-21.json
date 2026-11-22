@@ -46,7 +46,11 @@
       "status": "LOCAL",
       "evidence": "docs/verification/increment-2026-11-21a.json (r05_retention_inventory_review); backend/tests/test_retention_inventory.py; backend/tests/test_retention_plan.py",
       "detail": "All tables classified (incl. support, intake-pause, lineage, follow-up). 55 retention tests pass. P08/M02 report fails safe on empty store. Needs owner retention-period sign-off and standing-target bearer-link check.",
-      "blocking": "owner confirmation of legal/financial retention periods and bearer-link revocation check on the standing target"
+      "blocking": "owner confirmation of legal/financial retention periods and bearer-link revocation check on the standing target",
+      "inventory_check_2026_11_22": {
+        "result": "82/82 pb_ tables classified, 0 unclassified (checked against the current working tree retention inventory)",
+        "remaining": "owner sign-off on retention periods \u2014 see ~/Workspace/pb-coordination/R05-RETENTION-SIGNOFF.md"
+      }
     },
     "R06": {
       "status": "BLOCKED",
@@ -158,7 +162,32 @@
           "no_double_charge": "replay incremented nothing"
         },
         "real_stripe_sandbox_hold": "pi_3UeS7TQpJkemFkHB0DP4tI3b requires_capture, capturable 2999, received 0 -> canceled (earlier, test mode)",
-        "real_gemini_ocr": "gemini-3.5-flash-lite free tier: 11/11 fields, confidence 1.0, 1 cent (test mode)"
+        "real_gemini_ocr": "gemini-3.5-flash-lite free tier: 11/11 fields, confidence 1.0, 1 cent (test mode)",
+        "capture_after_mailing_and_lob_dedup": {
+          "ordering": "mail attempt prepared 22:51:33Z -> dispatch IN_TRANSIT -> Stripe payment_intent.succeeded callback 22:52:21Z -> capture operation (call_kind=capture, amount 2999)",
+          "payment_operations": [
+            "22:51:34 retrieve amount 2999",
+            "22:52:21 capture amount 2999"
+          ],
+          "final_states": {
+            "payment": "CAPTURED",
+            "letter": "IN_TRANSIT"
+          },
+          "stripe_callback": {
+            "first": "200 duplicate:false",
+            "replay": "200 duplicate:true",
+            "tampered": "400 invalid_signature",
+            "stale": "400 invalid_signature"
+          },
+          "lob_callback": {
+            "first": "200 duplicate:false (stored to backlog: unmatched submission token)",
+            "replay": "200 duplicate:true",
+            "tampered": "400 invalid_signature",
+            "stale": "400 invalid_signature"
+          },
+          "no_double_capture": "replay inserted no second webhook row and no second capture operation",
+          "note": "fake provider transports; state machine, signatures, dedup and ordering are real"
+        }
       },
       "remaining_blocker": {
         "what": "joined real-provider run (Stripe test capture + Lob test piece) cannot proceed because real-mode research stops before tier/hold",
