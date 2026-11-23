@@ -50,6 +50,12 @@ const nextConfig: NextConfig = {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
+          {
+            // Scope to this exact host on purpose: no includeSubDomains or
+            // preload until every subdomain is verified HTTPS-only.
+            key: "Strict-Transport-Security",
+            value: "max-age=15552000",
+          },
         ],
       },
       {

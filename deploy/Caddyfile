@@ -2,6 +2,7 @@
     admin off
 }
 {$PB_DOMAIN} {
+    header Strict-Transport-Security "max-age=15552000"
     @private path /internal/* /api/internal/* /api/dev-worker/*
     respond @private 404
     reverse_proxy web:3000

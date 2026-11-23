@@ -85,6 +85,7 @@ def test_production_compose_has_only_tls_ingress(tmp_path: Path) -> None:
     assert "PB_WORKER_SECRET" not in services["web"].get("environment", {})
     caddy = (ROOT / "deploy/Caddyfile").read_text()
     assert "reverse_proxy web:3000" in caddy
+    assert 'Strict-Transport-Security "max-age=15552000"' in caddy
     assert "tls internal" not in caddy
     assert "http_port" not in caddy
     assert "https_port" not in caddy
