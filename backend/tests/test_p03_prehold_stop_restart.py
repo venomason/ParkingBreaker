@@ -196,3 +196,65 @@ async def test_bearer_restart_with_carried_notes_replays(tmp_path: Path) -> None
         replay = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
         assert replay.status_code == 201, replay.text
         assert replay.json()["workspace_id"] == fresh
+
+
+async def test_prehold_stop_restart_preserves_intake_form_and_photo_refs(tmp_path: Path) -> None:
+    """Restarting after a pre-hold stop returns carried intake_form and photo refs."""
+    async with _client(tmp_path) as client:
+        started = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        assert started.status_code == 201, started.text
+        stopped_workspace = started.json()["workspace_id"]
+        front_ref = await _photo(client, stopped_workspace, ALICE)
+        back_ref = await _photo(client, stopped_workspace, ALICE)
+        saved = await client.put(
+            f"/workspaces/{stopped_workspace}/intake-form",
+            headers=ALICE,
+            json={
+                "expected_revision": 1,
+                "form": {
+                    "values": {"story": "Meter display was dark"},
+                    "ticket_photo_ref": front_ref,
+                    "ticket_back_photo_ref": back_ref,
+                    "evidence_photo_refs": [],
+                    "step": 2,
+                },
+            },
+        )
+        assert saved.status_code == 200, saved.text
+        stopped = await client.post(
+            f"/workspaces/{stopped_workspace}/intake",
+            headers=ALICE,
+            json={
+                **INTAKE,
+                "photo_refs": [front_ref],
+                "citation_photo_ref": front_ref,
+                "citation_back_photo_ref": back_ref,
+                "rental_company_paid": True,
+            },
+        )
+        assert stopped.status_code == 200, stopped.text
+        assert stopped.json()["state"] == "STOPPED_NO_CHARGE"
+
+        restarted = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        assert restarted.status_code == 201, restarted.text
+        view = restarted.json()
+        assert view["workspace_id"] != stopped_workspace
+        assert view["intake_form"] is not None
+        assert view["intake_form"]["ticket_photo_ref"] == front_ref
+        assert view["intake_form"]["ticket_back_photo_ref"] == back_ref
+        assert view["intake_form"]["values"]["story"] == "Meter display was dark"
+
+        # Submitting with the carried photo refs succeeds without re-uploading.
+        resubmitted = await client.post(
+            f"/workspaces/{view['workspace_id']}/intake",
+            headers=ALICE,
+            json={
+                **INTAKE,
+                "photo_refs": [front_ref],
+                "citation_photo_ref": front_ref,
+                "citation_back_photo_ref": back_ref,
+                "rental_company_paid": False,
+            },
+        )
+        assert resubmitted.status_code == 200, resubmitted.text
+        assert resubmitted.json()["state"] == "INTAKE"

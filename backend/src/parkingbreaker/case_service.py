@@ -964,9 +964,7 @@ class CaseService:
                 )
             except IntakeConflict as exc:
                 raise ServiceConflict(str(exc)) from None
-            return s.WorkspaceView(
-                workspace_id=created.workspace_token, notes=created.workspace.notes
-            )
+            return self.workspace_view(created.workspace_token)
         token = f"ws_{self._deps.new_id()}"
         try:
             saved = self._store.create_owned_workspace(
@@ -974,7 +972,7 @@ class CaseService:
             )
         except IntakeConflict as exc:
             raise ServiceConflict(str(exc)) from None
-        return s.WorkspaceView(workspace_id=saved.workspace_token, notes=saved.workspace.notes)
+        return self.workspace_view(saved.workspace_token)
 
     def _finished_transaction(self, workspace_id: str) -> bool:
         """Whether this workspace's transaction reached a terminal state.

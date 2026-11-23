@@ -566,24 +566,6 @@ function Journey() {
   const completeResearch = useCallback(() => goTo(4), [goTo]);
   const backToResearch = useCallback(() => goTo(3), [goTo]);
   const openConflict = useCallback(() => goTo(9), [goTo]);
-  const reopenStopDetails = useCallback(async () => {
-    if (LIVE && !PREVIEW_AUTH) {
-      try { await api.startAppeal(); } catch { /* createWorkspace retries startAppeal if needed */ }
-    }
-    resetWorkspace();
-    setPhotoRefs({ ticket: null, back: null });
-    setEvidencePhotos((prev) => prev.map((entry) => ({ ...entry, ref: null })));
-    setLiveStop(null);
-    setLiveCase(null);
-    setLiveStatus(null);
-    setLiveOffer(null);
-    setLiveBeta(null);
-    setLiveError(null);
-    if (LIVE && typeof window !== "undefined") {
-      window.history.replaceState(null, "", window.location.pathname);
-    }
-    goTo(2);
-  }, [resetWorkspace, goTo]);
   const startNewFromStop = useCallback(async () => {
     if (LIVE && !PREVIEW_AUTH) {
       try { await api.startAppeal(); } catch { /* createWorkspace retries startAppeal if needed */ }
@@ -714,6 +696,67 @@ function Journey() {
       setVisionChecking(false);
     }
   }, [ensureWorkspace, applyRestoredVision, restoreVisionForm, visionBinding, visionBindingSignatureFor, photoUploads]);
+
+  const reopenStopDetails = useCallback(async () => {
+    if (LIVE && !PREVIEW_AUTH) {
+      setLiveBusy(true);
+      setLiveError(null);
+      try {
+        // Keep the existing appeal session so P03's assisted restart creates a
+        // child workspace under the same owner, preserving uploaded ticket/evidence
+        // photo_refs, form values, and lineage.
+        const fresh = await api.createWorkspace("");
+        restoreWorkspace(fresh);
+        setWorkspaceId(fresh.workspace_id);
+        const form = fresh.intake_form;
+        if (form) {
+          setPhotoRefs((prev) => ({
+            ticket: form.ticket_photo_ref ?? prev.ticket,
+            back: form.ticket_back_photo_ref ?? prev.back,
+          }));
+          const savedEvidenceRefs = form.evidence_photo_refs ?? (form.evidence_photo_ref ? [form.evidence_photo_ref] : []);
+          if (savedEvidenceRefs.length > 0) {
+            setEvidencePhotos((prev) =>
+              prev.some((entry) => entry.ref)
+                ? prev
+                : savedEvidenceRefs.map((ref) => ({ id: crypto.randomUUID(), file: null, ref }))
+            );
+          }
+        }
+        setLiveStop(null);
+        setLiveCase(null);
+        setLiveStatus(null);
+        setLiveOffer(null);
+        setLiveBeta(null);
+        setLiveError(null);
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+        const discovered = await discoverVision(fresh);
+        const nextStep = (fresh.ticket_reading_required || discovered?.status.required)
+          ? restoredTicketStep(fresh, discovered?.status)
+          : 2;
+        if (nextStep === 1) setVisionDirty(false);
+        goTo(nextStep);
+      } catch (error) {
+        setLiveError(plainError(error));
+      } finally {
+        setLiveBusy(false);
+      }
+      return;
+    }
+    resetWorkspace();
+    setLiveStop(null);
+    setLiveCase(null);
+    setLiveStatus(null);
+    setLiveOffer(null);
+    setLiveBeta(null);
+    setLiveError(null);
+    if (LIVE && typeof window !== "undefined") {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+    goTo(2);
+  }, [restoreWorkspace, resetWorkspace, discoverVision, goTo]);
 
   const refreshVisionStatusOnly = useCallback(async () => {
     if (!workspaceId || visionBusy || photoUploads) return;
