@@ -467,7 +467,13 @@
       "next_16_4_6_result": "16 passed, 1 skipped (cro-landing 11/11 pass)",
       "next_16_2_3_controlled_result": "same build config with next 16.2.3 installed: cro-landing 11/11 FAILED",
       "conclusion": "the minor Next upgrade does not regress the browser suite and in this controlled comparison it fixes the live-landing specs that failed on 16.2.3",
-      "caveat": "the full paid browser campaign still needs the deployment-window environment (provider keys, auth mode) before launch traffic; this local run covers the landing, configuration and ingress specs"
+      "caveat": "the full paid browser campaign still needs the deployment-window environment (provider keys, auth mode) before launch traffic; this local run covers the landing, configuration and ingress specs",
+      "broader_batch": {
+        "specs": "beta-phase-gate, pricing-assignment, customer-access-recovery, runtime-phase, redesign, durable-intake",
+        "result": "32 passed, 8 skipped, 14 failed under a local fake-mode server",
+        "triage": "every failure traces to a missing deployment-window fixture, not app behaviour: beta-phase-gate requires SECURE_BASE, a bare reserved HTTPS *.example.test origin validated in the spec itself (TypeError: Invalid URL with SECURE_BASE unset). runtime-phase passes 2/2 when run alone.",
+        "conclusion": "no app regression observed beyond the harness requirements; those specs belong to the paid campaign in the deployment window"
+      }
     }
   },
   "security_battery_2026_11_23": {
