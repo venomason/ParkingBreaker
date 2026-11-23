@@ -260,3 +260,33 @@ test("lost signed approval response retries the original inspected packet withou
   expect(uploads).toBe(1);
   expect(previews).toBe(1);
 });
+
+
+test("letter studio warns while editing and displays packet preview conflicts", async ({page}) => {
+  await seed(page);
+  const letter = page.locator("#liveLetterText");
+  const original = await letter.inputValue();
+  await expect(page.locator("#live-letter-fit")).toBeEmpty();
+
+  const long = original + "\n" + "The sign was covered.\n".repeat(100);
+  await letter.fill(long);
+  await expect(page.locator("#live-letter-fit")).toContainText("may exceed two printed pages");
+  await letter.fill(original);
+  await expect(page.locator("#live-letter-fit")).toBeEmpty();
+  await expect(page.locator("#liveAdopt")).toBeEnabled();
+  await page.locator("#liveAdopt").click();
+
+  await page.route("**/packet-preview", route =>
+    route.fulfill({status:409, json:{detail:"letter_does_not_fit"}}));
+  await page.locator("#livePreview").click();
+  await expect(page.getByRole("alert").filter({hasText:"Your letter does not fit"})).toBeVisible();
+  await expect(page.locator("#liveApprove")).toHaveCount(0);
+
+  await page.unroute("**/packet-preview");
+  await previewAndInspect(page);
+  await page.route("**/approval", route =>
+    route.fulfill({status:409, json:{detail:"required_form_not_ready"}}));
+  await page.locator("#liveApprove").click();
+  await expect(page.getByRole("alert").filter({hasText:"A required agency form"})).toBeVisible();
+  await expect(page.locator("#liveOpenPacket")).toHaveCount(0);
+});

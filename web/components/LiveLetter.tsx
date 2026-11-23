@@ -1,6 +1,7 @@
 "use client";
 
 import { HurtleGuide } from "./HurtleGuide";
+import { LetterFitWarning } from "./Step6LetterStudio";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Draft, PacketPreview } from "../lib/api";
 
@@ -285,6 +286,7 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
       <label className="sr" htmlFor="liveLetterText">Letter text</label>
       <textarea
         id="liveLetterText"
+        aria-describedby={locked ? undefined : "live-letter-fit"}
         value={text}
         onChange={(e) => {
           if (!busy && !locked && (!adopted || editingAdopted)) {
@@ -295,6 +297,7 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
         readOnly={busy || (adopted && !editingAdopted) || locked}
         style={{ width: "100%" }}
       />
+      {!locked && <LetterFitWarning id="live-letter-fit" text={text} />}
       <p className="small" role="status">{changed ? "Your latest edits are not saved yet. Keep this page open." : "This exact text is saved for your appeal."}</p>
       {adopted && !editingAdopted && (
         <button className="btn btn-ghost" type="button" id="liveEditAdopted" disabled={busy || locked} onClick={unlock} style={{ marginTop: "8px" }}>

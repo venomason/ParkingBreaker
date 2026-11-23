@@ -90,6 +90,10 @@ class PacketError(ValueError):
     pass
 
 
+class LetterLayoutError(PacketError):
+    """The adopted letter needs more space than the printed letter allows."""
+
+
 @dataclass(frozen=True)
 class Packet:
     pdf: bytes
@@ -195,7 +199,7 @@ class _PacketPdf(FPDF):
         height = self.multi_cell(0, _LINE_HEIGHT, block, dry_run=True, output="HEIGHT")
         assert isinstance(height, (int, float))
         if height > self.eph:
-            raise PacketError("the letter signature block does not fit a page")
+            raise LetterLayoutError("the letter signature block does not fit a page")
         if self.will_page_break(height):
             self.add_page()
         signature_position = (self.page - 1, self.get_y() + _LINE_HEIGHT)
@@ -429,7 +433,7 @@ def build_packet(
     pdf.add_page()
     signature_position = pdf.text_block(adopted_text, signature_image=customer_signature)
     if pdf.page > LETTER_MAX_PAGES:
-        raise PacketError(f"the letter is longer than {LETTER_MAX_PAGES} pages")
+        raise LetterLayoutError(f"the letter is longer than {LETTER_MAX_PAGES} pages")
 
     # The citation number on every photo page lets a separated page find its file.
     reference = () if citation_reference is None else (citation_reference,)

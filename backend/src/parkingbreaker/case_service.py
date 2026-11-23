@@ -77,6 +77,7 @@ from parkingbreaker.appeal.letter import (
 )
 from parkingbreaker.appeal.packet import (
     ApprovalRefused,
+    LetterLayoutError,
     Packet,
     PacketError,
     approval_gate,
@@ -3368,6 +3369,8 @@ class CaseService:
                 required_copies=copies,
                 packet_plan=form_plan,
             )
+        except LetterLayoutError:
+            raise ServiceConflict("letter_does_not_fit") from None
         except PacketError:
             raise ServiceConflict("packet_not_ready") from None
         return packet, result, form_plan, research.revision

@@ -10,6 +10,54 @@ import type { SentenceItem } from "../lib/api";
 
 export type { NoteItem } from "../lib/api";
 
+// Standard Helvetica advances in thousandths of an em, in ASCII order from space.
+const HELVETICA_WIDTHS = [
+  278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278,
+  556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556,
+  1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778,
+  667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556,
+  333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556,
+  556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584,
+];
+// US Letter minus two 72pt margins and the PDF cell's two 2.835pt insets.
+const LINE_WIDTH = (612 - 144 - 5.67) * 1000 / 11;
+const TWO_PAGE_LINES = 2 * Math.floor((792 - 144) / 14);
+const NOTICE_AT_LINES = TWO_PAGE_LINES - 12;
+
+function estimatedPrintLines(text: string): number {
+  let lines = 0;
+  for (const paragraph of text.split(/\r\n?|\n/)) {
+    lines++;
+    let used = 0;
+    for (const run of paragraph.match(/ +|[^ ]+/g) ?? []) {
+      let width = 0;
+      for (const char of run) width += HELVETICA_WIDTHS[char.charCodeAt(0) - 32] ?? 1000;
+      if (used > 0 && used + width > LINE_WIDTH && run.trim()) {
+        lines++;
+        used = 0;
+      }
+      const overflow = Math.max(0, Math.ceil((used + width) / LINE_WIDTH) - 1);
+      lines += overflow;
+      used += width - overflow * LINE_WIDTH;
+    }
+  }
+  return lines;
+}
+
+export function LetterFitWarning({ text, id }: { text: string; id: string }) {
+  const lines = estimatedPrintLines(text);
+  return (
+    <div id={id} aria-live="polite">
+      {lines >= NOTICE_AT_LINES && (
+        <p className="small">
+          {lines > TWO_PAGE_LINES ? "This letter may exceed two printed pages." : "This letter is close to the two-page print limit."}
+          {" "}Shorten the text or remove extra blank lines if needed. The exact PDF checks the final fit.
+        </p>
+      )}
+    </div>
+  );
+}
+
 interface Step6LetterStudioProps {
   citationNumber: string;
   traceMode: boolean;
@@ -190,6 +238,9 @@ export function Step6LetterStudio({
         </div>
       </div>
 
+      {!lapsed && <LetterFitWarning id="demo-letter-fit" text={
+        [p0, p1, p2].map(paragraph => paragraph.map(sentence => sentence.text).join(" ")).join("\n\n")
+      } />}
       <div className="paper" id="paper">
         <p className="meta">
           {adopted ? (
