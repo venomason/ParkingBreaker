@@ -235,13 +235,31 @@
       "status": "LOCAL",
       "evidence": "journey event/capture/context/timeline suites, ai spend caps, isolation and idempotency suites",
       "detail": "server milestones distinct from browser observations, pause/budget reasons recorded, idempotent state transitions covered",
-      "blocking": "deployed end-to-end walkthrough in R06"
+      "blocking": "deployed end-to-end walkthrough in R06",
+      "deployed_instrumentation_evidence": {
+        "target": "pb-qual-backend-01 (image sha256:40e04a76, commit 7061b45)",
+        "journey_events": 56,
+        "journey_capture_rows": 47,
+        "journey_event_context_rows": 56,
+        "journey_links_rows": 47,
+        "kinds": {
+          "intake_submitted": 18,
+          "ticket_read": 15,
+          "facts_confirmed": 11,
+          "ticket_read_unknown": 8,
+          "ticket_read_refused": 2,
+          "packet_approved": 1,
+          "hold_authorized": 1
+        },
+        "conclusion": "server milestones with outcome/refusal reasons are recorded on the deployed target during the synthetic walkthroughs; the formal R06 walkthrough receipt is still to be produced"
+      }
     },
     "J05": {
       "status": "LOCAL (frozen on 699b209; 3 production/starvation defects fixed on launch-fixes @ 24a207d)",
       "evidence": "backend/tests/test_outcome_follow_up.py (8 passed), test_outcome_follow_up_store.py (8 passed), test_api_roles.py (5 passed), test_t22_cloudrun_overlay.py (8 passed); make web-check EXIT 0",
       "detail": "D+14 and D+30 emails after delivery, one send per window, opt-out/opt-in transitions honored, agency vs customer outcomes distinct, UNKNOWN after final window + grace. Fixed in 24a207d: (1) delivered_cases excludes cases with existing outcomes and OutcomeFollowUpService skips resolved cases (preventing 50-case starvation and post-outcome reminder emails), (2) /outcomes/opt-out and /outcomes/report moved to customer/all roles and exposed through Caddyfile.private + next.config.ts rewrites, (3) app_from_environment() wires follow_ups and outcome_links and compose passes /internal/follow-ups to scheduler-loop.sh.",
-      "blocking": "promote launch-fixes (24a207d) to main and rebuild candidate images"
+      "blocking": "deployed follow-up delivery exercise on the standing target (GATE 0)",
+      "integration_note": "launch-fixes content reached main through the signed integration 1d82058 and the reviewed launch fixes 5c79af9; the 24a207d branch commit is not an ancestor but its runtime fixes are present and extended. outcome_follow_up.py uses delivered_cases (line 189) and the store implements it (protocol line 222, implementation line 282). J05 suites pass on merged main: 32 tests across test_outcome_follow_up, test_outcome_follow_up_store and test_t22_cloudrun_overlay."
     },
     "M02": {
       "status": "PASS (owner decision)",
