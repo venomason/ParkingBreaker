@@ -442,5 +442,19 @@
     "ruff": "passed on changed modules; tree-wide check was clean when the launch fixes were committed",
     "mypy": "passed on the changed modules (0 errors)",
     "conclusion": "merged candidate is fully green: backend 13,951/13,951, web check EXIT 0, offline qualification self-tests pass"
+  },
+  "security_battery_2026_11_23": {
+    "target": "pb-qual-backend-01, image sha256:40e04a76 (commit 7061b45 code), test mode with cookie auth",
+    "owned_workspace_read": "200",
+    "no_session_read": "401 authentication_required",
+    "no_session_start": "401 authentication_required",
+    "missing_origin_mutation": "403 request_forbidden",
+    "wrong_origin_mutation": "403 request_forbidden",
+    "missing_csrf_mutation": "403 request_forbidden",
+    "wrong_csrf_mutation": "403 request_forbidden",
+    "bearer_header_on_customer_route": "401 (customer routes never accept a bearer credential)",
+    "cross_owner_read": "404 (customer B cannot read customer A's workspace, before and after B creates its own)",
+    "owner_own_access": "201 create and 200 read",
+    "conclusion": "origin, CSRF, session and ownership boundaries enforce correctly on the deployed target"
   }
 }
