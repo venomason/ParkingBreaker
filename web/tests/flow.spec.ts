@@ -60,7 +60,8 @@ for (const tier of ["certified"] as const) {
     page.on("pageerror", (error) => errors.push(error.message));
     await toOffer(page);
     await page.locator(`input[value="${tier}"]`).check();
-    await page.locator("#actAuthBtn").click();
+    await page.locator("#termsAccepted").check();
+  await page.locator("#actAuthBtn").click();
     await expect(page.locator("#s5")).toBeVisible();
     await expect(page.locator("#pillT")).not.toHaveText("0:00");
     await guardrails(page);
