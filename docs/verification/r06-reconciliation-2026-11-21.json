@@ -44,7 +44,17 @@
       "remaining": [
         "standing production VM + regional disk provisioning approval (GATE 0, ~$45-60/mo)",
         "Cloud Run frontend routed to the private VM over VPC Direct Egress (drill used local 127.0.0.1:443 -> :8443 stand-in)"
-      ]
+      ],
+      "preflight_on_merged_candidate_2026_11_23": {
+        "candidate": "main a640e36",
+        "deploy_validate_dry_run": "EXIT 0 - offline syntax checks passed",
+        "lifecycle_deploy_dry_run": "EXIT 0 - owner plan printed (cloudrun-private-vm)",
+        "lifecycle_rollback_dry_run": "EXIT 0 - owner plan printed",
+        "backup_dry_run": "EXIT 0 - READY_FAKE; captures 1, letters 1, reconciliation issues [], restore artifacts_match true records_match true",
+        "test_suites": "147 passed across test_t22_disk_policy, test_t22_cloudrun_overlay, test_t22_lifecycle, test_release_readiness, test_t22_parallel_backup, test_t24_health (85s)",
+        "note": "the integrated launch fixes modified deploy/backup.sh, compose.private-vm.yaml, provision-host.sh, scheduler-loop.sh and added the backup systemd timer; these preflights validate them offline",
+        "full_drill": "not re-run: the previous isolated window approval covered one drill; a refreshed deploy --apply drill needs a new owner-approved window"
+      }
     },
     "R03": {
       "status": "BLOCKED",
