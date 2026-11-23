@@ -522,6 +522,13 @@
       "verified": "npm audit --omit=dev reports 0 vulnerabilities; web lint, type-check and production build EXIT 0 on the bumped tree",
       "residual_risk": "Next moved by a minor version, so the paid browser campaign should be re-run inside the deployment window before launch traffic",
       "commit": "b174c38"
+    },
+    "python_dependency_cves": {
+      "finding": "pip-audit on the backend lock reported three vulnerable production packages: pillow 12.3.0 (42 advisories), pypdf 6.20.1 (14 advisories) and certifi 2026.7.22 (2 advisories). Pillow decodes customer-supplied ticket photos and pypdf parses packet PDFs, so the image/PDF CVE surface is reachable from untrusted input.",
+      "change": "pillow 13.0.0, pypdf 6.21.4 (kept in the 6.x line rather than the 7.x major the resolver picked first), certifi 2026.11.20",
+      "verified": "re-exported requirements audit reports 0 vulnerable packages; full backend suite 13,951 passed 0 failed (13m34s) on the upgraded interpreter; image/PDF/intake suites 165 passed",
+      "wheels": "pillow 13.0.0 publishes manylinux_2_28 cp312 x86_64 and aarch64 wheels, so the container build still installs a wheel",
+      "commit": "5401125"
     }
   },
   "operational_checks_2026_11_23": {
