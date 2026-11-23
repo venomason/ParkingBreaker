@@ -312,6 +312,8 @@ def _source_data(source: SourceRecord) -> dict[str, object]:
         data["etag"] = source.etag
     if source.jurisdiction is not None:
         data["jurisdiction"] = source.jurisdiction
+    if source.aspnet_state_sha256 is not None:
+        data["aspnet_state_sha256"] = source.aspnet_state_sha256
     return data
 
 
@@ -329,7 +331,7 @@ def _source(value: object) -> SourceRecord:
             "authority_class",
         }
         | (
-            {"linked_urls", "etag", "jurisdiction"}.intersection(value)
+            {"linked_urls", "etag", "jurisdiction", "aspnet_state_sha256"}.intersection(value)
             if isinstance(value, dict)
             else set()
         ),
@@ -339,13 +341,19 @@ def _source(value: object) -> SourceRecord:
     status = _int(data["http_status"], "source.http_status", minimum=100)
     if status > 599 or _HASH.fullmatch(sha) is None:
         raise ValueError("source status or hash is invalid")
+    media = _str(data["content_type"], "source.content_type")
+    state_sha = None
+    if "aspnet_state_sha256" in data:
+        state_sha = _str(data["aspnet_state_sha256"], "source.aspnet_state_sha256")
+        if media != "text/html" or _HASH.fullmatch(state_sha) is None:
+            raise ValueError("source HTML state hash is invalid")
     return SourceRecord(
         _str(data["url"], "source.url"),
         _str(data["final_url"], "source.final_url"),
         _datetime(data["retrieved_at"], "source.retrieved_at"),
         status,
         sha,
-        _str(data["content_type"], "source.content_type"),
+        media,
         _str(data["text"], "source.text"),
         _enum(AuthorityClass, data["authority_class"], "source.authority_class"),
         linked_urls=_str_tuple(data["linked_urls"], "source.linked_urls")
@@ -355,6 +363,7 @@ def _source(value: object) -> SourceRecord:
         jurisdiction=_str(data["jurisdiction"], "source.jurisdiction")
         if "jurisdiction" in data
         else None,
+        aspnet_state_sha256=state_sha,
     )
 
 

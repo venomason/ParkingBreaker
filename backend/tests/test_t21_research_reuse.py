@@ -414,3 +414,71 @@ async def test_service_researches_changed_ticket_inputs_afresh(
         assert '"2026-10-12"' not in saved.research_json
     finally:
         await client.aclose()
+
+
+_TOKEN_FORM = (
+    '<form method="post"><input type="hidden" name="__VIEWSTATE" value="STATEABC" /></form>'
+)
+
+
+def _research_with_state_form() -> tuple[ResearchResult, str]:
+    original = sample_page("sfmta_contest.html") + _TOKEN_FORM
+    transport = FakeFetcher(
+        {**fetcher().responses, CONTEST_URL: html_response(CONTEST_URL, original)}
+    )
+    result = run_research(
+        TICKET, TEST_AGENCY, SEEDS, transport, answers(), TickingClock(), wait=lambda _: None
+    )
+    assert result.decision.ok
+    return result, original
+
+
+def test_rotated_hidden_state_rebinds_raw_source_manifest_and_assessment() -> None:
+    import hashlib
+
+    from parkingbreaker.research_records import decode_research
+
+    saved, original = _research_with_state_form()
+    prior = next(source for source in saved.sources if source.url == CONTEST_URL)
+    saved = decode_research(research_json(saved))  # the original raw HTML is transient
+    assert prior.aspnet_state_sha256 is not None
+    rotated = original.replace("STATEABC", "STATENEW==")
+    raw_digest = hashlib.sha256(rotated.encode()).hexdigest()
+    transport = FakeFetcher(
+        {**fetcher().responses, CONTEST_URL: html_response(CONTEST_URL, rotated)}
+    )
+    reused = attempt(saved, OTHER, 2, transport=transport)
+    assert reused is not None
+    assert reused.decision.ok
+    current = next(source for source in reused.sources if source.url == CONTEST_URL)
+    assert current.sha256 == raw_digest != prior.sha256
+    assert current.text == prior.text
+    assert next(a for a in reused.manifest.artifacts if a.url == CONTEST_URL).sha256 == raw_digest
+    assert any(raw_digest in f.source_sha256s for f in reused.findings)
+    assert all(prior.sha256 not in f.source_sha256s for f in reused.findings)
+    assert any(
+        f.procedure_assessment is not None and f.procedure_assessment.source_sha256 == raw_digest
+        for f in reused.findings
+    )
+    assert "STATENEW" not in research_json(reused)
+    assert "STATEABC" not in research_json(saved)
+
+
+@pytest.mark.parametrize("mutation", ["trailing_space", "form_action", "other_html", "legacy"])
+def test_rotated_state_never_masks_any_other_byte_or_missing_baseline(mutation: str) -> None:
+    saved, original = _research_with_state_form()
+    rotated = original.replace("STATEABC", "STATENEW")
+    if mutation == "trailing_space":
+        rotated += " "
+    elif mutation == "form_action":
+        rotated = rotated.replace('method="post"', 'method="get"')
+    elif mutation == "other_html":
+        rotated = rotated.replace('name="__VIEWSTATE"', 'name="__VIEWSTATE" tabindex="0"')
+    else:
+        saved = replace(
+            saved, sources=tuple(replace(s, aspnet_state_sha256=None) for s in saved.sources)
+        )
+    transport = FakeFetcher(
+        {**fetcher().responses, CONTEST_URL: html_response(CONTEST_URL, rotated)}
+    )
+    assert attempt(saved, OTHER, 2, transport=transport) is None

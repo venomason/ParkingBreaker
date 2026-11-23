@@ -58,6 +58,8 @@ class SourceRecord:
     jurisdiction: str | None = None
     # Transient bounded original form bytes; persisted only in the existing PacketPlan.
     form_pdf: bytes | None = field(default=None, compare=False, repr=False)
+    # Optional comparison digest for ASP.NET state tokens. The raw hash remains evidence.
+    aspnet_state_sha256: str | None = None
 
 
 @dataclass(frozen=True)
@@ -322,6 +324,75 @@ def html_to_text(html: str) -> str:
     return "\n\n".join(parser.paragraphs)
 
 
+# Recognise the exact server-generated form used in the captured official pages.
+# Only the quoted value is erased; name, markup, whitespace and every other byte
+# remain significant. Ambiguous, rearranged or unfamiliar tags use raw equality.
+_ASPNET_STATE_INPUT = re.compile(
+    r'<input[ \t]+type="hidden"[ \t]+'
+    r'name="(?P<name>__VIEWSTATE|__VIEWSTATEGENERATOR|__EVENTVALIDATION)"'
+    r'(?:[ \t]+id="(?P=name)")?[ \t]+value="(?P<value>[A-Za-z0-9+/=]+)"[ \t]*/?>'
+)
+_INERT_HTML = frozenset({"textarea", "title", "template", "noscript", "iframe", "xmp", "plaintext"})
+
+
+class _AspNetStateInputs(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=False)
+        self.in_form = False
+        self.inert: str | None = None
+        self.inert_depth = 0
+        self.spans: list[tuple[int, int, int]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if self.inert is not None:
+            if tag == self.inert:
+                self.inert_depth += 1
+            return
+        if tag in _INERT_HTML:
+            self.inert = tag
+            self.inert_depth = 1
+        elif tag == "form":
+            self.in_form = True
+        elif tag == "input" and self.in_form:
+            match = _ASPNET_STATE_INPUT.fullmatch(self.get_starttag_text() or "")
+            if match is not None:
+                line, column = self.getpos()
+                start, end = match.span("value")
+                self.spans.append((line, column + start, column + end))
+
+    def handle_endtag(self, tag: str) -> None:
+        if self.inert is not None:
+            if tag == self.inert and tag != "plaintext":
+                self.inert_depth -= 1
+                if not self.inert_depth:
+                    self.inert = None
+        elif tag == "form":
+            self.in_form = False
+
+
+def aspnet_state_digest(body: bytes) -> str | None:
+    """Hash the exact raw HTML with only known hidden-state values replaced."""
+    if b"\x00" in body or (b"__VIEWSTATE" not in body and b"__EVENTVALIDATION" not in body):
+        return None
+    # A one-to-one decode gives parser offsets in bytes without reserializing HTML.
+    parser = _AspNetStateInputs()
+    parser.feed(body.decode("latin-1"))
+    parser.close()
+    if not parser.spans:
+        return None
+    starts = [0, *(match.end() for match in re.finditer(rb"\n", body))]
+    digest = hashlib.sha256()
+    pos = 0
+    for line, start, end in parser.spans:
+        offset = starts[line - 1]
+        digest.update(body[pos : offset + start])
+        # NUL cannot occur in a valid state value and identifies its exact boundary.
+        digest.update(b"\x00")
+        pos = offset + end
+    digest.update(body[pos:])
+    return digest.hexdigest()
+
+
 _ARTIFACT_TERMS = re.compile(
     r"form|affidavit|declaration|contest|appeal|protest|instructions|rules|hearing|\.pdf", re.I
 )
@@ -575,6 +646,9 @@ def fetch_source(
             else (),
             off_scope_linked_urls=tuple(link for link in harvested if not is_allowed(link, scopes)),
             etag=response.headers.get("etag"),
+            aspnet_state_sha256=aspnet_state_digest(response.body)
+            if media == "text/html"
+            else None,
             form_pdf=response.body
             if media == "application/pdf"
             and authority_class is AuthorityClass.OFFICIAL_FORM

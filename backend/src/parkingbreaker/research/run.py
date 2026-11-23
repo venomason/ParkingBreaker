@@ -467,6 +467,36 @@ def _agency_scopes(agency: ResolvedAgency) -> tuple[SourceScope, ...]:
     )
 
 
+def _same_research_source(saved: SourceRecord, fetched: SourceRecord) -> bool:
+    if (
+        saved.final_url != fetched.final_url
+        or saved.content_type != fetched.content_type
+        or saved.authority_class is not fetched.authority_class
+        or saved.jurisdiction != fetched.jurisdiction
+    ):
+        return False
+    return saved.sha256 == fetched.sha256 or (
+        saved.content_type == "text/html"
+        and saved.aspnet_state_sha256 is not None
+        and saved.aspnet_state_sha256 == fetched.aspnet_state_sha256
+        and saved.text == fetched.text
+    )
+
+
+def _rebind_finding(finding: Finding, hashes: Mapping[str, str]) -> Finding:
+    assessment = finding.procedure_assessment
+    if assessment is not None:
+        assessment = replace(
+            assessment, source_sha256=hashes.get(assessment.source_sha256, assessment.source_sha256)
+        )
+    return replace(
+        finding,
+        source_sha256s=tuple(hashes.get(sha, sha) for sha in finding.source_sha256s),
+        evidence=tuple(_rebind_finding(item, hashes) for item in finding.evidence),
+        procedure_assessment=assessment,
+    )
+
+
 def reuse_research(
     candidates: Iterable[ResearchResult],
     ticket: Ticket,
@@ -483,8 +513,9 @@ def reuse_research(
     """Saved research for another customer's ticket, rebuilt for this one, or None.
 
     Candidates are supplied newest first. Before a candidate is accepted, every page, form
-    and PDF it relied on is fetched again through the same allowlist and its bytes must
-    hash identically; one difference or failed fetch means the ticket is researched afresh.
+    and PDF it relied on is fetched again through the same allowlist. Only known ASP.NET
+    hidden-state values may change, and only when extracted text also matches exactly.
+    Every reused citation is checked again against the freshly fetched sources.
     """
     scopes = _agency_scopes(agency) + SHARED_CODE_SCOPES
     ticket = replace(ticket, jurisdiction=agency.id, stage=ticket.stage or "first-level review")
@@ -493,27 +524,43 @@ def reuse_research(
         if not candidate.reusable_across(ticket, now):
             continue
         hashes: dict[str, str] = {}
+        rebound_hashes: dict[str, str] = {}
         sources: list[SourceRecord] = []
         for source in candidate.sources:
             if time_limit - clock() <= timedelta(minutes=5, seconds=60):
                 return None
             fetched = fetch_source(source.url, source.authority_class, scopes, fetcher, clock)
-            if (
-                isinstance(fetched, FetchFailure)
-                or fetched.final_url != source.final_url
-                or fetched.content_type != source.content_type
-                or fetched.sha256 != source.sha256
-            ):
+            if isinstance(fetched, FetchFailure):
                 return None
             if is_code_publisher(fetched.final_url):
                 fetched = replace(
                     fetched, authority_class=AuthorityClass.STATUTE, jurisdiction=agency.id
                 )
+            if not _same_research_source(source, fetched):
+                return None
+            # A hash used by two source URLs must have one unambiguous replacement.
+            if rebound_hashes.setdefault(source.sha256, fetched.sha256) != fetched.sha256:
+                return None
             sources.append(fetched)
             hashes[source.url] = fetched.sha256
         finished = clock()
         if finished < now or time_limit - finished <= timedelta(minutes=5):
             return None
+        if any(old != fresh for old, fresh in rebound_hashes.items()):
+            candidate = replace(
+                candidate,
+                findings=tuple(_rebind_finding(f, rebound_hashes) for f in candidate.findings),
+                candidates=tuple(_rebind_finding(f, rebound_hashes) for f in candidate.candidates),
+                payment_rules=tuple(
+                    replace(
+                        rule,
+                        source_sha256s=tuple(
+                            rebound_hashes.get(sha, sha) for sha in rule.source_sha256s
+                        ),
+                    )
+                    for rule in candidate.payment_rules
+                ),
+            )
         reused = replace(candidate, sources=tuple(sources)).reused_for(
             ticket,
             finished,

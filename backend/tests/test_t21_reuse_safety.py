@@ -258,3 +258,64 @@ def test_roundtrip_reuse_canonicalizes_an_alias_stage_with_private_suffix() -> N
     assert secret not in repr(reused.findings)
     assert secret not in repr(reused.candidates)
     assert secret not in str(reused) + research_json(reused)
+
+
+def test_dynamic_state_comparison_matches_captured_form_and_ignores_inert_tags() -> None:
+    import re
+    from pathlib import Path
+
+    from parkingbreaker.research.sources import aspnet_state_digest
+
+    captured = (Path(__file__).parent / "fixtures/unfamiliar_issuers/cambridge.html").read_bytes()
+    rotated, replacements = re.subn(
+        rb'(name="__VIEWSTATE" id="__VIEWSTATE" value=")[A-Za-z0-9+/=]+(")',
+        rb"\g<1>SYNTHETICNEWVALUE==\2",
+        captured,
+    )
+    assert replacements == 1
+    assert aspnet_state_digest(captured) == aspnet_state_digest(rotated) is not None
+    assert aspnet_state_digest(rotated + b" ") != aspnet_state_digest(captured)
+    hidden = b'<input type="hidden" name="__VIEWSTATE" value="OLD" />'
+    assert aspnet_state_digest(b"<form><!-- " + hidden + b" --></form>") is None
+    assert aspnet_state_digest(b"<form><textarea>" + hidden + b"</textarea></form>") is None
+
+
+def test_rotated_state_rebinds_scoped_payment_rule_without_weakening_rule_guard() -> None:
+    import hashlib
+
+    from parkingbreaker.research.fakes import html_response
+    from parkingbreaker.research.resolution import ResearchAnswers
+    from parkingbreaker.research.sources import AuthorityClass, SourceRecord, fetch_source
+    from test_t21_payment_policy import FINE, HEADING, rule
+    from test_t21_research_reuse import _TOKEN_FORM
+
+    saved, _ = first_research()
+    url = "https://www.sfmta.com/payment-policy-test"
+    page = f"<p>{HEADING}{FINE}</p>{_TOKEN_FORM}"
+    source = fetch_source(
+        url,
+        AuthorityClass.OFFICIAL_PROCEDURE,
+        TEST_AGENCY.source_scopes(),
+        FakeFetcher({url: html_response(url, page)}),
+        lambda: saved.finished_at,
+    )
+    assert isinstance(source, SourceRecord)
+    assert source.aspnet_state_sha256 is not None
+    payment = rule()
+    assert payment.scope is not None
+    scope = replace(payment.scope, issuer=TEST_AGENCY.id)
+    payment = replace(payment, scope=scope, source_sha256s=(source.sha256,))
+    saved = replace(
+        saved, sources=(*saved.sources, source), payment_rules=(payment,), payment_scope=scope
+    )
+    saved = decode_research(research_json(saved))
+    refreshed = page.replace("STATEABC", "ROTATEDTOKEN")
+    transport = FakeFetcher({**fetcher().responses, url: html_response(url, refreshed)})
+    reused = attempt(saved, saved.ticket, 2, transport=transport)
+    assert reused is not None
+    assert reused.payment_rules[0].source_sha256s == (
+        hashlib.sha256(refreshed.encode()).hexdigest(),
+    )
+    assert not reused.resolve(ResearchAnswers(paid_fine=True)).ready
+    bad = replace(saved, payment_rules=(replace(payment, verbatim_quote="Unverified prose."),))
+    assert attempt(bad, saved.ticket, 2, transport=transport) is None
