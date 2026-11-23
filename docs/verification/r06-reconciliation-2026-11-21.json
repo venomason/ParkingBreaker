@@ -71,7 +71,7 @@
       "blocking": "physical Foxx A56 + physical iPhone (Safari) run against the deployed candidate (plus mid-range Android or explicit floor limitation note)"
     },
     "P03": {
-      "status": "LOCAL code/tests + DEPLOYED fix verified (branch fix/p03-prehold-stop-restart @ 8d9927e, pending review/merge)",
+      "status": "FIXED AND DEPLOYED-VERIFIED \u2014 merged to main 7061b45 (independent review approved)",
       "evidence": "backend/tests/test_p03_assisted_restart.py (post-authorization Lob-reject stop) plus new backend/tests/test_p03_prehold_stop_restart.py (pre-hold stop, bearer path and cookie-auth route path; both fail without the fix)",
       "detail": "truthful stop (STOPPED_NO_CHARGE, hold released, frozen packet untouched, no resubmission) and assisted restart (fresh prefilled workspace, atomic parent_workspace lineage, concurrent start replay) proven.",
       "defect_found_on_deployed_target_2026_11_22": {
@@ -81,15 +81,17 @@
         "fix": "treat a saved pre-hold Stop as a finished transaction and let the auth route fall through to create_workspace() when the transaction is finished",
         "fix_branch": "fix/p03-prehold-stop-restart @ 8d9927e (2 files src + 1 new test file; ruff/mypy clean; 129 related tests pass)",
         "deployed_verification": {
-          "image": "sha256:6c25a72bc7d8810776286826bf3ce07e4ae9ddfa3cf82f82aabf4faf221cdb99",
-          "build_commit": "8d9927ef2ef42435c8bf176b54249a56a7f95ce8",
-          "run": "intake -> 200 STOPPED_NO_CHARGE; restart -> 201 fresh workspace ws_2c7161dde05845f58cade7b6bbaf3b62; lineage child=ws_2c71..., parent=ws_df0c..., reason=restart",
-          "conclusion": "dead end closed on the deployed target"
+          "image": "sha256:40e04a763fc88ba0cd7dd4a8518250168821fc9bdaf82cb7d41f6e717e1fd245",
+          "build_commit": "7061b452c2b84fa3988abf1aa61084f95836e92b",
+          "run": "intake -> 200 STOPPED_NO_CHARGE; restart -> 201 fresh workspace ws_2f71620b5cdd413698194b7753005087; GET fresh after restart -> 200 (session survives); replay -> 201 same fresh workspace; lineage child=ws_2f71..., parent=ws_a0d6..., reason=restart",
+          "conclusion": "dead end closed, session survives the restart, and no duplicate workspace is forked"
         },
-        "remaining": "review and merge the branch before the standing launch candidate; the qualification VM currently runs the fix-branch image"
+        "remaining": "none for the pre-hold stop path; the standing launch candidate now contains the fix",
+        "root_cause_3": "identity_store invalidated every session when an owner had more than one workspace, so the restart itself logged the customer out (401 on the next request). The legacy ambiguity guard now counts only unlineaged roots across sessions, identity-link confirmation and workspace recovery links."
       },
       "blocking": "review + merge of the fix branch (MiMo review), then rebuild the candidate image",
-      "fix_branch": "fix/p03-prehold-stop-restart @ d31aff0 (rebased onto main 5c79af9; 106 related tests, ruff clean)"
+      "fix_branch": "merged: main 7061b45 (branch fix/p03-prehold-stop-restart @ 0835149)",
+      "review": "independent review (Gemini 4 Neon) APPROVE after three rounds; all findings addressed"
     },
     "P04": {
       "status": "BLOCKED",
