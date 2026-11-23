@@ -502,7 +502,20 @@
       "verified": "topology/cloudrun/lifecycle suites 89 passed; web lint, type-check and production build EXIT 0",
       "takes_effect": "on the next web deploy; the current public preview build ffd1e848 predates it",
       "note": "HSTS is sticky for 180 days, which is intentional for a payment site that only serves HTTPS; no HTTP-only route is reachable on the main domain"
-    }
+    },
+    "session_cookie_flags": {
+      "session": "__Host-pb-session; HttpOnly; Path=/; SameSite=lax; Secure; Max-Age=2591999 (~30 days)",
+      "csrf": "__Host-pb-csrf; Path=/; SameSite=lax; Secure (readable by the page by design)",
+      "assessment": "the __Host- prefix enforces Secure + Path=/ + no Domain; HttpOnly on the session; SameSite=lax on both"
+    },
+    "customer_response_caching": "customer routes return Cache-Control: no-store (workspace view, case status, workspace create); health is public and uncached",
+    "client_xss_surface": {
+      "dangerouslySetInnerHTML": "none in app/components",
+      "eval_or_new_Function": "none",
+      "target_blank_without_rel": "none",
+      "assessment": "no obvious client-side XSS sink in the application code"
+    },
+    "csp_connect_src": "self and api.stripe.com only; frame-src self/blob/js.stripe.com/hooks.stripe.com; frame-ancestors none"
   },
   "operational_checks_2026_11_23": {
     "public_preview": {
