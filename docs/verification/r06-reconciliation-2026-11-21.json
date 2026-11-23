@@ -495,6 +495,11 @@
       "properties": "production web build, real cookie auth, durable SQLite, loopback-only fake providers, code and harness unchanged during each run, owned services stopped after",
       "qualification": "local synthetic rehearsal only; no provider credentials, charges, mail or external services",
       "conclusion": "the paid and beta browser campaigns pass on the merged candidate"
+    },
+    "whole_tree_gates": {
+      "make_lint": "All checks passed; 507 files already formatted (EXIT 0)",
+      "make_types": "Success: no issues found in 507 source files (EXIT 0)",
+      "note": "the first whole-tree types run caught three errors in the new P03 regression test (fixture re-export and two Any returns); fixed in this commit and both gates now pass"
     }
   },
   "security_battery_2026_11_23": {
