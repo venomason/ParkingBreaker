@@ -584,5 +584,16 @@
       "dns": "parkingbreaker.com -> 8.233.72.197 and an IPv6 address; no api subdomain record; www resolves to the apex",
       "health": "200 mode=fake build ffd1e848"
     }
+  },
+  "release_hygiene_2026_11_23": {
+    "web_check_on_head": "make web-check EXIT 0 (eslint --max-warnings=0, tsc, next build compiled successfully)",
+    "commit_signatures": "last eight commits all GPG-verified (git log %G? = G)",
+    "remote_sync": "main...origin/main with no ahead/behind markers",
+    "secrets_scan": {
+      "method": "git grep over tracked files for real-length key patterns: stripe sk_live/sk_test (>=20 chars suffix), resend re_ (>=24), brave BSA (>=24), AWS AKIA (16), and PEM private-key headers",
+      "result": "zero matches for every pattern class",
+      "placeholders_seen": "short obviously-synthetic values only (sk_test_offline..., sk_live_PRIVATE..., sk_live_synthetic...) in config and tests",
+      "conclusion": "no provider secret or private key is committed"
+    }
   }
 }
