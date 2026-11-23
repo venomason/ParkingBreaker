@@ -452,7 +452,8 @@ def unlineaged_workspace_roots(database: sqlite3.Connection, owner: str) -> int:
     row = database.execute(
         "SELECT count(*) FROM pb_intake_owners o WHERE o.owner=? "
         "AND NOT EXISTS (SELECT 1 FROM pb_workspace_lineage l "
-        "WHERE l.child_workspace=o.workspace_token)",
+        "JOIN pb_intake_owners parent ON parent.workspace_token=l.parent_workspace "
+        "WHERE l.child_workspace=o.workspace_token AND parent.owner=o.owner)",
         (owner,),
     ).fetchone()
     return 0 if row is None else int(row[0])

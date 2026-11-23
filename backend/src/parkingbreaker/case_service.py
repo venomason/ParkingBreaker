@@ -991,11 +991,8 @@ class CaseService:
         if intake is None:
             return False
         if intake.case_token is None:
-            record = self._store.get_intake(intake.intake_id)
-            if record is None:
-                return False
             try:
-                view = _PREHOLD.validate_json(record.prehold_json)
+                view = _PREHOLD.validate_json(intake.prehold_json)
             except ValueError:
                 return False
             # A persisted pre-hold Stop is terminal. A persisted Offer is a live
