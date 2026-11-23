@@ -266,6 +266,18 @@
             "stored_fact": "reduced exactly to kind, event, object_ref, payment_intent, status, amount_cents, category, event_created - no card data, customer text or evidence",
             "conclusion": "chargeback/fraud signals record once on the case for the ledger and review; they never capture, release, refund or change case state"
           }
+        },
+        "webhook_robustness_2026_11_23": {
+          "signature_rotation": "two v1 signatures (one wrong, one correct) -> 200 duplicate:false; the SDK accepts any matching v1",
+          "future_timestamp": "t=now+400 -> 400 invalid_signature (the 300 second window is enforced both ways)",
+          "invalid_json_with_valid_signature": "400 invalid_signature",
+          "concurrent_duplicate_delivery": {
+            "run": "four simultaneous deliveries of the same signed event",
+            "responses": "one duplicate:false and three duplicate:true",
+            "rows": "exactly one webhook row for the event id",
+            "conclusion": "no double-processing and no double-charge window on concurrent retries"
+          },
+          "oversized_body": "2 MB body with a valid signature -> 413 request_too_large (body limit middleware)"
         }
       },
       "remaining_blocker": {
