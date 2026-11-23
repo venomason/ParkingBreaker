@@ -596,7 +596,7 @@
       "shape": "single container bundling the backend (PB_API_ORIGIN=http://127.0.0.1:8000); /api/health reports mode=fake with build_commit ffd1e848; publicly reachable via the load balancer",
       "exposure": "the image predates the dependency remediation: Next 16.2.x advisories plus the old backend Pillow/pypdf versions; fake mode with no real keys or customer data",
       "assessed_limits": "the image optimizer negotiates webp only (AVIF output not enabled, so the AVIF RCE path is not demonstrated), next/og is unused, and card/mail providers are not live",
-      "action": "rebuild and deploy the current main candidate to the same service (plan with exact commands and rollback digest in the coordination folder: PREVIEW-HOTFIX-PLAN.md); owner approval required",
+      "action": "CORRECTED: the current repo build config produces a frontend-only image that expects an external API origin, while the live preview runs a legacy single-container image that bundles the API; a straight rebuild would break /api. Options in PREVIEW-HOTFIX-PLAN.md: A) block public ingress on the existing service until launch (one reversible command, recommended), B) build a preview-only combined image (1-2h), C) deploy the split architecture with a fake-mode API (2-3h), or D) document acceptance of the fake-mode exposure. Owner approval required; rollback digest recorded.",
       "complementary_findings": "no canonical /terms, /privacy or /refund-policy URLs and no robots.txt/sitemap.xml on the public site; drafts prepared in LEGAL-PAGES-DRAFT.md"
     }
   },
