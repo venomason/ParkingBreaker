@@ -309,6 +309,10 @@ _PREHOLD = TypeAdapter[s.PreHoldResult](s.PreHoldResult)
 _COPY_SELECTIONS = TypeAdapter(list[s.RequiredCopySelection])
 _FAILURE_FACTS = TypeAdapter(FailureFacts)
 ADDRESS_REFUND_POLICY_VERSION = "address-responsibility-v1"
+# Version of the published Terms/Refund/Privacy pages the customer accepts at the
+# paid authorization step. Bump when that copy changes so the accepted version is
+# recorded on the payment hold for dispute evidence.
+TERMS_VERSION = "terms-2026-11-23"
 # The recorded Stopped detail for a customer's decline of the customer-directed destination.
 DESTINATION_DECLINED = "DESTINATION_DECLINED"
 # States where a pending destination choice can be made: before any draft exists.
@@ -1460,11 +1464,22 @@ class CaseService:
             if intent.authorization_ref is not None:
                 held = self._deps.payments.retrieve(intent.authorization_ref)
             else:
+                # Consent evidence rides on the payment hold's metadata. Every
+                # value is derived from persisted state (the attempt's created_at,
+                # not the replay clock), so a replay with the same idempotency key
+                # sends byte-identical parameters and neither Stripe nor the fake
+                # provider can reject it as a changed request.
+                consent_metadata = {
+                    **saved_metadata,
+                    "terms_accepted": "true",
+                    "terms_accepted_at": intent.created_at.isoformat(),
+                    "terms_version": TERMS_VERSION,
+                }
                 held = self._deps.payments.authorize(
                     intent.amount_cents,
                     intent.payment_method_id,
                     intent.idempotency_key,
-                    saved_metadata,
+                    consent_metadata,
                 )
         except Exception:
             self._record_authorization_outcome(
