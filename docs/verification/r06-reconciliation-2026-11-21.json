@@ -40,7 +40,8 @@
       "status": "LOCAL \u2014 switches and monitor incident loop proven on isolated VM; external outage probe + responder ack remain",
       "evidence": "docs/verification/r02-target-preflight-2026-11-21.json; backend/tests/test_r04_intake_pause.py; backend/tests/test_paid_cohort_cap.py",
       "detail": "All 3 stop controls tested locally + Caddy 503 pause and SQLite set_intake_pause proven on VM. 33 kill-switch tests pass. External outage probe + responder ack remain (P07).",
-      "blocking": "independent external outage probe (<5 min alert on full VM loss) and live alert email delivery + human responder acknowledgment (P07)"
+      "blocking": "independent external outage probe (<5 min alert on full VM loss) and live alert email delivery + human responder acknowledgment (P07); both need a real RESEND_API_KEY and a named responder with email addresses",
+      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet."
     },
     "R05": {
       "status": "LOCAL",
@@ -109,7 +110,8 @@
       "status": "LOCAL",
       "evidence": "API route table review; backend/tests/test_access_email*.py",
       "detail": "GET prefetch cannot consume consent or mutate state; 15-minute TTL and regeneration covered in tests.",
-      "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check"
+      "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check",
+      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet."
     },
     "P06": {
       "status": "PARTIAL \u2014 full state machine + dedup proven on deployed target; joined real-provider run blocked on search",
@@ -236,7 +238,8 @@
       "status": "BLOCKED",
       "evidence": "backend/tests/test_support*.py; backend/tests/test_t14_authorization_recovery.py (test_customer_support_code_requires_enabled_channel)",
       "detail": "Support workflow and automatic remedies tested locally. Blocked on named human responder acknowledgement of R04 test alert.",
-      "blocking": "named human responder acknowledgment of a live R04 test alert with recorded timestamp + deployed support intake credentials"
+      "blocking": "named human responder acknowledgment of a live R04 test alert with recorded timestamp + deployed support intake credentials",
+      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet."
     },
     "P08": {
       "status": "PASS",
