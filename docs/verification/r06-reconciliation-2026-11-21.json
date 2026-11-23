@@ -165,7 +165,17 @@
       "evidence": "API route table review; backend/tests/test_access_email*.py",
       "detail": "GET prefetch cannot consume consent or mutate state; 15-minute TTL and regeneration covered in tests.",
       "blocking": "real Resend delivery from appeals@parkingbreaker.com (SPF/DKIM aligned) and deployed 15-minute expiry check",
-      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet."
+      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet.",
+      "email_dns_finding_2026_11_23": {
+        "checked": "public DNS for parkingbreaker.com on 2026-11-23",
+        "spf": "v=spf1 include:spf.improvmx.com include:sendgrid.net ~all (root domain)",
+        "dmarc": "v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc_rua@onsecureserver.net",
+        "resend_dkim": "TXT resend._domainkey.parkingbreaker.com publishes a 220-char DKIM public key",
+        "resend_return_path": "send.parkingbreaker.com is a CNAME to send.forge.rmta.net with its own SPF record",
+        "mx": "mx1/mx2.improvmx.com (forwarding only; not involved in sending)",
+        "assessment": "the Resend sending domain records (DKIM + return-path subdomain) are already published, so P05 is likely limited to an API key and a verified sender in the Resend dashboard; DMARC quarantine plus aligned DKIM/SPF should authenticate mail from appeals@parkingbreaker.com. Owner should confirm the domain shows Verified in Resend when creating the key.",
+        "not_verified": "cannot confirm Resend dashboard verification state without the API key; root SPF does not list Resend because sending uses the send. subdomain records"
+      }
     },
     "P06": {
       "status": "PARTIAL \u2014 full state machine + dedup proven on deployed target; joined real-provider run blocked on search",
@@ -319,7 +329,10 @@
       "evidence": "backend/tests/test_support*.py; backend/tests/test_t14_authorization_recovery.py (test_customer_support_code_requires_enabled_channel)",
       "detail": "Support workflow and automatic remedies tested locally. Blocked on named human responder acknowledgement of R04 test alert.",
       "blocking": "named human responder acknowledgment of a live R04 test alert with recorded timestamp + deployed support intake credentials",
-      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet."
+      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet.",
+      "email_dns_finding_2026_11_23": {
+        "summary": "Resend DKIM and return-path records already published; alert email delivery is limited to the API key and responder address"
+      }
     },
     "P08": {
       "status": "PASS",
