@@ -342,8 +342,8 @@ test("Update my details after a pre-hold stop preserves the appeal and ticket ph
   expect(restarted.workspace_id).not.toBe(original.workspace_id);
   expect(restarted.intake_form.ticket_photo_ref).toBe(originalPhotoRef);
 
-  // Correct the stop reason (switch to city/municipal agency) and proceed without re-uploading.
-  await page.getByRole("radio", { name: "A city or municipal agency" }).check();
+  // Correct the stop reason (switch to city/public agency) and proceed without re-uploading.
+  await page.getByRole("radio", { name: "A city or public agency" }).check();
   await page.locator("#liveRentalPaid").selectOption("not-rental");
   await page.locator("#liveSubmit").click();
   await expect(page.locator("#s3, #s4")).toBeVisible();
