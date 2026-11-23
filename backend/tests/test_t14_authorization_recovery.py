@@ -15,7 +15,7 @@ from httpx2 import ASGITransport, AsyncClient
 from parkingbreaker.api import schemas as s
 from parkingbreaker.api.app import create_app
 from parkingbreaker.api.service import ServiceConflict
-from parkingbreaker.case_service import CaseService
+from parkingbreaker.case_service import TERMS_VERSION, CaseService
 from parkingbreaker.case_state import Effect
 from parkingbreaker.intake_store import AuthorizationAttempt
 from parkingbreaker.mail_attempt_store import StorageCorruption
@@ -24,7 +24,7 @@ from parkingbreaker.payment_records import PaymentOutcome, mutation_key
 from parkingbreaker.prices import PRICE_EXPERIMENT_ID
 from parkingbreaker.pricing_store import PricingAssignment
 from parkingbreaker.transaction_store import SqliteTransactionStore
-from test_case_service import ALICE, BOB, INTAKE, PNG_B64, Clock, service
+from test_case_service import ALICE, BOB, INTAKE, NOW, PNG_B64, Clock, service
 from test_case_service import fake_resolution as fake_resolution
 
 PM = "pm_recovery_original"
@@ -92,16 +92,28 @@ class RecoveryCase:
         return mutation_key("authorization", self.case_id, "CERTIFIED:2999", PM)
 
     @property
-    def metadata(self) -> dict[str, str]:
+    def legacy_metadata(self) -> dict[str, str]:
         return {"case": self.case_id, "tier": "CERTIFIED", "service_amount_cents": "2999"}
 
     @property
+    def metadata(self) -> dict[str, str]:
+        return {
+            **self.legacy_metadata,
+            "terms_accepted": "true",
+            "terms_accepted_at": NOW.isoformat(),
+            "terms_version": TERMS_VERSION,
+        }
+
+    @property
     def request_json(self) -> str:
+        return self.encode_request(self.metadata)
+
+    def encode_request(self, metadata: dict[str, str]) -> str:
         return json.dumps(
             {
                 "amount_cents": 2999,
                 "currency": "usd",
-                "metadata": self.metadata,
+                "metadata": metadata,
                 "payment_method_id": PM,
                 "tier": "CERTIFIED",
             },
@@ -116,9 +128,10 @@ class RecoveryCase:
         assert saved is not None
         return saved
 
-    def reserve(self) -> AuthorizationAttempt:
+    def reserve(self, *, legacy: bool = False) -> AuthorizationAttempt:
+        request = self.encode_request(self.legacy_metadata) if legacy else self.request_json
         return self.real._store.begin_authorization_attempt(
-            self.case_id, self.key, "CERTIFIED", 2999, PM, self.request_json, self.clock()
+            self.case_id, self.key, "CERTIFIED", 2999, PM, request, self.clock()
         )
 
     def restart(self) -> None:
@@ -158,12 +171,12 @@ class RecoveryCase:
 def test_existing_untagged_reservation_replays_after_pricing_rollout(
     recovery: RecoveryCase, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    original = recovery.reserve()
+    original = recovery.reserve(legacy=True)
     assignment = PricingAssignment("visitor", PRICE_EXPERIMENT_ID, "P2999", 2999, recovery.clock())
     monkeypatch.setattr(recovery.real._store, "pricing_for_scope", lambda _: assignment)
     recovery.assert_one_case(recovery.real.authorize(recovery.case_id, BODY))
     assert recovery.attempt.request_json == original.request_json
-    assert recovery.payments.requests == [(2999, PM, recovery.key, recovery.metadata)]
+    assert recovery.payments.requests == [(2999, PM, recovery.key, recovery.legacy_metadata)]
 
 
 @pytest.mark.parametrize(
