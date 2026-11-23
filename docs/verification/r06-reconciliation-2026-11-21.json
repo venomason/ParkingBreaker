@@ -455,6 +455,15 @@
     "bearer_header_on_customer_route": "401 (customer routes never accept a bearer credential)",
     "cross_owner_read": "404 (customer B cannot read customer A's workspace, before and after B creates its own)",
     "owner_own_access": "201 create and 200 read",
-    "conclusion": "origin, CSRF, session and ownership boundaries enforce correctly on the deployed target"
+    "conclusion": "origin, CSRF, session and ownership boundaries enforce correctly on the deployed target",
+    "auth_and_abuse": {
+      "access_link_rate_limit": "five new intents for one email accepted (202), the sixth returns 429 request_rate_limited",
+      "request_id_replay": "the same request id twice returns 202 both times and consumes one slot (lost-response safe)",
+      "one_time_link": "first confirm 200, reusing the same token 401",
+      "logout_revocation": "logout 200 authenticated:false; the old session cookie then returns 401",
+      "cross_owner_photo_ref": "customer B submitting customer A's photo ref -> 409 unknown_photo_ref",
+      "worker_route_without_secret": "POST /internal/cases/{id}/step -> 401",
+      "conclusion": "rate limiting, one-time links, session revocation, photo ownership and worker authentication all enforce correctly"
+    }
   }
 }
