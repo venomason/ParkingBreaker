@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ParkingBreaker Control Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --panel: #121926;
+      --panel-2: #182234;
+      --border: #25334d;
+      --text: #e6edf7;
+      --muted: #8ea1bd;
+      --teal: #14b8a6;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --blue: #38bdf8;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(11, 15, 23, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: var(--teal);
+      box-shadow: 0 0 12px var(--teal);
+    }
+    .dot.warn { background: var(--amber); box-shadow: 0 0 12px var(--amber); }
+    .dot.err { background: var(--red); box-shadow: 0 0 12px var(--red); }
+    h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: 0.01em; }
+    .sub { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+    .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .safety-pill {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.14);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+    button {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--teal); color: #fff; }
+    button.primary { background: rgba(20, 184, 166, 0.18); border-color: var(--teal); color: #5eead4; }
+    main { max-width: 1380px; margin: 0 auto; padding: 20px 22px 48px; display: grid; gap: 18px; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+    }
+    .kpi {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+    .kpi .val { font-size: 22px; font-weight: 700; margin-top: 6px; font-family: var(--mono); }
+    .kpi .hint { font-size: 11px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 18px; }
+    section.card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    section.card h2 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid rgba(37, 51, 77, 0.65); vertical-align: top; }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+    code, .mono { font-family: var(--mono); font-size: 12px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--mono);
+      letter-spacing: 0.03em;
+    }
+    .b-ok, .b-DONE { background: rgba(34, 197, 94, 0.16); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
+    .b-warn, .b-PARTIAL { background: rgba(245, 158, 11, 0.16); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .b-err, .b-BLOCKED, .b-critical { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .b-owner, .b-OWNER, .b-warning { background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .alert-list { display: grid; gap: 8px; }
+    .alert-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+    .cmd-list { display: grid; gap: 10px; }
+    .cmd-box {
+      background: #090d14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .cmd-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .cmd-head span { font-size: 12px; font-weight: 600; color: #cbd5e1; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-all; font-family: var(--mono); font-size: 11.5px; color: #93c5fd; }
+    .muted { color: var(--muted); }
+    .receipt-kv { display: grid; grid-template-columns: 190px 1fr; gap: 6px 12px; font-size: 12.5px; }
+    .receipt-kv div:nth-child(odd) { color: var(--muted); font-family: var(--mono); font-size: 11.5px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="dot" id="connDot"></div>
+      <div>
+        <h1>ParkingBreaker Control Dashboard</h1>
+        <div class="sub" id="targetLine">Connecting to target…</div>
+      </div>
+    </div>
+    <div class="controls">
+      <span class="safety-pill" id="liveSafety">LIVE CHECKOUT: CLOSED (TEST MODE)</span>
+      <button class="primary" id="refreshBtn" type="button">Probe Now</button>
+      <button id="autoBtn" type="button">Auto-refresh: ON (15s)</button>
+      <span class="sub" id="lastUpdated">—</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="label">Provider Mode</div>
+        <div class="val" id="kpiMode">—</div>
+        <div class="hint" id="kpiModeHint">pb-api /health</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Service Phase</div>
+        <div class="val" id="kpiPhase">—</div>
+        <div class="hint" id="kpiPhaseHint">/auth/pricing</div>
+      </div>
+      <div class="kpi">
+        <div class="label">T75 Overseer Feed</div>
+        <div class="val" id="kpiOverseer">—</div>
+        <div class="hint" id="kpiOverseerHint">zero-PII telemetry</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Active Alerts</div>
+        <div class="val" id="kpiAlerts">—</div>
+        <div class="hint" id="kpiAlertsHint">critical / warning</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Tracked Cases</div>
+        <div class="val" id="kpiCases">—</div>
+        <div class="hint" id="kpiCasesHint">opaque ops IDs</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Web Routes (pb-web)</div>
+        <div class="val" id="kpiWeb">—</div>
+        <div class="hint" id="kpiWebHint">/, legal, robots, sitemap</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>Live Services &amp; Route Probes <span class="mono muted" id="endpointSummary"></span></h2>
+        <table>
+          <thead>
+            <tr><th>Endpoint</th><th>Status</th><th>Latency</th><th>Detail</th></tr>
+          </thead>
+          <tbody id="servicesBody"></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>T75 Overseer Alerts &amp; Freshness <span class="mono muted" id="freshnessState">—</span></h2>
+        <div class="alert-list" id="alertsList"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Tracked Cases (Zero-PII Opaque Operations IDs) <span class="mono muted" id="casesMeta">—</span></h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ops ID</th>
+            <th>Letter State</th>
+            <th>Payment</th>
+            <th>Attempt</th>
+            <th>Age (h)</th>
+            <th>Hold / Stuck</th>
+            <th>AI Cost (¢)</th>
+          </tr>
+        </thead>
+        <tbody id="casesBody"></tbody>
+      </table>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>Verified Launch Receipts <span class="mono muted">docs/verification/</span></h2>
+        <div class="receipt-kv" id="receiptsBox"></div>
+      </section>
+
+      <section class="card">
+        <h2>Safe Operator Command Palette <span class="mono muted">read-only UI · CLI writes only</span></h2>
+        <div class="cmd-list" id="cmdList"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Launch Gate Matrix <span class="mono muted">~/Workspace/pb-coordination/GATE-STATUS.md</span></h2>
+      <table>
+        <thead>
+          <tr><th>Gate</th><th>State</th><th>Status Detail</th><th>What Remains (External / Owner)</th></tr>
+        </thead>
+        <tbody id="gatesBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const COMMANDS = [
+      {
+        title: "Pause new paid checkouts (switch to controlled_free_beta)",
+        cmd: "gcloud compute ssh pb-qual-backend-01 --zone=us-west1-a --tunnel-through-iap --command='sudo docker exec pb-api python3 -m parkingbreaker.service_phase_cli --database /data/parkingbreaker.sqlite status'"
+      },
+      {
+        title: "Check live health CLI & alerts on pb-qual-backend-01",
+        cmd: "gcloud compute ssh pb-qual-backend-01 --zone=us-west1-a --tunnel-through-iap --command='sudo docker exec pb-api python3 -m parkingbreaker.health_cli --database /data/parkingbreaker.sqlite'"
+      },
+      {
+        title: "Run synthetic paid browser campaign (local, fake providers)",
+        cmd: "python3 build-kit/scripts/synthetic_rehearsal.py --service-phase paid"
+      },
+      {
+        title: "Check container status & deployed revision on pb-qual-backend-01",
+        cmd: "gcloud compute ssh pb-qual-backend-01 --zone=us-west1-a --tunnel-through-iap --command='sudo docker ps --format \"table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}\"'"
+      }
+    ];
+
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    }
+
+    function renderCommands() {
+      const box = document.getElementById("cmdList");
+      box.innerHTML = COMMANDS.map((item, idx) => `
+        <div class="cmd-box">
+          <div class="cmd-head">
+            <span>${esc(item.title)}</span>
+            <button type="button" data-copy="${idx}">Copy</button>
+          </div>
+          <pre>${esc(item.cmd)}</pre>
+        </div>
+      `).join("");
+      box.querySelectorAll("button[data-copy]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const i = Number(btn.getAttribute("data-copy"));
+          try {
+            await navigator.clipboard.writeText(COMMANDS[i].cmd);
+            btn.textContent = "Copied";
+            setTimeout(() => { btn.textContent = "Copy"; }, 1200);
+          } catch {
+            btn.textContent = "Select & Copy";
+          }
+        });
+      });
+    }
+
+    let autoOn = true;
+    let timer = null;
+
+    async function refresh() {
+      const dot = document.getElementById("connDot");
+      try {
+        const res = await fetch("/api/snapshot", { cache: "no-store" });
+        const snap = await res.json();
+
+        document.getElementById("targetLine").textContent = `${snap.target} · loopback-only operator console`;
+        document.getElementById("lastUpdated").textContent = `Updated ${new Date(snap.observed_at).toLocaleTimeString()}`;
+
+        const apiH = snap.services.api_health;
+        const workerH = snap.services.worker_health;
+        const pricing = snap.services.pricing;
+        const ov = snap.overseer;
+        const routes = snap.services.web_routes || {};
+
+        const mode = apiH.data?.mode ?? (apiH.ok ? "unknown" : "offline");
+        document.getElementById("kpiMode").textContent = String(mode).toUpperCase();
+        document.getElementById("kpiModeHint").textContent = apiH.ok ? `HTTP ${apiH.status} · ${apiH.latency_ms}ms` : (apiH.error || "unreachable");
+
+        const safetyPill = document.getElementById("liveSafety");
+        if (mode === "live") {
+          safetyPill.textContent = "LIVE MODE ACTIVE";
+          safetyPill.style.background = "rgba(239,68,68,0.2)";
+          safetyPill.style.color = "#fca5a5";
+        } else {
+          safetyPill.textContent = `LIVE CHECKOUT: CLOSED (${String(mode).toUpperCase()} MODE)`;
+        }
+
+        const phase = pricing.data?.service_phase ?? "—";
+        document.getElementById("kpiPhase").textContent = phase;
+        document.getElementById("kpiPhaseHint").textContent = pricing.data?.certified_cents ? `certified $${(pricing.data.certified_cents/100).toFixed(2)}` : (pricing.error || "/auth/pricing");
+
+        document.getElementById("kpiOverseer").textContent = ov.ok ? "CONNECTED" : "DISCONNECTED";
+        document.getElementById("kpiOverseerHint").textContent = ov.ok ? `HTTP 200 · ${ov.latency_ms}ms` : (ov.error || `HTTP ${ov.status}`);
+
+        const alerts = ov.data?.alerts || [];
+        const crit = alerts.filter(a => a.severity === "critical").length;
+        const warn = alerts.filter(a => a.severity !== "critical").length;
+        document.getElementById("kpiAlerts").textContent = ov.ok ? `${crit}C / ${warn}W` : "—";
+        document.getElementById("kpiAlertsHint").textContent = ov.ok ? `${alerts.length} total alerts` : "feed unavailable";
+
+        const cases = ov.data?.cases || [];
+        document.getElementById("kpiCases").textContent = ov.ok ? String(cases.length) : "—";
+        const aiCents = cases.reduce((acc, c) => acc + (c.ai_settled_cents || 0), 0);
+        document.getElementById("kpiCasesHint").textContent = ov.ok ? `AI settled: ${aiCents}¢` : "feed unavailable";
+
+        const routeEntries = Object.entries(routes);
+        const webOk = routeEntries.filter(([, r]) => r.ok).length;
+        document.getElementById("kpiWeb").textContent = `${webOk}/${routeEntries.length}`;
+        document.getElementById("kpiWebHint").textContent = webOk === routeEntries.length ? "all routes 200 OK" : "check route table";
+
+        dot.className = "dot" + (!apiH.ok || !ov.ok ? " err" : crit > 0 ? " warn" : "");
+
+        const rows = [
+          ["pb-api /health", apiH, apiH.data ? `mode=${apiH.data.mode}, customer_authored=${apiH.data.customer_authored_mode}` : (apiH.error || "")],
+          ["pb-api /auth/pricing", pricing, pricing.data ? `phase=${pricing.data.service_phase}, arm=${pricing.data.price_arm ?? "n/a"}` : (pricing.error || "")],
+          ["pb-worker /health", workerH, workerH.data ? `mode=${workerH.data.mode}` : (workerH.error || "")],
+          ["pb-worker /internal/overseer/feed", ov, ov.ok ? `generated_at=${ov.data.generated_at}` : (ov.error || "")],
+          ...routeEntries.map(([r, p]) => [`pb-web ${r}`, p, p.ok ? `${p.bytes} bytes` : (p.error || "")])
+        ];
+        document.getElementById("servicesBody").innerHTML = rows.map(([name, p, detail]) => `
+          <tr>
+            <td class="mono">${esc(name)}</td>
+            <td><span class="badge ${p.ok ? "b-ok" : "b-err"}">${p.ok ? `HTTP ${p.status}` : (p.status ? `HTTP ${p.status}` : "DOWN")}</span></td>
+            <td class="mono">${p.latency_ms ?? "—"} ms</td>
+            <td class="mono muted">${esc(detail)}</td>
+          </tr>
+        `).join("");
+
+        const fresh = ov.data?.freshness;
+        document.getElementById("freshnessState").textContent = fresh
+          ? `freshness=${fresh.state} · stale=${fresh.stale} · unfinished=${fresh.unfinished_runs}`
+          : "no feed";
+        const alertsEl = document.getElementById("alertsList");
+        if (!ov.ok) {
+          alertsEl.innerHTML = `<div class="alert-row"><span>Overseer feed unreachable (${esc(ov.error || ov.status)})</span><span class="badge b-err">OFFLINE</span></div>`;
+        } else if (alerts.length === 0) {
+          alertsEl.innerHTML = `<div class="alert-row"><span>No active operational alerts.</span><span class="badge b-ok">CLEAR</span></div>`;
+        } else {
+          alertsEl.innerHTML = alerts.map(a => `
+            <div class="alert-row">
+              <div>
+                <div class="mono"><strong>${esc(a.kind)}</strong> <span class="muted">(${esc(a.domain)})</span></div>
+                <div class="sub">count=${esc(a.count)}</div>
+              </div>
+              <span class="badge b-${esc(a.severity)}">${esc(a.severity).toUpperCase()}</span>
+            </div>
+          `).join("");
+        }
+
+        document.getElementById("casesMeta").textContent = ov.ok ? `${cases.length} case(s) · next_after=${ov.data.next_after ?? "null"}` : "unavailable";
+        document.getElementById("casesBody").innerHTML = cases.length
+          ? cases.map(c => `
+              <tr>
+                <td class="mono">${esc(c.ops_id)}</td>
+                <td><span class="badge b-ok">${esc(c.letter_state)}</span></td>
+                <td class="mono">${esc(c.payment_state)}</td>
+                <td class="mono">${esc(c.attempt)}</td>
+                <td class="mono">${esc(c.age_hours)}</td>
+                <td class="mono muted">${c.held ? esc(c.hold_reason || "held") : (c.stuck ? esc(c.stuck) : "—")}</td>
+                <td class="mono">${esc(c.ai_settled_cents)} / ${esc(c.ai_unsettled_reserved_cents)}</td>
+              </tr>
+            `).join("")
+          : `<tr><td colspan="7" class="muted">No cases in feed.</td></tr>`;
+
+        const rec = snap.receipts || {};
+        const rLatest = rec.rehearsal_latest || {};
+        const kv = [
+          ["Tested Candidate", rLatest.candidate || "legal/integration @ a1496b1"],
+          ["Paid Browser Campaign", rLatest.paid?.browser ? `${rLatest.paid.browser.results}/${rLatest.paid.browser.tests} PASS` : "—"],
+          ["P03 Deployed", rec.p03_deployed?.status || "—"],
+          ["P03 Lineage Receipt", rec.p03_deployed?.defect_found_on_deployed_target_2026_11_22?.deployed_verification?.run || "—"],
+          ["Stripe Sandbox Consent", rLatest.deployed_stripe_sandbox?.stripe_payment_intent_id ? `${rLatest.deployed_stripe_sandbox.stripe_payment_intent_id} (1 hold, terms_version=${rLatest.deployed_stripe_sandbox.original_terms_version}, canceled)` : "—"],
+          ["Lob Sandbox Check", rLatest.deployed_stripe_sandbox?.lob_sandbox_mode ? `provider_mode=${rLatest.deployed_stripe_sandbox.lob_sandbox_mode} verified` : "—"]
+        ];
+        document.getElementById("receiptsBox").innerHTML = kv.map(([k, v]) => `<div>${esc(k)}</div><div class="mono">${esc(v)}</div>`).join("");
+
+        document.getElementById("gatesBody").innerHTML = (snap.gates || []).map(g => `
+          <tr>
+            <td><strong>${esc(g.gate)}</strong></td>
+            <td><span class="badge b-${esc(g.badge)}">${esc(g.badge)}</span></td>
+            <td>${esc(g.status)}</td>
+            <td class="muted">${esc(g.remaining)}</td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        dot.className = "dot err";
+        document.getElementById("targetLine").textContent = `Dashboard error: ${err}`;
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", refresh);
+    document.getElementById("autoBtn").addEventListener("click", () => {
+      autoOn = !autoOn;
+      document.getElementById("autoBtn").textContent = autoOn ? "Auto-refresh: ON (15s)" : "Auto-refresh: OFF";
+      if (autoOn) { timer = setInterval(refresh, 15000); } else if (timer) { clearInterval(timer); timer = null; }
+    });
+
+    renderCommands();
+    refresh();
+    timer = setInterval(refresh, 15000);
+  </script>
+</body>
+</html>

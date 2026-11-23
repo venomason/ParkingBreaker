@@ -131,5 +131,52 @@
       "subsequent_changes": "docs only plus one test-file mypy fix (commit 4309814); the changed test file re-runs 4/4 green at HEAD cd19be3",
       "note": "a fresh full run on HEAD was attempted and stopped because the live desktop held the machine at load ~6, which stretched the run to ~2h; the 5401125 receipt remains the current full-suite evidence"
     }
+  },
+  "legal_integration_verified_2026_11_23": {
+    "candidate": "legal/integration a1496b1cead49432a21b77c045415a95a6a499f8",
+    "includes_main_p03_ui_fix": "main 41cd190 (ba35454 + 41cd190)",
+    "includes_consent_retry_fix": "e54d4ea",
+    "application_fingerprint": "6529634dace54ca18d42f595cf7b31031ccdc6d914f887a107e18c30c2359f97",
+    "paid": {
+      "passed": true,
+      "browser": {
+        "valid": true,
+        "tests": 162,
+        "results": 162
+      },
+      "browser_check_sha256": "cf8e22b93cdf2bdd004b9ed9b6859c8bef8409c6a34862f9686cef2218f772e9",
+      "web_source_manifest_sha256": "c71ed6a2580fcef59887fe133644b755852b396f56b98e6aa337593d799515fb",
+      "code_unchanged_during_rehearsal": true,
+      "harness_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true
+    },
+    "backend_targeted_battery": "206/206 passed (test_terms_consent_evidence, test_p03_prehold_stop_restart, test_intake_store, test_stripe_payment, test_beta_recovery, test_case_service); ruff + mypy clean on 508 files",
+    "deployed_rehearsal_target": {
+      "vm": "pb-qual-backend-01 (us-west1-a)",
+      "backend_image": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/backend@sha256:b7efe297927d6bc169bed0ac0a8011f3a9548afea5565b12c4bd58ed8116cd34",
+      "cloud_build_id": "56884639-4f36-4658-a44d-c98ae43c6ae3",
+      "p03_photo_preservation_receipt": {
+        "passed": true,
+        "parent_workspace": "ws_2def7c50b9ea48f9863fbe2d666d45c8",
+        "child_workspace": "ws_8d9651ae4dc5471497c8bf774e1f602c",
+        "reason": "restart",
+        "recorded_at": "2026-11-23T06:44:45.572661+00:00",
+        "resubmitted_without_reupload": true
+      }
+    },
+    "deployed_stripe_sandbox": {
+      "passed": true,
+      "case_id": "case_a193f3e1c0d04ca6819a857c80e9e03f",
+      "stripe_payment_intent_id": "pi_3Uer90QpJkemFkHB0ODPSSDr",
+      "stripe_holds_found_for_case": 1,
+      "original_terms_version": "terms-2026-11-23",
+      "bumped_terms_version_during_retry": "terms-2099-01-01",
+      "terms_accepted_at": "2026-11-23T06:54:30+00:00",
+      "stripe_status_before_release": "requires_capture",
+      "stripe_amount_capturable": 2999,
+      "stripe_status_after_release": "canceled",
+      "stripe_amount_received": 0,
+      "lob_sandbox_mode": "test"
+    }
   }
 }
