@@ -178,7 +178,8 @@ for (const width of [375, 1440]) {
     await page.locator("#liveSubmit").click();
     await expect(page.locator("#issuerCard")).toBeVisible({ timeout: 20000 });
     await page.locator('input[value="certified"]').check();
-    await page.locator("#actAuthBtn").click();
+    await page.locator("#termsAccepted").check();
+  await page.locator("#actAuthBtn").click();
     await expect(page.locator("#s5")).toBeVisible({ timeout: 20000 });
     await page.getByRole("button", { name: /letter studio/ }).click();
     await expect(page.locator("#liveFindings")).toBeVisible({ timeout: 20000 });
