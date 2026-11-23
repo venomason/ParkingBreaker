@@ -310,3 +310,42 @@ test("retrying a failed photo upload saves its reference before the original int
   expect(uploads).toBe(2);
   expect((await saved(page)).case_id).toBe(firstCase);
 });
+
+test("Update my details after a pre-hold stop preserves the appeal and ticket photo and lets the customer proceed", async ({ page }) => {
+  await enterTicket(page);
+  await page.locator("#actContinueTicket").click();
+  await openDetails(page);
+  await completePrivateDetails(page);
+  const original = await saved(page);
+  const originalPhotoRef = original.intake_form.ticket_photo_ref;
+  expect(originalPhotoRef).toBeTruthy();
+
+  // Trigger a pre-hold stop (private parking lot / company).
+  await page.locator("#liveRentalPaid").selectOption("not-rental");
+  await page.locator("#liveSubmit").click();
+  await expect(page.locator("#liveStopMessage")).toBeVisible();
+
+  let startAppealCalls = 0;
+  let photoUploads = 0;
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.url().endsWith("/api/auth/appeals")) startAppealCalls++;
+    if (request.method() === "POST" && /\/workspaces\/[^/]+\/photos$/.test(request.url())) photoUploads++;
+  });
+
+  // Click the actual "Update my details" button after a stop.
+  await page.locator("#liveStopEditDetails").click();
+  await expect(page.locator("#liveDetails")).toBeVisible();
+  // Must stay in the same appeal session (no POST /auth/appeals) and carry the ticket photo.
+  expect(startAppealCalls).toBe(0);
+  await expect(page.getByText("Saved for this appeal; choose a file only to replace it.")).toBeVisible();
+  const restarted = await saved(page);
+  expect(restarted.workspace_id).not.toBe(original.workspace_id);
+  expect(restarted.intake_form.ticket_photo_ref).toBe(originalPhotoRef);
+
+  // Correct the stop reason (switch to city/municipal agency) and proceed without re-uploading.
+  await page.getByRole("radio", { name: "A city or municipal agency" }).check();
+  await page.locator("#liveRentalPaid").selectOption("not-rental");
+  await page.locator("#liveSubmit").click();
+  await expect(page.locator("#s3, #s4")).toBeVisible();
+  expect(photoUploads).toBe(0);
+});
