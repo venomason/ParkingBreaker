@@ -493,5 +493,29 @@
       "closure": "post-launch F4 build; not required for the first paid orders",
       "register": "~/Workspace/pb-coordination/RISK-REGISTER.md"
     }
+  },
+  "security_hardening_2026_11_23": {
+    "hsts": {
+      "finding": "neither the Next response headers nor the public Caddy site block sent Strict-Transport-Security; the public preview confirmed the header was absent while CSP, X-Frame-Options, nosniff and Referrer-Policy were present",
+      "change": "both layers now send Strict-Transport-Security max-age=15552000 (180 days), scoped to the exact host (no includeSubDomains/preload; www resolves but the certificate SAN is not verified for it)",
+      "where": "web/next.config.ts headers() and deploy/Caddyfile public site block; topology test pins the Caddy directive",
+      "verified": "topology/cloudrun/lifecycle suites 89 passed; web lint, type-check and production build EXIT 0",
+      "takes_effect": "on the next web deploy; the current public preview build ffd1e848 predates it",
+      "note": "HSTS is sticky for 180 days, which is intentional for a payment site that only serves HTTPS; no HTTP-only route is reachable on the main domain"
+    }
+  },
+  "operational_checks_2026_11_23": {
+    "public_preview": {
+      "tls_certificate": "CN=parkingbreaker.com, issuer Google Trust Services WR3, valid 2026-11-09 to 2027-02-07",
+      "security_headers_present": [
+        "content-security-policy",
+        "x-frame-options: DENY",
+        "x-content-type-options: nosniff",
+        "referrer-policy: strict-origin-when-cross-origin"
+      ],
+      "hsts_before_this_change": "absent",
+      "dns": "parkingbreaker.com -> 8.233.72.197 and an IPv6 address; no api subdomain record; www resolves to the apex",
+      "health": "200 mode=fake build ffd1e848"
+    }
   }
 }
