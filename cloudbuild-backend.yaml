@@ -1,10 +1,21 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'sh'
-    args: [
-      '-ec',
-      'printf "%s" "${_PB_BUILD_COMMIT}" | grep -Eq "^[0-9a-f]{40}$$" || { echo "ERROR: _PB_BUILD_COMMIT must be a 40-char lowercase hex commit SHA" >&2; exit 1; }; test -n "${_IMAGE_TAG}" || { echo "ERROR: _IMAGE_TAG is required" >&2; exit 1; }'
-    ]
+    env:
+      - 'PB_EXPECTED_COMMIT=${_PB_BUILD_COMMIT}'
+      - 'PB_BUILD_IMAGE_TAG=${_IMAGE_TAG}'
+    args:
+      - '-ec'
+      - |-
+        if [ "$${#PB_EXPECTED_COMMIT}" -ne 40 ] ||
+           ! printf "%s" "$$PB_EXPECTED_COMMIT" | grep -Eq "^[0-9a-f]{40}$$"; then
+          echo "ERROR: _PB_BUILD_COMMIT must be a 40-char lowercase hex commit SHA" >&2
+          exit 1
+        fi
+        if [ -z "$$PB_BUILD_IMAGE_TAG" ]; then
+          echo "ERROR: _IMAGE_TAG is required" >&2
+          exit 1
+        fi
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
