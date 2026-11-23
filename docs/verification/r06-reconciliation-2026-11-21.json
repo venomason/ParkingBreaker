@@ -87,6 +87,14 @@
         "intake_after_clear": "409 ticket_form_required (no longer paused; proceeds to the next gate)",
         "final_status": "paused false at revision 4",
         "conclusion": "the intake kill-switch blocks new intakes and lifts cleanly on the merged candidate"
+      },
+      "launch_day_injection_rehearsal_2026_11_23": {
+        "what": "rehearsed the exact launch-day credential sequence on the qualification target with synthetic values",
+        "steps": "allow-listed setter wrote dummy BRAVE/Resend/alert values to the boot env, re-embedded the startup script, applied instance metadata, reset the VM, and waited for health",
+        "result": "VM reset applied the new boot env (container BRAVE 47 bytes, RESEND 41 bytes, alert recipient 30 bytes), health ok in 45s, mode=test",
+        "p07_alert_path": "monitor --once against an empty data dir raised 6 incidents (observation_unknown x5, backup_stale critical) and composed 6 notices for the configured recipient; 0 accepted because the Resend key was synthetic and 6 remained pending for retry, so delivery failure is recorded and retried with no false success and no real email",
+        "restore": "pristine boot env restored and VM reset again; container values back to placeholders (BRAVE 29, RESEND 14, alert recipient unset), health ok",
+        "conclusion": "the one-command credential path and the alert delivery/failure path both work on the target; only real credentials remain"
       }
     },
     "R05": {
