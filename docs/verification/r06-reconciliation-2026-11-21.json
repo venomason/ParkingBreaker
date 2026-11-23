@@ -349,5 +349,29 @@
     "verification": "full backend suite 13,946 passed 0 failed (13m57s); ruff check and format clean on 506 files; focused suites listed in the journals",
     "boundary": "local source and synthetic verification only - no deployment, live payment, mail, customer-data use or off-host RPO certification",
     "note": "the qualification images built earlier from this directory included these working-tree fixes because Cloud Build uploads the working directory"
+  },
+  "candidate_verification_2026_11_23": {
+    "main_commit": "143b0ad",
+    "backend_suite": {
+      "result": "13,950 passed, 1 failed (tests/test_bench_cli.py::test_all_17_cases_offline_and_resume), 19m05s",
+      "failure_analysis": "the bench-CLI case passed 3/3 immediately afterwards with no code change, so it is load-sensitive under the full-suite run; a second full-suite run started to confirm",
+      "failure_assertion": "one of the 17 bench cases recorded research_outcome.ran = False"
+    },
+    "web_check": "EXIT 0 - eslint --max-warnings=0, tsc type-check, next production build (compiled successfully)",
+    "qualification_self_tests": {
+      "research_campaign": {
+        "routing_self_test_passed": true,
+        "provider_called": false,
+        "exit": 0
+      },
+      "vision_campaign": {
+        "passed": true,
+        "provider_called": false,
+        "reserved_cents": 800,
+        "exit": 0
+      }
+    },
+    "ruff": "passed on changed modules; tree-wide check was clean when the launch fixes were committed",
+    "mypy": "passed on the changed modules (0 errors)"
   }
 }
