@@ -94,7 +94,7 @@
       "firefox-mobile375x812": "61/61 passed",
       "firefox-desktop1280x900": "61/61 passed on a clean install after retry"
     },
-    "flake_note": "the firefox desktop project hit intermittent 5s Playwright expectation timeouts on this loaded desktop machine (different tests each time, and the same test passed on retry and on a clean node_modules install). No product regression was demonstrated: the identical build/version passes 61/61 when the machine is quiet and dependencies are clean. Treat a single firefox-desktop timeout as flake and re-run; run the paid campaign on an idle machine in the deployment window.",
+    "flake_note": "the firefox desktop project hit intermittent 5s Playwright expectation timeouts on this loaded desktop machine (different tests each time; same build passes on retry and on a clean install). Load average sits around 6 with the live desktop (video wallpaper and WebKit processes) consuming CPU, which explains both the flake and occasional slow full-suite runs. Treat a single firefox-desktop timeout as flake and re-run; run the paid campaign on an idle machine in the deployment window.",
     "version_investigation": "an incomplete no-save dependency experiment made next 16.2.12 appear CVE-clean and made next 16.4.x appear to regress firefox; the advisory ranges show only next >= 16.4.6 clears every production advisory, so 16.4.6 stays. The no-save audits were reading stale lockfile ranges, not the installed tree."
   },
   "final_candidate_runs_2026_11_23": {
@@ -124,5 +124,12 @@
       "vision_self_test": "passed with provider_called false, manifest sha256 e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6"
     },
     "note": "fresh runs after the whole-tree mypy fix; code and harness hashes unchanged during each run and owned services stopped after"
+  },
+  "candidate_verification_2026_11_23": {
+    "full_suite_status": {
+      "last_full_run": "13,951 passed, 0 failed (17m31s) at main 5401125",
+      "subsequent_changes": "docs only plus one test-file mypy fix (commit 4309814); the changed test file re-runs 4/4 green at HEAD cd19be3",
+      "note": "a fresh full run on HEAD was attempted and stopped because the live desktop held the machine at load ~6, which stretched the run to ~2h; the 5401125 receipt remains the current full-suite evidence"
+    }
   }
 }
