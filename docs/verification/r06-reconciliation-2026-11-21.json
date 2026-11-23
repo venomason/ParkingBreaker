@@ -473,6 +473,14 @@
         "result": "32 passed, 8 skipped, 14 failed under a local fake-mode server",
         "triage": "every failure traces to a missing deployment-window fixture, not app behaviour: beta-phase-gate requires SECURE_BASE, a bare reserved HTTPS *.example.test origin validated in the spec itself (TypeError: Invalid URL with SECURE_BASE unset). runtime-phase passes 2/2 when run alone.",
         "conclusion": "no app regression observed beyond the harness requirements; those specs belong to the paid campaign in the deployment window"
+      },
+      "local_paid_campaign_harness": {
+        "built": "reserved HTTPS origin harness: /etc/hosts pb.example.test -> 127.0.0.1, self-signed cert with SAN, TLS proxy on 443 -> next on 3001, Playwright system Chrome with MAP host resolver rule and ignoreHTTPSErrors",
+        "campaign_build_config": "PB_PROVIDER_MODE=test, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_..., NEXT_PUBLIC_LIVE_API=1, PB_API_ORIGIN to a local fake-mode backend",
+        "beta_phase_gate": "14 passed, 0 failed (previously 0/14 without the harness)",
+        "full_paid_set": "20 passed, 25 skipped, 23 failed across beta-phase-gate, beta-acceptance, beta-full-journey, beta-notices, beta-ticket-vision, durable-destination, durable-intake, durable-letter, required-copies",
+        "remaining_failures": "the specs that still fail self-document the need for the isolated HTTPS cookie-auth API rehearsal (the backend must run email cookie auth on the reserved origin, not the fake-bearer server used here)",
+        "conclusion": "the local harness reproduces the campaign environment far enough to pass the phase-gate suite; the cookie-auth rehearsal remains part of the deployment window"
       }
     }
   },
