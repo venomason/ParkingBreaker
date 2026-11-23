@@ -26,6 +26,7 @@ from typing import Any
 import pytest
 from httpx2 import ASGITransport, AsyncClient
 
+from parkingbreaker.api.app import create_app
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from test_auth_integration import (
     ORIGIN,
@@ -35,7 +36,7 @@ from test_auth_integration import (
     headers,
     sign_in,
 )
-from test_case_service import ALICE, INTAKE, PNG_B64, create_app, fake_resolution, service
+from test_case_service import ALICE, INTAKE, PNG_B64, fake_resolution, service
 
 assert fake_resolution
 pytestmark = [pytest.mark.anyio, pytest.mark.usefixtures("fake_resolution")]
@@ -55,7 +56,10 @@ async def _photo(client: AsyncClient, workspace_id: str, auth: dict[str, str]) -
         json={"content_type": "image/png", "data_base64": PNG_B64},
     )
     assert response.status_code == 201, response.text
-    return response.json()["photo_ref"]
+    ref = response.json()["photo_ref"]
+    assert isinstance(ref, str)
+    assert ref
+    return ref
 
 
 async def _submit(
@@ -71,7 +75,9 @@ async def _submit(
         body["rental_company_paid"] = True
     receipt = await client.post(f"/workspaces/{workspace_id}/intake", headers=auth, json=body)
     assert receipt.status_code == 200, receipt.text
-    return receipt.json()
+    data = receipt.json()
+    assert isinstance(data, dict)
+    return data
 
 
 async def test_prehold_stop_restart_carries_into_a_fresh_workspace(tmp_path: Path) -> None:
