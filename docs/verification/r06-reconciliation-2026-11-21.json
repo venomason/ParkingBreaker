@@ -136,10 +136,10 @@
         "fix": "treat a saved pre-hold Stop as a finished transaction and let the auth route fall through to create_workspace() when the transaction is finished",
         "fix_branch": "fix/p03-prehold-stop-restart @ 8d9927e (2 files src + 1 new test file; ruff/mypy clean; 129 related tests pass)",
         "deployed_verification": {
-          "image": "sha256:40e04a763fc88ba0cd7dd4a8518250168821fc9bdaf82cb7d41f6e717e1fd245",
-          "build_commit": "7061b452c2b84fa3988abf1aa61084f95836e92b",
-          "run": "intake -> 200 STOPPED_NO_CHARGE; restart -> 201 fresh workspace ws_2f71620b5cdd413698194b7753005087; GET fresh after restart -> 200 (session survives); replay -> 201 same fresh workspace; lineage child=ws_2f71..., parent=ws_a0d6..., reason=restart",
-          "conclusion": "dead end closed, session survives the restart, and no duplicate workspace is forked"
+          "image": "sha256:b7efe297927d6bc169bed0ac0a8011f3a9548afea5565b12c4bd58ed8116cd34",
+          "build_commit": "a1496b1cead49432a21b77c045415a95a6a499f8",
+          "run": "intake -> 200 STOPPED_NO_CHARGE; Update my details restart -> 201 fresh workspace ws_8d9651ae4dc5471497c8bf774e1f602c carrying front+back ticket photo refs; GET fresh -> 200; resubmit with carried photo refs without re-upload -> 200; lineage child=ws_8d9651ae..., parent=ws_2def7c50..., reason=restart",
+          "conclusion": "dead end closed end-to-end (backend + Update my details UI button), session and ticket photos survive restart, and no duplicate workspace is forked"
         },
         "remaining": "none for the pre-hold stop path; the standing launch candidate now contains the fix",
         "root_cause_3": "identity_store invalidated every session when an owner had more than one workspace, so the restart itself logged the customer out (401 on the next request). The legacy ambiguity guard now counts only unlineaged roots across sessions, identity-link confirmation and workspace recovery links.",
