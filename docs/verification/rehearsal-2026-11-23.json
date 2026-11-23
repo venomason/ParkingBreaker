@@ -84,5 +84,17 @@
     "Controlled free beta with required OCR passes 61/61.",
     "Controlled free beta without the OCR preview flag reports 40/42: the two failures are the required ticket-reading journey specs, which cannot render their vision UI when the preview flag is off. That combination is not the supported campaign configuration; all supported combinations pass.",
     "These are local synthetic rehearsals with fake providers; no provider credentials, charges, mail or external service were used."
-  ]
+  ],
+  "browser_project_matrix_2026_11_23": {
+    "harness": "build-kit/scripts/synthetic_rehearsal.py --service-phase controlled_free_beta --browser-project <project> --ticket-reading-preview",
+    "candidate": "main b1663b0, web dependency next 16.4.6",
+    "results": {
+      "chromium-mobile375x812": "61/61 passed",
+      "chromium-desktop1280x900": "61/61 passed",
+      "firefox-mobile375x812": "61/61 passed",
+      "firefox-desktop1280x900": "61/61 passed on a clean install after retry"
+    },
+    "flake_note": "the firefox desktop project hit intermittent 5s Playwright expectation timeouts on this loaded desktop machine (different tests each time, and the same test passed on retry and on a clean node_modules install). No product regression was demonstrated: the identical build/version passes 61/61 when the machine is quiet and dependencies are clean. Treat a single firefox-desktop timeout as flake and re-run; run the paid campaign on an idle machine in the deployment window.",
+    "version_investigation": "an incomplete no-save dependency experiment made next 16.2.12 appear CVE-clean and made next 16.4.x appear to regress firefox; the advisory ranges show only next >= 16.4.6 clears every production advisory, so 16.4.6 stays. The no-save audits were reading stale lockfile ranges, not the installed tree."
+  }
 }
