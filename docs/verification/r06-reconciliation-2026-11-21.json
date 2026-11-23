@@ -210,6 +210,19 @@
           },
           "no_double_capture": "replay inserted no second webhook row and no second capture operation",
           "note": "fake provider transports; state machine, signatures, dedup and ordering are real"
+        },
+        "webhook_paths_2026_11_23": {
+          "matched_lob_delivery": {
+            "event": "letter.delivered with metadata.submission_token = sub_6386fff89a6a4ad6955141bf4ec83b54",
+            "first": "200 {received:true, duplicate:false}",
+            "replay": "200 {received:true, duplicate:true}",
+            "recorded_in": "pb_webhook_final_events (one row for the event id)"
+          },
+          "unmatched_lob_delivery": {
+            "event": "letter.delivered without a matching submission token",
+            "result": "retained in pb_webhook_backlog for review, never acted on"
+          },
+          "capture_semantics": "dispatch starts the mailing and queues the capture effect (AUTHORIZED -> CAPTURE_PENDING -> CAPTURED); delivery tracking is recorded as evidence and never manufactures delivery proof. The observed ordering mail attempt 22:51:33Z then capture operation 22:52:21Z matches that design."
         }
       },
       "remaining_blocker": {
