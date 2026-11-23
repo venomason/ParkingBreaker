@@ -78,6 +78,15 @@
         ],
         "assessment": "the detector fires correctly on the merged candidate; the first three are expected because the bare qualification VM runs no scheduler loop or backup timer, and the backlog warning is the deliberately parked unmatched Lob delivery",
         "remaining": "external outage probe and live alert delivery still need the standing target (GATE 0), a real Resend key and a named responder; sequence in ~/Workspace/pb-coordination/P07-ALERT-RUNBOOK.md"
+      },
+      "kill_switch_drill_on_merged_candidate_2026_11_23": {
+        "candidate": "main ecebf71, qualification target image sha256:40e04a76",
+        "pause": "operator set_intake_pause(True) under the current revision; durable operator change",
+        "intake_while_paused": "409 intake_paused (blocked before any ticket work)",
+        "clear": "operator set_intake_pause(False) under the next revision",
+        "intake_after_clear": "409 ticket_form_required (no longer paused; proceeds to the next gate)",
+        "final_status": "paused false at revision 4",
+        "conclusion": "the intake kill-switch blocks new intakes and lifts cleanly on the merged candidate"
       }
     },
     "R05": {
