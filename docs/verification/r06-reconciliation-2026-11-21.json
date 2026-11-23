@@ -351,11 +351,10 @@
     "note": "the qualification images built earlier from this directory included these working-tree fixes because Cloud Build uploads the working directory"
   },
   "candidate_verification_2026_11_23": {
-    "main_commit": "143b0ad",
+    "main_commit": "040410b",
     "backend_suite": {
-      "result": "13,950 passed, 1 failed (tests/test_bench_cli.py::test_all_17_cases_offline_and_resume), 19m05s",
-      "failure_analysis": "the bench-CLI case passed 3/3 immediately afterwards with no code change, so it is load-sensitive under the full-suite run; a second full-suite run started to confirm",
-      "failure_assertion": "one of the 17 bench cases recorded research_outcome.ran = False"
+      "result": "13,951 passed, 0 failed, 1 warning in 17m31s (second full run, EXIT 0)",
+      "first_run": "13,950 passed, 1 failed (test_bench_cli::test_all_17_cases_offline_and_resume) in 19m05s - load-sensitive flake, not reproducible: the case passed 3/3 in isolation and the second full run passed clean"
     },
     "web_check": "EXIT 0 - eslint --max-warnings=0, tsc type-check, next production build (compiled successfully)",
     "qualification_self_tests": {
@@ -372,6 +371,7 @@
       }
     },
     "ruff": "passed on changed modules; tree-wide check was clean when the launch fixes were committed",
-    "mypy": "passed on the changed modules (0 errors)"
+    "mypy": "passed on the changed modules (0 errors)",
+    "conclusion": "merged candidate is fully green: backend 13,951/13,951, web check EXIT 0, offline qualification self-tests pass"
   }
 }
