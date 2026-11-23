@@ -460,7 +460,15 @@
     },
     "ruff": "passed on changed modules; tree-wide check was clean when the launch fixes were committed",
     "mypy": "passed on the changed modules (0 errors)",
-    "conclusion": "merged candidate is fully green: backend 13,951/13,951, web check EXIT 0, offline qualification self-tests pass"
+    "conclusion": "merged candidate is fully green: backend 13,951/13,951, web check EXIT 0, offline qualification self-tests pass",
+    "next_bump_browser_checks": {
+      "setup": "production build of the live landing variant (NEXT_PUBLIC_LIVE_API=1) served on 3001 against a local fake-mode backend; Playwright chromium",
+      "specs": "tests/cro-landing.spec.ts + tests/configuration.spec.ts + tests/ingress.spec.ts",
+      "next_16_4_6_result": "16 passed, 1 skipped (cro-landing 11/11 pass)",
+      "next_16_2_3_controlled_result": "same build config with next 16.2.3 installed: cro-landing 11/11 FAILED",
+      "conclusion": "the minor Next upgrade does not regress the browser suite and in this controlled comparison it fixes the live-landing specs that failed on 16.2.3",
+      "caveat": "the full paid browser campaign still needs the deployment-window environment (provider keys, auth mode) before launch traffic; this local run covers the landing, configuration and ingress specs"
+    }
   },
   "security_battery_2026_11_23": {
     "target": "pb-qual-backend-01, image sha256:40e04a76 (commit 7061b45 code), test mode with cookie auth",
@@ -520,7 +528,7 @@
       "finding": "npm audit on the production dependency set for next 16.2.3 reported 1 critical and 2 high advisories: a Next.js Server Components denial-of-service, a postcss CSS-stringify XSS and sharp/libvips CVEs",
       "change": "next bumped 16.2.3 -> 16.4.6 (the non-major fix); lockfile regenerated with npm ci",
       "verified": "npm audit --omit=dev reports 0 vulnerabilities; web lint, type-check and production build EXIT 0 on the bumped tree",
-      "residual_risk": "Next moved by a minor version, so the paid browser campaign should be re-run inside the deployment window before launch traffic",
+      "residual_risk": "Next moved by a minor version; a local production-build run of the live landing, configuration and ingress specs passes 16/16 with 1 skip, and the same config on 16.2.3 failed cro-landing 11/11. The full paid campaign still belongs to the deployment window.",
       "commit": "b174c38"
     },
     "python_dependency_cves": {
