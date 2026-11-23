@@ -194,13 +194,34 @@ def _require_tz_aware(dt: datetime) -> None:
 
 
 def authorization_request_json(
-    intake_id: str, tier: str, amount_cents: int, payment_method_id: str, *, assigned: bool = False
+    intake_id: str,
+    tier: str,
+    amount_cents: int,
+    payment_method_id: str,
+    *,
+    assigned: bool = False,
+    terms_version: str | None = None,
+    terms_accepted_at: datetime | None = None,
 ) -> str:
     metadata = {"case": intake_id, "tier": tier, "service_amount_cents": str(amount_cents)}
     if assigned:
         if tier != "CERTIFIED":
             raise ValueError("price experiment requires a certified offer")
         metadata.update(price_experiment_id=PRICE_EXPERIMENT_ID, price_arm=price_arm(amount_cents))
+    if terms_version is not None or terms_accepted_at is not None:
+        if (
+            not isinstance(terms_version, str)
+            or not terms_version.strip()
+            or terms_version != terms_version.strip()
+            or not isinstance(terms_accepted_at, datetime)
+        ):
+            raise ValueError("invalid terms consent metadata")
+        _require_tz_aware(terms_accepted_at)
+        metadata.update(
+            terms_accepted="true",
+            terms_version=terms_version,
+            terms_accepted_at=terms_accepted_at.isoformat(),
+        )
     return json.dumps(
         {
             "amount_cents": amount_cents,
@@ -213,6 +234,38 @@ def authorization_request_json(
         sort_keys=True,
         separators=(",", ":"),
     )
+
+
+def _extract_terms_metadata(request_json: str) -> tuple[str | None, datetime | None]:
+    try:
+        parsed = json.loads(request_json)
+    except ValueError:
+        raise ValueError("invalid authorization identity") from None
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("metadata"), dict):
+        raise ValueError("invalid authorization identity")
+    metadata = parsed["metadata"]
+    has_any = any(
+        key in metadata for key in ("terms_accepted", "terms_version", "terms_accepted_at")
+    )
+    if not has_any:
+        return None, None
+    terms_accepted = metadata.get("terms_accepted")
+    terms_version = metadata.get("terms_version")
+    accepted_at_raw = metadata.get("terms_accepted_at")
+    if (
+        terms_accepted != "true"
+        or not isinstance(terms_version, str)
+        or not terms_version.strip()
+        or terms_version != terms_version.strip()
+        or not isinstance(accepted_at_raw, str)
+    ):
+        raise ValueError("invalid authorization identity")
+    try:
+        accepted_at = datetime.fromisoformat(accepted_at_raw)
+        _require_tz_aware(accepted_at)
+    except (TypeError, ValueError):
+        raise ValueError("invalid authorization identity") from None
+    return terms_version, accepted_at
 
 
 def _validate_authorization_identity(
@@ -240,13 +293,22 @@ def _validate_authorization_identity(
     ):
         raise ValueError("invalid authorization identity")
 
+    terms_version, terms_accepted_at = _extract_terms_metadata(request_json)
     fields = (intake_id, tier, amount_cents, payment_method_id)
-    if request_json == authorization_request_json(*fields):
+    if request_json == authorization_request_json(
+        *fields, terms_version=terms_version, terms_accepted_at=terms_accepted_at
+    ):
         return
     if (
         tier == "CERTIFIED"
         and amount_cents in ALLOWED_PRICE_CENTS
-        and request_json == authorization_request_json(*fields, assigned=True)
+        and request_json
+        == authorization_request_json(
+            *fields,
+            assigned=True,
+            terms_version=terms_version,
+            terms_accepted_at=terms_accepted_at,
+        )
     ):
         return
     raise ValueError("invalid authorization identity")
@@ -720,20 +782,41 @@ class IntakeStoreMixin:
             ).fetchone()
             if existing is not None:
                 attempt = _authorization_attempt(existing)
+                saved_terms_version, saved_terms_accepted_at = _extract_terms_metadata(
+                    attempt.request_json
+                )
+                incoming_assigned = "price_experiment_id" in json.loads(request_json)["metadata"]
+                expected_with_saved_terms = authorization_request_json(
+                    intake_id,
+                    tier,
+                    amount_cents,
+                    payment_method_id,
+                    assigned=incoming_assigned,
+                    terms_version=saved_terms_version,
+                    terms_accepted_at=saved_terms_accepted_at,
+                )
+                pre_telemetry_with_saved_terms = authorization_request_json(
+                    intake_id,
+                    tier,
+                    amount_cents,
+                    payment_method_id,
+                    assigned=False,
+                    terms_version=saved_terms_version,
+                    terms_accepted_at=saved_terms_accepted_at,
+                )
                 if (
                     attempt.intake_id != intake_id
                     or attempt.tier != tier
                     or attempt.amount_cents != amount_cents
                     or attempt.payment_method_id != payment_method_id
-                    # A pre-telemetry reservation always dispatches its original bytes,
-                    # even when its visitor now qualifies for experiment metadata.
-                    or (
-                        attempt.request_json != request_json
-                        and attempt.request_json
-                        != authorization_request_json(
-                            intake_id, tier, amount_cents, payment_method_id
-                        )
-                    )
+                    # A replay keeps the exact persisted request bytes (original
+                    # accepted terms_version/timestamp and pre-telemetry shape).
+                    or attempt.request_json
+                    not in {
+                        request_json,
+                        expected_with_saved_terms,
+                        pre_telemetry_with_saved_terms,
+                    }
                 ):
                     raise IntakeConflict("authorization_identity_changed")
                 database.execute("COMMIT")

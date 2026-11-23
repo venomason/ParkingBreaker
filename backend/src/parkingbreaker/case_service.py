@@ -1385,6 +1385,8 @@ class CaseService:
                 and assignment.experiment_id == prices.PRICE_EXPERIMENT_ID
                 and assignment.amount_cents == tier.amount_cents
             ),
+            terms_version=TERMS_VERSION,
+            terms_accepted_at=started_at,
         )
         key = mutation_key(
             "authorization",
@@ -1462,22 +1464,15 @@ class CaseService:
             if intent.authorization_ref is not None:
                 held = self._deps.payments.retrieve(intent.authorization_ref)
             else:
-                # Consent evidence rides on the payment hold's metadata. Every
-                # value is derived from persisted state (the attempt's created_at,
-                # not the replay clock), so a replay with the same idempotency key
-                # sends byte-identical parameters and neither Stripe nor the fake
-                # provider can reject it as a changed request.
-                consent_metadata = {
-                    **saved_metadata,
-                    "terms_accepted": "true",
-                    "terms_accepted_at": intent.created_at.isoformat(),
-                    "terms_version": TERMS_VERSION,
-                }
+                # Dispatch the exact persisted metadata (including the accepted
+                # terms_version and terms_accepted_at frozen when the attempt was
+                # reserved) so retries across a clock tick or TERMS_VERSION bump
+                # send byte-identical parameters for the same idempotency key.
                 held = self._deps.payments.authorize(
                     intent.amount_cents,
                     intent.payment_method_id,
                     intent.idempotency_key,
-                    consent_metadata,
+                    saved_metadata,
                 )
         except Exception:
             self._record_authorization_outcome(
