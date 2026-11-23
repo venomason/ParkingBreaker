@@ -227,6 +227,20 @@ def recorded_basis(agency: ResolvedAgency, bases: Mapping[str, StateBasis]) -> S
     return basis if basis and basis.key == agency.basis_key and basis.is_recorded else None
 
 
+# Owner Decision 20.21 holds AZ/NV for statutory document-preparer review.
+def held_state_before_resolution(state: str, bases: Mapping[str, StateBasis]) -> bool:
+    if state not in {"AZ", "NV"}:
+        return False
+    # State and local bases follow the violation state. Federal and tribal bases may
+    # apply independently, so a recorded one must keep issuer resolution available.
+    return not any(
+        key == basis.key
+        and basis.is_recorded
+        and (key in {state, "US-FED"} or key.startswith("TRIBE:"))
+        for key, basis in bases.items()
+    )
+
+
 class IntakeSupport(StrEnum):
     SUPPORTED = "supported"
     NOT_YET_VERIFIED = "not_yet_verified"
@@ -298,6 +312,15 @@ class IntakeSupportResult:
     control_entry: ServiceControlEntry | None = None
 
 
+def unrecorded_basis_stop() -> IntakeSupportResult:
+    return IntakeSupportResult(
+        IntakeSupport.NOT_YET_VERIFIED,
+        StopFamily.NOT_YET_VERIFIED,
+        HardStop.S6,
+        "Service basis is not yet recorded.",
+    )
+
+
 def intake_support_check(
     agency: ResolvedAgency | None,
     issuer_kind: IssuerKind,
@@ -350,12 +373,7 @@ def intake_support_check(
             detail=LAUNCH_EXCLUSION_DETAIL,
         )
     if recorded_basis(agency, state_basis) is None:
-        return IntakeSupportResult(
-            IntakeSupport.NOT_YET_VERIFIED,
-            StopFamily.NOT_YET_VERIFIED,
-            HardStop.S6,
-            "Service basis is not yet recorded.",
-        )
+        return unrecorded_basis_stop()
     if printed_deadline is not None and printed_deadline < today:
         return IntakeSupportResult(
             IntakeSupport.NOT_YET_VERIFIED,

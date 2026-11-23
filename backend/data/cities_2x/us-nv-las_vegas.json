@@ -2,7 +2,7 @@
   "city_id": "us-nv-las_vegas",
   "name": "Las Vegas",
   "jurisdiction": "city",
-  "status": "active",
+  "status": "blocked",
   "accepts_mail_appeals": true,
   "timezone": "America/Los_Angeles",
   "online_appeal_available": true,

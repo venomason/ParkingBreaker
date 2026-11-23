@@ -25,7 +25,9 @@ from parkingbreaker.service_policy import (
     IssuerKind,
     ServiceControlEntry,
     StateBasis,
+    held_state_before_resolution,
     intake_support_check,
+    unrecorded_basis_stop,
 )
 
 # Provider failures before a hold become a verification stop, never an exclusion.
@@ -74,25 +76,30 @@ def run_prehold(
     *,
     launch_allowlist: AbstractSet[str] | None,
 ) -> PreholdResult:
-    """Resolve the issuer (skipped for private notices: no spend on excluded scope)."""
+    """Resolve only issuers whose intake can use an official source."""
     issuer: IssuerResolutionRun | None = None
     error: Exception | None = None
-    if request.issuer_kind is IssuerKind.GOVERNMENT:
-        try:
-            issuer = resolve_ticket_issuer(
-                request.query,
-                request.printed_stage,
-                deps.snapshot,
-                request.today,
-                deps.searcher,
-                deps.fetcher,
-                deps.issuer_assessor,
-                deps.link_assessor,
-                deps.clock,
-                budget_cents=deps.budget_cents,
-            )
-        except PROVIDER_ERRORS as exc:
-            error = exc
+    if request.issuer_kind is not IssuerKind.PRIVATE:
+        # Query state is the customer-confirmed violation state, never a mailing address.
+        if held_state_before_resolution(request.query.customer_state, deps.state_basis):
+            if request.notice_date <= request.today:
+                return PreholdResult(None, unrecorded_basis_stop())
+        else:
+            try:
+                issuer = resolve_ticket_issuer(
+                    request.query,
+                    request.printed_stage,
+                    deps.snapshot,
+                    request.today,
+                    deps.searcher,
+                    deps.fetcher,
+                    deps.issuer_assessor,
+                    deps.link_assessor,
+                    deps.clock,
+                    budget_cents=deps.budget_cents,
+                )
+            except PROVIDER_ERRORS as exc:
+                error = exc
     support = intake_support_check(
         None if issuer is None else issuer.agency,
         request.issuer_kind,

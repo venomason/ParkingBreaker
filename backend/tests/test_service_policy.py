@@ -15,6 +15,7 @@ from parkingbreaker.service_policy import (
     ServiceControlCategory,
     ServiceControlEntry,
     StateBasis,
+    held_state_before_resolution,
     intake_support_check,
     recorded_basis,
     service_control_entry,
@@ -517,3 +518,13 @@ def test_dynamic_ticket_age_reachability() -> None:
         )
         is None
     )
+
+
+@pytest.mark.parametrize("state", ["AZ", "NV"])
+def test_pre_resolution_hold_releases_only_for_recorded_applicable_basis(state: str) -> None:
+    assert held_state_before_resolution(state, STATE_BASIS)
+    assert not held_state_before_resolution("CA", {})
+    for key in (state, "US-FED", "TRIBE:example"):
+        basis = replace(STATE_BASIS["CA"], key=key)
+        assert not held_state_before_resolution(state, {key: basis})
+        assert held_state_before_resolution(state, {key: replace(basis, checked_by="")})

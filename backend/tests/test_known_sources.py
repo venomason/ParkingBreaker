@@ -3,6 +3,9 @@
 import json
 from dataclasses import replace
 from pathlib import Path
+from urllib.parse import urlsplit
+
+import pytest
 
 from parkingbreaker.agencies import SourceScope
 from parkingbreaker.research.known_sources import known_seeds
@@ -40,3 +43,14 @@ def test_blocked_or_unverified_records_are_never_seeds() -> None:
 def test_every_copied_record_parses() -> None:
     assert len(RECORDS) == 45
     assert all(isinstance(r.get("city_id"), str) for r in RECORDS)
+
+
+@pytest.mark.parametrize("city", ["az-mesa", "az-phoenix", "az-tucson", "nv-las_vegas"])
+def test_document_preparer_hold_excludes_shipped_city_seeds(city: str) -> None:
+    record = json.loads((DATA / f"us-{city}.json").read_text())
+    host = urlsplit(record["mail_acceptance_policy"]["official_source_url"]).hostname
+    assert host is not None
+    agency = replace(SAN_FRANCISCO, official_domains=(host,))
+    assert record["status"] == "blocked"
+    assert known_seeds(agency, [record]) == ()
+    assert known_seeds(agency, [{**record, "status": "active"}])

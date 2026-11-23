@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, date, datetime
 from typing import Any
 
@@ -98,3 +99,32 @@ def test_launch_allowlist_applies_to_resolved_agencies(monkeypatch: pytest.Monke
     monkeypatch.setattr(prehold, "resolve_ticket_issuer", lambda *a, **k: Resolved(SAN_FRANCISCO))
     result = run_prehold(request(), deps(), launch_allowlist=frozenset({"lacity.gov"}))
     assert result.support.detail == LAUNCH_EXCLUSION_DETAIL
+
+
+@pytest.mark.parametrize("state", ["AZ", "NV"])
+@pytest.mark.parametrize("kind", [IssuerKind.GOVERNMENT, IssuerKind.PRIVATE])
+def test_held_state_uses_no_issuer_providers(
+    state: str, kind: IssuerKind, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def resolve(*_args: object, **_kwargs: object) -> None:
+        pytest.fail("held or private intake must not enter search, fetch or issuer assessment")
+
+    monkeypatch.setattr(prehold, "resolve_ticket_issuer", resolve)
+    inquiry = request(kind)
+    result = run_prehold(
+        replace(inquiry, query=replace(inquiry.query, customer_state=state)),
+        deps(),
+        launch_allowlist=None,
+    )
+    assert result.issuer is None
+    assert result.provider_error is None
+    if kind is IssuerKind.PRIVATE:
+        assert result.support.status is IntakeSupport.BUSINESS_EXCLUSION
+        assert result.support.family is StopFamily.BUSINESS_EXCLUSION
+        assert result.support.hard_stop is None
+        assert result.support.detail == "Private parking notices are excluded by product scope."
+    else:
+        assert result.support.status is IntakeSupport.NOT_YET_VERIFIED
+        assert result.support.family is StopFamily.NOT_YET_VERIFIED
+        assert result.support.hard_stop is HardStop.S6
+        assert result.support.detail == "Service basis is not yet recorded."

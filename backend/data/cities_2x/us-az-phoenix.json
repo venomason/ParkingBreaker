@@ -2,7 +2,7 @@
   "city_id": "us-az-phoenix",
   "name": "Phoenix",
   "jurisdiction": "city",
-  "status": "active",
+  "status": "blocked",
   "accepts_mail_appeals": true,
   "timezone": "America/Phoenix",
   "online_appeal_available": true,
