@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const price = { experiment_id: "certified-price-v1", arm: "P2499", amount_cents: 2499, service_phase: "paid" };
-const startButton = (page: Page) => page.getByRole("button", { name: "Start another appeal", exact: true });
+const startButton = (page: Page, existing = false) => page.getByRole("button", { name: existing ? "Start another appeal" : "Start an appeal", exact: true });
 
 async function session(page: Page) {
   await page.route("**/api/auth/session", (route) => route.fulfill({ status: 401, json: { detail: "no_session" } }));
@@ -87,7 +87,7 @@ for (const endpoint of ["appeal", "pricing", "status", "beta-offer", "appeals"] 
     } else {
       const retry = page.getByRole("button", { name: endpoint === "pricing" ? "Retry" : "Retry saved status", exact: true });
       await expect(retry).toBeVisible();
-      await expect(startButton(page)).toBeEnabled();
+      await expect(startButton(page, endpoint === "status" || endpoint === "beta-offer")).toBeEnabled();
       await expect(page.locator("#actSnap")).toHaveCount(0);
       failing = false;
       await retry.click();

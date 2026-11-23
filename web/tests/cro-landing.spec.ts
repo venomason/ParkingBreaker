@@ -66,7 +66,7 @@ for (const phase of ["paid", "controlled_free_beta"] as const) {
 }
 
 for (const pending of ["appeal", "pricing"] as const) {
-  test(`${pending} loading is announced, reduced-motion safe and keeps start-another access`, async ({ page }, testInfo) => {
+  test(`${pending} loading is announced, reduced-motion safe and keeps the first-visit action available`, async ({ page }, testInfo) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await visitor(page, "paid");
     let release!: () => void;
@@ -78,7 +78,7 @@ for (const pending of ["appeal", "pricing"] as const) {
     try {
       await page.goto("/");
       await expect(page.locator(".access-loading [role=status]")).toContainText("Loading");
-      await expect(page.getByRole("button", { name: "Start another appeal", exact: true })).toBeEnabled();
+      await expect(page.getByRole("button", { name: "Start an appeal", exact: true })).toBeEnabled();
       await expect(page.locator("#actSnap")).toHaveCount(0);
       await expect(page.locator(".access-skeleton")).toHaveAttribute("aria-hidden", "true");
       const animations = await page.locator(".access-skeleton span").evaluateAll(elements => elements.map(el => getComputedStyle(el).animationName));
@@ -108,11 +108,13 @@ test("the five photo illustrations use the owner's exact statement and keep tick
   await expect(previous).toBeDisabled();
   for (const index of [0, 1, 2, 3, 4]) {
     if (index > 0) await next.click();
+    await expect(intro.getByRole("status")).toHaveText(`Illustration ${index + 1} of 5`);
     await expect(pictures.nth(index)).toBeInViewport({ ratio: 0.9 });
     await expect.poll(() => pictures.nth(index).evaluate(image => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
   }
   await expect(next).toBeDisabled();
   await previous.click();
+  await expect(intro.getByRole("status")).toHaveText("Illustration 4 of 5");
   await expect(pictures.nth(3)).toBeInViewport({ ratio: 0.9 });
   await expect(page.locator("#sceneCamera")).toHaveAttribute("capture", "environment");
   await expect(page.locator("#sceneLibrary")).toHaveAttribute("multiple", "");

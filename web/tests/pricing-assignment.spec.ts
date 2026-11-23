@@ -28,7 +28,7 @@ test("assigned price is displayed and gates the live journey before it renders",
   await page.goto("/");
   await expect.poll(() => requests).toEqual(["POST"]);
   await expect(page.getByRole("status")).toContainText("Loading");
-  await expect(page.getByRole("button", { name: "Start another appeal" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Start an appeal" })).toBeEnabled();
   await expect(page.locator("#actSnap")).toHaveCount(0);
   release();
   await expect(page.getByLabel("Assigned certified mailing price")).toHaveText("Early beta price: $24.99 · Certified Mail, everything included");
@@ -54,7 +54,7 @@ test("pricing failure has no default, offers retry, and keeps children gated unt
   await expect(page.locator("p[role=alert]")).toContainText("couldn’t load pricing");
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByRole("heading", { level: 1, name: "Your appeal service is unavailable", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Start another appeal" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Start an appeal" })).toBeEnabled();
   await expect(page.getByLabel("Assigned certified mailing price")).toHaveCount(0);
   await expect(page.locator("#actSnap")).toHaveCount(0);
   await page.getByRole("button", { name: "Retry" }).click();
@@ -77,7 +77,7 @@ test("retry keeps journey gated until delayed pricing assignment resolves", asyn
   await page.goto("/");
   await expect(page.locator("p[role=alert]")).toContainText("couldn’t load pricing");
   await page.getByRole("button", { name: "Retry" }).click();
-  await expect(page.getByRole("button", { name: "Start another appeal" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Start an appeal" })).toBeEnabled();
   await expect(page.locator("#actSnap")).toHaveCount(0);
   release();
   await expect(page.getByLabel("Assigned certified mailing price")).toHaveText("Early beta price: $24.99 · Certified Mail, everything included");
@@ -92,7 +92,7 @@ test("null legacy assignment displays no price and preserves access controls", a
   await page.goto("/");
   await expect(page.getByLabel("Assigned certified mailing price")).toHaveCount(0);
   await expect(page.locator("#actSnap")).toBeVisible();
-  await page.getByRole("button", { name: "Start another appeal" }).click();
+  await page.getByRole("button", { name: "Start an appeal" }).click();
   await expect(page).toHaveURL(/\/$/);
 });
 
@@ -122,6 +122,7 @@ test("server-confirmed beta case survives pricing failure without a paid price",
   await expect(page.getByLabel("Assigned certified mailing price")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1, name: "Your appeal service is unavailable", exact: true })).toHaveCount(0);
   await expect(page.locator("#s1")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start another appeal", exact: true })).toBeEnabled();
 });
 
 // UI-only phase mocks: the real server gate remains the authority.
@@ -131,7 +132,7 @@ test("controlled free beta never exposes the assigned paid price", async ({ page
   await page.goto("/");
   await expect(page.getByLabel("Assigned certified mailing price")).toHaveCount(0);
   await expect(page.locator("#actSnap")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Start another appeal" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Start an appeal" })).toBeEnabled();
 });
 
 test("missing service_phase fails closed, shows retry and never defaults paid", async ({ page }) => {

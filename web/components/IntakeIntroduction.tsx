@@ -22,8 +22,11 @@ export function IntakeIntroduction() {
   }
 
   return <section className="intake-introduction guide-cover" aria-labelledby="intake-title">
-    <h1 id="intake-title">As soon as you spot a ticket, start taking photos.</h1>
-    <p className="curbside-intro">Get both sides of the ticket and photos of the area around your car. You can review them later and choose which ones accurately support what you’re saying.</p>
+    <div className="curbside-copy">
+      <span className="curbside-kicker">Curbside photo guide</span>
+      <h1 id="intake-title">As soon as you spot a ticket, start taking photos.</h1>
+      <p className="curbside-intro">Get both sides of the ticket and photos of the area around your car. You can review them later and choose which ones accurately support what you’re saying.</p>
+    </div>
     <div className="curbside-gallery">
       <div className="curbside-strip" id="curbside-illustrations" ref={strip} role="group" aria-label="Hurtle’s photo illustrations" tabIndex={0} onScroll={event => {
         const { scrollLeft, clientWidth } = event.currentTarget;
@@ -39,6 +42,7 @@ export function IntakeIntroduction() {
         ))}
       </div>
       <div className="curbside-arrows">
+        <span className="curbside-count" role="status" aria-atomic="true">Illustration {current + 1} of {photos.length}</span>
         <button type="button" aria-label="Previous illustration" aria-controls="curbside-illustrations" disabled={current === 0} onClick={() => showPhoto(current - 1)}>‹</button>
         <button type="button" aria-label="Next illustration" aria-controls="curbside-illustrations" disabled={current === photos.length - 1} onClick={() => showPhoto(current + 1)}>›</button>
       </div>
