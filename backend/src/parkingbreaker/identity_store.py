@@ -237,12 +237,7 @@ class IdentityStoreMixin:
             if link[4] is not None or now < link[2] or now >= link[3]:
                 database.execute("COMMIT")
                 return None
-            if (
-                database.execute(
-                    "SELECT count(*) FROM pb_intake_owners WHERE owner=?", (link[1],)
-                ).fetchone()[0]
-                > 1
-            ):
+            if unlineaged_workspace_roots(database, link[1]) > 1:
                 # Never consume a historical account-wide credential or broaden it.
                 database.execute("COMMIT")
                 return None
@@ -326,19 +321,9 @@ class IdentityStoreMixin:
             or session.expires_at <= now
         ):
             return None
-        # Legacy accounts could own several unlinked workspaces before identity
-        # existed; that ambiguity must not be consumed. A legitimate assisted
-        # restart records parent lineage, so count only unlineaged roots: a
-        # restart chain keeps exactly one root and the session stays valid.
-        if (
-            database.execute(
-                "SELECT count(*) FROM pb_intake_owners o WHERE o.owner=? "
-                "AND NOT EXISTS (SELECT 1 FROM pb_workspace_lineage l "
-                "WHERE l.child_workspace=o.workspace_token)",
-                (session.customer_id,),
-            ).fetchone()[0]
-            > 1
-        ):
+        # A restart chain keeps exactly one unlineaged root, so a legitimate
+        # restart does not invalidate the session.
+        if unlineaged_workspace_roots(database, session.customer_id) > 1:
             return None
         return session
 
@@ -454,6 +439,23 @@ def _digest(value: str) -> str:
     if not isinstance(value, str) or _DIGEST.fullmatch(value) is None:
         raise IdentityConflict("invalid identity input")
     return value
+
+
+def unlineaged_workspace_roots(database: sqlite3.Connection, owner: str) -> int:
+    """Count this owner's workspaces that no restart lineage points at.
+
+    Legacy accounts could own several unlinked workspaces before identity
+    existed; that ambiguity must never be consumed or expanded. A legitimate
+    assisted restart records parent lineage, so a restart chain still has
+    exactly one root and the account is not ambiguous.
+    """
+    row = database.execute(
+        "SELECT count(*) FROM pb_intake_owners o WHERE o.owner=? "
+        "AND NOT EXISTS (SELECT 1 FROM pb_workspace_lineage l "
+        "WHERE l.child_workspace=o.workspace_token)",
+        (owner,),
+    ).fetchone()
+    return 0 if row is None else int(row[0])
 
 
 def _utc(value: datetime) -> datetime:

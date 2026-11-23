@@ -396,3 +396,22 @@ def test_legacy_multi_workspace_link_is_not_consumed(tmp_path: Path) -> None:
         assert store._require_open().execute(
             "SELECT consumed_at FROM pb_identity_links"
         ).fetchone() == (None,)
+
+
+def test_restart_lineage_is_not_legacy_ambiguity(tmp_path: Path) -> None:
+    """A restart chain keeps one unlineaged root, so the session survives."""
+    from parkingbreaker.workspace import Workspace
+
+    with SqliteTransactionStore(tmp_path / "lineage.sqlite") as store:
+        issue(store)
+        assert consume(store) is not None
+        for workspace in ("root", "child"):
+            store.save_workspace(workspace, Workspace(), NOW)
+            store.set_workspace_owner(workspace, "customer-1", NOW)
+        store.record_workspace_lineage("child", "root", now=NOW)
+        assert store.identity_session(digest(100), now=NOW) is not None
+
+        # One unlinked extra workspace is legacy ambiguity again: refuse the scope.
+        store.save_workspace("legacy", Workspace(), NOW)
+        store.set_workspace_owner("legacy", "customer-1", NOW)
+        assert store.identity_session(digest(100), now=NOW) is None

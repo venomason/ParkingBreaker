@@ -19,6 +19,7 @@ replay instead of restarting.
 
 from __future__ import annotations
 
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +27,14 @@ import pytest
 from httpx2 import ASGITransport, AsyncClient
 
 from parkingbreaker.transaction_store import SqliteTransactionStore
-from test_auth_integration import ORIGIN, RecordingEmail, app_for, headers, sign_in
+from test_auth_integration import (
+    ORIGIN,
+    WORKER,
+    RecordingEmail,
+    app_for,
+    headers,
+    sign_in,
+)
 from test_case_service import ALICE, INTAKE, PNG_B64, create_app, fake_resolution, service
 
 assert fake_resolution
@@ -137,3 +145,48 @@ async def test_email_auth_restart_carried_notes_replay(tmp_path: Path) -> None:
             conflict = await client.post("/workspaces", headers=auth, json={"notes": "other"})
             assert conflict.status_code == 409, conflict.text
             assert conflict.json()["detail"] == "appeal_already_started"
+
+            # Recovery must still work after a restart: a workspace-bound email
+            # link is queued and confirms even though the owner now holds a restart
+            # chain of two workspaces (the legacy guard used to drop it silently).
+            assert (
+                await client.post("/auth/logout", headers=headers(client), json={})
+            ).status_code == 200
+            before = len(mail.sent)
+            link = await client.post(
+                "/auth/link",
+                headers={"Origin": ORIGIN},
+                json={
+                    "email": "restart@example.test",
+                    "request_id": str(uuid.uuid4()),
+                    "workspace_id": fresh,
+                },
+            )
+            assert link.status_code == 202, link.text
+            assert (await client.post("/internal/dispatch", headers=WORKER)).status_code == 200
+            assert len(mail.sent) == before + 1
+            token = mail.sent[-1].text.split("#token=", 1)[1].splitlines()[0]
+            confirm = await client.post(
+                "/auth/confirm", headers={"Origin": ORIGIN}, json={"token": token}
+            )
+            assert confirm.status_code == 200, confirm.text
+            assert (
+                await client.get(f"/workspaces/{fresh}", headers=headers(client))
+            ).status_code == 200
+
+
+async def test_bearer_restart_with_carried_notes_replays(tmp_path: Path) -> None:
+    """The store replay rule treats an empty notes body as no preference."""
+    async with _client(tmp_path) as client:
+        started = await client.post("/workspaces", headers=ALICE, json={"notes": "keep me"})
+        stopped_workspace = started.json()["workspace_id"]
+        receipt = await _submit(client, stopped_workspace, ALICE, rental_paid=True)
+        assert receipt["state"] == "STOPPED_NO_CHARGE"
+        restarted = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        assert restarted.status_code == 201, restarted.text
+        fresh = restarted.json()["workspace_id"]
+        assert fresh != stopped_workspace
+        assert restarted.json()["notes"] == "keep me"
+        replay = await client.post("/workspaces", headers=ALICE, json={"notes": ""})
+        assert replay.status_code == 201, replay.text
+        assert replay.json()["workspace_id"] == fresh

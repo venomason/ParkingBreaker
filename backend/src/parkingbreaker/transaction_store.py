@@ -1519,7 +1519,9 @@ class SqliteTransactionStore(
             replay = self.get_workspace(latest)
             if replay is None:
                 raise StorageCorruption("workspace owner has no workspace")
-            if replay.workspace.notes != workspace.notes:
+            # A restart carries the earlier notes when the caller sends none, so
+            # an empty request body means "no preference" and must replay.
+            if workspace.notes and replay.workspace.notes != workspace.notes:
                 raise IntakeConflict("appeal_already_started")
             database.execute("COMMIT")
             return replay

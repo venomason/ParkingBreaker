@@ -1000,7 +1000,9 @@ class CaseService:
                 return False
             # A persisted pre-hold Stop is terminal. A persisted Offer is a live
             # transaction even if a later re-read would re-evaluate a fresh stop.
-            return isinstance(view, s.Stop)
+            # The transient cohort-full stop is never persisted here, but exclude
+            # it by key so a future caller cannot fork a live offer.
+            return isinstance(view, s.Stop) and view.reason_key != "paid_cohort_full"
         case = self._store.get_case(intake.case_token)
         return case is not None and case.letter_state in TERMINAL_STATES
 
