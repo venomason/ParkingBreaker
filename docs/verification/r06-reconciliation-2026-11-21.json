@@ -87,11 +87,17 @@
           "conclusion": "dead end closed, session survives the restart, and no duplicate workspace is forked"
         },
         "remaining": "none for the pre-hold stop path; the standing launch candidate now contains the fix",
-        "root_cause_3": "identity_store invalidated every session when an owner had more than one workspace, so the restart itself logged the customer out (401 on the next request). The legacy ambiguity guard now counts only unlineaged roots across sessions, identity-link confirmation and workspace recovery links."
+        "root_cause_3": "identity_store invalidated every session when an owner had more than one workspace, so the restart itself logged the customer out (401 on the next request). The legacy ambiguity guard now counts only unlineaged roots across sessions, identity-link confirmation and workspace recovery links.",
+        "concurrency_verified": {
+          "run": "after a pre-hold stop, two simultaneous POST /workspaces requests",
+          "result": "both 201 with the same fresh workspace; owner_workspaces=2, unlineaged roots=1, lineage rows=1",
+          "conclusion": "no fork and no split-brain on the restart race"
+        }
       },
       "blocking": "review + merge of the fix branch (MiMo review), then rebuild the candidate image",
       "fix_branch": "merged: main 7061b45 (branch fix/p03-prehold-stop-restart @ 0835149)",
-      "review": "independent review (Gemini 4 Neon) APPROVE after three rounds; all findings addressed"
+      "review": "independent review (Gemini 4 Neon) APPROVE after three rounds; all findings addressed",
+      "deployed_evidence": "deployed image sha256:40e04a76 (commit 7061b45) on pb-qual-backend-01: truthful stop, fresh restart, session survives, replay without fork, lineage recorded, and concurrent starts converge on one workspace"
     },
     "P04": {
       "status": "BLOCKED",
