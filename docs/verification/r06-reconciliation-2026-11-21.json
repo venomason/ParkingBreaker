@@ -482,6 +482,19 @@
         "remaining_failures": "the specs that still fail self-document the need for the isolated HTTPS cookie-auth API rehearsal (the backend must run email cookie auth on the reserved origin, not the fake-bearer server used here)",
         "conclusion": "the local harness reproduces the campaign environment far enough to pass the phase-gate suite; the cookie-auth rehearsal remains part of the deployment window"
       }
+    },
+    "synthetic_paid_campaign_2026_11_23": {
+      "receipt": "docs/verification/rehearsal-2026-11-23.json",
+      "application_fingerprint": "f3a9dcfb4be8e63df101407d2d7e6ac992115a1c5d0e3e85ea23851d718a492d",
+      "runs": {
+        "paid": "160/160 browser checks passed",
+        "paid_required_ocr": "17/17 passed",
+        "controlled_free_beta_required_ocr": "61/61 passed",
+        "controlled_free_beta_without_ocr_preview": "40/42 - the two failures are the required ticket-reading journey specs that cannot render without the preview flag; unsupported combination"
+      },
+      "properties": "production web build, real cookie auth, durable SQLite, loopback-only fake providers, code and harness unchanged during each run, owned services stopped after",
+      "qualification": "local synthetic rehearsal only; no provider credentials, charges, mail or external services",
+      "conclusion": "the paid and beta browser campaigns pass on the merged candidate"
     }
   },
   "security_battery_2026_11_23": {

@@ -1,0 +1,88 @@
+{
+  "date_pacific": "2026-11-23",
+  "candidate": "main b4296eb (runtime code unchanged since 5401125 CVE bump)",
+  "runs": {
+    "paid": {
+      "passed": true,
+      "service_phase": "paid",
+      "ticket_reading_preview": false,
+      "browser_report_validation": {
+        "valid": true,
+        "tests": 160,
+        "results": 160
+      },
+      "application_fingerprint": "f3a9dcfb4be8e63df101407d2d7e6ac992115a1c5d0e3e85ea23851d718a492d",
+      "browser_check_receipt": "build-kit/evidence/checks/1795401240296024368-synthetic-browser.json",
+      "browser_check_sha256": "b4cfd05521722cbfa03115bb7482607639320be0e474f9f50ecf863283c0392e",
+      "web_source_manifest_sha256": "7e344f99f5bcce0f0c4bf76a38c9d691588d8709ee6fafd033d2fd8f687cd69b",
+      "code_unchanged_during_rehearsal": true,
+      "harness_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "evidence_dir": "/tmp/pb-synthetic-20261122T183343",
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance"
+    },
+    "paid_ocr": {
+      "passed": true,
+      "service_phase": "paid",
+      "ticket_reading_preview": true,
+      "browser_report_validation": {
+        "valid": true,
+        "tests": 17,
+        "results": 17
+      },
+      "application_fingerprint": "f3a9dcfb4be8e63df101407d2d7e6ac992115a1c5d0e3e85ea23851d718a492d",
+      "browser_check_receipt": "build-kit/evidence/checks/1795402036404990881-synthetic-browser.json",
+      "browser_check_sha256": "ff2b76dcfef67c890730df818399ec925eac00067ffadd531f2056c583d101dc",
+      "web_source_manifest_sha256": "7e344f99f5bcce0f0c4bf76a38c9d691588d8709ee6fafd033d2fd8f687cd69b",
+      "code_unchanged_during_rehearsal": true,
+      "harness_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "evidence_dir": "/tmp/pb-synthetic-paidocr-20261122T184701",
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance"
+    },
+    "beta_ocr": {
+      "passed": true,
+      "service_phase": "controlled_free_beta",
+      "ticket_reading_preview": true,
+      "browser_report_validation": {
+        "valid": true,
+        "tests": 61,
+        "results": 61
+      },
+      "application_fingerprint": "f3a9dcfb4be8e63df101407d2d7e6ac992115a1c5d0e3e85ea23851d718a492d",
+      "browser_check_receipt": "build-kit/evidence/checks/1795401917469778740-synthetic-browser-controlled-free-beta.json",
+      "browser_check_sha256": "b6e0f08fa9f496873a69016cf06fa0419a98535160766748a41d9ebe1a07ce93",
+      "web_source_manifest_sha256": "7e344f99f5bcce0f0c4bf76a38c9d691588d8709ee6fafd033d2fd8f687cd69b",
+      "code_unchanged_during_rehearsal": true,
+      "harness_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "evidence_dir": "/tmp/pb-synthetic-betaocr-20261122T184502",
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance"
+    },
+    "beta_no_ocr": {
+      "passed": false,
+      "service_phase": "controlled_free_beta",
+      "ticket_reading_preview": false,
+      "browser_report_validation": {
+        "valid": false,
+        "reason": "Missing or invalid complete passing Playwright report"
+      },
+      "application_fingerprint": "f3a9dcfb4be8e63df101407d2d7e6ac992115a1c5d0e3e85ea23851d718a492d",
+      "browser_check_receipt": "build-kit/evidence/checks/1795401600022204515-synthetic-browser-controlled-free-beta.json",
+      "browser_check_sha256": "fc261092676d4407ab6c9ad30fc38de74a315e95aa259e399be1db47f58d9865",
+      "web_source_manifest_sha256": "7e344f99f5bcce0f0c4bf76a38c9d691588d8709ee6fafd033d2fd8f687cd69b",
+      "code_unchanged_during_rehearsal": true,
+      "harness_unchanged_during_rehearsal": true,
+      "owned_services_stopped": true,
+      "evidence_dir": "/tmp/pb-synthetic-beta-20261122T183944",
+      "qualification": "Local synthetic rehearsal only; not task or launch acceptance"
+    }
+  },
+  "notes": [
+    "The paid phase run passes 160/160 required browser checks.",
+    "Paid with required OCR passes 17/17.",
+    "Controlled free beta with required OCR passes 61/61.",
+    "Controlled free beta without the OCR preview flag reports 40/42: the two failures are the required ticket-reading journey specs, which cannot render their vision UI when the preview flag is off. That combination is not the supported campaign configuration; all supported combinations pass.",
+    "These are local synthetic rehearsals with fake providers; no provider credentials, charges, mail or external service were used."
+  ]
+}
