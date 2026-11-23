@@ -475,5 +475,14 @@
       "worker_route_without_secret": "POST /internal/cases/{id}/step -> 401",
       "conclusion": "rate limiting, one-time links, session revocation, photo ownership and worker authentication all enforce correctly"
     }
+  },
+  "known_deferred_risks_2026_11_23": {
+    "reauthorization_f4": {
+      "where": "backend/src/parkingbreaker/payment_state.py ReauthorizationNeeded (TODO(F4))",
+      "behaviour": "a lapsed card hold raises IllegalTransition in every state instead of re-authorizing before sending",
+      "why_not_a_first_order_blocker": "the review window is two hours and an authorization is valid for six days (AUTHORIZATION_VALIDITY), so mailing happens days inside the hold; the health monitor also alerts when capture stays pending past sixty minutes (CAPTURE_WINDOW)",
+      "closure": "post-launch F4 build; not required for the first paid orders",
+      "register": "~/Workspace/pb-coordination/RISK-REGISTER.md"
+    }
   }
 }
