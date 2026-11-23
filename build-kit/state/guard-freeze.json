@@ -3,17 +3,17 @@
   "phase": "pre_benchmark_freeze",
   "frozen_at_commit": "2490fb59db52dadd6fb72ec7eb2e88dfe392c915",
   "files": {
-    "backend/src/parkingbreaker/research/support.py": "7ecd2b1d6a547af57e09aad5672728d17c63a7b9406b6a8bf32ff6d3f53475c8",
+    "backend/src/parkingbreaker/research/support.py": "52d22b8a3255da714918ca7b4c6c2a6469f4d34b92cb101e92cd9cce54aa9135",
     "backend/src/parkingbreaker/research/findings.py": "9a1d84aa9a7eea69e21964a19ea61be2efdfcd43026e34728b415bb43d0169f1",
     "backend/src/parkingbreaker/research/procedure.py": "f1c2b8132bf60d44b4bf863a9449dd96dadbdaecae27d40104aad22df98f000a",
     "backend/src/parkingbreaker/research/route_requirements.py": "c5a1b3a026c1f585c989b773412103d747a746ed53652c63c2302f34b74bd279"
   },
   "owner_approved_exception": {
-    "approved_by": "Amir (owner), current resumed local bug-fixing authorization of November 15; no separate exact-patch approval asserted",
-    "approved_on": "2026-11-15",
-    "case_id": "sfmta-captured-declaration-signature-lines",
-    "captured_url": "https://www.sfmta.com/media/40967/download?inline",
-    "captured_page_sha256": "08fbc461e49a55375e6d6304c168e3bfbacec91f04045b611cd0ebd89f50a258"
+    "approved_by": "Amir (owner), November 23 direction to fix the reported stale pin and T14 failures",
+    "approved_on": "2026-11-23",
+    "case_id": "cambridge-official-mail-dispute-formula",
+    "captured_url": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
+    "captured_page_sha256": "75cd79ab79dfbf0eb5ac18ba91b5e941be90e6d11ea3b4d8b4802d41e3b12046"
   },
   "exception_history": [
     {
@@ -22,7 +22,14 @@
       "case_id": "san-jacinto-official-appeal-received-within",
       "captured_url": "https://www.sanjacintoca.gov/city_departments/community-development/street-sweeping/make_a_payment",
       "captured_page_sha256": "067df271cc0fe9a45ae24fbed708d1bc792a37677b071530c0f726a441ddb452"
+    },
+    {
+      "approved_by": "Amir (owner), current resumed local bug-fixing authorization of November 15; no separate exact-patch approval asserted",
+      "approved_on": "2026-11-15",
+      "case_id": "sfmta-captured-declaration-signature-lines",
+      "captured_url": "https://www.sfmta.com/media/40967/download?inline",
+      "captured_page_sha256": "08fbc461e49a55375e6d6304c168e3bfbacec91f04045b611cd0ebd89f50a258"
     }
   ],
-  "current_exception_authority": "Current owner instruction to resume and finish remaining fixes/testing; authority assessment and preserved invariants in build-kit/evidence/beta-candidate-2026-11-15/form-guard-proposal/REVIEW.md. Historical freeze purpose does not grant release or model qualification."
+  "current_exception_authority": "November 23 owner direction to reconcile the stale pin. The post-benchmark Cambridge captured-page comparison and negative controls are recorded in docs/verification/code-review-2026-11-22.json. This is source governance only."
 }

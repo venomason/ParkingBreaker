@@ -9,7 +9,7 @@ A fake-provider preview is deployed at [parkingbreaker.com](https://parkingbreak
 
 ---
 
-The November 22 [repository review](verification/code-review-2026-11-22.json) also found a mismatch between the research guard at `main@e27e151` and its recorded hash. The Cambridge source and signed November 18 change are verified. Reconcile that change with the recorded owner exception before freezing the release. A separate tested change for business-day deadlines awaits evidence from an applicable official filing procedure.
+The November 22 [repository review](verification/code-review-2026-11-22.json) recorded the Cambridge guard mismatch and captured-page comparison. The November 23 owner-directed reconciliation records the Cambridge exception and the hash of the existing signed change in [the guard freeze](../build-kit/state/guard-freeze.json). A separate tested change for business-day deadlines awaits evidence from an applicable official filing procedure.
 
 ## 1. Non-Negotiable Product, Legal & Financial Rules
 
