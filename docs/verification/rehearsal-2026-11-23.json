@@ -96,5 +96,33 @@
     },
     "flake_note": "the firefox desktop project hit intermittent 5s Playwright expectation timeouts on this loaded desktop machine (different tests each time, and the same test passed on retry and on a clean node_modules install). No product regression was demonstrated: the identical build/version passes 61/61 when the machine is quiet and dependencies are clean. Treat a single firefox-desktop timeout as flake and re-run; run the paid campaign on an idle machine in the deployment window.",
     "version_investigation": "an incomplete no-save dependency experiment made next 16.2.12 appear CVE-clean and made next 16.4.x appear to regress firefox; the advisory ranges show only next >= 16.4.6 clears every production advisory, so 16.4.6 stays. The no-save audits were reading stale lockfile ranges, not the installed tree."
+  },
+  "final_candidate_runs_2026_11_23": {
+    "candidate": "main a832df0",
+    "application_fingerprint": "336ab6896a1e2bd38b719720566f78869df425b14a4019508e0f274800e9658f",
+    "paid": {
+      "passed": true,
+      "browser": {
+        "valid": true,
+        "tests": 160,
+        "results": 160
+      },
+      "receipt_sha256": "bbad1aea453039ecb601e3e00fa52b9dc875d1bc35b9c68239f8c278d8abcfee",
+      "web_source_manifest_sha256": "7e344f99f5bcce0f0c4bf76a38c9d691588d8709ee6fafd033d2fd8f687cd69b"
+    },
+    "controlled_free_beta_required_ocr": {
+      "passed": true,
+      "browser": {
+        "valid": true,
+        "tests": 61,
+        "results": 61
+      },
+      "receipt_sha256": "f5a5ee69942e23ec7f811ce522fbebe2e0340f9329fa81e80d6c89257e363255"
+    },
+    "offline_qualification": {
+      "research_routing_self_test": "passed with provider_called false",
+      "vision_self_test": "passed with provider_called false, manifest sha256 e24cb7cf49797bddb66bbb2b3335734d5c920d2a003c87e1e9165662cc0f21c6"
+    },
+    "note": "fresh runs after the whole-tree mypy fix; code and harness hashes unchanged during each run and owned services stopped after"
   }
 }
