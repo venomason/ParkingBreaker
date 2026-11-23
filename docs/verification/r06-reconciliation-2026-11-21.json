@@ -224,7 +224,21 @@
             "event": "letter.delivered without a matching submission token",
             "result": "retained in pb_webhook_backlog for review, never acted on"
           },
-          "capture_semantics": "dispatch starts the mailing and queues the capture effect (AUTHORIZED -> CAPTURE_PENDING -> CAPTURED); delivery tracking is recorded as evidence and never manufactures delivery proof. The observed ordering mail attempt 22:51:33Z then capture operation 22:52:21Z matches that design."
+          "capture_semantics": "dispatch starts the mailing and queues the capture effect (AUTHORIZED -> CAPTURE_PENDING -> CAPTURED); delivery tracking is recorded as evidence and never manufactures delivery proof. The observed ordering mail attempt 22:51:33Z then capture operation 22:52:21Z matches that design.",
+          "stripe_dispute_and_fraud": {
+            "dispute": {
+              "event": "charge.dispute.created status=needs_response reason=fraudulent",
+              "first": "200 {received:true, duplicate:false}",
+              "replay": "200 {received:true, duplicate:true}"
+            },
+            "fraud_warning": {
+              "event": "radar.early_fraud_warning.created fraud_type=made_with_stolen_card",
+              "first": "200 {received:true, duplicate:false}",
+              "replay": "200 {received:true, duplicate:true}"
+            },
+            "stored_fact": "reduced exactly to kind, event, object_ref, payment_intent, status, amount_cents, category, event_created - no card data, customer text or evidence",
+            "conclusion": "chargeback/fraud signals record once on the case for the ledger and review; they never capture, release, refund or change case state"
+          }
         }
       },
       "remaining_blocker": {
