@@ -41,7 +41,18 @@
       "evidence": "docs/verification/r02-target-preflight-2026-11-21.json; backend/tests/test_r04_intake_pause.py; backend/tests/test_paid_cohort_cap.py",
       "detail": "All 3 stop controls tested locally + Caddy 503 pause and SQLite set_intake_pause proven on VM. 33 kill-switch tests pass. External outage probe + responder ack remain (P07).",
       "blocking": "independent external outage probe (<5 min alert on full VM loss) and live alert email delivery + human responder acknowledgment (P07); both need a real RESEND_API_KEY and a named responder with email addresses",
-      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet."
+      "email_credential_prerequisite": "needs a real RESEND_API_KEY: non-fake email access requires it (auth_config.py) and the health monitor sends alerts through Resend (health_cli.py). The qualification target carries a placeholder, so no real access or alert email can leave it yet.",
+      "monitor_detector_verified_2026_11_23": {
+        "command": "python -m parkingbreaker.health_cli check --data /data (inside pb-api on pb-qual-backend-01)",
+        "output": [
+          "scheduler_stale (critical): no sweep started in the last 3 minutes",
+          "sweep_failing (critical): no fully successful sweep in the last 10 minutes",
+          "backup_stale (critical): no completed backup",
+          "webhook_backlog (warning): a provider event waited over 30 minutes to be matched"
+        ],
+        "assessment": "the detector fires correctly on the merged candidate; the first three are expected because the bare qualification VM runs no scheduler loop or backup timer, and the backlog warning is the deliberately parked unmatched Lob delivery",
+        "remaining": "external outage probe and live alert delivery still need the standing target (GATE 0), a real Resend key and a named responder; sequence in ~/Workspace/pb-coordination/P07-ALERT-RUNBOOK.md"
+      }
     },
     "R05": {
       "status": "LOCAL",
