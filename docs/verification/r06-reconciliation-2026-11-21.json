@@ -515,7 +515,14 @@
       "target_blank_without_rel": "none",
       "assessment": "no obvious client-side XSS sink in the application code"
     },
-    "csp_connect_src": "self and api.stripe.com only; frame-src self/blob/js.stripe.com/hooks.stripe.com; frame-ancestors none"
+    "csp_connect_src": "self and api.stripe.com only; frame-src self/blob/js.stripe.com/hooks.stripe.com; frame-ancestors none",
+    "web_dependency_cves": {
+      "finding": "npm audit on the production dependency set for next 16.2.3 reported 1 critical and 2 high advisories: a Next.js Server Components denial-of-service, a postcss CSS-stringify XSS and sharp/libvips CVEs",
+      "change": "next bumped 16.2.3 -> 16.4.6 (the non-major fix); lockfile regenerated with npm ci",
+      "verified": "npm audit --omit=dev reports 0 vulnerabilities; web lint, type-check and production build EXIT 0 on the bumped tree",
+      "residual_risk": "Next moved by a minor version, so the paid browser campaign should be re-run inside the deployment window before launch traffic",
+      "commit": "b174c38"
+    }
   },
   "operational_checks_2026_11_23": {
     "public_preview": {
