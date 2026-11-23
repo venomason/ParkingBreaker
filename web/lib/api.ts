@@ -348,9 +348,9 @@ export const api = {
   noticePageUrl: (c: string, noticeId: string, pageNumber: number) =>
     `${API_BASE}/cases/${encodeURIComponent(c)}/notices/${encodeURIComponent(noticeId)}/pages/${encodeURIComponent(String(pageNumber))}`,
   chooseTier: (c: string, tier: MailTier) => call<Offer>("PUT", `/cases/${c}/tier`, { tier }),
-  authorize: (c: string, paymentMethodId: string) =>
+  authorize: (c: string, paymentMethodId: string, termsAccepted: boolean) =>
     call<Authorization>("POST", `/cases/${c}/authorization`, {
-      terms_accepted: true,
+      terms_accepted: termsAccepted,
       payment_method_id: paymentMethodId,
     }, false, ACCESS_TIMEOUT_MS),
   recoverAuthorization: (c: string) =>

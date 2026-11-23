@@ -73,10 +73,12 @@ test("live ticket runs from intake to mailed and charged", async ({ page }) => {
   await page.locator('input[value="certified"]').check();
   // An unavailable secure card form must never turn into a synthetic card on live providers.
   await page.route("**/api/health", (route) => route.fulfill({ json: { status: "ok", mode: "live" } }));
+  await page.locator("#termsAccepted").check();
   await page.locator("#actAuthBtn").click();
   await expect(page.locator("#toast")).toContainText("The secure card form is unavailable");
   expect(authorizationRequests).toBe(0);
   await page.unroute("**/api/health");
+  await page.locator("#termsAccepted").check();
   await page.locator("#actAuthBtn").click();
   await expect(page.locator("#s5")).toBeVisible({ timeout: 20000 });
   await expect(page.locator("#demoWarn, #demoLapse, #jumperBtn")).toHaveCount(0);

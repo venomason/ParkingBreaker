@@ -48,11 +48,13 @@ for (const width of [320,375,768,1440]) {
     await page.locator('input[value="certified"]').check();
     // ParkingBreaker returns this response only after a verified decline.
     await page.route("**/api/cases/*/authorization",route=>route.fulfill({status:409,json:{detail:"card_not_authorized"}}));
-    await page.locator("#actAuthBtn").click();
+    await page.locator("#termsAccepted").check();
+  await page.locator("#actAuthBtn").click();
     await expect(page.locator("#liveActionError")).toContainText("card wasn");
     await shot(page,`${width}-payment-error`);
     await page.unroute("**/api/cases/*/authorization");
-    await page.locator("#actAuthBtn").click();
+    await page.locator("#termsAccepted").check();
+  await page.locator("#actAuthBtn").click();
     await expect(page.locator("#s5")).toBeVisible({timeout:20000});
     await layout(page); await shot(page,`${width}-review-window`);
     await page.getByRole("button",{name:/letter studio/}).click();

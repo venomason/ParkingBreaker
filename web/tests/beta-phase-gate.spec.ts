@@ -259,6 +259,9 @@ test("stale paid UI 409 refreshes actual phase, removes every paid affordance, a
   // shell (and its in-memory state) must survive the in-place phase refresh.
   const shell = await page.$("#main");
   expect(shell).not.toBeNull();
+  await expect(page.locator("#actAuthBtn")).toBeDisabled();
+  await page.locator("#termsAccepted").check();
+  await expect(page.locator("#actAuthBtn")).toBeEnabled();
   await page.locator("#actAuthBtn").click();
 
   await expect(page.locator("#h-s4")).toHaveText("Paid ordering is paused for this appeal.");
@@ -300,6 +303,7 @@ test("last paid place taken during checkout shows saved work and the issuer link
   });
   await page.goto("/");
   await page.locator('input[name="tier"][value="certified"]').check();
+  await page.locator("#termsAccepted").check();
   await page.locator("#actAuthBtn").click();
   await expect(page.locator("#liveStopMessage")).toHaveText(stop.message);
   await expect(page.getByRole("link", { name: "Open the issuer's official site" })).toHaveAttribute("href", stop.official_url);
@@ -345,6 +349,7 @@ test("an uncertain checkout uses the saved hold across reload without creating a
 
   await page.goto("/");
   await page.locator('input[name="tier"][value="certified"]').check();
+  await page.locator("#termsAccepted").check();
   await page.locator("#actAuthBtn").click();
   await expect(page.locator("#h-s4")).toHaveText("Check your original card hold.");
   await expect(page.locator("#cardField")).toHaveCount(0);
@@ -391,7 +396,8 @@ for (const reload of [false, true]) {
 
     await page.goto("/");
     await page.locator('input[name="tier"][value="certified"]').check();
-    await page.locator("#actAuthBtn").click();
+    await page.locator("#termsAccepted").check();
+  await page.locator("#actAuthBtn").click();
     await expect(page.locator("#h-s4")).toHaveText("Check your original card hold.");
     if (reload) await page.reload();
     await page.getByRole("button", { name: "Check card hold" }).click();

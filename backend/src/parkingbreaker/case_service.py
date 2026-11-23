@@ -309,6 +309,10 @@ _PREHOLD = TypeAdapter[s.PreHoldResult](s.PreHoldResult)
 _COPY_SELECTIONS = TypeAdapter(list[s.RequiredCopySelection])
 _FAILURE_FACTS = TypeAdapter(FailureFacts)
 ADDRESS_REFUND_POLICY_VERSION = "address-responsibility-v1"
+# Version of the published Terms/Refund/Privacy pages the customer accepts at the
+# paid authorization step. Bump when that copy changes so the accepted version is
+# recorded on the payment hold for dispute evidence.
+TERMS_VERSION = "terms-2026-11-23"
 # The recorded Stopped detail for a customer's decline of the customer-directed destination.
 DESTINATION_DECLINED = "DESTINATION_DECLINED"
 # States where a pending destination choice can be made: before any draft exists.
@@ -1381,6 +1385,8 @@ class CaseService:
                 and assignment.experiment_id == prices.PRICE_EXPERIMENT_ID
                 and assignment.amount_cents == tier.amount_cents
             ),
+            terms_version=TERMS_VERSION,
+            terms_accepted_at=started_at,
         )
         key = mutation_key(
             "authorization",
@@ -1458,6 +1464,10 @@ class CaseService:
             if intent.authorization_ref is not None:
                 held = self._deps.payments.retrieve(intent.authorization_ref)
             else:
+                # Dispatch the exact persisted metadata (including the accepted
+                # terms_version and terms_accepted_at frozen when the attempt was
+                # reserved) so retries across a clock tick or TERMS_VERSION bump
+                # send byte-identical parameters for the same idempotency key.
                 held = self._deps.payments.authorize(
                     intent.amount_cents,
                     intent.payment_method_id,

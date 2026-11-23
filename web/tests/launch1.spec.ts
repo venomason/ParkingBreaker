@@ -65,3 +65,13 @@ test("generated prototype and live price is $29", () => {
   expect(render("Step4Offer", {...offer, liveOffer: current})).toContain("$29");
   expect(render("Step5Window", {live: true, tier: "certified", amountCents: 2999, now: 0, timerEnd: 100000})).toContain("$29");
 });
+
+test("legal effective date matches backend TERMS_VERSION", () => {
+  const backend = readFileSync("../backend/src/parkingbreaker/case_service.py", "utf8");
+  const web = readFileSync("lib/legal.ts", "utf8");
+  const backendMatch = backend.match(/^TERMS_VERSION = "terms-([^"]+)"$/m);
+  const webMatch = web.match(/^export const LEGAL_EFFECTIVE_DATE = "([^"]+)";$/m);
+  expect(backendMatch).not.toBeNull();
+  expect(webMatch).not.toBeNull();
+  expect(webMatch![1]).toBe(backendMatch![1]);
+});

@@ -11,7 +11,7 @@ import { SAMPLE_FACTS } from "../lib/api";
 interface Step4OfferProps {
   selectedTier: "certified" | "standard" | null;
   setSelectedTier: (tier: "certified" | "standard") => void;
-  onComplete: (tier: "certified" | "standard") => void | Promise<void>;
+  onComplete: (tier: "certified" | "standard", termsAccepted: boolean) => void | Promise<void>;
   setActionBar: (sub: React.ReactNode, buttons: React.ReactNode) => void;
   onOpenTerms: () => void;
   onOpenSample: () => void;
@@ -34,11 +34,16 @@ export function Step4Offer({
   const live = liveOffer !== undefined;
   // Guardrail: nothing pre-selected (selectedTier initially null)
   const [isAuthorizing, setIsAuthorizing] = useState<boolean>(false);
+  // Explicit consent: stored against the tier it was given for, so changing the
+  // chosen mailing naturally invalidates it without an effect (and starts unchecked).
+  const [consentFor, setConsentFor] = useState<string | null>(null);
 
   const certifiedPrice = live ? (liveOffer?.certifiedCents == null ? null : liveOffer.certifiedCents / 100) : CERTIFIED_CENTS / 100;
   // One flat certified price; the standard tier is never offered.
   const price = certifiedPrice;
   const tierName = "Certified Mail";
+
+  const termsAccepted = selectedTier !== null && consentFor === selectedTier;
 
   useEffect(() => {
     if (!selectedTier) {
@@ -67,25 +72,26 @@ export function Step4Offer({
         className="btn btn-primary"
         type="button"
         id="actAuthBtn"
-        disabled={price == null}
+        disabled={price == null || !termsAccepted}
+        aria-disabled={price == null || !termsAccepted}
         onClick={() => {
-          if (isAuthorizing) return;
+          if (isAuthorizing || !termsAccepted) return;
           setIsAuthorizing(true);
-          if (live) void Promise.resolve(onComplete(selectedTier)).finally(() => setIsAuthorizing(false));
+          if (live) void Promise.resolve(onComplete(selectedTier, termsAccepted)).finally(() => setIsAuthorizing(false));
         }}
       >
         {live ? `Authorize $${price}${liveOffer?.testMode ? " (test card)" : ""} →` : `Authorize $${price} (simulated) →`}
       </button>
     );
-  }, [selectedTier, isAuthorizing, price, onComplete, setActionBar, live, liveOffer?.testMode, certifiedPrice, setSelectedTier]);
+  }, [selectedTier, isAuthorizing, price, onComplete, setActionBar, live, liveOffer?.testMode, certifiedPrice, setSelectedTier, termsAccepted]);
 
   useEffect(() => {
-    if (live || !isAuthorizing || !selectedTier) return;
+    if (live || !isAuthorizing || !selectedTier || !termsAccepted) return;
     const timer = setTimeout(() => {
-      void Promise.resolve(onComplete(selectedTier)).finally(() => setIsAuthorizing(false));
+      void Promise.resolve(onComplete(selectedTier, termsAccepted)).finally(() => setIsAuthorizing(false));
     }, 900);
     return () => clearTimeout(timer);
-  }, [live, isAuthorizing, selectedTier, onComplete]);
+  }, [live, isAuthorizing, selectedTier, onComplete, termsAccepted]);
 
   return (
     <section className="screen on" id="s4" aria-labelledby="h-s4">
@@ -191,6 +197,23 @@ export function Step4Offer({
       </p>
 
       <LegalDisclosure id="offerAttorneyDisclosure" />
+
+      <label className="small" htmlFor="termsAccepted" style={{ display: "flex", gap: "8px", alignItems: "flex-start", marginTop: "12px" }}>
+        <input
+          id="termsAccepted"
+          type="checkbox"
+          checked={termsAccepted}
+          onChange={(event) => setConsentFor(event.target.checked ? selectedTier : null)}
+          style={{ marginTop: "3px" }}
+        />
+        <span>
+          I agree to the{" "}
+          <a href="/terms" target="_blank" rel="noreferrer">Terms of Service</a>,{" "}
+          <a href="/refund-policy" target="_blank" rel="noreferrer">Refund Policy</a> and{" "}
+          <a href="/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>, and to the hold
+          and refund terms for this mailing.
+        </span>
+      </label>
 
       <div className="sheet-links">
         <button className="chip" type="button" onClick={onOpenTerms}>

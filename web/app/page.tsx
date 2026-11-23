@@ -1125,7 +1125,8 @@ function Journey() {
     }
   }, [liveCase, applySavedStatus, refreshCurrentCase, goTo]);
 
-  const handleStep4Complete = useCallback(async (selectedTier: "certified" | "standard") => {
+  const handleStep4Complete = useCallback(async (selectedTier: "certified" | "standard", termsAccepted: boolean) => {
+    if (!termsAccepted) return;
     if (LIVE) {
       if (!liveCase || newPaidBlocked || phase !== "paid" || needsAuthorizationRecovery ||
           authorizationInFlight.current) return;
@@ -1161,7 +1162,7 @@ function Journey() {
         }
         if (liveCaseIdRef.current !== caseId) return;
         requested = true;
-        const auth = await api.authorize(caseId, paymentMethod);
+        const auth = await api.authorize(caseId, paymentMethod, termsAccepted);
         const saved = await api.status(caseId);
         if (liveCaseIdRef.current !== caseId) return;
         setTier(selectedTier);
