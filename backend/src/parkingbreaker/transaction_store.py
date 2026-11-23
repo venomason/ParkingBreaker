@@ -681,6 +681,7 @@ def _initialize_transactions(database: sqlite3.Connection) -> None:
         if version < 5:
             _migrate_no_charge_cases(database)
         _check_case_table(database, beta_enabled=True)
+        _initialize_monitor_indexes(database)
         _initialize_submission(database)
         if database.execute("PRAGMA foreign_key_check").fetchall():
             raise StorageCorruption("transaction migration left invalid foreign keys")
@@ -692,6 +693,26 @@ def _initialize_transactions(database: sqlite3.Connection) -> None:
     finally:
         database.execute("PRAGMA legacy_alter_table=OFF")
         database.execute("PRAGMA foreign_keys=ON")
+
+
+def _initialize_monitor_indexes(database: sqlite3.Connection) -> None:
+    # Derived indexes for the read-only operational monitor. Install inside the existing
+    # schema transaction on both fresh and restored databases.
+    for sql in (
+        "CREATE INDEX IF NOT EXISTS pb_cases_monitor_state ON pb_cases(letter_state, case_token)",
+        "CREATE INDEX IF NOT EXISTS pb_cases_monitor_paid_workspace "
+        "ON pb_cases(workspace_token, julianday(authorized_at)) WHERE amount_cents > 0",
+        "CREATE INDEX IF NOT EXISTS pb_history_monitor_letter_entry "
+        "ON pb_case_history(case_token, revision DESC) WHERE machine='letter' AND source<>target",
+        "CREATE INDEX IF NOT EXISTS pb_history_monitor_exhaustion "
+        "ON pb_case_history(event_name) WHERE machine='payment'",
+        "CREATE INDEX IF NOT EXISTS pb_effects_monitor_writeoff "
+        "ON pb_pending_effects(effect) WHERE machine='payment' AND completed_at IS NOT NULL",
+        "CREATE INDEX IF NOT EXISTS pb_effects_monitor_counter_time "
+        "ON pb_pending_effects(effect, julianday(created_at)) "
+        "WHERE machine='counter' AND completed_at IS NOT NULL",
+    ):
+        database.execute(sql)
 
 
 def _initialize_lifecycle(database: sqlite3.Connection, version: int) -> None:

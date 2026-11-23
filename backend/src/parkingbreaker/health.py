@@ -42,6 +42,11 @@ class AlertKind(StrEnum):
     OFF_HOST_REPLICA_STALE = "off_host_replica_stale"
     WEBHOOK_BACKLOG = "webhook_backlog"
     HOLD_REVIEW_DUE = "hold_review_due"
+    WEBHOOK_DESYNC = "webhook_desync"
+    CAPTURE_WRITTEN_OFF = "capture_written_off"
+    RESEARCH_STALLED = "research_stalled"
+    SUBMISSION_UNANCHORED = "submission_unanchored"
+    ISSUER_STOP_STREAK = "issuer_stop_streak"
 
 
 class Severity(StrEnum):
@@ -56,6 +61,7 @@ class Alert:
     # A fixed observation name or an opaque case token; never customer data.
     subject: str
     detail: str
+    count: int = 1
 
 
 @dataclass(frozen=True)
@@ -98,6 +104,15 @@ class HoldObservation:
 
 
 @dataclass(frozen=True)
+class OperationalObservation:
+    webhook_desync: int | None = 0
+    capture_written_off: int | None = 0
+    research_stalled: int | None = 0
+    submission_unanchored: int | None = 0
+    issuer_stop_streak: int | None = 0
+
+
+@dataclass(frozen=True)
 class HealthSnapshot:
     sweep: SweepObservation | None
     stuck: tuple[StuckCase, ...] | None
@@ -113,6 +128,7 @@ class HealthSnapshot:
     holds: tuple[HoldObservation, ...] | None = ()
     require_off_host_replica: bool = False
     last_off_host_replica_at: datetime | None = None
+    operations: OperationalObservation = OperationalObservation()
 
 
 def _unknown(name: str) -> Alert:
@@ -249,4 +265,49 @@ def evaluate(snapshot: HealthSnapshot, now: datetime) -> tuple[Alert, ...]:
                         f"a held case is due for review (due {hold.review_due_at.isoformat()})",
                     )
                 )
+    operations = snapshot.operations
+    for count, kind, severity, domain, detail in (
+        (
+            operations.webhook_desync,
+            AlertKind.WEBHOOK_DESYNC,
+            Severity.CRITICAL,
+            "webhooks",
+            "review contradictory Lob webhook evidence against the case and provider record",
+        ),
+        (
+            operations.capture_written_off,
+            AlertKind.CAPTURE_WRITTEN_OFF,
+            Severity.CRITICAL,
+            "captures",
+            "review exhausted payment reconciliation and its ledger entry",
+        ),
+        (
+            operations.research_stalled,
+            AlertKind.RESEARCH_STALLED,
+            Severity.WARNING,
+            "cases",
+            "review active research cases in the same state for over 1 hour",
+        ),
+        (
+            operations.submission_unanchored,
+            AlertKind.SUBMISSION_UNANCHORED,
+            Severity.WARNING,
+            "cases",
+            "reconcile submissions over 24 hours old with no letter identity",
+        ),
+        (
+            operations.issuer_stop_streak,
+            AlertKind.ISSUER_STOP_STREAK,
+            Severity.WARNING,
+            "coverage",
+            "review issuers with at least 3 paid verification stops and no serviceable outcome",
+        ),
+    ):
+        if count is None:
+            if not any(
+                a.kind is AlertKind.OBSERVATION_UNKNOWN and a.subject == domain for a in alerts
+            ):
+                alerts.append(_unknown(domain))
+        elif count:
+            alerts.append(Alert(kind, severity, kind.value, detail, count))
     return tuple(alerts)

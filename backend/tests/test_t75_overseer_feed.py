@@ -546,3 +546,37 @@ async def test_case_error_class_reports_only_observed_closed_state_categories(
     response = await client.get("/internal/overseer/feed", headers=FEED)
     assert response.status_code == 200
     assert response.json()["cases"][0]["error_class"] == expected
+
+
+@pytest.mark.anyio
+async def test_feed_reports_unanchored_and_desynced_cases_as_aggregates(
+    runtime: tuple[CaseService, AsyncClient],
+) -> None:
+    service, client = runtime
+    old = datetime.now(UTC) - timedelta(hours=25)
+    db = service._store._require_open()
+    waiting = bare_case(service._store, 71, old)
+    anchored = bare_case(service._store, 72, old)
+    for token in (waiting, anchored):
+        db.execute("UPDATE pb_cases SET letter_state='SUBMITTING' WHERE case_token=?", (token,))
+    seed_submission_cursor(service._store, anchored, 1, Accepted(PRIVATE), datetime.now(UTC))
+    db.execute(
+        "INSERT INTO pb_webhook_unmatched VALUES ('lob', ?, ?, 'CONFLICTING_LETTER', ?, ?)",
+        (PRIVATE, json.dumps({"private": PRIVATE}), NOW.isoformat(), NOW.isoformat()),
+    )
+    response = await client.get("/internal/overseer/feed", headers=FEED)
+    assert response.status_code == 200
+    assert PRIVATE not in response.text
+    alerts = {row["kind"]: row for row in response.json()["alerts"]}
+    assert alerts["webhook_desync"] == {
+        "kind": "webhook_desync",
+        "severity": "critical",
+        "domain": "webhooks",
+        "count": 1,
+    }
+    assert alerts["submission_unanchored"] == {
+        "kind": "submission_unanchored",
+        "severity": "warning",
+        "domain": "cases",
+        "count": 1,
+    }

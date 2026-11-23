@@ -300,6 +300,9 @@ def initialize_webhook_backlog(database: sqlite3.Connection) -> None:
             # table (and so lose the letter index); rebuilding an index never loses data.
             _create_missing(database, tables=False)
         _check_schema(database)
+        database.execute(
+            "CREATE INDEX IF NOT EXISTS pb_webhook_unmatched_reason ON pb_webhook_unmatched(reason)"
+        )
         database.execute("COMMIT")
     except BaseException:
         rollback_preserving_error(database)

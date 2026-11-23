@@ -17,12 +17,13 @@ import json
 import re
 import shutil
 import sqlite3
+from collections import Counter
 from collections.abc import Callable, Iterator
 from contextlib import closing, contextmanager, suppress
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from parkingbreaker.case_state import TERMINAL_STATES
+from parkingbreaker.case_state import TERMINAL_STATES, CaseState, StopFamily
 from parkingbreaker.draft_ownership_store import drafting_owners
 from parkingbreaker.email_client import EmailMessage, EmailOutcome
 from parkingbreaker.health import (
@@ -33,13 +34,17 @@ from parkingbreaker.health import (
     DiskObservation,
     HealthSnapshot,
     HoldObservation,
+    OperationalObservation,
     StuckCase,
     StuckWhy,
     SweepObservation,
 )
 from parkingbreaker.lob_submission import pending_evidence
+from parkingbreaker.oplog.counters import decode_counter_key
+from parkingbreaker.oplog.digest import CounterMilestone
 from parkingbreaker.payment_records import decode_cursor
 from parkingbreaker.submission_records import decode_outcome
+from parkingbreaker.webhook_backlog_store import CONFLICTING_LETTER, CONTRADICTS_CASE_STATE
 
 DATABASE = "parkingbreaker.sqlite"
 # Outbox effects and submission follow-ups this far past due are stuck.
@@ -238,6 +243,132 @@ def _last_off_host_replica(backups: Path, now: datetime) -> datetime | None:
     return newest
 
 
+# The bounds apply before joins or per-row investigation. Saturation reports an
+# unknown observation, never zero, which also avoids false no-success streaks.
+_MONITOR_LIMIT = 1000
+_COVERAGE_WINDOW = timedelta(days=7)
+_WEBHOOK_DESYNC_SQL = (
+    "SELECT 1 FROM pb_webhook_unmatched INDEXED BY pb_webhook_unmatched_reason "
+    "WHERE reason IN (?, ?) LIMIT 1"
+)
+_WRITE_OFF_HISTORY_SQL = (
+    "SELECT 1 FROM pb_case_history INDEXED BY pb_history_monitor_exhaustion "
+    "WHERE machine='payment' AND event_name='ReconciliationExhausted' LIMIT 1"
+)
+_WRITE_OFF_EFFECT_SQL = (
+    "SELECT 1 FROM pb_pending_effects INDEXED BY pb_effects_monitor_writeoff "
+    "WHERE machine='payment' AND effect='LOG_WRITE_OFF' "
+    "AND completed_at IS NOT NULL LIMIT 1"
+)
+_TRANSIENT_SQL = """
+    SELECT coalesce((
+        SELECT h.occurred_at FROM pb_case_history h INDEXED BY pb_history_monitor_letter_entry
+        WHERE h.case_token=c.case_token AND h.machine='letter' AND h.source<>h.target
+        ORDER BY h.revision DESC LIMIT 1
+    ), c.authorized_at),
+    CASE WHEN c.letter_state='SUBMITTING' THEN (
+        SELECT json_extract(s.outcome_json, '$.letter_id')
+        FROM pb_submission_cursors s WHERE s.case_token=c.case_token AND s.attempt=c.attempt
+    ) END
+    FROM pb_cases c INDEXED BY pb_cases_monitor_state
+    WHERE c.letter_state=? LIMIT ?
+"""
+_COVERAGE_SQL = """
+    WITH recent AS MATERIALIZED (
+        SELECT effect_id, request_token, created_at, effect
+        FROM pb_pending_effects INDEXED BY pb_effects_monitor_counter_time
+        WHERE machine='counter' AND completed_at IS NOT NULL AND effect=?
+        AND julianday(created_at) BETWEEN julianday(?) AND julianday(?) LIMIT ?
+    )
+    SELECT coverage.payload_json, EXISTS (
+        SELECT 1 FROM pb_cases c INDEXED BY pb_cases_monitor_paid_workspace
+        WHERE c.workspace_token=recent.request_token AND c.amount_cents>0
+        AND julianday(c.authorized_at)<=julianday(recent.created_at) LIMIT 1
+    ),
+    recent.effect='OTHER_EXIT' AND EXISTS (
+        SELECT 1 FROM pb_pending_effects e
+        JOIN pb_coverage_counters earlier ON earlier.event_token=e.effect_id
+        WHERE e.request_token=recent.request_token AND e.effect='REQUIRED_FACTS_UNVERIFIED'
+        AND e.completed_at IS NOT NULL
+        AND julianday(e.created_at) BETWEEN julianday(?) AND julianday(?)
+        AND json_extract(earlier.payload_json, '$.issuer_token')
+            =json_extract(coverage.payload_json, '$.issuer_token')
+    )
+    FROM recent LEFT JOIN pb_coverage_counters coverage ON coverage.event_token=recent.effect_id
+"""
+
+
+def _transient_count(
+    db: sqlite3.Connection, now: datetime, state: CaseState, ttl: timedelta
+) -> int | None:
+    rows = db.execute(_TRANSIENT_SQL, (state.value, _MONITOR_LIMIT + 1)).fetchall()
+    if len(rows) > _MONITOR_LIMIT:
+        return None
+    return sum(anchor is None and now - _time(since) > ttl for since, anchor in rows)
+
+
+def _issuer_stop_count(db: sqlite3.Connection, now: datetime) -> int | None:
+    stops: Counter[str] = Counter()
+    serviceable: set[str] = set()
+    start, end = (now - _COVERAGE_WINDOW).isoformat(), now.isoformat()
+    for milestone in (
+        CounterMilestone.REQUIRED_FACTS_UNVERIFIED,
+        CounterMilestone.OTHER_EXIT,
+        CounterMilestone.TIER1_PASSED,
+        CounterMilestone.APPEAL_COMPLETED,
+    ):
+        rows = db.execute(
+            _COVERAGE_SQL,
+            (milestone.value, start, end, _MONITOR_LIMIT + 1, start, end),
+        ).fetchall()
+        if len(rows) > _MONITOR_LIMIT:
+            return None
+        for payload, paid, duplicate_stop in rows:
+            if payload is None:
+                return None
+            key = decode_counter_key(payload)
+            if key.milestone is not milestone:
+                return None
+            if key.issuer_token == "unknown":
+                continue
+            if key.outcome == "SERVICEABLE":
+                serviceable.add(key.issuer_token)
+            elif paid and not duplicate_stop and key.outcome is StopFamily.NOT_YET_VERIFIED:
+                stops[key.issuer_token] += 1
+    return sum(count >= 3 and issuer not in serviceable for issuer, count in stops.items())
+
+
+def _operations(db: sqlite3.Connection, now: datetime) -> OperationalObservation:
+    def observe_count(read: Callable[[], int | None]) -> int | None:
+        with suppress(sqlite3.Error, ValueError, TypeError):
+            return read()
+        return None
+
+    return OperationalObservation(
+        webhook_desync=observe_count(
+            lambda: int(
+                db.execute(
+                    _WEBHOOK_DESYNC_SQL, (CONTRADICTS_CASE_STATE, CONFLICTING_LETTER)
+                ).fetchone()
+                is not None
+            )
+        ),
+        capture_written_off=observe_count(
+            lambda: int(
+                db.execute(_WRITE_OFF_HISTORY_SQL).fetchone() is not None
+                or db.execute(_WRITE_OFF_EFFECT_SQL).fetchone() is not None
+            )
+        ),
+        research_stalled=observe_count(
+            lambda: _transient_count(db, now, CaseState.RESEARCHING, timedelta(hours=1))
+        ),
+        submission_unanchored=observe_count(
+            lambda: _transient_count(db, now, CaseState.SUBMITTING, timedelta(hours=24))
+        ),
+        issuer_stop_streak=observe_count(lambda: _issuer_stop_count(db, now)),
+    )
+
+
 def observe(
     data: Path, backups: Path, now: datetime, *, require_off_host: bool = False
 ) -> HealthSnapshot:
@@ -247,6 +378,7 @@ def observe(
     holds: tuple[HoldObservation, ...] | None = None
     backlog: datetime | None = None
     backlog_known = False
+    operations = OperationalObservation(None, None, None, None, None)
     try:
         with _read_only(database) as db:
             with suppress(sqlite3.Error, ValueError, TypeError):
@@ -259,6 +391,7 @@ def observe(
                 holds = _holds(db)
             with suppress(sqlite3.Error, ValueError, TypeError):
                 backlog, backlog_known = _webhook_backlog(db), True
+            operations = _operations(db, now)
     except (OSError, sqlite3.Error):
         pass
     disk = None
@@ -287,6 +420,7 @@ def observe(
         holds,
         require_off_host_replica=require_off_host,
         last_off_host_replica_at=last_replica,
+        operations=operations,
     )
 
 
@@ -331,6 +465,11 @@ _DOMAIN = {
     AlertKind.OFF_HOST_REPLICA_STALE: "off_host_replica",
     AlertKind.WEBHOOK_BACKLOG: "webhooks",
     AlertKind.HOLD_REVIEW_DUE: "holds",
+    AlertKind.WEBHOOK_DESYNC: "webhooks",
+    AlertKind.CAPTURE_WRITTEN_OFF: "captures",
+    AlertKind.RESEARCH_STALLED: "cases",
+    AlertKind.SUBMISSION_UNANCHORED: "cases",
+    AlertKind.ISSUER_STOP_STREAK: "coverage",
 }
 
 

@@ -467,3 +467,110 @@ def test_private_monitor_ages_verified_replica_by_source_snapshot(tmp_path: Path
     }
     (old / "manifest.json").write_text("changed after acknowledgement")
     assert observe(tmp_path, backups, NOW, require_off_host=True).last_off_host_replica_at is None
+
+
+def test_monitor_reads_indexed_desyncs_and_only_recent_paid_issuer_stops(tmp_path: Path) -> None:
+    from parkingbreaker.case_state import StopFamily
+    from parkingbreaker.health_service import (
+        _COVERAGE_SQL,
+        _TRANSIENT_SQL,
+        _WEBHOOK_DESYNC_SQL,
+        _WRITE_OFF_EFFECT_SQL,
+        _WRITE_OFF_HISTORY_SQL,
+    )
+    from parkingbreaker.oplog.counters import CounterKey
+    from parkingbreaker.oplog.digest import CounterMilestone
+    from parkingbreaker.transaction_store import SqliteTransactionStore
+    from parkingbreaker.workspace import Workspace
+
+    private = "customer-person@example.invalid"
+    at = NOW - timedelta(days=2)
+    with SqliteTransactionStore(tmp_path / "parkingbreaker.sqlite") as store:
+        db = store._require_open()
+        stamp = NOW.isoformat()
+        for sql, params in (
+            (_TRANSIENT_SQL, ("RESEARCHING", 1001)),
+            (_COVERAGE_SQL, ("OTHER_EXIT", at.isoformat(), stamp, 1001, at.isoformat(), stamp)),
+            (_WEBHOOK_DESYNC_SQL, ("CONTRADICTS_CASE_STATE", "CONFLICTING_LETTER")),
+            (_WRITE_OFF_EFFECT_SQL, ()),
+            (_WRITE_OFF_HISTORY_SQL, ()),
+        ):
+            plan = "\n".join(r[3] for r in db.execute("EXPLAIN QUERY PLAN " + sql, params))
+            assert "SEARCH" in plan
+            assert all(
+                "SCAN" not in line or line.endswith("SCAN recent") for line in plan.splitlines()
+            )
+        db.execute(
+            "INSERT INTO pb_webhook_unmatched VALUES ('lob', ?, ?, 'CONTRADICTS_CASE_STATE', ?, ?)",
+            (private, json.dumps({"customer": private}), stamp, stamp),
+        )
+
+        for n, issuer in enumerate(["CA_test_gov"] * 3 + ["NV_test_gov"] * 3 + ["AZ_test_gov"] * 3):
+            workspace = f"sample-workspace-{n}"
+            store.save_workspace(workspace, Workspace(notes=private), at)
+            if n < 6:
+                store.start_case(workspace, f"auth-{n}", at, NOW + timedelta(days=2))
+            stop = CounterKey(
+                issuer_token=issuer,
+                milestone=CounterMilestone.REQUIRED_FACTS_UNVERIFIED,
+                outcome=StopFamily.NOT_YET_VERIFIED,
+            )
+            store.record_counter(workspace, stop, occurred_at=NOW - timedelta(minutes=12))
+            store.record_counter(
+                workspace,
+                replace(stop, milestone=CounterMilestone.OTHER_EXIT),
+                occurred_at=NOW - timedelta(minutes=11),
+            )
+            if n == 5:
+                store.record_counter(
+                    workspace,
+                    replace(stop, milestone=CounterMilestone.TIER1_PASSED, outcome="SERVICEABLE"),
+                    occurred_at=NOW - timedelta(minutes=10),
+                )
+        assert store.flush_counters(occurred_at=NOW)
+        case = store.start_case("sample-workspace-8", "auth-last", NOW, NOW + timedelta(days=2))
+        db.execute(
+            "INSERT INTO pb_case_history VALUES (?, 2, 'payment', 'CAPTURE_RETRYING', "
+            "'WRITTEN_OFF', 'ReconciliationExhausted', ?, ?)",
+            (case.case_token, json.dumps({"private": private}), stamp),
+        )
+    before = (tmp_path / "parkingbreaker.sqlite").read_bytes()
+    snapshot = observe(tmp_path, tmp_path / "recovery", NOW)
+    assert snapshot.operations.webhook_desync == 1
+    assert snapshot.operations.capture_written_off == 1
+    assert snapshot.operations.research_stalled == 6
+    assert snapshot.operations.submission_unanchored == 0
+    assert snapshot.operations.issuer_stop_streak == 1
+    signals = {
+        a.kind: a
+        for a in evaluate(snapshot, NOW)
+        if a.kind
+        in {
+            AlertKind.WEBHOOK_DESYNC,
+            AlertKind.CAPTURE_WRITTEN_OFF,
+            AlertKind.RESEARCH_STALLED,
+            AlertKind.ISSUER_STOP_STREAK,
+        }
+    }
+    assert signals[AlertKind.WEBHOOK_DESYNC].severity is Severity.CRITICAL
+    assert signals[AlertKind.CAPTURE_WRITTEN_OFF].severity is Severity.CRITICAL
+    assert signals[AlertKind.RESEARCH_STALLED].count == 6
+    assert signals[AlertKind.ISSUER_STOP_STREAK].severity is Severity.WARNING
+    assert private not in repr(signals)
+    assert "CA_test_gov" not in repr(signals)
+    assert "sample-workspace-" not in repr(signals)
+    assert before == (tmp_path / "parkingbreaker.sqlite").read_bytes()
+
+    notices: list[EmailMessage] = []
+
+    def notify(message: EmailMessage, _key: str) -> EmailOutcome:
+        notices.append(message)
+        return EmailOutcome("accepted", ACCEPTED)
+
+    incident_log = IncidentLog(tmp_path / "monitor.sqlite")
+    try:
+        incident_log.deliver(tuple(signals.values()), NOW, notify, "ops@example.invalid")
+    finally:
+        incident_log.close()
+    assert len(notices) == 4
+    assert all(private not in message.text for message in notices)

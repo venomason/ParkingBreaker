@@ -40,6 +40,7 @@ from parkingbreaker.health_service import (
     _captures,
     _holds,
     _last_backup,
+    _operations,
     _stuck,
     _sweep,
     _webhook_backlog,
@@ -100,6 +101,7 @@ class HealthDomain(StrEnum):
     BACKUP = "backup"
     WEBHOOKS = "webhooks"
     HOLDS = "holds"
+    COVERAGE = "coverage"
 
 
 @dataclass(frozen=True)
@@ -260,6 +262,7 @@ def _health(database: sqlite3.Connection, path: Path, now: datetime) -> HealthSn
         _webhook_backlog(database),
         True,
         _holds(database),
+        operations=_operations(database, now),
     )
 
 
@@ -274,6 +277,11 @@ _ALERT_DOMAIN = {
     AlertKind.OFF_HOST_REPLICA_STALE: HealthDomain.BACKUP,
     AlertKind.WEBHOOK_BACKLOG: HealthDomain.WEBHOOKS,
     AlertKind.HOLD_REVIEW_DUE: HealthDomain.HOLDS,
+    AlertKind.WEBHOOK_DESYNC: HealthDomain.WEBHOOKS,
+    AlertKind.CAPTURE_WRITTEN_OFF: HealthDomain.CAPTURES,
+    AlertKind.RESEARCH_STALLED: HealthDomain.CASES,
+    AlertKind.SUBMISSION_UNANCHORED: HealthDomain.CASES,
+    AlertKind.ISSUER_STOP_STREAK: HealthDomain.COVERAGE,
 }
 
 
@@ -285,7 +293,7 @@ def _alerts(snapshot: HealthSnapshot, now: datetime) -> tuple[FeedAlert, ...]:
             if alert.kind is AlertKind.OBSERVATION_UNKNOWN
             else _ALERT_DOMAIN[alert.kind]
         )
-        counts[alert.kind, alert.severity, domain] += 1
+        counts[alert.kind, alert.severity, domain] += alert.count
     return tuple(FeedAlert(*key, count) for key, count in sorted(counts.items()))
 
 
