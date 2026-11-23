@@ -22,7 +22,7 @@ from parkingbreaker.access_link_material import (
 )
 from parkingbreaker.customer_access import token_digest
 from parkingbreaker.email_client import EmailClient, EmailMessage, EmailOutcome, EmailReason
-from parkingbreaker.identity_store import _canonical_email, _utc
+from parkingbreaker.identity_store import _canonical_email, _utc, unlineaged_workspace_roots
 from parkingbreaker.mail_attempt_store import StorageCorruption
 from parkingbreaker.notification_store import NotificationConflict
 from parkingbreaker.transaction_store import RevisionConflict, SqliteTransactionStore
@@ -78,14 +78,9 @@ class AccessEmailService:
             )
             # Knowing a case/workspace ID never authenticates. Recovery sends only
             # to the previously bound contact, with the same generic response.
-            if row is None:
+            if row is None or owner is None:
                 return
-            if (
-                self._store._require_open()
-                .execute("SELECT count(*) FROM pb_intake_owners WHERE owner=?", (owner,))
-                .fetchone()[0]
-                != 1
-            ):
+            if unlineaged_workspace_roots(self._store._require_open(), owner) != 1:
                 return
             contact = row[0]
             if contact == "":
