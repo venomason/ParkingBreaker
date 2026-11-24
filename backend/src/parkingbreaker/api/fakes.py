@@ -473,6 +473,14 @@ class FakeServices:
     def beta_feedback_notice_page(self, case_id: str, notice_id: str, page_number: int) -> bytes:
         raise ServiceConflict("beta_feedback_requires_durable_service")
 
+    def pilot_feedback(self, case_id: str) -> s.PilotFeedbackView:
+        return s.PilotFeedbackView()
+
+    def record_pilot_feedback(
+        self, case_id: str, body: s.PilotFeedbackUpdate
+    ) -> s.PilotFeedbackView:
+        raise ServiceConflict("pilot_feedback_not_eligible")
+
     def status(self, case_id: str) -> s.CaseStatus:
         return self._status(self.cases[case_id])
 

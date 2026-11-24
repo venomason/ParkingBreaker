@@ -1,0 +1,11 @@
+[Unit]
+Description=Check enrolled ParkingBreaker appeal-mail destinations
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/docker exec parkingbreaker-worker python -m parkingbreaker.route_monitor --database /data/parkingbreaker.sqlite check
+StandardOutput=journal
+StandardError=journal

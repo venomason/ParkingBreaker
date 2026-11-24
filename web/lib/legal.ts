@@ -31,13 +31,14 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
   {
     title: "What you pay for",
     paragraphs: [
-      "A one-time fee for preparing and mailing one certified appeal packet. The price is shown before you authorize payment. There is no subscription and no recurring charge.",
+      "For paid appeals, a one-time fee covers preparation and Certified Mail for one packet. The price is shown before you authorize payment. There is no subscription and no recurring charge.",
+      "A selected free beta includes one mailing attempt for $0 and requires no card hold or payment. Your offer states the mailing class before you accept. Ordinary First-Class Mail has no customer tracking number or proof of delivery. The arrival date is uncertain.",
     ],
   },
   {
     title: "Card holds and charges",
     paragraphs: [
-      "We place an authorization hold when you approve. If we stop before mailing, the hold is released and you are not charged. We charge only when we mail your packet.",
+      "For paid appeals, we place a card hold when you authorize payment. If we stop before mailing, the hold is released and you are not charged. We charge only when we mail your packet.",
       "A duplicate charge is refunded.",
     ],
   },
@@ -74,14 +75,14 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
   {
     title: "How we use it",
     paragraphs: [
-      "To prepare and mail your appeal, to show you the exact packet you approve, to take payment, to support you, and to meet legal and accounting obligations.",
+      "To prepare and mail your appeal, to show you the exact packet you approve, to take payment, to support you, and to meet legal and accounting obligations. When you choose to share beta feedback, we record your answers about routing, agency response and the outcome.",
       "We do not sell your data and we do not use it for advertising.",
     ],
   },
   {
     title: "Who processes it",
     paragraphs: [
-      "Payment: Stripe. Certified mail: Lob. Email delivery: Resend. Document reading: AI model providers engaged for extraction only. Each processes data on our instructions and only as needed for the service.",
+      "Stripe processes payments. Lob handles printing and mailing. Resend delivers email. AI model providers read documents for extraction only. Each processes data on our instructions and only as needed for the service.",
     ],
   },
   {

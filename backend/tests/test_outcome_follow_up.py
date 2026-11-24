@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import re
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
@@ -77,7 +78,9 @@ def stripe_of(real: CaseService) -> tuple[object, object]:
     return stripe(payment_fixture(), payment_fixture(), payment_fixture("succeeded"))
 
 
-def _service(real: CaseService, client: FakeEmailClient, clock: Clock) -> OutcomeFollowUpService:
+def _service(
+    real: CaseService, client: FakeEmailClient, clock: Callable[[], datetime]
+) -> OutcomeFollowUpService:
     return OutcomeFollowUpService(
         real._store,
         client,

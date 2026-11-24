@@ -3,10 +3,10 @@ import { Icon } from "./Icons";
 const workflow = [
   ["Photograph your ticket", "Start at the windshield. Photograph the ticket and any surroundings you want to keep. Check the ticket details and issuing agency we read."],
   ["Tell your side", "Tell us what happened in your own words. We ask neutral questions about the facts."],
-  ["Choose your mailing", "Review the offer for your appeal. Nothing is pre-selected."],
+  ["Review your mailing offer", "See the mailing class and any fee for your appeal before you accept."],
   ["Check the requirements", "We check the agency’s official pages and show you the sources and exact wording."],
   ["Approve your packet", "Review and edit the letter, inspect the exact PDF, and approve it before anything is sent."],
-  ["Track your mailing", "After you approve the packet, ParkingBreaker sends it through Lob. Your appeal keeps a copy and the available postal updates."],
+  ["Keep your mailing record", "After you approve the packet, ParkingBreaker sends it through Lob. Your appeal keeps a copy of the mailed packet."],
 ];
 
 export function IntakeTrust() {
@@ -35,7 +35,7 @@ export function IntakeTrust() {
           <div><Icon id="doc" size={22} /><h3>Your words, your control.</h3><p>Tell us what happened. Review and edit the draft before adopting it as your own statement. We don’t judge your reasons or invent arguments. We handle the clerical work without evaluating the merits of your appeal.</p></div>
           <div><Icon id="check" size={22} /><h3>Nothing goes out without your OK.</h3><p>You inspect and approve the exact PDF first.</p></div>
           <div><Icon id="lock" size={22} /><h3>Private by default.</h3><p>Each appeal has its own private link.</p></div>
-          <div><Icon id="doc" size={22} /><h3>A mailing record you can keep.</h3><p>Keep the available USPS delivery or attempted-delivery updates and a copy of your mailed packet. Tracking does not tell us when the agency opens or reviews it, and it isn’t a USPS Return Receipt. Delivery is not guaranteed.</p></div>
+          <div><Icon id="doc" size={22} /><h3>A mailing record you can keep.</h3><p>Keep a copy of your mailed packet. Certified Mail shows available postal updates. Ordinary First-Class Mail comes without a tracking number, proof of delivery or a delivery guarantee.</p></div>
           <div><Icon id="globe" size={22} /><h3>An address you can check.</h3><p>We look for the appeal address on the agency’s official pages and show you the sources. If we cannot establish the required submission details, we pause or stop without charging for mailing. You approve the exact destination before mailing.</p></div>
         </div>
       </section>

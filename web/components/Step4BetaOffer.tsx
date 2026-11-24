@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import type { BetaOffer } from "../lib/api";
+import { mailClassName } from "../lib/fulfillment";
 import { ConciergeMark } from "./ConciergeMark";
 import { Icon } from "./Icons";
 import { LegalDisclosure } from "./LegalDisclosure";
@@ -34,7 +35,8 @@ export function Step4BetaOffer({
 }: Step4BetaOfferProps) {
   // Consent is bound to the exact case and displayed digest, so a change in
   // either one automatically returns the checkbox to unchecked.
-  const scope = `${caseId}\u0000${offer.disclosure_sha256}`;
+  const scope = `${caseId}\u0000${offer.disclosure_sha256}\u0000${offer.tier}`;
+  const mailClass = mailClassName(offer.tier);
   const [consentedScope, setConsentedScope] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const inFlight = useRef<string | null>(null);
@@ -92,7 +94,7 @@ export function Step4BetaOffer({
           ✓ Selected for this appeal from the owner-approved beta
         </p>
         <p className="dl-big">
-          <strong>Certified Mail, everything included</strong> · <strong>$0</strong>
+          <strong>{mailClass}</strong> · <strong>$0</strong>
         </p>
         <p className="muted small">
           No card hold, no payment and no card form are part of this selected beta.
@@ -120,8 +122,7 @@ export function Step4BetaOffer({
           onChange={(event) => setConsentedScope(event.target.checked ? scope : null)}
         />
         <span>
-          I have read this exact disclosure. I accept the free beta appeal with no
-          card hold and no payment.
+          I have read this exact disclosure. I accept {mailClass} for $0 with no card hold and no payment.
         </span>
       </label>
 

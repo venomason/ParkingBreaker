@@ -40,19 +40,20 @@ import {
   buildLetterData,
   isoDate,
 } from "../lib/api";
-import type { ApprovalRequest, PacketPreview, CaseStatus, Draft, Offer, Stop, Tracking, IntakeForm, BetaOffer, TicketDiscrepancyResolution, TicketReadingStatus, TicketReviewSnapshot, TicketFactBindingPayload, WorkspaceView, TicketFacts } from "../lib/api";
+import type { ApprovalRequest, PacketPreview, CaseStatus, Draft, Offer, Stop, Tracking, IntakeForm, BetaOffer, MailTier, TicketDiscrepancyResolution, TicketReadingStatus, TicketReviewSnapshot, TicketFactBindingPayload, WorkspaceView, TicketFacts } from "../lib/api";
 import { LiveDetails, LiveDetailsData, EMPTY_CONTACT, EvidencePhotoEntry, LiveContactValues } from "../components/LiveDetails";
 import { CurbsidePhotos } from "../components/CurbsidePhotos";
 import { LiveResearch, ResearchEvidence } from "../components/LiveResearch";
 import { LiveLetter } from "../components/LiveLetter";
 import { LiveFulfillment } from "../components/LiveFulfillment";
 import { BetaNotices } from "../components/BetaNotices";
+import { PilotFeedback } from "../components/PilotFeedback";
 import { CARD_FORM_AVAILABLE, CardField, CardFieldHandle } from "../components/CardField";
 import { CustomerGate, savedFundingKind, useServicePhase } from "../components/CustomerAccess";
 import { PREVIEW_AUTH } from "../lib/api";
 import { useWorkspaceAutosave } from "../lib/useWorkspaceAutosave";
 import { emptyFactDraft, factDraftFromAdopted, factDraftFromReading, factDraftFromValues, literalFromReading, literalFromSnapshot, ticketFactsFromAdopted, ticketFormWithDraft, restoredTicketStep, validateFactDraft, type AdoptedFacts, type FactDraft, type TicketLiteral } from "../lib/intake";
-import { customerStage, fulfillmentCopy, mailingConfirmed, offlinePaymentAllowed } from "../lib/fulfillment";
+import { FIRST_CLASS_LIMITS, customerStage, dispatchSettled, fulfillmentCopy, mailClassName, mailingConfirmed, matchingTracking, offlinePaymentAllowed } from "../lib/fulfillment";
 
 // The real flow against the API (fake, test or live providers behind it). Off: the prototype.
 const LIVE = process.env.NEXT_PUBLIC_LIVE_API === "1";
@@ -105,6 +106,7 @@ function plainError(error: unknown): string {
     beta_disclosure_changed: "The beta disclosure changed. Read the current text and agree again before accepting.",
     beta_qualification_expired: "This selected beta offer can no longer be accepted. Nothing was charged. Check the saved status.",
     beta_qualification_changed: "This appeal changed since the beta offer was made. Review the current offer before accepting.",
+    invalid_beta_offer: "We could not verify the selected beta offer. Check the saved status before continuing.",
     invalid_beta_receipt: "The free beta acceptance could not be verified from the server. Nothing was charged. Check the saved status.",
     paid_orders_paused: "The server refused a new paid authorization in this controlled beta. No new card was charged and your saved appeal is unchanged. Check the saved status before continuing.",
     ticket_reading_required: "Read your current ticket photos before saving or confirming the facts.",
@@ -229,14 +231,25 @@ function buildReceipts(step: number, fields: TicketField[], photo: boolean | nul
   return list;
 }
 
+function journeyTier(tier: MailTier | null | undefined): "certified" | "standard" | null {
+  if (tier === "STANDARD") return "standard";
+  if (tier === "CERTIFIED") return "certified";
+  return null;
+}
+
 function liveReceipts(step: number, fields: TicketField[], offer: Offer | null, beta: BetaOffer | null, status: CaseStatus | null, amountCents: number | null): Receipt[] {
   const cit = fields.find((f) => f.k === "cit")?.v ?? "";
   const list: Receipt[] = [];
   if (step === 8) return list;
   if (step > 1) list.push({ stepNum: 1, stepName: "Ticket", summary: `\u2713 Ticket confirmed \u00b7 ${cit}` });
   if (step > 2) list.push({ stepNum: 2, stepName: "Your side", summary: "\u2713 Your side and contact details saved" });
-  if (beta && step >= 4) list.push({ stepNum: 4, stepName: "Selected beta", summary: `\u2713 Free beta \u00b7 $0 \u00b7 no card hold or payment${status?.payment_state === "NO_CHARGE" ? " \u00b7 accepted" : ""}` });
-  if (offer && (step === 3 || step >= 5)) list.push({ stepNum: 4, stepName: "Agency and hold", summary: `${offer.issuer.issuer_name}${amountCents == null ? "" : ` · $${(amountCents / 100).toFixed(2)}`}${status?.payment_state ? ` · ${status.payment_state.toLowerCase().replaceAll("_", " ")}` : ""}` });
+  const betaAccepted = status?.payment_state === "NO_CHARGE";
+  if ((beta || betaAccepted) && (step === 3 || step >= 4)) {
+    const tier = (betaAccepted && status.selected_tier) || beta?.tier;
+    list.push({ stepNum: 4, stepName: "Selected beta", summary: `Free beta · ${tier ? `${mailClassName(tier)} · ` : ""}$0 · no card hold or payment${betaAccepted ? " · accepted" : ""}` });
+  } else if (offer && (step === 3 || step >= 5)) {
+    list.push({ stepNum: 4, stepName: "Agency and hold", summary: `${offer.issuer.issuer_name}${amountCents == null ? "" : ` · $${(amountCents / 100).toFixed(2)}`}${status?.payment_state ? ` · ${status.payment_state.toLowerCase().replaceAll("_", " ")}` : ""}` });
+  }
   const findings = status?.research?.findings ?? [];
   if (step >= 6 && findings.length) {
     const confirmed = findings.filter((f) => f.status === "CONFIRMED").length;
@@ -995,6 +1008,7 @@ function Journey() {
   // saved window/amount when the server response omits it.
   const applySavedStatus = useCallback((saved: CaseStatus) => {
     setLiveStatus(saved);
+    if (saved.selected_tier) setTier(journeyTier(saved.selected_tier));
     if (saved.amount_cents != null) setLiveAmount(saved.amount_cents);
     if (saved.seconds_remaining != null) {
       setTimerEnd(Date.now() + saved.seconds_remaining * 1000);
@@ -1040,12 +1054,12 @@ function Journey() {
       if (offer) {
         setLiveBeta(offer);
         setBetaBlocked(false);
-        if (offer.accepted_at) { setLiveAmount(0); setTier("certified"); }
+        if (offer.accepted_at) { setLiveAmount(0); setTier(journeyTier(saved.selected_tier ?? offer.tier)); }
       } else {
         // Drop the stale paid offer so no card affordance can remount.
         setLiveBeta(null);
         setLiveOffer(null);
-        setTier(null);
+        setTier(journeyTier(saved.selected_tier));
       }
       // Resume this case's own saved stage instead of mounting a new checkout.
       // Stage 6/7 need their owned evidence fetched first; every read is guarded
@@ -1129,7 +1143,7 @@ function Journey() {
   const handleStep4Complete = useCallback(async (selectedTier: "certified" | "standard", termsAccepted: boolean) => {
     if (!termsAccepted) return;
     if (LIVE) {
-      if (!liveCase || newPaidBlocked || phase !== "paid" || needsAuthorizationRecovery ||
+      if (!liveCase || liveBeta || liveStatus?.payment_state === "NO_CHARGE" || newPaidBlocked || phase !== "paid" || needsAuthorizationRecovery ||
           authorizationInFlight.current) return;
       const caseId = liveCase.caseId;
       authorizationInFlight.current = true;
@@ -1143,7 +1157,7 @@ function Journey() {
           setAuthorizationRecoveryCase(caseId);
           return;
         }
-        if (customerStage(current) !== 4) {
+        if (current.payment_state === "NO_CHARGE" || customerStage(current) !== 4) {
           await refreshCurrentCase();
           return;
         }
@@ -1201,7 +1215,7 @@ function Journey() {
     setTier(selectedTier);
     if (!timerEnd) { setTimerEnd(Date.now() + 30 * 60 * 1000); setWarned(false); setLapsed(false); }
     goTo(5);
-  }, [goTo, timerEnd, liveCase, showToast, blockNewPaid, refreshCurrentCase, newPaidBlocked, phase, needsAuthorizationRecovery, applySavedStatus]);
+  }, [goTo, timerEnd, liveCase, liveBeta, liveStatus?.payment_state, showToast, blockNewPaid, refreshCurrentCase, newPaidBlocked, phase, needsAuthorizationRecovery, applySavedStatus]);
 
   const handleBetaAccept = useCallback(async () => {
     if (!LIVE || !liveCase || !liveBeta || betaBusy) return;
@@ -1210,14 +1224,17 @@ function Journey() {
     setBetaBusy(true); setBetaError(null); setLiveError(null); setBetaBlocked(false);
     try {
       const receipt = await api.acceptBeta(caseId, offer.disclosure_sha256);
-      if (receipt.case_id !== caseId || receipt.funding !== "NO_CHARGE" || receipt.amount_cents !== 0 || receipt.tier !== "CERTIFIED") {
+      if (receipt.case_id !== caseId || receipt.funding !== "NO_CHARGE" || receipt.amount_cents !== 0 || receipt.tier !== offer.tier) {
         throw new ApiError(502, "invalid_beta_receipt");
       }
       const saved = await api.status(caseId);
       if (liveCaseIdRef.current !== caseId) return;
+      if (saved.case_id !== caseId || saved.payment_state !== "NO_CHARGE" || saved.selected_tier !== offer.tier) {
+        throw new ApiError(502, "invalid_beta_receipt");
+      }
       setLiveStatus(saved);
       setLiveAmount(0);
-      setTier("certified");
+      setTier(journeyTier(receipt.tier));
       setLiveBeta({ ...offer, accepted_at: receipt.accepted_at });
       setTimerEnd(saved.seconds_remaining == null ? null : Date.now() + saved.seconds_remaining * 1000);
       setWarned(false); setLapsed(saved.window_status === "EXPIRED");
@@ -1248,7 +1265,7 @@ function Journey() {
       if (fresh.accepted_at) {
         const saved = await api.status(caseId);
         if (liveCaseIdRef.current !== caseId) return;
-        setLiveStatus(saved); setLiveAmount(0); setTier("certified");
+        setLiveStatus(saved); setLiveAmount(0); setTier(journeyTier(saved.selected_tier ?? fresh.tier));
         setTimerEnd(saved.seconds_remaining == null ? null : Date.now() + saved.seconds_remaining * 1000);
         setLapsed(saved.window_status === "EXPIRED");
         goTo(saved.window_started_at ? 3 : 4);
@@ -1314,7 +1331,7 @@ function Journey() {
         setFields((previous) => previous.map((field) => ({ ...field, v: ({ cit: intake.ticket.citation_number, date: intake.ticket.issue_date, agency: intake.ticket.issuer_hint, vio: intake.ticket.violation_description } as Record<string, string | null>)[field.k] ?? field.v })));
         setLiveStatus(status);
         setLiveAmount(status.amount_cents ?? null);
-        setTier(status.selected_tier === "STANDARD" ? "standard" : "certified");
+        setTier(journeyTier(status.selected_tier ?? (betaAccepted ? restoredBeta?.tier : null)));
         setTimerEnd(status.seconds_remaining == null ? null : Date.now() + status.seconds_remaining * 1000);
         setLapsed(status.window_status === "EXPIRED");
         window.history.replaceState(null, "", `?w=${workspace.workspace_id}&c=${workspace.case_id}`);
@@ -1547,7 +1564,7 @@ function Journey() {
         setLiveBeta(beta);
         if (beta.accepted_at) {
           const saved = await api.status(receipt.case_id);
-          setLiveStatus(saved); setLiveAmount(0); setTier("certified");
+          setLiveStatus(saved); setLiveAmount(0); setTier(journeyTier(saved.selected_tier ?? beta.tier));
           setTimerEnd(saved.seconds_remaining == null ? null : Date.now() + saved.seconds_remaining * 1000);
           goTo(5);
         } else {
@@ -1582,8 +1599,11 @@ function Journey() {
   const savedKind = LIVE ? savedFundingKind(liveStatus) : "none";
   const admittedPaid = savedKind === "admitted_paid";
   const savedPending = needsAuthorizationRecovery || savedKind === "saved_pending";
-  const newPaidAccess = !newPaidBlocked && !admittedPaid && !savedPending && phase === "paid" && funding === "paid";
-  const betaFunding = !admittedPaid && !savedPending && (funding === "beta" || savedKind === "beta");
+  const newPaidAccess = !liveBeta && !newPaidBlocked && !admittedPaid && !savedPending && phase === "paid" && funding === "paid";
+  const betaFunding = !admittedPaid && !savedPending && (funding === "beta" || savedKind === "beta" || Boolean(liveBeta));
+  const betaTier = betaFunding
+    ? (liveStatus?.payment_state === "NO_CHARGE" ? liveStatus.selected_tier : null) ?? liveBeta?.tier
+    : null;
 
   const handleStep5Complete = useCallback(() => {
     if (!LIVE) { goTo(6); return; }
@@ -1736,16 +1756,18 @@ function Journey() {
       } else return;
       if (stopFromStatus(frozen)) return;
       let status = frozen;
-      for (let i = 0; i < 4 && status.payment_state !== "CAPTURED"; i++) {
+      for (let i = 0; i < 4 && !dispatchSettled(status); i++) {
         status = await api.advance(liveCase.caseId, "dispatch");
         if (stopFromStatus(status)) return;
       }
       const tracking = await api.tracking(liveCase.caseId);
       setLiveStatus(status);
       setLiveTracking(tracking);
-      if (!mailingConfirmed(status, tracking)) {
+      if (!matchingTracking(status, tracking) || !mailingConfirmed(status, tracking)) {
         setStep(7);
-        setLiveError("Your packet is still being processed. Mailing and payment are not both confirmed yet. Check mailing status to continue.");
+        setLiveError(status.payment_state === "NO_CHARGE"
+          ? "Your packet is still being processed. Check the saved mailing status for an update."
+          : "Your packet is still being processed. Mailing and payment are not both confirmed yet. Check mailing status to continue.");
         return;
       }
       setTimerEnd(null);
@@ -1761,18 +1783,20 @@ function Journey() {
         setLiveApprovalUncertain(true);
         setLiveError("The connection was interrupted. Approval may have been saved. Retry this same inspected packet to confirm; your original signature and packet will be reused.");
       } else {
-        setLiveError("We could not confirm the mailing and payment. Check mailing status to continue.");
+        setLiveError(betaFunding
+          ? "We could not confirm mailing. Check mailing status to continue."
+          : "We could not confirm the mailing and payment. Check mailing status to continue.");
       }
     } finally {
       packetActionInFlight.current = false;
       setLiveBusy(false);
     }
-  }, [goTo, liveCase, liveDraft, livePacketPreview, liveLetterText, liveSubmissionPending, lapsed, stopFromStatus, invalidateLivePreview]);
+  }, [goTo, liveCase, liveDraft, livePacketPreview, liveLetterText, liveSubmissionPending, lapsed, stopFromStatus, invalidateLivePreview, betaFunding]);
 
 
   const refreshMailing = useCallback(async () => {
     if (!liveCase || liveBusy) return;
-    if (liveStatus && ["FROZEN", "SUBMITTING", "IN_TRANSIT"].includes(liveStatus.state) && !["CAPTURED", "REFUNDED", "RELEASED", "WRITTEN_OFF"].includes(liveStatus.payment_state ?? "")) {
+    if (liveStatus && ["FROZEN", "SUBMITTING", "IN_TRANSIT"].includes(liveStatus.state) && !dispatchSettled(liveStatus) && !["REFUNDED", "RELEASED", "WRITTEN_OFF"].includes(liveStatus.payment_state ?? "")) {
       await handleLiveApprove();
       return;
     }
@@ -1929,10 +1953,10 @@ function Journey() {
           {step === 3 && !LIVE && (<Step3Research onProgress={setEvidenceCount} onComplete={completeResearch} setActionBar={setActionBar} onOpenFact={(f) => { setSheetFactData(f); setSheetFact(true); }} onOpenChecklist={() => setSheetChk(true)} onGoConflict={openConflict} />)}
           {step === 4 && needsAuthorizationRecovery && <AuthorizationRecovery busy={liveBusy} onRetry={handleAuthorizationRecovery} setActionBar={setActionBar} />}
           {step === 4 && !needsAuthorizationRecovery && LIVE && liveBeta && (<Step4BetaOffer offer={liveBeta} caseId={liveCase?.caseId ?? ""} busy={liveBusy || betaBusy} blocked={betaBlocked} error={betaError} onAccept={handleBetaAccept} onRefresh={() => { void refreshBetaOffer(); }} setActionBar={setActionBar} />)}
-          {step === 4 && !needsAuthorizationRecovery && LIVE && !liveBeta && (!liveOffer || phase !== "paid" || paidPaused || newPaidBlocked) && (<ControlledBetaWaiting paused={paidPaused} admittedPaid={admittedPaid} savedPending={savedPending} phaseRefreshFailed={pricingRefreshFailed} busy={liveBusy} onRetry={checkSavedStatus} setActionBar={setActionBar} />)}
-          {step === 4 && !needsAuthorizationRecovery && !(LIVE && (liveBeta || !liveOffer || phase !== "paid" || paidPaused || newPaidBlocked)) && (<Step4Offer liveOffer={LIVE && liveOffer ? { issuerName: liveOffer.issuer.issuer_name, decidingBody: liveOffer.issuer.deciding_body, standardOffered: liveOffer.tiers.some((t) => t.tier === "STANDARD"), testMode: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_") ?? false, certifiedCents: liveOffer.tiers.find(t => t.tier === "CERTIFIED")?.amount_cents ?? null, standardCents: liveOffer.tiers.find(t => t.tier === "STANDARD")?.amount_cents ?? null } : undefined} cardSlot={LIVE ? CARD_FORM_AVAILABLE ? <CardField ref={cardRef} /> : <p className="small" role="status">The secure card form is unavailable. Please try again later.</p> : undefined} selectedTier={tier} setSelectedTier={setTier} onComplete={handleStep4Complete} setActionBar={setActionBar} onOpenTerms={openTerms} onOpenSample={openSample} />)}
-          {step === 5 && (<Step5Window live={LIVE} beta={Boolean(LIVE && (liveStatus?.payment_state === "NO_CHARGE" || liveBeta?.accepted_at))} supportCaseId={LIVE ? liveStatus?.support_code : undefined} amountCents={liveAmount} now={now} tier={tier ?? "certified"} timerEnd={timerEnd} lapsed={lapsed} onComplete={handleStep5Complete} setActionBar={setActionBar} onDemoWarn={() => { setTimerEnd(Date.now() + 5 * 60 * 1000); setWarned(false); setLapsed(false); }} onDemoLapse={() => { setTimerEnd(Date.now()); setWarned(true); setLapsed(false); }} />)}
-          {step === 6 && LIVE && liveDraft && (<LiveLetter key={liveDraft.text_sha256 + (liveDraft.adopted_sha256 ?? "")} draft={liveDraft} value={liveLetterText ?? liveDraft.text} onTextChange={setLiveLetterText} autoSave busy={liveBusy || (lapsed && !liveSubmissionPending && !liveApprovalUncertain)} error={liveError} submissionPending={liveSubmissionPending} approvalUncertain={liveApprovalUncertain} preview={livePacketPreview?.packet ?? null} previewUrl={livePacketPreview?.url ?? null} onInvalidatePreview={invalidateLivePreview} onSave={saveLiveLetter} onAdopt={() => liveDraftAction((c) => api.adopt(c, liveDraft.text, liveDraft.text_sha256))} onPreview={handleLivePreview} onApprove={handleLiveApprove} onOpenRules={openTerms} />)}
+          {step === 4 && !needsAuthorizationRecovery && LIVE && !liveBeta && (betaFunding || !liveOffer || phase !== "paid" || paidPaused || newPaidBlocked) && (<ControlledBetaWaiting paused={paidPaused} admittedPaid={admittedPaid} savedPending={savedPending} phaseRefreshFailed={pricingRefreshFailed} busy={liveBusy} onRetry={checkSavedStatus} setActionBar={setActionBar} />)}
+          {step === 4 && !needsAuthorizationRecovery && !(LIVE && (liveBeta || betaFunding || !liveOffer || phase !== "paid" || paidPaused || newPaidBlocked)) && (<Step4Offer liveOffer={LIVE && liveOffer ? { issuerName: liveOffer.issuer.issuer_name, decidingBody: liveOffer.issuer.deciding_body, standardOffered: liveOffer.tiers.some((t) => t.tier === "STANDARD"), testMode: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_") ?? false, certifiedCents: liveOffer.tiers.find(t => t.tier === "CERTIFIED")?.amount_cents ?? null, standardCents: liveOffer.tiers.find(t => t.tier === "STANDARD")?.amount_cents ?? null } : undefined} cardSlot={LIVE ? CARD_FORM_AVAILABLE ? <CardField ref={cardRef} /> : <p className="small" role="status">The secure card form is unavailable. Please try again later.</p> : undefined} selectedTier={tier} setSelectedTier={setTier} onComplete={handleStep4Complete} setActionBar={setActionBar} onOpenTerms={openTerms} onOpenSample={openSample} />)}
+          {step === 5 && (<Step5Window live={LIVE} beta={Boolean(LIVE && (liveStatus?.payment_state === "NO_CHARGE" || liveBeta?.accepted_at))} supportCaseId={LIVE ? liveStatus?.support_code : undefined} amountCents={liveAmount} now={now} tier={LIVE ? journeyTier(betaTier) ?? tier : tier ?? "certified"} timerEnd={timerEnd} lapsed={lapsed} onComplete={handleStep5Complete} setActionBar={setActionBar} onDemoWarn={() => { setTimerEnd(Date.now() + 5 * 60 * 1000); setWarned(false); setLapsed(false); }} onDemoLapse={() => { setTimerEnd(Date.now()); setWarned(true); setLapsed(false); }} />)}
+          {step === 6 && LIVE && liveDraft && (<LiveLetter key={liveDraft.text_sha256 + (liveDraft.adopted_sha256 ?? "")} draft={liveDraft} value={liveLetterText ?? liveDraft.text} onTextChange={setLiveLetterText} autoSave busy={liveBusy || (lapsed && !liveSubmissionPending && !liveApprovalUncertain)} error={liveError} betaTier={betaTier} submissionPending={liveSubmissionPending} approvalUncertain={liveApprovalUncertain} preview={livePacketPreview?.packet ?? null} previewUrl={livePacketPreview?.url ?? null} onInvalidatePreview={invalidateLivePreview} onSave={saveLiveLetter} onAdopt={() => liveDraftAction((c) => api.adopt(c, liveDraft.text, liveDraft.text_sha256))} onPreview={handleLivePreview} onApprove={handleLiveApprove} onOpenRules={openTerms} />)}
           {LIVE && step !== 6 && liveLetterText != null && liveLetterText !== liveDraft?.text && <div className="card"><p role="alert">These letter edits have not been saved. Keep this page open and copy your text before leaving.</p><textarea aria-label="Unsaved letter edits" value={liveLetterText} readOnly /></div>}
           {step === 6 && !LIVE && (<Step6LetterStudio traceMode={traceMode} setTraceMode={setTraceMode} citationNumber={fv("cit")} lapsed={lapsed} onOpenNotes={openNotes} onOpenSentenceModal={handleOpenSentenceModal} onOpenExactPdf={handleOpenExactPdf} onRestartWindow={handleRestartWindow} setActionBar={setActionBar} sents={sents} adopted={adopted} setAdopted={setAdopted} senderName={senderName} setSenderName={setSenderName} senderAddress={senderAddress} setSenderAddress={setSenderAddress} />)}
           {step === 7 && LIVE && liveStatus && <LiveFulfillment status={liveStatus} tracking={liveTracking} busy={liveBusy} error={liveError} onRefresh={() => { void refreshMailing(); }} />}
@@ -1940,11 +1964,17 @@ function Journey() {
           {step === 8 && (<Step8Stop liveStop={LIVE && liveStop ? { message: liveStop.message, officialQuote: liveStop.official_quote ?? null, officialUrl: liveStop.official_url ?? null, savedWords: liveDraft?.text ?? story } : undefined} onCopyNotes={copyNotes} onOpenAgencyForm={openAgencyForm} onEditDetails={liveStop?.reason_key === "paid_cohort_full" ? undefined : reopenStopDetails} onStartNew={liveStop?.reason_key === "paid_cohort_full" ? undefined : startNewFromStop} setActionBar={setActionBar} />)}
           {step === 9 && (<Step9Conflict optedIn={conflictOptedIn} setOptedIn={setConflictOptedIn} onBackToResearch={backToResearch} setActionBar={setActionBar} />)}
           </div></JourneyCard>
-          {LIVE && liveCase && liveStatus?.payment_state === "NO_CHARGE" && (
-            <BetaNotices key={`beta-notices-${liveCase.caseId}`} caseId={liveCase.caseId} workspaceId={liveCase.workspaceId} />
+          {LIVE && liveCase && liveStatus?.case_id === liveCase.caseId && liveStatus.payment_state === "NO_CHARGE" && (
+            <>
+              {step === 7 && liveStatus.selected_tier === "STANDARD" && <section className="card stack" id="pilotFeedbackCard" aria-labelledby="pilotFeedbackHeading">
+                <h3 id="pilotFeedbackHeading">Share feedback on your appeal</h3>
+                <PilotFeedback key={liveCase.caseId} caseId={liveCase.caseId} />
+              </section>}
+              <BetaNotices key={`beta-notices-${liveCase.caseId}`} caseId={liveCase.caseId} workspaceId={liveCase.workspaceId} />
+            </>
           )}
         </div>
-        {step === 1 ? <IntakeTrust /> : <DesktopAside onEvidenceClick={openChecklist} onRulesClick={openRules} servicePhase={phase} funding={funding} paidCase={admittedPaid} savedPending={savedPending} betaCase={betaFunding} newPaidBlocked={newPaidBlocked} />}
+        {step === 1 ? <IntakeTrust /> : <DesktopAside onEvidenceClick={openChecklist} onRulesClick={openRules} servicePhase={phase} funding={funding} paidCase={admittedPaid} savedPending={savedPending} betaCase={betaFunding} betaTier={betaTier} newPaidBlocked={newPaidBlocked} />}
       </main>
 
       <div className={step === 1 ? "intake-actions" : undefined}><ActionBar subText={actionSub}>{LIVE && (step === 6 || step === 7) ? null : actionButtons}</ActionBar></div>
@@ -1986,7 +2016,7 @@ function Journey() {
           <li><div><strong>Choose your mailing.</strong><span>{LIVE ? (newPaidAccess ? "You choose from the mailing options and prices confirmed for this appeal. Nothing is pre-selected." : admittedPaid ? "Your existing mailing choice and payment status stay as recorded; no new payment is requested." : savedPending ? "We’re checking your existing payment; no new payment is requested." : betaFunding ? "This selected free beta offers no paid mailing option, and no card or payment is requested." : phase === "controlled_free_beta" ? "This controlled beta offers no new paid mailing option. No new card or payment is requested now; use Check my appeal for the latest update." : "No paid mailing options are shown until this appeal’s service phase and funding are confirmed.") : `You choose Certified Mail ($${CERTIFIED_CENTS / 100}). Nothing is pre-selected.`}</span></div></li>
           <li><div><strong>Check the requirements.</strong><span>We check the agency’s official pages and show you the sources and exact wording.</span></div></li>
           <li><div><strong>Approve your packet.</strong><span>Review and edit the letter, inspect the exact PDF, and approve it before anything is sent.</span></div></li>
-          <li><div><strong>Track your mailing.</strong><span>Keep the available postal updates and a copy of your exact mailed packet in your appeal.</span></div></li>
+          <li><div><strong>Keep your mailing record.</strong><span>Keep a copy of your exact mailed packet. {betaTier === "STANDARD" ? FIRST_CLASS_LIMITS : "Your appeal shows postal updates when available for its mailing class."}</span></div></li>
         </ol>
         <h3 className="how-section-title">What we never do</h3>
         <ul className="never">
@@ -2041,13 +2071,15 @@ function Journey() {
       </BottomSheet>
 
       {/* Terms */}
-      <BottomSheet id="termsDlg" isOpen={sheetTerms} onClose={() => setSheetTerms(false)} title="Hold & refund terms">
-        <ul className="never">
+      <BottomSheet id="termsDlg" isOpen={sheetTerms} onClose={() => setSheetTerms(false)} title={betaFunding ? "Selected free beta terms" : "Hold & refund terms"}>
+        {betaFunding ? (
+          <p>{betaTier ? `${mailClassName(betaTier)} for $0. ` : "$0. "}No card hold and no payment. One mailing attempt after your exact packet approval. {betaTier === "STANDARD" && `${FIRST_CLASS_LIMITS} `}Beta participation does not extend a ticket deadline.</p>
+        ) : <ul className="never">
           <li>If we stop before mailing, the hold is released and you are not charged.</li>
           <li>A duplicate charge is refunded.</li>
           <li>If a destination we verified proves wrong, you receive a full refund. For other mailing errors of ours: a free re-mail where feasible, otherwise a full refund. Agency-side returns do not receive a refund. When the cause is unknown, a re-mail or refund minus mailing cost may apply.</li>
           <li>After mailing, a change of mind or the agency&#39;s decision is not a refund reason.</li>
-        </ul>
+        </ul>}
         <CustomerChoiceRules />
         <LegalDisclosure id="termsAttorneyDisclosure" />
       </BottomSheet>

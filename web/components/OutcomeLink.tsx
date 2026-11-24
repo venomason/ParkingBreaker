@@ -108,7 +108,7 @@ export function OutcomeLink() {
               </button>
             </div>
             <p className="outcome-fineprint">
-              ParkingBreaker prepares appeals clerically and mails them by USPS Certified Mail. We
+              ParkingBreaker prepares and mails appeals as a clerical service. We
               do not give legal advice and do not promise any outcome.{" "}
               <button className="link-button" type="button" disabled={busy} onClick={() => act("opt-out")}>
                 Stop follow-up reminders

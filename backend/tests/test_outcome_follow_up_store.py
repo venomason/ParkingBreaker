@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from parkingbreaker.outcome_follow_up_store import (
+    _DDL_V1,
     FollowUpConflict,
     canonical_email_key,
 )
@@ -137,3 +138,28 @@ def test_schema_rejects_a_case_less_outcome_and_an_email_less_consent(tmp_path: 
                 "(100, 'case', NULL, 'OPT_OUT', '', 'bad-2', 'operator', 'r', "
                 "'2026-11-21T12:00:00+00:00')"
             )
+
+
+def test_v1_migration_preserves_consent_reminders_and_outcome_uniqueness(tmp_path: Path) -> None:
+    path = tmp_path / "legacy.sqlite"
+    with _store(path) as store:
+        store.set_follow_up_consent(EMAIL, False, "opt-out", "customer", now=NOW)
+        store.record_follow_up_send(CASE, "D14", "sent", "worker", now=NOW)
+        store.record_unknown_outcome(CASE, "unknown", "worker", now=NOW)
+        recorded = store._follow_up_events()
+        db = store._require_open()
+        old_rows = db.execute("SELECT * FROM pb_outcome_follow_up_events").fetchall()
+        db.execute("DROP TABLE pb_outcome_follow_up_events")
+        db.execute(_DDL_V1)
+        db.executemany(
+            "INSERT INTO pb_outcome_follow_up_events VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", old_rows
+        )
+        db.execute("UPDATE pb_store_versions SET version=1 WHERE component='outcome_follow_up'")
+    with _store(path) as upgraded:
+        assert upgraded._follow_up_events() == recorded
+        assert not upgraded.follow_up_allowed(EMAIL)
+        assert upgraded.follow_up_sent(CASE, "D14")
+        with pytest.raises(FollowUpConflict, match="follow_up_already_recorded"):
+            upgraded.record_unknown_outcome(CASE, "duplicate-unknown", "worker", now=NOW)
+        with pytest.raises(sqlite3.IntegrityError, match="append-only"):
+            upgraded._require_open().execute("DELETE FROM pb_outcome_follow_up_events")

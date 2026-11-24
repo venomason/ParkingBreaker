@@ -1,6 +1,7 @@
 "use client";
 
 import { CERTIFIED_CENTS } from "../lib/prices";
+import { FIRST_CLASS_LIMITS, mailClassName } from "../lib/fulfillment";
 import { formatSupportCaseId } from "../lib/support-case-id";
 import React, { useEffect } from "react";
 import { ConciergeMark } from "./ConciergeMark";
@@ -11,7 +12,7 @@ interface Step5WindowProps {
   beta?: boolean;
   supportCaseId?: string | null;
   amountCents?: number | null;
-  tier: "certified" | "standard";
+  tier: "certified" | "standard" | null;
   timerEnd: number | null;
   now: number;
   lapsed: boolean;
@@ -38,7 +39,7 @@ export function Step5Window({
   const displayCaseId = formatSupportCaseId(supportCaseId) ?? (!live ? "PB-48213" : null);
   const price = live ? (amountCents == null ? null : amountCents / 100) : CERTIFIED_CENTS / 100;
   const free = beta || (live && amountCents === 0);
-  const tierName = tier === "standard" ? "Standard Mail" : "Certified Mail";
+  const tierName = tier ? mailClassName(tier === "standard" ? "STANDARD" : "CERTIFIED") : "Mailing";
 
   const remaining = timerEnd ? Math.max(0, timerEnd - now) : 0;
   const isWarn = !lapsed && remaining <= 5 * 60 * 1000;
@@ -73,7 +74,7 @@ export function Step5Window({
           </h2>
           <p className="lead" id="s5lead">
             {free ? (
-              <>{tierName}, $0. No card hold and no payment. Beta participation does not extend any ticket deadline.{live ? " The countdown uses your saved review deadline." : " You have 2 hours to review and approve."}</>
+              <>{tierName}, $0. No card hold and no payment.{tier === "standard" && ` ${FIRST_CLASS_LIMITS}`} Beta participation does not extend any ticket deadline.{live ? " The countdown uses your saved review deadline." : " You have 2 hours to review and approve."}</>
             ) : (
               <>{tierName}{price == null ? "" : `, $${price}`}, authorized. Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.{live ? " The countdown uses your saved review deadline." : " You have 2 hours to review and approve."}</>
             )}

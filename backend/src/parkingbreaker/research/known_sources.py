@@ -1,9 +1,7 @@
-"""Starting pages from 2.x's verified city files (backend/data/cities_2x, copied as data).
+"""Research leads from the legacy city files in backend/data/cities_2x.
 
-2.x verified each city's official contest page by hand. Those URLs are only where research
-starts looking: every page is fetched live through the same allowlist, scope and quote
-guards, and nothing from the files is ever treated as a fact. Pure: the caller loads the
-files and passes their parsed records.
+The records have mixed provenance. Only their URLs enter research, where the ordinary
+issuer-scope, fetch and quote checks apply. The caller loads and parses the files.
 """
 
 from __future__ import annotations
@@ -16,7 +14,7 @@ from parkingbreaker.research.questions import CRITICAL_KEYS
 from parkingbreaker.research.run import SeedUrl
 from parkingbreaker.research.sources import AuthorityClass
 
-# 2.x statuses whose page was checked and still in use.
+# Historical statuses eligible to suggest a starting URL.
 USABLE_STATUSES = frozenset({"active", "paused"})
 
 

@@ -525,6 +525,9 @@ class IncidentLog:
         )
 
     def deliver(self, alerts: tuple[Alert, ...], now: datetime, notify: Notifier, to: str) -> None:
+        # TODO(T05): In the monitor DB, atomically enqueue one diagnosis per incident opening.
+        # Record each repair's expected result and verify it against fresh authoritative receipts.
+        # A quiet poll can clear an alert while a charge is still unresolved. Track both outcomes.
         current = {_key(alert): alert for alert in alerts}
         unknown = {a.subject for a in alerts if a.kind is AlertKind.OBSERVATION_UNKNOWN}
         stamp = now.isoformat()

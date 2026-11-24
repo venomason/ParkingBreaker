@@ -10,7 +10,7 @@ import {
 
 export const metadata: Metadata = {
   title: `Terms of Service | ${LEGAL_ENTITY}`,
-  description: "ParkingBreaker terms of service: clerical document preparation and certified mailing.",
+  description: "ParkingBreaker terms of service for clerical document preparation and mailing.",
 };
 
 export default function TermsPage() {

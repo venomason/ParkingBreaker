@@ -207,6 +207,9 @@ class IntakePauseStoreMixin:
 
     def intake_paused(self: _Connected) -> bool:
         """Whether new intake is stopped; an unused switch is open, never invented."""
+        # TODO(R04): Track automated admission holds separately by failing dependency. Compose
+        # them with the operator override. Release only the matching automatic hold after sustained
+        # healthy probes and reconciled backlog. Keep accepted cases on their recovery paths.
         row = self._intake_pause_row(self._require_open())
         return False if row is None else _change_from_row(row).paused
 

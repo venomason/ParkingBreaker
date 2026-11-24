@@ -4,27 +4,32 @@ Consumes an already approved SUBMITTING case; never authorizes a mailing.
 Caller supplies a clock, optimistic revisions and ids; pure policy reads no clock.
 """
 
+import sqlite3
 from collections.abc import Callable
 from contextlib import nullcontext
+from dataclasses import dataclass
 from datetime import datetime
 
 from parkingbreaker.address_disclosure import DISCLOSURE_SHA256
-from parkingbreaker.address_policy import mailing_gate
+from parkingbreaker.address_policy import address_fingerprint, mailing_gate
+from parkingbreaker.address_store import prepared_route_scope, research_route_scope
 from parkingbreaker.approval_manifest import (
     ApprovalIntegrityError,
     verify_dispatch_integrity,
     verify_remail_approval,
 )
 from parkingbreaker.case_state import CaseState
-from parkingbreaker.intake_store import IntakeConflict
+from parkingbreaker.intake_store import IntakeConflict, IntakeRecord
 from parkingbreaker.lob_submission import (
     FALLBACK_LEAD,
     LOCAL_REFUSAL_REASON,
     Accepted,
     CancelableLobClient,
     Canceled,
+    CancelOutcome,
     CancelRequest,
     LetterEvidence,
+    LetterRequest,
     LobResponse,
     MetadataLookup,
     Rejected,
@@ -40,13 +45,92 @@ from parkingbreaker.lob_submission import (
 )
 from parkingbreaker.mail_attempt_store import PreparedMailAttempt, StorageCorruption
 from parkingbreaker.payment_state import EXPIRY_MARGIN, PaymentState
-from parkingbreaker.research_records import decode_answers, decode_research
+from parkingbreaker.research.run import ResearchResult
+from parkingbreaker.research_records import decode_agency, decode_answers, decode_research
 from parkingbreaker.submission_records import SubmissionCursor
-from parkingbreaker.transaction_store import RevisionConflict, SqliteTransactionStore
+from parkingbreaker.transaction_store import (
+    GATE_REFUSED_REASON,
+    RevisionConflict,
+    SqliteTransactionStore,
+)
 
 # Fixed, sanitized reason for a NO_CHARGE retry refusal that follows an earlier call
 # intent: the provider's 4xx text is not kept and the refusal cannot prove a non-send.
 RETRY_REJECTION_REASON = "retry refused after an earlier call intent"
+
+type CreateGuard = Callable[[CancelableLobClient], CancelableLobClient]
+
+
+class _RouteRefused(Exception):
+    """The final route check refused locally before calling Lob."""
+
+
+@dataclass(frozen=True)
+class _MailRouteGuard:
+    client: CancelableLobClient
+    allowed: Callable[[], bool]
+
+    def create_letter(self, request: LetterRequest, idempotency_key: str) -> LobResponse:
+        if not self.allowed():
+            raise _RouteRefused
+        return self.client.create_letter(request, idempotency_key)
+
+    def find_by_metadata(self, submission_token: str) -> str | MetadataLookup | None:
+        return self.client.find_by_metadata(submission_token)
+
+    def lookup_letter(self, letter_id: str, submission_token: str) -> MetadataLookup:
+        return self.client.lookup_letter(letter_id, submission_token)
+
+    def cancel_letter(self, letter_id: str) -> CancelOutcome:
+        return self.client.cancel_letter(letter_id)
+
+
+def _route_allows_create(
+    store: SqliteTransactionStore,
+    prepared: PreparedMailAttempt,
+    intake: IntakeRecord | None,
+    research: ResearchResult | None,
+    now: datetime,
+) -> bool:
+    """Require the same current verified route and exact frozen address for monitored mail."""
+    try:
+        scope = (
+            None
+            if intake is None
+            else prepared_route_scope(
+                intake, prepared.request, None if research is None else research.ticket
+            )
+        )
+        if scope is None and intake is not None and intake.agency_json is not None:
+            issuer = decode_agency(intake.agency_json).id
+            mail_class = prepared.request.options.mail_class.value
+            if any(
+                route.scope.issuer == issuer and route.scope.mail_class == mail_class
+                for route in store.monitored_routes()
+            ):
+                # An unknown legacy stage cannot identify which enrolled route applies.
+                return False
+        bound = store.bound_route(prepared.case_token, prepared.attempt)
+        current = None if scope is None else store.current_route(scope)
+        if intake is not None:
+            entitlement = store.beta_entitlement(intake.intake_id)
+            pilot = entitlement.pilot_scope if entitlement is not None else None
+            if pilot is not None and (pilot != scope or current is None):
+                return False
+        fingerprint = address_fingerprint(prepared.request.recipient)
+        if current is None:
+            return (bound is None or bound == (scope, 0)) and not store.withdrawn_address(
+                fingerprint, now
+            )
+        return (
+            bound == (scope, current.revision)
+            and current.address_fingerprint == fingerprint
+            and research is not None
+            and research_route_scope(research.ticket, prepared.request) == scope
+            and store.route_check_current(current, now)
+        )
+    except (StorageCorruption, ValueError, sqlite3.Error):
+        return False
 
 
 def _fallback_lookup(
@@ -116,6 +200,7 @@ def run_submission_step(
     already_owned: bool = False,
     effect_ids: tuple[str, ...] = (),
     validate_prepared: Callable[[PreparedMailAttempt], None] | None = None,
+    create_guards: tuple[CreateGuard, ...] = (),
 ) -> SubmissionCursor:
     """Perform at most one due call. No sleeps, network setup or implicit clock.
 
@@ -147,6 +232,7 @@ def run_submission_step(
         gate = None
         integrity_error: str | None = None
         research = None
+        intake = None
         if kind == "create":
             # The one free re-mail follows a return: it needs a SYSTEM_VERIFIED destination
             # that differs from the address the returned letter went to.
@@ -205,9 +291,11 @@ def run_submission_step(
             # Recheck saved runtime research under current capabilities. Preserve
             # historical intents: refusal follows the existing no-create/reconcile
             # branch below, never a bulk state or frozen-packet rewrite.
-            research_record = None if intake is None else store.get_research(intake.intake_id)
             if gate.allowed:
                 try:
+                    research_record = (
+                        None if intake is None else store.get_research(intake.intake_id)
+                    )
                     if research_record is not None:
                         research = decode_research(research_record.research_json)
                         resolution = research.resolve(decode_answers(research_record.answers_json))
@@ -313,20 +401,48 @@ def run_submission_step(
                         original_id,
                     )
             else:
-                response = client.create_letter(prepared.request, prepared.key)
-                if response.local_refusal and previous is not None:
+                # Install the route check closest to Lob, after any application guards
+                # that read the clock or revalidate the original ticket and deadline.
+                def route_allowed() -> bool:
+                    return _route_allows_create(store, prepared, intake, research, clock())
+
+                create_client: CancelableLobClient = _MailRouteGuard(client, route_allowed)
+                for guard in create_guards:
+                    create_client = guard(create_client)
+                try:
+                    response = create_client.create_letter(prepared.request, prepared.key)
+                except _RouteRefused:
+                    if previous is None:
+                        outcome = Rejected(422, GATE_REFUSED_REASON)
+                    else:
+                        found = _fallback_lookup(
+                            client, prepared.request.submission_token, original_id
+                        )
+                        resolved = (
+                            resolve_lookup(found, original_id)
+                            if financial
+                            else _beta_evidence_resolution(found, original_id)
+                        )
+                        # This operation reserved a create rather than a lookup. Keep
+                        # absence/cancellation for the existing dedicated lookup policy.
+                        outcome = (
+                            resolved
+                            if isinstance(resolved, Accepted | Uncertain)
+                            else Uncertain("route refused retry; awaiting authoritative lookup")
+                        )
+                else:
                     # A call intent already exists, so a request may have reached the
                     # provider earlier; only a first intent is a definite non-send.
-                    outcome = Uncertain("local refusal after an earlier call intent")
-                else:
-                    outcome = classify_response(response)
-                    if not financial and previous is not None and isinstance(outcome, Rejected):
-                        # A free-beta retry can be refused by validation after an earlier
-                        # intent may already have created the original. A 4xx now does not
-                        # reach back and prove that earlier request was never sent, so keep
-                        # the hold; the existing lookup schedule still resolves it. The
-                        # paid path keeps its separately reviewed rejection policy.
-                        outcome = Uncertain(RETRY_REJECTION_REASON)
+                    if response.local_refusal and previous is not None:
+                        outcome = Uncertain("local refusal after an earlier call intent")
+                    else:
+                        outcome = classify_response(response)
+                        if not financial and previous is not None and isinstance(outcome, Rejected):
+                            # A free-beta retry can be refused by validation after an earlier
+                            # intent may already have created the original. A 4xx now does not
+                            # reach back and prove that earlier request was never sent, so keep
+                            # the hold; existing lookup still resolves it.
+                            outcome = Uncertain(RETRY_REJECTION_REASON)
         except Exception:
             # Do not store potentially identifying provider exception text. The hold stays.
             outcome = classify_response(LobResponse(None, error="provider call failed"))

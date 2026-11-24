@@ -23,7 +23,15 @@ SUBJECT = "Your ParkingBreaker letter was accepted for mailing"
 
 
 def tracking_message(item: TrackingEmail) -> EmailMessage:
-    service = "certified mail" if item.certified else "first-class mail"
+    if not item.certified:
+        return EmailMessage(
+            item.email,
+            "Your First-Class letter was accepted for mailing",
+            "Our mail provider accepted your appeal for ordinary First-Class Mail on "
+            f"{pacific(item.confirmed_at).date().isoformat()}. Your appeal page has the "
+            "mailing record. An acknowledgment or decision from the agency can confirm "
+            "that it opened your filing.",
+        )
     number = (
         f"Its USPS tracking number is {item.tracking_number}. You can look it up at usps.com."
         if item.tracking_number
@@ -33,7 +41,7 @@ def tracking_message(item: TrackingEmail) -> EmailMessage:
     return EmailMessage(
         item.email,
         SUBJECT,
-        f"Your appeal letter was accepted by our mail provider for {service} on "
+        "Your appeal letter was accepted by our mail provider for certified mail on "
         f"{pacific(item.confirmed_at).date().isoformat()}.\n{number}\n\n"
         "This email is not proof of mailing or delivery. Your appeal page shows every "
         "tracking update.",

@@ -22,6 +22,7 @@ from collections.abc import Callable, Mapping, Sequence
 from collections.abc import Set as AbstractSet
 from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
+from functools import partial
 from itertools import chain
 from typing import Any, Literal
 from uuid import uuid4
@@ -105,9 +106,6 @@ from parkingbreaker.beta_feedback_store import (
     NoticeReceipt,
 )
 from parkingbreaker.beta_store import (
-    BETA_DISCLOSURE_SHA256,
-    BETA_DISCLOSURE_TEXT,
-    BETA_DISCLOSURE_VERSION,
     BetaConflict,
     BetaEntitlement,
 )
@@ -190,6 +188,7 @@ from parkingbreaker.mail_config import MailClass
 from parkingbreaker.mail_request import envelope_sha256, validate_request
 from parkingbreaker.mail_timing import DeadlineRule, latest_safe_send_date
 from parkingbreaker.oplog.ai_journal import AiCall, AiCallStatus, AiJournalEntry, AiNote, AiWorker
+from parkingbreaker.outcome_follow_up_store import FollowUpConflict
 from parkingbreaker.payment_records import PaymentClient, mutation_key
 from parkingbreaker.payment_state import EXPIRY_MARGIN, PaymentState
 from parkingbreaker.prehold import (
@@ -238,6 +237,7 @@ from parkingbreaker.returned_mail import (
     classify_return,
     estimated_mailing_cost,
 )
+from parkingbreaker.route_registry import RouteScope
 from parkingbreaker.service_phase import ServicePhase
 from parkingbreaker.service_policy import (
     LAUNCH_STANDARD_OFFERED,
@@ -339,7 +339,7 @@ class ResearchDeps:
     wait: Callable[[float], None]
     recovery: RecoveryConfig | None = field(default_factory=RecoveryConfig)
     budget_cents: int = 50
-    # Verified starting pages (2.x city files); every page is still fetched and guarded live.
+    # Legacy city URLs suggest where to start. The current source provides the evidence.
     known_records: tuple[Mapping[str, object], ...] = ()
     # The configured model preset or id, recorded with each run's AI call log entry.
     model_label: str = "unrecorded"
@@ -1177,7 +1177,7 @@ class CaseService:
                 )
             except IntakeConflict as exc:
                 raise ServiceConflict(str(exc)) from None
-            return self._receipt(workspace_id, record.intake_id, record.prehold_json)
+            return self._receipt(workspace_id, record.intake_id)
         if not is_printable(body.customer_position.statement):
             raise ServiceConflict("customer_statement_not_printable")
         if self._deps.ticket_intake is not None and self._deps.ticket_intake.required:
@@ -1273,10 +1273,15 @@ class CaseService:
             )
         except IntakeConflict as exc:
             raise ServiceConflict(str(exc)) from None
-        return self._receipt(workspace_id, record.intake_id, record.prehold_json)
+        return self._receipt(workspace_id, record.intake_id)
 
-    def _receipt(self, workspace_id: str, case_id: str, prehold_json: str) -> s.IntakeReceipt:
+    def _receipt(self, workspace_id: str, case_id: str) -> s.IntakeReceipt:
         stopped = isinstance(self.pre_hold(case_id), s.Stop)
+        if not stopped and self.service_phase is ServicePhase.CONTROLLED_FREE_BETA:
+            # A retried intake POST can finish selection after a crash. Status reads never enroll.
+            self._store.offer_first_class_pilot(
+                case_id, self._deps.clock(), configured_phase=self._deps.service_phase
+            )
         return s.IntakeReceipt(
             workspace_id=workspace_id,
             case_id=case_id,
@@ -1315,6 +1320,16 @@ class CaseService:
                     message="The paid beta is full. Your work is saved. "
                     "Check your ticket for the issuer's filing instructions and deadline.",
                 )
+            if stopped is None and not self._intake_route_available(case_id, view.issuer):
+                stopped = s.Stop(
+                    case_id=case_id,
+                    family=StopFamily.NOT_YET_VERIFIED,
+                    hard_stop=HardStop.S2,
+                    reason_key="appeal_office_needs_verification",
+                    message="We need to confirm where this office receives mailed appeals. "
+                    "Your work is saved. You can contact the issuer directly about filing "
+                    "before your deadline.",
+                )
             if stopped is not None:
                 if record.agency_json is not None:
                     agency = decode_agency(record.agency_json)
@@ -1324,6 +1339,34 @@ class CaseService:
         if isinstance(view, s.Offer) and record.selected_tier is not None:
             view = view.model_copy(update={"selected_tier": s.MailTier(record.selected_tier)})
         return view
+
+    def _intake_route_available(self, case_id: str, issuer: s.ResolvedIssuer) -> bool:
+        try:
+            entitlement = self._store.beta_entitlement(case_id)
+            pilot = entitlement.pilot_scope if entitlement is not None else None
+            if entitlement is None and self.service_phase is ServicePhase.CONTROLLED_FREE_BETA:
+                campaign = self._store.first_class_pilot_status()
+                if (
+                    campaign is not None
+                    and campaign.starts_at <= self._deps.clock() < campaign.ends_at
+                ):
+                    candidate = RouteScope(issuer.issuer_id, issuer.stage, MailClass.FIRST_CLASS)
+                    if candidate == campaign.scope:
+                        pilot = candidate
+            mail_class = MailClass.CERTIFIED if pilot is None else MailClass.FIRST_CLASS
+            scope = RouteScope(issuer.issuer_id, issuer.stage, mail_class.value)
+            route = self._store.current_route(scope)
+            if pilot is not None and (pilot != scope or route is None):
+                return False
+            return route is None or self._store.route_check_current(route, self._deps.clock())
+        except (ValueError, StorageCorruption):
+            return False
+
+    def _packet_mail_class(self, case_id: str) -> MailClass:
+        entitlement = self._store.beta_entitlement(case_id)
+        if entitlement is not None and entitlement.pilot_scope is not None:
+            return MailClass.FIRST_CLASS
+        return MailClass.CERTIFIED
 
     def choose(self, case_id: str, body: s.ChooseTier) -> s.Offer:
         record = self._store.get_intake(case_id)
@@ -1646,9 +1689,10 @@ class CaseService:
                 entitlement = self._reconcile_beta_refusal(case_id, refusal)
         return s.BetaOffer(
             case_id=case_id,
-            disclosure_version=BETA_DISCLOSURE_VERSION,
-            disclosure_text=BETA_DISCLOSURE_TEXT,
-            disclosure_sha256=BETA_DISCLOSURE_SHA256,
+            tier=s.MailTier(entitlement.tier),
+            disclosure_version=entitlement.disclosure_version,
+            disclosure_text=entitlement.disclosure_text,
+            disclosure_sha256=entitlement.disclosure_sha256,
             eligible_until=entitlement.eligible_until,
             accepted_at=entitlement.accepted_at,
         )
@@ -1677,6 +1721,7 @@ class CaseService:
             case_id=case_id,
             support_code=self._public_support_code(case.case_token),
             accepted_at=accepted.accepted_at,
+            tier=s.MailTier(accepted.tier),
             window_started_at=case.authorized_at,
             window_expires_at=case.authorization_expires_at,
         )
@@ -1775,6 +1820,32 @@ class CaseService:
             raise ServiceConflict("beta_feedback_page_not_found")
         return data
 
+    def pilot_feedback(self, case_id: str) -> s.PilotFeedbackView:
+        case_token = self._intake(case_id).case_token
+        if case_token is None:
+            return s.PilotFeedbackView()
+        return s.PilotFeedbackView.model_validate(
+            self._store.pilot_feedback(case_token), from_attributes=True
+        )
+
+    def record_pilot_feedback(
+        self, case_id: str, body: s.PilotFeedbackUpdate
+    ) -> s.PilotFeedbackView:
+        case_token = self._intake(case_id).case_token
+        if case_token is None:
+            raise ServiceConflict("pilot_feedback_not_eligible")
+        try:
+            feedback = self._store.record_pilot_feedback(
+                case_token,
+                body.request_id,
+                body.expected_revision,
+                body.reported_values(),
+                now=self._deps.clock(),
+            )
+        except FollowUpConflict as exc:
+            raise ServiceConflict(str(exc)) from None
+        return s.PilotFeedbackView.model_validate(feedback, from_attributes=True)
+
     def status(self, case_id: str) -> s.CaseStatus:
         record = self._intake(case_id)
         offer = self.pre_hold(case_id)
@@ -1806,6 +1877,9 @@ class CaseService:
         expired = now >= window_deadline
         saved = self._store.get_research(case_id)
         draft = self._store.get_draft(case_id)
+        # TODO: Expose the original mailing's capture basis in customer status. Once payment
+        # confirms the charge, label the basis as a USPS scan or the hold-expiry fallback.
+        # Legacy records with missing evidence should report the basis as unknown.
         return s.CaseStatus(
             case_id=case_id,
             support_code=self._public_support_code(case.case_token),
@@ -2123,7 +2197,11 @@ class CaseService:
             pdf_base64=base64.b64encode(prepared.request.pdf).decode("ascii"),
             pdf_sha256=hashlib.sha256(prepared.request.pdf).hexdigest(),
             letter_id=cursor.outcome.letter_id,
-            tracking_number=cursor.outcome.tracking_number,
+            tracking_number=(
+                cursor.outcome.tracking_number
+                if prepared.request.options.mail_class is MailClass.CERTIFIED
+                else None
+            ),
             events=[
                 s.ReturnProofEvent(
                     event=data["event"],
@@ -2390,7 +2468,7 @@ class CaseService:
             event = ResearchComplete()
         if event is not None:
             if isinstance(event, ResearchComplete) and not effective.deadline_feasible(
-                production_date(self._deps.clock()), MailClass.CERTIFIED
+                production_date(self._deps.clock()), self._packet_mail_class(case_id)
             ):
                 event = Stopped(StopReason.NOT_FEASIBLE)
             self._apply(case_token, event)
@@ -3394,7 +3472,8 @@ class CaseService:
         )
         if timing.deadline is None or timing.counting is None or timing.counting.disclose:
             raise ServiceConflict("research_not_ready")
-        if not timing.deadline_feasible(production_date(self._deps.clock()), MailClass.CERTIFIED):
+        mail_class = self._packet_mail_class(record.intake_id)
+        if not timing.deadline_feasible(production_date(self._deps.clock()), mail_class):
             assert record.case_token is not None
             self._apply(record.case_token, Stopped(StopReason.NOT_FEASIBLE))
             raise ServiceConflict("deadline_not_feasible")
@@ -3403,6 +3482,17 @@ class CaseService:
             raise ServiceConflict("destination_decision_mismatch")
         if destination.decision.provenance is AddressProvenance.CUSTOMER_DIRECTED_UNVERIFIED:
             raise ServiceConflict("destination_verification_required")
+        if mail_class is MailClass.FIRST_CLASS:
+            entitlement = self._store.beta_entitlement(record.intake_id)
+            scope = entitlement.pilot_scope if entitlement is not None else None
+            route = None if scope is None else self._store.current_route(scope)
+            if (
+                route is None
+                or not self._store.route_check_current(route, self._deps.clock())
+                or destination.decision.address is None
+                or route.address_fingerprint != address_fingerprint(destination.decision.address)
+            ):
+                raise ServiceConflict("appeal_office_needs_verification")
         adoption = Adoption(saved.adopted_by, saved.adopted_at, saved.adopted_sha256)
         signature = None
         if signature_ref is not None:
@@ -3438,7 +3528,7 @@ class CaseService:
                 address.zip_code,
             ),
             destination.decision.address,
-            LetterOptions(MailClass.CERTIFIED),
+            LetterOptions(mail_class),
         )
         try:
             validate_request(request)
@@ -4370,6 +4460,17 @@ class CaseService:
                 raise ValueError("naive event")
         except ValueError:
             raise ServiceConflict("invalid_webhook") from None
+        # Only the signed occurrence date can anchor an ordinary-post reminder. Older
+        # backlog envelopes may carry a synthesized date equal to our receipt time.
+        pilot_printer_handoff_at = (
+            occurred_at.isoformat()
+            if provider == "lob"
+            and event_type == "letter.mailed"
+            and isinstance(occurred, str)
+            and occurred_at <= now
+            and (saved is None or data.get("pilot_printer_handoff_at") == occurred_at.isoformat())
+            else None
+        )
         envelope = ""
         if provider == "lob":
             # Keep only the fields needed by the SAME predicates on replay. Preserve
@@ -4401,14 +4502,15 @@ class CaseService:
                         if value is None
                         else True
                     )
-            envelope = json.dumps(
-                {
-                    "id": event_id,
-                    "event_type": event_type,
-                    "date_created": occurred_at.isoformat(),
-                    "body": reduced,
-                }
-            )
+            envelope_data = {
+                "id": event_id,
+                "event_type": event_type,
+                "date_created": occurred_at.isoformat(),
+                "body": reduced,
+            }
+            if pilot_printer_handoff_at is not None:
+                envelope_data["pilot_printer_handoff_at"] = pilot_printer_handoff_at
+            envelope = json.dumps(envelope_data)
 
         if token is None:
             if provider != "lob":
@@ -4428,6 +4530,7 @@ class CaseService:
                 acceptance = None
                 prepared = None if attempt is None else self._store.get(token, attempt)
                 cursor = None if attempt is None else self._store.submission_cursor(token, attempt)
+                held = None
                 if provider == "lob":
                     # Matching happened before ownership. Revalidate the exact attempt
                     # before projecting a return or writing any tracking/effects.
@@ -4499,28 +4602,40 @@ class CaseService:
                 scans = (
                     scan_proof(obj.get("tracking_events")) if scan_matches or return_matches else ()
                 )
-                safe = json.dumps(
-                    {
-                        "event": event_type,
-                        "occurred_at": occurred_at.isoformat(),
-                        "tracking_number": tracking_number
-                        if isinstance(tracking_number, str)
-                        else None,
-                        "letter_id": ref,
-                        "attempt": attempt,
-                        "failure_evidence": failure_matches,
-                        "scan_evidence": scan_matches or return_matches,
-                        "evidence_ignored": (
-                            "submission_identity_mismatch"
-                            if provider == "lob"
-                            and event_type in FAILURE_WEBHOOKS
-                            and not failure_matches
-                            else None
-                        ),
-                        "tracking_events": [scan.as_sent() for scan in scans],
-                        **evidence,
-                    }
-                )
+                safe_data = {
+                    "event": event_type,
+                    "occurred_at": occurred_at.isoformat(),
+                    "tracking_number": tracking_number
+                    if isinstance(tracking_number, str)
+                    else None,
+                    "letter_id": ref,
+                    "attempt": attempt,
+                    "failure_evidence": failure_matches,
+                    "scan_evidence": scan_matches or return_matches,
+                    "evidence_ignored": (
+                        "submission_identity_mismatch"
+                        if provider == "lob"
+                        and event_type in FAILURE_WEBHOOKS
+                        and not failure_matches
+                        else None
+                    ),
+                    "tracking_events": [scan.as_sent() for scan in scans],
+                    **evidence,
+                }
+                if (
+                    pilot_printer_handoff_at is not None
+                    and attempt == 1
+                    and held == ref
+                    and case.payment_state is PaymentState.NO_CHARGE
+                    and prepared is not None
+                    and prepared.request.options.mail_class is MailClass.FIRST_CLASS
+                    and submission_token == prepared.request.submission_token
+                    and obj.get("status") in (None, "processed", "rendered")
+                    and obj.get("failure_reason") is None
+                    and (obj.get("deleted") is None or obj.get("deleted") is False)
+                ):
+                    safe_data["pilot_printer_handoff_at"] = pilot_printer_handoff_at
+                safe = json.dumps(safe_data)
                 if (
                     provider == "lob"
                     and attempt == case.attempt
@@ -4813,13 +4928,14 @@ class CaseService:
         self._replay_case_webhooks(token)
         processed = dispatch_once(
             self._store,
-            self._original_create_client(self._deps.lob, token),
+            self._deps.lob,
             self._deps.payments,
             self._deps.clock,
             self._deps.new_id,
             case_id=token,
             deadline_feasible=self._mailing_deadline_feasible,
             validate_prepared=self._validate_prepared_packet,
+            original_create_guard=partial(self._original_create_client, token=token),
         )
         self._replay_case_webhooks(token)
         return processed
@@ -4951,6 +5067,7 @@ class CaseService:
     def tracking(self, case_id: str) -> s.Tracking:
         record = self._intake(case_id)
         status = self.status(case_id)
+        ordinary = self._packet_mail_class(case_id) is MailClass.FIRST_CLASS
         events: list[s.TrackingEvent] = []
         tracking_number = None
         if record.case_token is not None:
@@ -4992,8 +5109,12 @@ class CaseService:
             case_id=case_id,
             state=status.state,
             tier=status.selected_tier,
-            tracking_number=tracking_number,
+            tracking_number=None if ordinary else tracking_number,
             events=sorted(events, key=lambda e: e.occurred_at),
-            delivery_confirmation_title="ParkingBreaker Delivery Confirmation",
+            delivery_confirmation_title=(
+                "ParkingBreaker Mailing Record"
+                if ordinary
+                else "ParkingBreaker Delivery Confirmation"
+            ),
             fake=False,
         )

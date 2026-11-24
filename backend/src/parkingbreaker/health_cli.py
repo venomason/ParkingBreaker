@@ -75,6 +75,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             invalidate_monitor_poll(args.state)
             snapshot = observe(args.data, backups, now, require_off_host=require_replica)
             alerts = evaluate(snapshot, now)
+            # TODO(J06/R04): Have an off-host probe watch the age of the committed sweep and
+            # monitor receipts plus the oldest due repair. If progress stalls or this VM goes
+            # dark, page the duty responder independently and reach the backup on missed ack.
             log.deliver(alerts, now, notify, to)
             record_monitor_poll(snapshot, args.data, args.state, now, datetime.now(UTC))
             print(

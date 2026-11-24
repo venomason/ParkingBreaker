@@ -5,6 +5,7 @@
  */
 
 import { CERTIFIED_CENTS } from "./prices";
+import { dispatchSettled } from "./fulfillment";
 import type { components } from "./api-types";
 
 type Schemas = components["schemas"];
@@ -42,6 +43,12 @@ export type BetaAcceptanceReceipt = Schemas["BetaAcceptanceReceipt"];
 export type BetaFeedbackNoticeRequest = Schemas["BetaFeedbackNoticeRequest"];
 export type BetaFeedbackNoticeReceipt = Schemas["BetaFeedbackNoticeReceipt"];
 export type BetaFeedbackNoticeList = Schemas["BetaFeedbackNoticeList"];
+
+export type PilotFeedbackSnapshot = Schemas["PilotFeedbackView"];
+export type PilotFeedbackRequest = Schemas["PilotFeedbackUpdate"];
+export type PilotFeedbackAnswers = Required<Pick<PilotFeedbackSnapshot, "routing" | "acknowledgment" | "disposition">>;
+type PilotFeedbackLink = Schemas["OutcomeLinkRequest"];
+
 // Immutable server funding posture. It is returned on every pricing response;
 // a missing or unknown value must never be read as "paid".
 export type ServicePhase = "paid" | "controlled_free_beta";
@@ -165,14 +172,14 @@ function csrfToken(): string {
   return document.cookie.split("; ").find((part) => part.startsWith("__Host-pb-csrf="))?.slice("__Host-pb-csrf=".length) ?? "";
 }
 
-async function call<T>(method: string, path: string, body?: unknown, publicAuth = false, timeoutMs?: number, quiet = false): Promise<T> {
+async function call<T>(method: string, path: string, body?: unknown, publicAuth: boolean | "anonymous" = false, timeoutMs?: number, quiet = false): Promise<T> {
   const controller = timeoutMs === undefined ? undefined : new AbortController();
   const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
   try {
     const response = await fetch(`${API_BASE}${path}`, {
       method,
       signal: controller?.signal,
-      credentials: "same-origin",
+      credentials: publicAuth === "anonymous" ? "omit" : "same-origin",
       cache: "no-store",
       headers: {
         ...(PREVIEW_AUTH && !publicAuth ? { Authorization: "Bearer fake-alice" } : {}),
@@ -326,13 +333,29 @@ export const api = {
   submitIntake: (w: string, intake: SubmitIntake) =>
     call<IntakeReceipt>("POST", `/workspaces/${w}/intake`, intake),
   preHold: (c: string) => call<PreHoldResult>("GET", `/cases/${c}/pre-hold`),
-  betaOffer: (c: string) => call<BetaOffer>("GET", `/cases/${c}/beta-offer`, undefined, false, ACCESS_TIMEOUT_MS),
+  betaOffer: async (c: string) => {
+    const offer = await call<BetaOffer>("GET", `/cases/${c}/beta-offer`, undefined, false, ACCESS_TIMEOUT_MS);
+    if (offer.case_id !== c || offer.funding !== "NO_CHARGE" || offer.amount_cents !== 0 || !["STANDARD", "CERTIFIED"].includes(offer.tier)) {
+      throw new ApiError(502, "invalid_beta_offer");
+    }
+    return offer;
+  },
   // Consent is only the exact displayed server disclosure; no tier, card or amount.
   acceptBeta: (c: string, disclosureSha256: string) =>
     call<BetaAcceptanceReceipt>("POST", `/cases/${c}/beta-acceptance`, {
       terms_accepted: true,
       disclosure_sha256: disclosureSha256,
     }),
+  pilotFeedback: (c: string) =>
+    call<PilotFeedbackSnapshot>("GET", `/cases/${encodeURIComponent(c)}/pilot-feedback`, undefined, false, ACCESS_TIMEOUT_MS),
+  recordPilotFeedback: (c: string, request: PilotFeedbackRequest) =>
+    call<PilotFeedbackSnapshot>("POST", `/cases/${encodeURIComponent(c)}/pilot-feedback`, request, false, ACCESS_TIMEOUT_MS),
+  pilotFeedbackFromLink: (link: PilotFeedbackLink) =>
+    call<PilotFeedbackSnapshot>("POST", "/outcomes/pilot-feedback/status", link, "anonymous", ACCESS_TIMEOUT_MS),
+  recordPilotFeedbackFromLink: (link: PilotFeedbackLink, request: PilotFeedbackRequest) =>
+    call<PilotFeedbackSnapshot>("POST", "/outcomes/pilot-feedback", { ...link, ...request }, "anonymous", ACCESS_TIMEOUT_MS),
+  optOutOfFollowUp: (link: PilotFeedbackLink) =>
+    call<{ status: "opted_out" }>("POST", "/outcomes/opt-out", link, "anonymous", ACCESS_TIMEOUT_MS),
   // Customer-reported notices for an accepted beta. The cursor is the opaque
   // public notice id and is passed back exactly as returned, never decoded.
   notices: (c: string, limit = 25, cursor?: string | null) =>
@@ -397,7 +420,7 @@ export const api = {
       s.state === "STOPPED_NO_CHARGE" ||
       (step === "research" && s.state !== "RESEARCHING") ||
       (step === "draft" && s.state !== "DRAFTING") ||
-      (step === "dispatch" && s.payment_state === "CAPTURED");
+      (step === "dispatch" && dispatchSettled(s));
     for (let attempt = 0; attempt < 120; attempt++) {
       const status = await call<CaseStatus>("GET", `/cases/${c}/status`);
       if (done(status)) return status;

@@ -1,10 +1,8 @@
 """Append-only outcome follow-up record: consent, sends and reported outcomes.
 
-One append-only table holds the whole follow-up story for a case: an e-mail consent or
-opt-out decision (scoped to the canonical e-mail identity, never the raw address), the
-D+14 and D+30 sends, and the reported outcome. Partial unique indexes make the invariants
-structural rather than conventional: at most one send per window, one UNKNOWN outcome, and
-one append-only history that no UPDATE or DELETE can rewrite.
+One append-only table holds e-mail consent (scoped to a hashed address), the D+14 and
+D+30 sends, and reported outcomes. First-class pilot reports can update routing,
+acknowledgment and disposition independently without changing the outcome record.
 
 The outcome kinds keep agency-reported and customer-reported results distinct, and record
 non-response as UNKNOWN. No path in this module records a dismissal or a defeat on the
@@ -14,17 +12,25 @@ customer's behalf.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import sqlite3
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Final, Protocol
 
+from parkingbreaker.lob_submission import Accepted, Canceled, Uncertain, UspsScan
+from parkingbreaker.lob_webhook import USPS_SCAN_NAMES
 from parkingbreaker.mail_attempt_store import (
+    PreparedMailAttempt,
     StorageCorruption,
     check_versions_schema,
     rollback_preserving_error,
 )
+from parkingbreaker.mail_config import MailClass
+from parkingbreaker.submission_records import SubmissionCursor
 
 COMPONENT = "outcome_follow_up"
 TABLE = "pb_outcome_follow_up_events"
@@ -35,10 +41,11 @@ MAX_DETAIL_LENGTH = 2000
 CONSENT_KINDS: Final = frozenset({"OPT_IN", "OPT_OUT"})
 SEND_WINDOWS: Final = {"D14": "SENT_D14", "D30": "SENT_D30"}
 OUTCOME_KINDS: Final = frozenset({"OUTCOME_AGENCY", "OUTCOME_CUSTOMER", "OUTCOME_UNKNOWN"})
-_ALL_KINDS: Final = CONSENT_KINDS | frozenset(SEND_WINDOWS.values()) | OUTCOME_KINDS
+_PILOT_KINDS: Final = frozenset({"PILOT_FEEDBACK", "PILOT_SEND_STARTED"})
+_ALL_KINDS: Final = CONSENT_KINDS | frozenset(SEND_WINDOWS.values()) | OUTCOME_KINDS | _PILOT_KINDS
 
 # The kind list is a closed set enforced by the schema itself.
-_DDL = """CREATE TABLE pb_outcome_follow_up_events (
+_DDL_V1 = """CREATE TABLE pb_outcome_follow_up_events (
     revision INTEGER PRIMARY KEY CHECK (revision >= 1),
     case_token TEXT,
     email_key TEXT,
@@ -56,19 +63,35 @@ _DDL = """CREATE TABLE pb_outcome_follow_up_events (
         OR (kind NOT IN ('OPT_IN', 'OPT_OUT') AND case_token IS NOT NULL)
     )
 )"""
+_DDL = _DDL_V1.replace(
+    "'OUTCOME_AGENCY', 'OUTCOME_CUSTOMER', 'OUTCOME_UNKNOWN'",
+    "'OUTCOME_AGENCY', 'OUTCOME_CUSTOMER', 'OUTCOME_UNKNOWN',\n"
+    "        'PILOT_FEEDBACK', 'PILOT_SEND_STARTED'",
+)
 
 _INDEXES: Final = (
     f"CREATE UNIQUE INDEX {TABLE}_one_d14 ON {TABLE} (case_token) WHERE kind='SENT_D14'",
     f"CREATE UNIQUE INDEX {TABLE}_one_d30 ON {TABLE} (case_token) WHERE kind='SENT_D30'",
     f"CREATE UNIQUE INDEX {TABLE}_one_outcome ON {TABLE} (case_token) "
     "WHERE kind IN ('OUTCOME_AGENCY', 'OUTCOME_CUSTOMER', 'OUTCOME_UNKNOWN')",
+    f"CREATE INDEX {TABLE}_pilot_updates ON {TABLE} (case_token, revision) "
+    "WHERE kind='PILOT_FEEDBACK'",
 )
 
 _COMMAND_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}")
+_PILOT_REQUEST_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}")
 _PRINTABLE = re.compile(r"[^\x00-\x1f\x7f]+")
 _COLUMNS = "revision, case_token, email_key, kind, detail, command_id, actor, reason, recorded_at"
 _SELECT = f"SELECT {_COLUMNS} FROM {TABLE} ORDER BY revision ASC"
 _SELECT_FOR_CASE = f"SELECT {_COLUMNS} FROM {TABLE} WHERE case_token=? ORDER BY revision ASC"
+_PILOT_CASE = """c.payment_state='NO_CHARGE' AND c.amount_cents=0 AND EXISTS (
+    SELECT 1 FROM pb_beta_entitlements e JOIN pb_beta_campaigns p USING (campaign_id)
+    WHERE e.case_token=c.case_token AND e.accepted_at IS NOT NULL AND p.pilot_issuer_id IS NOT NULL
+) AND EXISTS (
+    SELECT 1 FROM pb_mail_attempts a WHERE a.case_token=c.case_token AND a.attempt=1
+    AND CASE WHEN json_valid(a.envelope_json)
+        THEN json_extract(a.envelope_json, '$.options.mail_class') END = 'first_class'
+)"""
 
 
 class FollowUpConflict(ValueError):
@@ -87,6 +110,63 @@ class FollowUpEvent:
     reason: str
     recorded_at: datetime
     replayed: bool = False
+
+
+class PilotRouting(StrEnum):
+    RETURNED = "returned"
+    REDIRECTED = "redirected"
+    WRONG_OFFICE = "wrong_office"
+    NO_KNOWN_PROBLEM = "no_known_problem"
+    UNKNOWN = "unknown"
+
+
+class PilotAcknowledgment(StrEnum):
+    ACKNOWLEDGED = "acknowledged"
+    MORE_INFO_REQUESTED = "more_info_requested"
+    PENDING = "pending"
+    UNKNOWN = "unknown"
+
+
+class PilotDisposition(StrEnum):
+    DISMISSED = "dismissed"
+    REDUCED = "reduced"
+    UPHELD = "upheld"
+    FILING_REJECTED = "filing_rejected"
+    PENDING = "pending"
+
+
+@dataclass(frozen=True)
+class PilotFeedback:
+    eligible: bool = False
+    revision: int = 0
+    first_postal_scan_at: datetime | None = None
+    printer_handoff_at: datetime | None = None
+    routing: str | None = None
+    acknowledgment: str | None = None
+    disposition: str | None = None
+    updated_at: datetime | None = None
+
+
+_PILOT_FIELDS: Final = {
+    "routing": PilotRouting,
+    "acknowledgment": PilotAcknowledgment,
+    "disposition": PilotDisposition,
+}
+
+
+def _pilot_patch(values: Mapping[str, object]) -> dict[str, str]:
+    if not values:
+        raise FollowUpConflict("pilot_feedback_empty")
+    validated = {}
+    for name, value in values.items():
+        field = _PILOT_FIELDS.get(name)
+        if field is None or not isinstance(value, str):
+            raise FollowUpConflict("pilot_feedback_invalid")
+        try:
+            validated[name] = field(value).value
+        except ValueError:
+            raise FollowUpConflict("pilot_feedback_invalid") from None
+    return validated
 
 
 def canonical_email_key(email: str) -> str:
@@ -177,7 +257,7 @@ def _event_from_row(row: tuple[object, ...]) -> FollowUpEvent:
 
 
 def initialize_outcome_follow_up(database: sqlite3.Connection) -> None:
-    """Create or validate the versioned append-only table inside a caller transaction."""
+    """Create or migrate the versioned append-only table in one transaction."""
     database.execute("BEGIN IMMEDIATE")
     try:
         check_versions_schema(database)
@@ -190,17 +270,26 @@ def initialize_outcome_follow_up(database: sqlite3.Connection) -> None:
         if version is None:
             if table is not None:
                 raise StorageCorruption("unversioned outcome follow-up schema")
+        elif version not in {(1,), (2,)} or table is None:
+            raise StorageCorruption("malformed outcome follow-up schema")
+        else:
+            expected = _DDL_V1 if version == (1,) else _DDL
+            if " ".join(str(table[0]).upper().split()) != " ".join(expected.upper().split()):
+                raise StorageCorruption("malformed outcome follow-up schema")
+        if version == (1,):
+            database.execute(f"ALTER TABLE {TABLE} RENAME TO {TABLE}_v1")
+        if version != (2,):
             database.execute(_DDL)
+            if version == (1,):
+                database.execute(f"INSERT INTO {TABLE} SELECT {_COLUMNS} FROM {TABLE}_v1")
+                database.execute(f"DROP TABLE {TABLE}_v1")
             for statement in _INDEXES:
                 database.execute(statement)
-            database.execute("INSERT INTO pb_store_versions VALUES (?, 1)", (COMPONENT,))
-        elif (
-            type(version[0]) is not int
-            or version[0] != 1
-            or table is None
-            or " ".join(str(table[0]).upper().split()) != " ".join(_DDL.upper().split())
-        ):
-            raise StorageCorruption("malformed outcome follow-up schema")
+            database.execute(
+                "INSERT INTO pb_store_versions VALUES (?, 2) "
+                "ON CONFLICT(component) DO UPDATE SET version=excluded.version",
+                (COMPONENT,),
+            )
         for action in ("UPDATE", "DELETE"):
             database.execute(
                 f"CREATE TRIGGER IF NOT EXISTS {TABLE}_no_{action.lower()} "
@@ -220,6 +309,26 @@ class FollowUpStoreProtocol(Protocol):
     def follow_up_consent_state(self, email: str) -> tuple[bool | None, int]: ...
 
     def delivered_cases(self, limit: int = 100) -> list[tuple[str, datetime]]: ...
+
+    def pilot_follow_up_candidates(self) -> tuple[str, ...]: ...
+
+    def is_pilot_case(self, case_token: str) -> bool: ...
+
+    def pilot_feedback(self, case_token: str) -> PilotFeedback: ...
+
+    def record_pilot_feedback(
+        self,
+        case_token: str,
+        request_id: str,
+        expected_revision: int,
+        values: Mapping[str, object],
+        *,
+        now: datetime,
+    ) -> PilotFeedback: ...
+
+    def start_pilot_follow_up(
+        self, case_token: str, window: str, *, now: datetime
+    ) -> FollowUpEvent: ...
 
     def intake_json_for_case(self, case_token: str) -> str | None: ...
 
@@ -279,9 +388,17 @@ class _Connected(Protocol):
 
     def _follow_up_events(self, case_token: str | None = None) -> list[FollowUpEvent]: ...
 
-    def delivered_cases(self, limit: int = 100) -> list[tuple[str, datetime]]: ...
+    def get(self, case_token: str, attempt: int) -> PreparedMailAttempt | None: ...
 
-    def intake_json_for_case(self, case_token: str) -> str | None: ...
+    def usps_scans(self, case_id: str, attempt: int = 1) -> tuple[UspsScan, ...]: ...
+
+    def submission_cursor(self, case_id: str, attempt: int) -> SubmissionCursor | None: ...
+
+    def tracking_payloads(self, case_id: str) -> tuple[str, ...]: ...
+
+    def is_pilot_case(self, case_token: str) -> bool: ...
+
+    def pilot_feedback(self, case_token: str) -> PilotFeedback: ...
 
     def _append(
         self,
@@ -294,7 +411,59 @@ class _Connected(Protocol):
         actor: str,
         reason: str,
         now: datetime,
+        expected_pilot_revision: int | None = None,
     ) -> FollowUpEvent: ...
+
+
+def _date_from_observation(value: object, prepared_at: datetime) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        when = _utc(datetime.fromisoformat(value))
+    except (ValueError, OverflowError):
+        return None
+    return when if when >= prepared_at else None
+
+
+def _pilot_postal_evidence(store: _Connected, case_token: str) -> PilotFeedback:
+    if not store.is_pilot_case(case_token):
+        return PilotFeedback()
+    prepared = store.get(case_token, 1)
+    if prepared is None or prepared.request.options.mail_class is not MailClass.FIRST_CLASS:
+        return PilotFeedback()
+    cursor = store.submission_cursor(case_token, 1)
+    outcome = None if cursor is None else cursor.outcome
+    if not isinstance(outcome, Accepted | Uncertain | Canceled) or outcome.letter_id is None:
+        return PilotFeedback()
+    if isinstance(outcome, Canceled):
+        return PilotFeedback(eligible=True)
+    scans = (
+        scan.time
+        for scan in store.usps_scans(case_token, 1)
+        if scan.event_type == "normal" and scan.name in USPS_SCAN_NAMES
+    )
+    scan_times = (
+        parsed
+        for timestamp in scans
+        if (parsed := _date_from_observation(timestamp, prepared.prepared_at)) is not None
+    )
+    handoffs = []
+    for payload in store.tracking_payloads(case_token):
+        data = json.loads(payload)
+        if (
+            data.get("event") != "letter.mailed"
+            or data.get("attempt") != 1
+            or data.get("letter_id") != outcome.letter_id
+        ):
+            continue
+        when = _date_from_observation(data.get("pilot_printer_handoff_at"), prepared.prepared_at)
+        if when is not None:
+            handoffs.append(when)
+    return PilotFeedback(
+        eligible=True,
+        first_postal_scan_at=min(scan_times, default=None),
+        printer_handoff_at=min(handoffs, default=None),
+    )
 
 
 class OutcomeFollowUpStoreMixin:
@@ -319,6 +488,7 @@ class OutcomeFollowUpStoreMixin:
                 "SELECT c.case_token, MIN(h.occurred_at) AS delivered_at FROM pb_cases c "
                 "JOIN pb_case_history h ON h.case_token = c.case_token "
                 "WHERE c.letter_state = 'DELIVERED' AND h.event_name = 'DeliveryProofStored' "
+                f"AND NOT ({_PILOT_CASE}) "
                 f"AND NOT EXISTS (SELECT 1 FROM {TABLE} e WHERE e.case_token = c.case_token "
                 "AND e.kind IN ('OUTCOME_AGENCY', 'OUTCOME_CUSTOMER', 'OUTCOME_UNKNOWN')) "
                 "GROUP BY c.case_token "
@@ -351,6 +521,113 @@ class OutcomeFollowUpStoreMixin:
             .fetchone()
         )
         return None if row is None else str(row[0])
+
+    def is_pilot_case(self: _Connected, case_token: str) -> bool:
+        row = (
+            self._require_open()
+            .execute(
+                f"SELECT 1 FROM pb_cases c WHERE c.case_token=? AND ({_PILOT_CASE})", (case_token,)
+            )
+            .fetchone()
+        )
+        return row is not None
+
+    def pilot_follow_up_candidates(self: _Connected) -> tuple[str, ...]:
+        """First-class no-charge cases with at least one reminder still unsent."""
+        rows = self._require_open().execute(
+            f"SELECT c.case_token FROM pb_cases c WHERE ({_PILOT_CASE}) "
+            f"AND NOT EXISTS (SELECT 1 FROM {TABLE} e WHERE e.case_token=c.case_token "
+            "AND e.kind='SENT_D30') "
+            "ORDER BY c.authorized_at, c.case_token"
+        )
+        return tuple(str(row[0]) for row in rows)
+
+    def pilot_feedback(self: _Connected, case_token: str) -> PilotFeedback:
+        evidence = _pilot_postal_evidence(self, case_token)
+        if not evidence.eligible:
+            return evidence
+        values: dict[str, str] = {}
+        updated_at = None
+        revision = 0
+        rows = self._require_open().execute(
+            f"SELECT {_COLUMNS} FROM {TABLE} WHERE case_token=? AND kind='PILOT_FEEDBACK' "
+            "ORDER BY revision",
+            (case_token,),
+        )
+        for row in rows:
+            event = _event_from_row(tuple(row))
+            try:
+                payload = json.loads(event.detail)
+                if (
+                    not isinstance(payload, dict)
+                    or set(payload) != {"expected_revision", "values"}
+                    or type(payload["expected_revision"]) is not int
+                    or payload["expected_revision"] != revision
+                    or not isinstance(payload["values"], dict)
+                ):
+                    raise ValueError("invalid pilot feedback revision")
+                values.update(_pilot_patch(payload["values"]))
+            except ValueError as exc:
+                raise StorageCorruption("invalid stored pilot feedback") from exc
+            updated_at = event.recorded_at
+            revision += 1
+        return replace(
+            evidence,
+            revision=revision,
+            routing=values.get("routing"),
+            acknowledgment=values.get("acknowledgment"),
+            disposition=values.get("disposition"),
+            updated_at=updated_at,
+        )
+
+    def record_pilot_feedback(
+        self: _Connected,
+        case_token: str,
+        request_id: str,
+        expected_revision: int,
+        values: Mapping[str, object],
+        *,
+        now: datetime,
+    ) -> PilotFeedback:
+        if not isinstance(request_id, str) or _PILOT_REQUEST_ID.fullmatch(request_id) is None:
+            raise FollowUpConflict("invalid_pilot_feedback_request")
+        if type(expected_revision) is not int or expected_revision < 0:
+            raise FollowUpConflict("invalid_pilot_feedback_revision")
+        patch = _pilot_patch(values)
+        digest = hashlib.sha256(f"{case_token}\0{request_id}".encode()).hexdigest()
+        self._append(
+            case_token=case_token,
+            email_key=None,
+            kind="PILOT_FEEDBACK",
+            detail=json.dumps(
+                {"expected_revision": expected_revision, "values": patch},
+                sort_keys=True,
+                separators=(",", ":"),
+            ),
+            command_id=f"pilot-feedback:{digest}",
+            actor="customer",
+            reason="customer reported an ordinary-post update",
+            now=now,
+            expected_pilot_revision=expected_revision,
+        )
+        return self.pilot_feedback(case_token)
+
+    def start_pilot_follow_up(
+        self: _Connected, case_token: str, window: str, *, now: datetime
+    ) -> FollowUpEvent:
+        """Persist the first attempt so a crash cannot extend provider idempotency."""
+        if window not in SEND_WINDOWS:
+            raise FollowUpConflict("unknown follow-up window")
+        return self._append(
+            case_token=case_token,
+            email_key=None,
+            kind="PILOT_SEND_STARTED",
+            detail=window,
+            command_id=f"pilot-start:{window}:{case_token}",
+            actor="worker",
+            reason="scheduled ordinary-post reminder attempt",
+            now=now,
+        )
 
     # Consent ---------------------------------------------------------------------------
     def set_follow_up_consent(
@@ -505,6 +782,7 @@ class OutcomeFollowUpStoreMixin:
         actor: str,
         reason: str,
         now: datetime,
+        expected_pilot_revision: int | None = None,
     ) -> FollowUpEvent:
         named_actor = _text(actor, "actor", MAX_ACTOR_LENGTH)
         explanation = _text(reason, "reason", MAX_REASON_LENGTH)
@@ -513,6 +791,10 @@ class OutcomeFollowUpStoreMixin:
         database = self._require_open()
         database.execute("BEGIN IMMEDIATE")
         try:
+            if kind in _PILOT_KINDS and (
+                case_token is None or not _pilot_postal_evidence(self, case_token).eligible
+            ):
+                raise FollowUpConflict("pilot_feedback_not_eligible")
             existing = database.execute(
                 "SELECT revision, case_token, email_key, kind, detail, command_id, actor, "
                 f"reason, recorded_at FROM {TABLE} WHERE command_id=?",
@@ -531,6 +813,13 @@ class OutcomeFollowUpStoreMixin:
                     database.execute("COMMIT")
                     return replace(saved, replayed=True)
                 raise FollowUpConflict("command_id_payload_changed")
+            if kind == "PILOT_FEEDBACK":
+                (current_revision,) = database.execute(
+                    f"SELECT COUNT(*) FROM {TABLE} WHERE case_token=? AND kind='PILOT_FEEDBACK'",
+                    (case_token,),
+                ).fetchone()
+                if current_revision != expected_pilot_revision:
+                    raise FollowUpConflict("pilot_feedback_revision_changed")
             revision_row = database.execute(
                 f"SELECT COALESCE(MAX(revision), 0) FROM {TABLE}"
             ).fetchone()

@@ -15,7 +15,7 @@ const PRELOAD_FONTS = [
 
 export const metadata: Metadata = {
   title: "ParkingBreaker · Appeal your parking ticket in your own words",
-  description: "Appeal your parking ticket in your own words. Review the exact packet before we print and send it by USPS Certified Mail. Clerical service only; no legal advice and no promised outcome.",
+  description: "Appeal your parking ticket in your own words. Review and approve the exact packet before we print and mail it. Clerical service only with no legal advice or promised outcome.",
   applicationName: "ParkingBreaker",
 };
 

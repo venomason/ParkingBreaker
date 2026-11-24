@@ -363,6 +363,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cases/{case_id}/pilot-feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pilot Feedback */
+        get: operations["pilot_feedback_cases__case_id__pilot_feedback_get"];
+        put?: never;
+        /** Record Pilot Feedback */
+        post: operations["record_pilot_feedback_cases__case_id__pilot_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cases/{case_id}/status": {
         parameters: {
             query?: never;
@@ -636,6 +654,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/outcomes/pilot-feedback/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pilot Link Status */
+        post: operations["pilot_link_status_outcomes_pilot_feedback_status_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/outcomes/pilot-feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pilot Link Update */
+        post: operations["pilot_link_update_outcomes_pilot_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/webhooks/stripe": {
         parameters: {
             query?: never;
@@ -809,12 +861,8 @@ export interface components {
              * @constant
              */
             currency: "usd";
-            /**
-             * Tier
-             * @default CERTIFIED
-             * @constant
-             */
-            tier: "CERTIFIED";
+            /** @default CERTIFIED */
+            tier: components["schemas"]["MailTier"];
             /**
              * Accepted At
              * Format: date-time
@@ -953,12 +1001,8 @@ export interface components {
              * @constant
              */
             currency: "usd";
-            /**
-             * Tier
-             * @default CERTIFIED
-             * @constant
-             */
-            tier: "CERTIFIED";
+            /** @default CERTIFIED */
+            tier: components["schemas"]["MailTier"];
             /** Disclosure Version */
             disclosure_version: number;
             /** Disclosure Text */
@@ -1330,6 +1374,16 @@ export interface components {
             tiers: components["schemas"]["TierOffer"][];
             selected_tier?: components["schemas"]["MailTier"] | null;
         };
+        /**
+         * OutcomeLinkRequest
+         * @description The private per-case link material carried by a follow-up email.
+         */
+        OutcomeLinkRequest: {
+            /** Case Id */
+            case_id: string;
+            /** Token */
+            token: string;
+        };
         /** PacketPreview */
         PacketPreview: {
             /** Pdf Base64 */
@@ -1403,6 +1457,82 @@ export interface components {
             /** Data Base64 */
             data_base64: string;
         };
+        /**
+         * PilotAcknowledgment
+         * @enum {string}
+         */
+        PilotAcknowledgment: "acknowledged" | "more_info_requested" | "pending" | "unknown";
+        /**
+         * PilotDisposition
+         * @enum {string}
+         */
+        PilotDisposition: "dismissed" | "reduced" | "upheld" | "filing_rejected" | "pending";
+        /**
+         * PilotFeedbackLinkUpdate
+         * @description One report authorized by the private pilot email link.
+         */
+        PilotFeedbackLinkUpdate: {
+            routing?: components["schemas"]["PilotRouting"] | null;
+            acknowledgment?: components["schemas"]["PilotAcknowledgment"] | null;
+            disposition?: components["schemas"]["PilotDisposition"] | null;
+            /** Request Id */
+            request_id: string;
+            /** Expected Revision */
+            expected_revision: number;
+            /** Case Id */
+            case_id: string;
+            /** Token */
+            token: string;
+        };
+        /**
+         * PilotFeedbackUpdate
+         * @description One progressive customer report. Omitted fields retain their stored values.
+         */
+        PilotFeedbackUpdate: {
+            routing?: components["schemas"]["PilotRouting"] | null;
+            acknowledgment?: components["schemas"]["PilotAcknowledgment"] | null;
+            disposition?: components["schemas"]["PilotDisposition"] | null;
+            /** Request Id */
+            request_id: string;
+            /** Expected Revision */
+            expected_revision: number;
+        };
+        /**
+         * PilotFeedbackView
+         * @description Ordinary-post feedback, with USPS timing and customer statements kept distinct.
+         */
+        PilotFeedbackView: {
+            routing?: components["schemas"]["PilotRouting"] | null;
+            acknowledgment?: components["schemas"]["PilotAcknowledgment"] | null;
+            disposition?: components["schemas"]["PilotDisposition"] | null;
+            /**
+             * Eligible
+             * @default false
+             */
+            eligible: boolean;
+            /**
+             * Revision
+             * @default 0
+             */
+            revision: number;
+            /** First Postal Scan At */
+            first_postal_scan_at?: string | null;
+            /** Printer Handoff At */
+            printer_handoff_at?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /**
+             * Source
+             * @default customer_reported
+             * @constant
+             */
+            source: "customer_reported";
+        };
+        /**
+         * PilotRouting
+         * @enum {string}
+         */
+        PilotRouting: "returned" | "redirected" | "wrong_office" | "no_known_problem" | "unknown";
         PreHoldResult: components["schemas"]["Offer"] | components["schemas"]["Stop"];
         /**
          * RemedyKind
@@ -2267,9 +2397,9 @@ export interface components {
             events: components["schemas"]["TrackingEvent"][];
             /**
              * Delivery Confirmation Title
-             * @constant
+             * @enum {string}
              */
-            delivery_confirmation_title: "ParkingBreaker Delivery Confirmation";
+            delivery_confirmation_title: "ParkingBreaker Delivery Confirmation" | "ParkingBreaker Mailing Record";
             /**
              * Fake
              * @default true
@@ -3726,6 +3856,126 @@ export interface operations {
             };
         };
     };
+    pilot_feedback_cases__case_id__pilot_feedback_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotFeedbackView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    record_pilot_feedback_cases__case_id__pilot_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PilotFeedbackUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotFeedbackView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     status_cases__case_id__status_get: {
         parameters: {
             query?: never;
@@ -4710,6 +4960,126 @@ export interface operations {
                     "application/json": {
                         [key: string]: number;
                     };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    pilot_link_status_outcomes_pilot_feedback_status_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutcomeLinkRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotFeedbackView"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    pilot_link_update_outcomes_pilot_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PilotFeedbackLinkUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PilotFeedbackView"];
                 };
             };
             /** @description Unauthorized */

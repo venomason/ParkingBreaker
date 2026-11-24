@@ -346,6 +346,12 @@ async def _contract_examples(
         )
         await call("GET", f"/cases/{case}/notices", expected_status=409)
         await call("GET", f"/cases/{case}/notices/{'0' * 32}/pages/1", expected_status=409)
+        feedback = {"request_id": "notice-feedback", "expected_revision": 0, "routing": "unknown"}
+        link = {"case_id": "fixture-mail-token", "token": "0" * 64}
+        await call("GET", f"/cases/{case}/pilot-feedback")
+        await call("POST", f"/cases/{case}/pilot-feedback", feedback, expected_status=409)
+        await call("POST", "/outcomes/pilot-feedback/status", link, expected_status=503)
+        await call("POST", "/outcomes/pilot-feedback", {**link, **feedback}, expected_status=503)
         # The ticket-reading path is actual supported customer API, so the generated
         # contract documents its four authenticated routes. The preview capability is
         # honestly disabled and the three write commands refuse durably.
@@ -448,6 +454,12 @@ CUSTOMER_ROUTES = [
     ("POST", "/approval", scripted_approval("a" * 64)),
     ("GET", "/tracking", None),
     ("GET", "/mailing-record", None),
+    ("GET", "/pilot-feedback", None),
+    (
+        "POST",
+        "/pilot-feedback",
+        {"request_id": "pilot-feedback-permission", "expected_revision": 0, "routing": "unknown"},
+    ),
     ("GET", "/destination/disclosure", None),
     (
         "POST",

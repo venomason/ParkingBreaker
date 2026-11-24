@@ -29,8 +29,12 @@ from parkingbreaker.address_policy import (
 )
 from parkingbreaker.agencies import MailingAddress
 from parkingbreaker.case_state import CaseState
-from parkingbreaker.intake_store import IntakeConflict
+from parkingbreaker.intake_store import IntakeConflict, IntakeRecord, SavedResearch
+from parkingbreaker.lob_submission import LetterRequest
 from parkingbreaker.mail_attempt_store import StorageCorruption, rollback_preserving_error
+from parkingbreaker.research.questions import Ticket
+from parkingbreaker.research_records import decode_agency, decode_research
+from parkingbreaker.route_registry import RouteRevision, RouteScope
 from parkingbreaker.transaction_records import _reject_constant, _unique_object
 
 _TABLES = ("pb_address_revisions", "pb_address_consents", "pb_address_decisions")
@@ -69,6 +73,14 @@ class SavedDestinationDecision:
 
 class _Connected(Protocol):
     def _require_open(self) -> sqlite3.Connection: ...
+
+
+class _RouteBindingStore(Protocol):
+    def get_research(self, intake_id: str) -> SavedResearch | None: ...
+    def current_route(self, scope: RouteScope) -> RouteRevision | None: ...
+    def bind_route(
+        self, case_token: str, attempt: int, scope: RouteScope, revision: int
+    ) -> None: ...
 
 
 @contextmanager
@@ -405,8 +417,51 @@ def _next_revision(current: int | None, expected: int | None) -> int:
     return 1 if current is None else current + 1
 
 
+def research_route_scope(ticket: Ticket, request: LetterRequest) -> RouteScope:
+    return RouteScope(
+        ticket.jurisdiction or ticket.city_id,
+        ticket.stage or "first-level review",
+        request.options.mail_class.value,
+    )
+
+
+def prepared_route_scope(
+    intake: IntakeRecord, request: LetterRequest, research_ticket: Ticket | None
+) -> RouteScope | None:
+    """Use the case's resolved issuer and saved ticket stage independently of research."""
+    if intake.agency_json is None:
+        return None if research_ticket is None else research_route_scope(research_ticket, request)
+    issuer = decode_agency(intake.agency_json).id
+    payload: object = json.loads(
+        intake.intake_json, object_pairs_hook=_unique_object, parse_constant=_reject_constant
+    )
+    if not isinstance(payload, dict) or not isinstance(ticket := payload.get("ticket"), dict):
+        # Old records may have an issuer but no ticket stage. Keep their packet
+        # history readable without guessing a route to bind during freeze.
+        return None
+    stage = ticket.get("stage", "first-level review")
+    if not isinstance(stage, str) or not stage.strip():
+        return None
+    return RouteScope(issuer, stage, request.options.mail_class.value)
+
+
 class AddressStoreMixin:
     """Owner-scoped address persistence; no policy inference or external actions."""
+
+    def _bind_prepared_route(
+        self: _RouteBindingStore,
+        case_token: str,
+        attempt: int,
+        intake: IntakeRecord,
+        request: LetterRequest,
+    ) -> None:
+        """Bind the observed route revision in the same transaction as the new packet."""
+        saved = None if intake.agency_json is not None else self.get_research(intake.intake_id)
+        ticket = None if saved is None else decode_research(saved.research_json).ticket
+        scope = prepared_route_scope(intake, request, ticket)
+        if scope is not None:
+            route = self.current_route(scope)
+            self.bind_route(case_token, attempt, scope, 0 if route is None else route.revision)
 
     def lock_destination_for_draft(
         self: _Connected,

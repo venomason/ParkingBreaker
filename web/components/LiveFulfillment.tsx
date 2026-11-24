@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { api, ApiError, type CaseStatus, type PacketPreview, type Tracking } from "../lib/api";
-import { fulfillmentCopy, mailingConfirmed, paymentCopy } from "../lib/fulfillment";
+import { FIRST_CLASS_LIMITS, fulfillmentCopy, mailClassName, mailingConfirmed, matchingTracking, paymentCopy } from "../lib/fulfillment";
 import { formatSupportCaseId } from "../lib/support-case-id";
 import { PostalEventTrail } from "./CaseVisuals";
 import { SupportCaseIdCard } from "./SupportCaseIdCard";
@@ -83,9 +83,11 @@ function RemailReview({ caseId, onRefresh }: { caseId: string; onRefresh: () => 
 export function LiveFulfillment({status, tracking, busy, error, onRefresh}: Props) {
   const copy = fulfillmentCopy(status, tracking);
   const supportCaseId = formatSupportCaseId(status.support_code);
-  const matched = tracking?.case_id === status.case_id ? tracking : null;
+  const matched = matchingTracking(status, tracking);
+  const tier = status.selected_tier ?? matched?.tier;
+  const firstClass = tier === "STANDARD";
   const remedy = status.return_remedy;
-  const proof = remedy?.proof_packet;
+  const proof = firstClass ? null : remedy?.proof_packet;
   // A closed free-beta return carries the backend's closed-case message; no money or
   // second mailing exists, so its refund and re-mail rows are never shown.
   const betaClosed = remedy?.kind === "BETA_RETURN_CLOSED";
@@ -133,23 +135,25 @@ export function LiveFulfillment({status, tracking, busy, error, onRefresh}: Prop
     <div className="card state-card payment-card" role="status"><h3>Payment</h3><p>{paymentCopy(status)}</p></div>
     <div className="card state-card postal-card" id={mailed ? "liveTracking" : "mailingEvents"}>
       <div className="postal-head">
-        <h3>Postal record</h3>
-        {matched && <span className={`bdg ${matched.events.length ? "s-ok" : "s-unk"}`}>{matched.events.length ? `${matched.events.length} reported` : "No events yet"}</span>}
+        <h3>{firstClass ? mailClassName(tier) : "Postal record"}</h3>
+        {!firstClass && matched && <span className={`bdg ${matched.events.length ? "s-ok" : "s-unk"}`}>{matched.events.length ? `${matched.events.length} reported` : "No events yet"}</span>}
       </div>
-      {matched?.tier !== "STANDARD" && (
-        <p className="tracking-number"><b>Certified tracking number:</b> <span className="mono">{matched?.tracking_number ?? "not reported yet"}</span></p>
-      )}
-      {matched?.events.length ? (
+      {firstClass ? <p className="small muted">{FIRST_CLASS_LIMITS}</p> : (
         <>
-          <p className="small muted">Only the events the saved postal record reports appear below, with their recorded times and wording.</p>
-          <PostalEventTrail events={matched.events} />
+          {tier === "CERTIFIED" && <p className="tracking-number"><b>Certified tracking number:</b> <span className="mono">{matched?.tracking_number ?? "not reported yet"}</span></p>}
+          {matched?.events.length ? (
+            <>
+              <p className="small muted">Only the events the saved postal record reports appear below, with their recorded times and wording.</p>
+              <PostalEventTrail events={matched.events} />
+            </>
+          ) : <p className="muted small">No postal events are available yet. Check again later.</p>}
+          {tier === "CERTIFIED" && <p className="small muted">Certified Mail supplies postal records. It does not change the agency’s filing requirements or establish its decision.</p>}
         </>
-      ) : <p className="muted small">No postal events are available yet. Check again later.</p>}
-      <p className="small muted">Certified Mail supplies postal records. It does not change the agency’s filing requirements or establish its decision.</p>
+      )}
       {mailed && (record?.key === recordKey
         ? <a id="liveMailingRecord" href={record.url} download="parkingbreaker-mailing-record.pdf">Download your mailing record (PDF)</a>
         : <button className="btn" id="livePrepareMailingRecord" type="button" onClick={() => { void prepareRecord(); }}>Get your mailing record (PDF)</button>)}
-      {mailed && <p className="small muted">Your mailing record is a copy of the exact packet the mail provider accepted. Postal tracking, when available, is shown above. This is not proof of delivery or a USPS Return Receipt.</p>}
+      {mailed && <p className="small muted">Your mailing record is a copy of the exact packet the mail provider accepted.{!firstClass && " Postal tracking, when available, is shown above. This is not proof of delivery or a USPS Return Receipt."}</p>}
       {recordError && <p className="small" role="alert">{recordError}</p>}
     </div>
     {remedy && <div className="card state-card" id="liveReturnRemedy">

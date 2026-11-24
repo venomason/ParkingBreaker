@@ -4255,8 +4255,23 @@ input[type="file"]:focus-visible {
 
 /* ---------------------------------------------------------------- Beta notices */
 
+#pilotFeedbackCard,
 #betaNoticesCard {
   margin-top: 20px;
+}
+
+.pilot-feedback-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.pilot-feedback-form select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
 }
 
 #betaNoticesCard h4 {

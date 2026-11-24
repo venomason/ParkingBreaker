@@ -247,7 +247,7 @@ def _fake_snapshot(today: date) -> DotGovSnapshot:
 
 
 def known_city_records() -> tuple[dict[str, object], ...]:
-    """2.x's verified city files plus the shared unserviceable list, as starting pages only."""
+    """Legacy city files and the shared unserviceable list supply candidate starting pages."""
     from parkingbreaker.unserviceable import parse_entries, seed_records
 
     folder = REPO_ROOT / "backend" / "data"

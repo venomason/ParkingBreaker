@@ -421,6 +421,9 @@ def input_binding_hash(
 
 def parse_reading(data: JsonValue) -> tuple[FieldReading, ...] | None:
     """Parse and fully validate one closed reading; None means refuse the output."""
+    # TODO: Add a provider example to docs/OCR-ROUTING.md with a qualification fixture.
+    # Trace an unreadable field through this parser, customer correction and saved provenance.
+    # Pair it with a guessed value on an unreadable field to exercise the review boundary.
     try:
         return _parse_reading(data)
     except _RefusedSchema:

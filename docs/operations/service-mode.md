@@ -12,6 +12,10 @@ This is a private operator action. There is **no web-exposed change endpoint** a
 customer-facing switch. The switch does not select a beta batch, accept terms, fund postage,
 change prices, change beta eligibility, or activate live providers.
 
+When an operator separately opens the [ordinary-mail pilot](controlled-beta.md#ordinary-first-class-feedback-pilot),
+eligible intake submissions in controlled-free-beta mode can reserve one of its five places.
+The case owner accepts the versioned free offer before case work begins.
+
 ## What the switch does and does not touch
 
 - **New paid intent:** `begin_authorization_attempt` reads the effective mode inside its own

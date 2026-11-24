@@ -484,6 +484,8 @@ def fallback_resolution(
             and found.send_date < now
             and now.tzinfo is not None
         ):
+            # TODO: Carry the observed send_date and lookup time into the saved fallback outcome.
+            # Recovery should be able to explain this decision after the Lob object changes.
             return Accepted(letter_id, found.tracking_number, LetterEvidence.EXPIRY_FALLBACK)
         return CancelRequest(letter_id)
     if found.evidence is LetterEvidence.CREATED:

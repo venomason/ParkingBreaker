@@ -422,6 +422,9 @@ test("saved-status refresh discovers a selected preaccept beta under paid phase 
   const acceptRequests: string[] = [];
   const selectedOffer = {
     case_id: "case_gate",
+    funding: "NO_CHARGE",
+    amount_cents: 0,
+    tier: "CERTIFIED",
     disclosure_text: "Exact server beta disclosure.",
     disclosure_sha256: "a".repeat(64),
     // Selected, not accepted: the saved case is still preaccept.

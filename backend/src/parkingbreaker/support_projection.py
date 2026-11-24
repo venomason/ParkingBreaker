@@ -382,6 +382,10 @@ def build_support_context(
                 stop_quote = raw_quote.strip()
 
     # Check prepared mail attempts & submission cursors for mail class and latest tracking number
+    # TODO: Give support the same charge explanation as customer status. Read the basis from
+    # the original paid attempt so a free re-mail's tracking history cannot explain that charge.
+    # Have the notification worker send an update when a committed change needs customer action.
+    # Key delivery by case, transition and notice kind so replay sends one correction request.
     mail_class: MailClass | None = None
     for attempt in (case.attempt, 1):
         prepared = store.get(case_token, attempt)

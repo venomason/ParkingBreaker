@@ -39,7 +39,6 @@ from parkingbreaker.beta_feedback_store import (
     initialize_beta_feedback,
 )
 from parkingbreaker.beta_store import (
-    BETA_DISCLOSURE_SHA256,
     BetaConflict,
     BetaStoreMixin,
     initialize_beta,
@@ -181,6 +180,8 @@ from parkingbreaker.required_copy_store import (
 )
 from parkingbreaker.returned_mail import Remedy, RemedyKind
 from parkingbreaker.review_store import ReviewStoreMixin, initialize_review
+from parkingbreaker.route_checks import RouteCheckStoreMixin, initialize_route_checks
+from parkingbreaker.route_registry import RouteRegistryMixin, initialize_route_registry
 from parkingbreaker.service_phase_store import (
     ServicePhaseStoreMixin,
     initialize_runtime_service_phase,
@@ -1022,6 +1023,8 @@ class SqliteTransactionStore(
     BetaStoreMixin,
     BetaFeedbackStoreMixin,
     ReviewStoreMixin,
+    RouteRegistryMixin,
+    RouteCheckStoreMixin,
     TrickStoreMixin,
     TrackingEmailStoreMixin,
     SettingsStoreMixin,
@@ -1089,6 +1092,8 @@ class SqliteTransactionStore(
             initialize_review(self._require_open())
             initialize_tricks(self._require_open())
             initialize_approval_manifests(self._require_open())
+            initialize_route_registry(self._require_open())
+            initialize_route_checks(self._require_open())
             initialize_tracking_email(self._require_open())
             initialize_settings(self._require_open())
             initialize_runtime_service_phase(self._require_open())
@@ -1125,6 +1130,7 @@ class SqliteTransactionStore(
         intake = None if case is None else self.intake_for_workspace(case.workspace_token)
         if intake is None or intake.case_token != case_token:
             return
+        self._bind_prepared_route(case_token, attempt, intake, request)
         history = destination_decisions_snapshot(
             self._require_open(), intake.intake_id, intake.owner
         )
@@ -1766,7 +1772,7 @@ class SqliteTransactionStore(
                 database.execute("COMMIT")
                 return case
             offer = json.loads(intake.prehold_json)
-            if not any(
+            if entitlement.pilot_scope is None and not any(
                 isinstance(tier, dict) and tier.get("tier") == "CERTIFIED"
                 for tier in offer.get("tiers", [])
             ):
@@ -1780,16 +1786,16 @@ class SqliteTransactionStore(
                 no_charge=True,
             )
             changed = database.execute(
-                "UPDATE pb_intake_records SET selected_tier='CERTIFIED', case_token=?, "
+                "UPDATE pb_intake_records SET selected_tier=?, case_token=?, "
                 "revision=revision+1 WHERE intake_id=? AND case_token IS NULL AND revision=?",
-                (case.case_token, intake_id, intake.revision),
+                (entitlement.tier, case.case_token, intake_id, intake.revision),
             )
             if changed.rowcount != 1:
                 raise BetaConflict("beta_intake_changed")
             database.execute(
                 "UPDATE pb_beta_entitlements SET accepted_at=?, disclosure_sha256=?, "
                 "case_token=? WHERE intake_id=? AND case_token IS NULL",
-                (now.isoformat(), BETA_DISCLOSURE_SHA256, case.case_token, intake_id),
+                (now.isoformat(), entitlement.disclosure_sha256, case.case_token, intake_id),
             )
             database.execute("COMMIT")
             return case
@@ -2396,6 +2402,9 @@ class SqliteTransactionStore(
                     expected_revision,
                 ),
             )
+            # TODO(T04): Queue a diagnostic event here with each history row in the same commit.
+            # Key it by case, revision and machine. Give each consumer a lease and checkpoint so
+            # a crash can replay the event safely. Run provider lookups after the write commits.
             for item in records:
                 database.execute(
                     "INSERT INTO pb_case_history VALUES (?, ?, ?, ?, ?, ?, ?, ?)",

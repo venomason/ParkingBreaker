@@ -167,6 +167,9 @@ def run_payment_step(
                 evidence_version=1,
                 classification="charge_mismatch",
             )
+        # TODO(R03): Exercise a worker loss at this boundary in the sandbox. Stripe may already
+        # have captured while the local intent is unfinished. Verify recovery against that same
+        # PaymentIntent and record the settled amount and count of successful charges.
         return store.finish_payment(
             claimed,
             outcome,

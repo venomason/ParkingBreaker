@@ -6,11 +6,11 @@ See [current readiness](../BETA-READINESS.md) for source-specific results.
 Status: **NO-GO for live intake**. This is a preparation and acceptance packet,
 not permission to provision, deploy, use paid providers, send notifications or mail.
 
-## Current owner direction (November 17)
+## Paid launch direction (November 17)
 
-The planned beta is paid. Use the existing paid authorization, exact-packet approval,
-mailing and capture controls; do not select a free entitlement batch for launch. Historical
-free-beta qualification below remains historical evidence only. New intake requires ticket
+Paid launch uses the existing authorization, exact-packet approval, mailing and capture
+controls. The November 23 ordinary-mail pilot has its own enrollment and qualification
+described below. New intake requires ticket
 images and an OCR attempt before fact confirmation; correction does not replace reading.
 The intended correct-office/on-time commitment requires verified official procedure and
 provider qualification before customer admission. See [Customer Choice Rules](../CUSTOMER-CHOICE-RULES.md).
@@ -24,6 +24,91 @@ the exact facts and packet. Do not guess facts, legal conclusions or deadlines.
 If an essential fact or a safe fulfillment condition remains unknown, stop before
 charge or dispatch. No issuer-by-issuer lookup project or city allowlist is a launch
 prerequisite. Existing per-request source checks and safe refusals remain in force.
+
+## Ordinary First-Class feedback pilot
+
+The proposed pilot admits up to five selected cases for one issuing authority and filing
+stage, with enrollment closing 14 days after opening or when the fifth slot is selected.
+Participants pay zero, approve the exact packet, and can report a return, agency response
+or decision through their private case. Existing accepted cases retain their terms and
+support after enrollment closes.
+
+Before activation, obtain dated official evidence for ordinary mailed contests, the exact
+receiving office, filing deadline, required enclosures, signatures and any original-ticket
+requirement. Check that the service can prepare and mail the customer's approved copies.
+Use both sides of an applicable ticket to identify the procedure. Keep unresolved conflicts
+with the agency for confirmation. Qualify the actual print, return handling, authenticated
+postal events, feedback delivery and restart behavior on the intended durable deployment.
+The paid Certified Mail and Stripe qualification remains a separate release decision.
+
+On an authorized target, use the route `evidence` and `enroll` commands below with
+`--mail-class first_class`. The ordinary-mail checker looks for an explicit affirmative
+instruction in the contest address section. If the ordinary postage question remains
+unresolved, enrollment waits for a current, publishable agency source.
+Once the monitor is running, use the private command below to open the reviewed route.
+
+```sh
+python -m parkingbreaker.beta_campaign_cli --database /data/parkingbreaker.sqlite open-first-class \
+  --campaign-id "$campaign_id" --issuer "$issuer_id" --stage "$stage" \
+  --identity-policy-ref "$issuer_review" --configuration-ref "$pilot_approval" \
+  --evidence-sha256 "$official_digest"
+```
+
+In the controlled free-beta phase, an eligible intake submission can select a slot.
+Check `beta_campaign_cli --database /data/parkingbreaker.sqlite status` for the opening,
+closing and selection count. Each customer must accept the First-Class disclosure.
+The free offer never authorizes a credit card. Check release mode, the current route
+and a genuine official source before opening any cohort on a live database.
+
+Count every selected case when evaluating the pilot. Track returned or redirected mail,
+agency acknowledgment or a request for more information, and the eventual disposition
+separately. A decision upholding a ticket can confirm that the correct office processed
+the filing. An unanswered reminder leaves the outcome unknown. When mailing evidence or
+a customer report is absent, keep that absence visible in the pilot review. The free offer
+discloses up to two feedback emails, due at 14 and 30 days from a dated postal scan
+or authenticated printer handoff. Each includes an opt-out. Participants can also report
+directly through their case.
+Use the private report for counts of selected cases, acceptances, dated handoffs and scans,
+and the customer answers. Each question includes its own count of unreported answers.
+
+```sh
+python -m parkingbreaker.beta_campaign_cli --database /data/parkingbreaker.sqlite report
+```
+
+## Monitoring a confirmed mailing office
+
+Enroll an issuer, filing stage and mail class when saved case research contains an official
+passage that supports both the destination and permission to file by mail. The ticket back,
+Reddit accounts and department contacts can identify which office or notice to investigate.
+An enrollment requires a fresh fetch of the qualified official source.
+
+Run the following from the owning worker environment. Supply the existing case ID and use
+the fingerprint and evidence digest returned by the first command. Choose an explicit
+UTC expiry and a unique command ID. The first enrollment expects revision zero.
+
+```sh
+python -m parkingbreaker.route_monitor --database /data/parkingbreaker.sqlite evidence \
+  --case-id "$case_id"
+python -m parkingbreaker.route_monitor --database /data/parkingbreaker.sqlite enroll \
+  --case-id "$case_id" --address-fingerprint "$fingerprint" --evidence-sha256 "$digest" \
+  --valid-until "$expires" --expected-revision 0 --command-id "$command_id"
+```
+
+On an approved private VM deployment, install the route monitor service and timer from
+`deploy/systemd/`, then enable `parkingbreaker-route-monitor.timer`. Inspect the service
+journal for each route's result. The timer checks every 15 minutes. A changed normalized
+page, a missing official passage, or an HTTP 404/410 fences the old revision. An unavailable
+page cannot refresh the last good check. After one hour without a successful check, new mail
+stops even if the timer itself has failed. The enrollment also has a hard expiry.
+If an office moves while its published page stays the same, the watcher has no signal
+of that move. A department confirmation can trigger an immediate scoped revocation.
+
+For a move confirmed directly by the department, run `show` for the issuer and stage,
+then `revoke` with that scope, its current `--expected-revision` and a unique
+`--command-id`. A replacement requires fresh official evidence and a new revision.
+An approval tied to the old route cannot mail a changed envelope. Reconcile any submission
+already underway by its original provider reference. After a database restore, preserve
+quarantine while reconciling route revisions with recorded moves before resuming dispatch.
 
 ## Configuration and provider access
 
@@ -210,13 +295,20 @@ it with an ad hoc `compose up`. No cloud creation command has been executed here
 
 ## Intake stop and incident handling
 
+<!-- TODO(P06/R03): Generate the missing-callback example from the drill. Show the worker
+     comparing provider delivery, local receipt and saved cursors against both deadlines.
+     Resolve a match on the original attempt automatically. For a conflict, show the
+     evidence, decision needed, reply deadline and primary-to-backup handoff. Rehearse
+     the handoff with the worker or VM down and verify acknowledgment before the cutoff. -->
 These are different controls; record which one an incident needs.
 
 1. **Stop new paid authorizations:** the existing private service-phase CLI stores
    a revision-checked override. It does not cancel existing holds, replay uncertain
    sends, stop admitted free cases or close every intake route.
-2. **Stop new free-beta admission:** do not select or approve another entitlement
-   batch. Existing admitted cases retain their recovery and support obligations.
+2. **Stop new free-beta admission.** Legacy batches require explicit selection. For the
+   ordinary pilot, the durable intake pause stops automatic selection and new acceptance.
+   A changed office also suspends the affected route. Preserve existing cases for recovery
+   and support.
 3. **Stop all new intake.** The private gateway supports `PB_NEW_INTAKE=paused`.
    On an approved target, apply the gateway setting and verify the effective rule
    on every reachable customer ingress. Status, sign-in recovery and provider

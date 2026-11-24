@@ -4,6 +4,12 @@ Canonical GitHub-backed codebase: Python 3.12/FastAPI backend and Next.js fronte
 
 ## Start here
 
+<!-- TODO: Add a short developer walkthrough of one paid appeal here. For each rule
+     (clerical scope, verified destination, exact packet approval, capture and recovery),
+     link the enforcing code and one regression test. Use the source retrieval time and hash
+     to show exactly when a quoted rule was observed. Generate the worked timeline and OCR
+     example from synthetic drill receipts in CI. Fail the docs check if the saved examples
+     drift from those receipts or an enforcing test reference stops resolving. -->
 | Document | Authority |
 | --- | --- |
 | [Execution roadmap](docs/ROADMAP.md) | Remaining work, decisions, dependencies and acceptance criteria |

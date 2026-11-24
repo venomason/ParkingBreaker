@@ -481,6 +481,9 @@ class BetaFeedbackStoreMixin:
             if row is None:
                 raise StorageCorruption("beta feedback notice disappeared")
             _, receipt = _receipt(row)
+            # TODO(T04/P07): Enqueue review with this receipt before commit, keyed by notice ID.
+            # Start the acknowledgment clock at receipt even when the deadline is unreadable.
+            # A correction should refresh the private brief and retain both source versions.
             database.execute("COMMIT")
             return receipt
         except Exception:

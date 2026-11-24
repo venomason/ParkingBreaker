@@ -26,6 +26,7 @@ from parkingbreaker.api.fakes import FakeServices
 from parkingbreaker.api.service import CaseServices, ServiceConflict
 from parkingbreaker.appeal.drafting import CUSTOMER_AUTHORED_MODE_VERSION
 from parkingbreaker.outcome_follow_up import OutcomeFollowUpService, OutcomeLinkService
+from parkingbreaker.outcome_follow_up_store import FollowUpConflict, PilotFeedback
 from parkingbreaker.overseer_feed import OPS_ID_PATTERN
 from parkingbreaker.provider_credentials import valid_header_credential
 from parkingbreaker.support_comms import SupportCommsService, SupportIntakeRequest
@@ -464,6 +465,22 @@ def create_app(
             headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
         )
 
+    @api.get("/cases/{case_id}/pilot-feedback", response_model=s.PilotFeedbackView)
+    async def pilot_feedback(case: Annotated[str, Depends(owned_case)]) -> Response:
+        return JSONResponse(
+            content=services.pilot_feedback(case).model_dump(mode="json"),
+            headers={"Cache-Control": "no-store"},
+        )
+
+    @api.post("/cases/{case_id}/pilot-feedback", response_model=s.PilotFeedbackView)
+    async def record_pilot_feedback(
+        body: s.PilotFeedbackUpdate, case: Annotated[str, Depends(owned_case)]
+    ) -> Response:
+        return JSONResponse(
+            content=services.record_pilot_feedback(case, body).model_dump(mode="json"),
+            headers={"Cache-Control": "no-store"},
+        )
+
     @api.get("/cases/{case_id}/status", response_model=s.CaseStatus)
     async def status(case: Annotated[str, Depends(owned_case)]) -> s.CaseStatus:
         return services.status(case)
@@ -694,6 +711,36 @@ def create_app(
                 "pending" if body.decision == "pending" else "recorded"
             )
             return s.OutcomeLinkReceipt(status=status)
+
+        def pilot_link_response(feedback: PilotFeedback | None) -> Response:
+            if feedback is None:
+                raise HTTPException(400, "invalid_link")
+            view = s.PilotFeedbackView.model_validate(feedback, from_attributes=True)
+            return JSONResponse(
+                content=view.model_dump(mode="json"), headers={"Cache-Control": "no-store"}
+            )
+
+        @api.post("/outcomes/pilot-feedback/status", response_model=s.PilotFeedbackView)
+        async def pilot_link_status(body: s.OutcomeLinkRequest) -> Response:
+            if outcome_links is None:
+                raise HTTPException(503, "outcome_links_not_configured")
+            return pilot_link_response(outcome_links.pilot_feedback(body.case_id, body.token))
+
+        @api.post("/outcomes/pilot-feedback", response_model=s.PilotFeedbackView)
+        async def pilot_link_update(body: s.PilotFeedbackLinkUpdate) -> Response:
+            if outcome_links is None:
+                raise HTTPException(503, "outcome_links_not_configured")
+            try:
+                feedback = outcome_links.report_pilot_feedback(
+                    body.case_id,
+                    body.token,
+                    body.request_id,
+                    body.expected_revision,
+                    body.reported_values(),
+                )
+            except FollowUpConflict as exc:
+                raise ServiceConflict(str(exc)) from None
+            return pilot_link_response(feedback)
 
     async def provider_webhook(provider: str, request: Request) -> dict[str, bool]:
         try:

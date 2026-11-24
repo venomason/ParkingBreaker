@@ -11,12 +11,17 @@ A fake-provider preview is deployed at [parkingbreaker.com](https://parkingbreak
 
 The November 22 [repository review](verification/code-review-2026-11-22.json) recorded the Cambridge guard mismatch and captured-page comparison. The November 23 owner-directed reconciliation records the Cambridge exception and the hash of the existing signed change in [the guard freeze](../build-kit/state/guard-freeze.json). A separate tested change for business-day deadlines awaits evidence from an applicable official filing procedure.
 
+Municipal office monitoring has a local enrollment and dispatch guard. Before counting an
+issuer as monitored in production, qualify its official evidence, timer execution and a
+move observed between packet approval and dispatch on the owning host.
+[Controlled beta operating procedure](operations/controlled-beta.md#monitoring-a-confirmed-mailing-office)
+
 ## 1. Non-Negotiable Product, Legal & Financial Rules
 
 1. **Clerical boundary only (zero legal representation):** Customers supply and confirm their own facts, wording, and selected evidence. Service-generated text enforces `appeal/proofread.py` (`BANNED_PHRASES`)—never invent legal arguments, cite unverified statutes, assess win probability, or promise dismissal.
 2. **Verified official destination or full stop:** Every accepted appeal requires an OCR-read ticket image attempt, customer-confirmed issuer, and verified official `.gov` agency evidence establishing the receiving office, mail-in eligibility, and filing deadline. Do not use a `.gov` suffix alone as proof that mail-in contesting is permitted; online-only, in-person-only, private-lot notices, wet-signature/notary/original-stub requirements, or unresolved essential facts must stop cleanly.
 3. **Triple-gated deadline safety:** Feasibility (`latest_safe_send_date`) is checked at research completion, packet freeze, and the mail-create boundary, accounting for production business days, USPS Certified Mail transit, and conservative holiday/cutoff buffers. We never sell or dispatch an appeal that cannot meet the verified filing rule.
-4. **Paid beta only (strict payment-state precision):** Beta is a paid maturity phase, not a free giveaway; `controlled_free_beta` remains a regression/pause fixture only. Keep four states strictly distinct in code, tests, and receipts:
+4. **Paid beta and a separate bounded mail pilot:** The paid launch keeps its Certified Mail and payment gates. A separately approved pilot may offer five no-charge ordinary First-Class cases in one qualified jurisdiction during a 14-day window. Keep pilot results separate from paid launch evidence. See [pilot operation and qualification](operations/controlled-beta.md#ordinary-first-class-feedback-pilot). For paid cases, keep four states distinct in code, tests, and receipts:
    - **No authorization:** Unsupported intake stops before placing a card hold where determinable upfront.
    - **Authorization placed (`requires_capture` with `amount_capturable > 0`):** A created `PaymentIntent` awaiting confirmation is not an authorization.
    - **Authorization cancelled/released:** Mandatory whenever post-hold research or timing proves infeasible, or review expires ($0 captured).
@@ -124,6 +129,10 @@ Queued behind `R08` Cohort #1 reconciliation unless a specific item is needed ea
 - **T05–T07 (BUILD / QUALIFY):** Deterministic integrity scanner + deduplicated repair queue (`T05`), isolated-checkout patch worker with zero live secrets (`T06`), and synthetic fault-to-verified-patch proof (`T07`).
 - **T08 & R09 (BUILD / QUALIFY):** Staged release coordinator (`T08`) and supervised production repair pilot (`R09`).
 - **J06 & J07 (BUILD):** Telemetry gap/lag canary (`J06`) and authenticated operator timeline view (`J07`).
+<!-- TODO(T05–T08): When an incident recurs after reconciliation, reproduce it from a redacted
+     fixture in an isolated checkout. Require the regression to fail before the patch and pass
+     afterward. Replay it twice and assert the expected letter and charge counts for that case.
+     Feed results to the staged release gate and track recurrence by deployed revision. -->
 
 ### B. Algorithmic Unit Economics, Attribution & Scaling (`SCALE` & `OPTIONAL`)
 - **M01 (BUILD · SCALE):** Controlled first-party campaign/UTM attribution and immutable offer-arm persistence.

@@ -718,6 +718,63 @@
   },
   {
     "method": "GET",
+    "path": "/cases/case_00000000000000000000000000000001/pilot-feedback",
+    "request": null,
+    "status": 200,
+    "response": {
+      "routing": null,
+      "acknowledgment": null,
+      "disposition": null,
+      "eligible": false,
+      "revision": 0,
+      "first_postal_scan_at": null,
+      "printer_handoff_at": null,
+      "updated_at": null,
+      "source": "customer_reported"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/cases/case_00000000000000000000000000000001/pilot-feedback",
+    "request": {
+      "request_id": "notice-feedback",
+      "expected_revision": 0,
+      "routing": "unknown"
+    },
+    "status": 409,
+    "response": {
+      "detail": "pilot_feedback_not_eligible"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/outcomes/pilot-feedback/status",
+    "request": {
+      "case_id": "fixture-mail-token",
+      "token": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "status": 503,
+    "response": {
+      "detail": "outcome_links_not_configured"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/outcomes/pilot-feedback",
+    "request": {
+      "case_id": "fixture-mail-token",
+      "token": "0000000000000000000000000000000000000000000000000000000000000000",
+      "request_id": "notice-feedback",
+      "expected_revision": 0,
+      "routing": "unknown"
+    },
+    "status": 503,
+    "response": {
+      "detail": "outcome_links_not_configured"
+    }
+  },
+  {
+    "method": "GET",
     "path": "/workspaces/ws_00000000000000000000000000000001/ticket-reading",
     "request": null,
     "status": 200,

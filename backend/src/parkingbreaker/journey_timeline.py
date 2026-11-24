@@ -455,6 +455,12 @@ def reconstruct_journey(
     )
 
 
+# TODO(J07): Build an authenticated, read-only case briefing from this timeline plus the
+# approved packet hash, original mail receipts, payment ledger and any recorded notice.
+# Give the AI only redacted facts with opaque receipt references. Check dates, amounts and
+# citations against the snapshot. On a mismatch or model outage, render the cited facts
+# directly. Flag gaps and conflicts, retain access to originals for authorized reviewers,
+# and generate private audio from the same checked text on demand.
 def read_journey_timeline(
     database: sqlite3.Connection, *, workspace_token: str, owner: str | None = None
 ) -> JourneyTimeline:

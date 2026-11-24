@@ -197,6 +197,10 @@ def evaluate_notice_triage(record: NoticeTriageRecord) -> NoticeTriageEvaluation
     if record.action_deadline_date is not None:
         _date(record.action_deadline_date)
     escalation = record.urgent or record.observed_kind == "deadline_escalation"
+    # TODO(P07): Key follow-up work by the immutable triage ID so replay reuses the same notice.
+    # Route urgent notices and unresolved dates to the duty responder with an acknowledgment
+    # timer and backup. Attach the private briefing and identify who must act and by when,
+    # using a date only when confirmed. Surface a founder decision only when it is theirs.
     if escalation and record.escalation_owner is None:
         raise BetaNoticeTriageConflict("beta_notice_triage_escalation_owner_required")
     if record.escalation_owner is not None:

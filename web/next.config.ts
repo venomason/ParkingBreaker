@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/outcomes/opt-out",
+        source: "/outcomes/:page(opt-out|pilot)",
         headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
       },
     ];

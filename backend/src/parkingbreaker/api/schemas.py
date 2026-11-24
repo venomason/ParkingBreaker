@@ -19,6 +19,11 @@ from parkingbreaker.appeal.correction import Flag, TextSpan
 from parkingbreaker.case_hold_store import HoldReason
 from parkingbreaker.case_state import CaseState, HardStop, StopFamily
 from parkingbreaker.health import AlertKind, Severity, StuckWhy
+from parkingbreaker.outcome_follow_up_store import (
+    PilotAcknowledgment,
+    PilotDisposition,
+    PilotRouting,
+)
 from parkingbreaker.overseer_feed import (
     OPS_ID_PATTERN,
     CaseErrorClass,
@@ -353,7 +358,7 @@ class BetaOffer(Model):
     funding: Literal["NO_CHARGE"] = "NO_CHARGE"
     amount_cents: Literal[0] = 0
     currency: Literal["usd"] = "usd"
-    tier: Literal[MailTier.CERTIFIED] = MailTier.CERTIFIED
+    tier: MailTier = MailTier.CERTIFIED
     disclosure_version: int
     disclosure_text: str
     disclosure_sha256: Digest
@@ -376,7 +381,7 @@ class BetaAcceptanceReceipt(Model):
     funding: Literal["NO_CHARGE"] = "NO_CHARGE"
     amount_cents: Literal[0] = 0
     currency: Literal["usd"] = "usd"
-    tier: Literal[MailTier.CERTIFIED] = MailTier.CERTIFIED
+    tier: MailTier = MailTier.CERTIFIED
     accepted_at: AwareDatetime
     window_started_at: AwareDatetime
     window_expires_at: AwareDatetime
@@ -720,7 +725,9 @@ class Tracking(Model):
     tier: MailTier | None
     tracking_number: str | None
     events: list[TrackingEvent]
-    delivery_confirmation_title: Literal["ParkingBreaker Delivery Confirmation"]
+    delivery_confirmation_title: Literal[
+        "ParkingBreaker Delivery Confirmation", "ParkingBreaker Mailing Record"
+    ]
     fake: bool = True
 
 
@@ -809,6 +816,41 @@ class BetaFeedbackNoticeReceipt(Model):
 class BetaFeedbackNoticeList(Model):
     notices: list[BetaFeedbackNoticeReceipt]
     next_cursor: str | None
+
+
+class PilotFeedbackFields(Model):
+    routing: PilotRouting | None = None
+    acknowledgment: PilotAcknowledgment | None = None
+    disposition: PilotDisposition | None = None
+
+
+class PilotFeedbackUpdate(PilotFeedbackFields):
+    """One progressive customer report. Omitted fields retain their stored values."""
+
+    request_id: TicketOperationId
+    expected_revision: Annotated[int, Field(ge=0, strict=True)]
+
+    def reported_values(self) -> dict[str, object]:
+        return self.model_dump(
+            include={"routing", "acknowledgment", "disposition"}, exclude_none=True, mode="json"
+        )
+
+    @model_validator(mode="after")
+    def require_reported_value(self) -> Self:
+        if not self.reported_values():
+            raise ValueError("report at least one update")
+        return self
+
+
+class PilotFeedbackView(PilotFeedbackFields):
+    """Ordinary-post feedback, with USPS timing and customer statements kept distinct."""
+
+    eligible: bool = False
+    revision: int = 0
+    first_postal_scan_at: AwareDatetime | None = None
+    printer_handoff_at: AwareDatetime | None = None
+    updated_at: AwareDatetime | None = None
+    source: Literal["customer_reported"] = "customer_reported"
 
 
 # Ticket reading, independent review and customer confirmation ---------------------------
@@ -1124,6 +1166,10 @@ class OutcomeReportRequest(OutcomeLinkRequest):
     """A customer-reported agency decision; "pending" means no decision yet."""
 
     decision: Literal["dismissed", "upheld", "pending"]
+
+
+class PilotFeedbackLinkUpdate(OutcomeLinkRequest, PilotFeedbackUpdate):
+    """One report authorized by the private pilot email link."""
 
 
 class OutcomeLinkReceipt(BaseModel):

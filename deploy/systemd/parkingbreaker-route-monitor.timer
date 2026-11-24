@@ -1,0 +1,10 @@
+[Unit]
+Description=Recheck monitored municipal appeal offices every fifteen minutes
+
+[Timer]
+OnCalendar=*:0/15
+Persistent=true
+Unit=parkingbreaker-route-monitor.service
+
+[Install]
+WantedBy=timers.target

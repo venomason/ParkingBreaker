@@ -3,7 +3,8 @@
 import { HurtleGuide } from "./HurtleGuide";
 import { LetterFitWarning } from "./Step6LetterStudio";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { Draft, PacketPreview } from "../lib/api";
+import type { Draft, MailTier, PacketPreview } from "../lib/api";
+import { FIRST_CLASS_LIMITS, mailClassName } from "../lib/fulfillment";
 
 type Affirmation = { declaration_id: string; text_sha256: string };
 import { PacketReviewProgress } from "./CaseVisuals";
@@ -18,6 +19,7 @@ interface LiveLetterProps {
   autoSave?: boolean;
   busy: boolean;
   error: string | null;
+  betaTier?: MailTier | null;
   submissionPending?: boolean;
   approvalUncertain?: boolean;
   preview: PacketPreview | null;
@@ -31,7 +33,7 @@ interface LiveLetterProps {
 }
 
 /** Adopt exact words, inspect the assembled packet and envelope, then authorize mailing. */
-export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy, error, submissionPending = false, approvalUncertain = false, preview, previewUrl, onInvalidatePreview, onPreview, onSave, onAdopt, onApprove, onOpenRules }: LiveLetterProps) {
+export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy, error, betaTier, submissionPending = false, approvalUncertain = false, preview, previewUrl, onInvalidatePreview, onPreview, onSave, onAdopt, onApprove, onOpenRules }: LiveLetterProps) {
   const [localText, setLocalText] = useState(draft.text);
   const text = value ?? localText;
   const setText = onTextChange ?? setLocalText;
@@ -409,7 +411,11 @@ export function LiveLetter({ draft, value, onTextChange, autoSave = false, busy,
             </div>
           )}
           {preview && !previewUrl && <p role="alert">The PDF could not be displayed. Preview the packet again before approving.</p>}
-          {preview && !locked && <p className="small adoption-disclosure">By choosing “Approve and mail”, you authorize automated mailing of this exact packet to the destination shown above, using your existing service authorization.</p>}
+          {preview && !locked && <p className="small adoption-disclosure">
+            {betaTier
+              ? <>By choosing “Approve and mail”, you authorize us to send this exact packet once by {mailClassName(betaTier)} to the destination shown above for $0. No card hold or payment.{betaTier === "STANDARD" && ` ${FIRST_CLASS_LIMITS}`}</>
+              : "By choosing ‘Approve and mail’, you authorize automated mailing of this exact packet to the destination shown above, using your existing service authorization."}
+          </p>}
           {!locked && <LegalDisclosure id="liveAttorneyDisclosure" />}
           {!locked && missingDeclarations && <p role="alert" className="small" id="liveDeclarationsMissing">Affirm every required declaration above before approving.</p>}
           {(preview || locked) && <button className="btn btn-primary" type="button" id="liveApprove" disabled={busy || editingAdopted || (!locked && !inspected) || (!locked && missingDeclarations)} onClick={approve} style={{ width: "100%", marginTop: "10px" }}>

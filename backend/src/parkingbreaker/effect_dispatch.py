@@ -29,7 +29,7 @@ from parkingbreaker.payment_coordinator import run_payment_step
 from parkingbreaker.payment_records import PaymentClient
 from parkingbreaker.payment_state import EXPIRY_MARGIN, PaymentEffect, PaymentState
 from parkingbreaker.session_window import WindowStatus, applies_to, window_status
-from parkingbreaker.submission_coordinator import run_submission_step
+from parkingbreaker.submission_coordinator import CreateGuard, run_submission_step
 from parkingbreaker.transaction_records import CaseRecord
 from parkingbreaker.transaction_store import (
     RevisionConflict,
@@ -169,6 +169,7 @@ def dispatch_once(
     case_id: str | None = None,
     deadline_feasible: Callable[[str, datetime], bool] | None = None,
     validate_prepared: Callable[[PreparedMailAttempt], None] | None = None,
+    original_create_guard: CreateGuard | None = None,
 ) -> int:
     """One due submission and payment call per case, with crash-safe process ownership.
 
@@ -177,6 +178,7 @@ def dispatch_once(
     The next scheduler invocation continues any unfinished provider reconciliation.
     """
     processed = 0
+    original_guards = () if original_create_guard is None else (original_create_guard,)
     try:
         with store.submission_ownership():
             for token in store.case_ids() if case_id is None else (case_id,):
@@ -251,6 +253,7 @@ def dispatch_once(
                         new_effect_id=new_id,
                         already_owned=True,
                         validate_prepared=validate_prepared,
+                        create_guards=original_guards,
                     )
                     processed += 1
                     case = store.get_case(token)
@@ -308,23 +311,28 @@ def dispatch_once(
                     if row.claimed_at is None:
                         store.claim_effect(row.effect_id, now)
                     try:
-                        cursor = run_submission_step(
-                            store,
-                            (
-                                _AuthorizationGuard(
-                                    lob,
+                        create_guard: CreateGuard = (
+                            partial(
+                                _AuthorizationGuard,
+                                expires_at=(
                                     None
                                     if case.payment_state is PaymentState.NO_CHARGE
-                                    else case.authorization_expires_at,
-                                    clock,
-                                    cursor is not None,
+                                    else case.authorization_expires_at
+                                ),
+                                clock=clock,
+                                potentially_sent=cursor is not None,
+                                deadline_feasible=(
                                     None
                                     if deadline_feasible is None
-                                    else partial(deadline_feasible, token),
-                                )
-                                if attempt == 1
-                                else _RemailGuard(lob, case.payment_state)
-                            ),
+                                    else partial(deadline_feasible, token)
+                                ),
+                            )
+                            if attempt == 1
+                            else partial(_RemailGuard, payment_state=case.payment_state)
+                        )
+                        cursor = run_submission_step(
+                            store,
+                            lob,
                             token,
                             attempt,
                             expected_case_revision=case.revision,
@@ -334,6 +342,7 @@ def dispatch_once(
                             new_effect_id=new_id,
                             already_owned=True,
                             validate_prepared=validate_prepared,
+                            create_guards=(*original_guards, create_guard),
                         )
                     except SubmissionPaused:
                         # A held create intent is scheduling inactivity, not a rejection,
@@ -363,6 +372,10 @@ def dispatch_once(
                     is not None
                 ) or (payment is not None and not payment.done)
                 submission = store.submission_cursor(token, 1)
+                # TODO(T05): When evidence is overdue, schedule a lookup of the original attempt
+                # through its coordinator. Persist backoff and cap attempts and spend. Escalate
+                # before the hold or filing cutoff. Park disputed actions while read-only checks
+                # continue, so a late receipt can still resolve what happened to the original.
                 if submission is not None and pending_evidence(submission.outcome):
                     # Legacy accepted cursors must obtain evidence before any capture.
                     money_due = False

@@ -1,4 +1,6 @@
 import React from "react";
+import type { MailTier } from "../lib/api";
+import { FIRST_CLASS_LIMITS, mailClassName } from "../lib/fulfillment";
 import type { FundingState, PhaseState } from "./CustomerAccess";
 
 interface DesktopAsideProps {
@@ -17,6 +19,7 @@ interface DesktopAsideProps {
   savedPending?: boolean;
   /** Actual beta funding (accepted free beta) for this case. */
   betaCase?: boolean;
+  betaTier?: MailTier | null;
   /** A paid-order refusal latch; removes every new-paid promise immediately. */
   newPaidBlocked?: boolean;
 }
@@ -29,6 +32,7 @@ export function DesktopAside({
   paidCase = false,
   savedPending = false,
   betaCase = false,
+  betaTier = null,
   newPaidBlocked = false,
 }: DesktopAsideProps) {
   // Only a resolved paid phase plus resolved paid funding may promise a new card
@@ -57,7 +61,7 @@ export function DesktopAside({
         ) : newCharge ? (
           <><b>No charge unless mailed.</b> Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.</>
         ) : betaCase ? (
-          <><b>No card and no payment in this selected free beta.</b> This appeal is funded by the beta and is not charged.</>
+          <><b>No card and no payment in this selected free beta.</b> {betaTier && <>{mailClassName(betaTier)} for $0. </>}{betaTier === "STANDARD" && FIRST_CLASS_LIMITS}</>
         ) : (
           <><b>No new card or payment is requested now.</b> This appeal’s service phase, funding or any earlier saved payment is still being confirmed. Use Check my appeal for the latest update before choosing a mailing option.</>
         )}

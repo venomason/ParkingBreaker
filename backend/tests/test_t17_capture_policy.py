@@ -351,6 +351,12 @@ def signed_event(
 def test_signed_scan_for_pending_exact_letter_captures_once_after_restart(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, invalid: str | None
 ) -> None:
+    # TODO(P06/R03): Use this sequence in the deployed sandbox drill. Delay the signed callback,
+    # interrupt after a provider response but before local commit, restart, then replay the event.
+    # Match the original Lob letter and Stripe intent to one letter, one capture and its basis.
+    # Run the fault sequence unattended with fakes in CI. Assert replay converges without
+    # paging anyone when receipts match. With conflicting receipts, assert no further charge
+    # or letter, one open incident, and escalation before the applicable deadline.
     wire = OfflineLob(monkeypatch, lambda *_: (200, resource()))
     path = tmp_path / "cases.sqlite"
     payments = FakePaymentClient()
