@@ -20,7 +20,13 @@ from parkingbreaker.research.findings import Finding
 from parkingbreaker.research.questions import FactKey
 from parkingbreaker.research.resolution import ResearchAnswers
 from parkingbreaker.research.run import ResearchResult, run_research
-from parkingbreaker.research.sources import AuthorityClass, Fetcher, FetchResponse, SourceRecord
+from parkingbreaker.research.sources import (
+    AuthorityClass,
+    Fetcher,
+    FetchResponse,
+    SourceRecord,
+    fetch_source,
+)
 from parkingbreaker.research_records import agency_json, answers_json, research_json
 from parkingbreaker.route_monitor import (
     MonitorConflict,
@@ -33,6 +39,7 @@ from parkingbreaker.route_registry import RouteRevision
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from parkingbreaker.workspace import Workspace
 from samples import RETRIEVED_AT, fixture
+from samples import source as saved_source
 from test_research_run import (
     CONTEST_URL,
     SEEDS,
@@ -66,7 +73,14 @@ def approved() -> ResearchResult:
 
 
 def _save(store: SqliteTransactionStore, result: ResearchResult) -> None:
-    store.save_research(CASE_ID, research_json(result), answers_json(ResearchAnswers()), NOW, None)
+    saved = store.get_research(CASE_ID)
+    store.save_research(
+        CASE_ID,
+        research_json(result),
+        answers_json(ResearchAnswers()),
+        NOW,
+        saved.revision if saved is not None else None,
+    )
 
 
 def _pages(html: str = CONTEST, status: int = 200) -> FakeFetcher:
@@ -161,7 +175,12 @@ def test_explicit_first_level_section_controls_a_page_with_a_hearing_header(
         ("You may submit your appeal by first-class mail.", True),
         ("You may submit your appeal by regular mail or by certified mail.", True),
         ("You may submit your appeal by certified mail or regular mail.", True),
-        ("You may submit your appeal by mail.", False),
+        ("You may submit your appeal by mail.", True),
+        (
+            "To submit your Administrative Review by Mail, send your written request and "
+            "supporting documentation to:",
+            True,
+        ),
         ("You cannot submit your appeal by regular mail.", False),
         ("You may submit your payment by ordinary mail.", False),
         ("You may submit your appeal online and send payment by regular mail.", False),
@@ -169,12 +188,21 @@ def test_explicit_first_level_section_controls_a_page_with_a_hearing_header(
         ("You may submit your appeal by ordinary mail only if approved.", False),
         ("You may submit your appeal by ordinary mail. Certified mail is required.", False),
         ("You may submit your appeal by ordinary mail. We no longer accept regular mail.", False),
+        ("Contests sent by mail must be received by the deadline.", False),
+        ("Your notice will be sent by mail.", False),
+        ("Appeals are accepted by mail.", False),
+        ("Appeal information and mail services are available.", False),
+        ("You may submit your payment by mail.", False),
+        ("You may submit your appeal online and send payment by mail.", False),
+        ("You may submit your appeal by mail if approved.", False),
     ],
 )
 def test_first_class_route_requires_its_own_filing_instruction(
     store: SqliteTransactionStore, instruction: str, ordinary_allowed: bool
 ) -> None:
-    html = CONTEST.replace("</main>", f"<p>{instruction}</p></main>")
+    html = CONTEST.replace(
+        "</main>", f"<p>{instruction}</p><p>Keep a copy for your records.</p></main>"
+    )
     result = run_research(
         TICKET, TEST_AGENCY, SEEDS, _pages(html), answers(), TickingClock(), wait=lambda _: None
     )
@@ -185,6 +213,11 @@ def test_first_class_route_requires_its_own_filing_instruction(
         return
     assert case_route_evidence(store, CASE_ID)
     (candidate,) = case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
+    assert candidate.first_class_basis == (
+        "explicit_ordinary_mail"
+        if any(word in instruction for word in ("regular mail", "first-class mail"))
+        else "inferred_from_unqualified_contest_mail"
+    )
     route = enroll_route(
         store,
         _pages(html),
@@ -200,6 +233,337 @@ def test_first_class_route_requires_its_own_filing_instruction(
     assert route.scope.mail_class == "first_class"
     assert instruction in (route.source_quote or "")
     assert store.current_route(replace(route.scope, mail_class="certified")) is None
+
+
+UNQUALIFIED_MAIL = "You may submit your appeal by mail."
+SCOPED_CONTEST = CONTEST.replace(
+    "<h1>Contest a Citation</h1>",
+    "<h1>San Francisco parking citation first-level review</h1>",
+).replace("</main>", f"<p>{UNQUALIFIED_MAIL}</p></main>")
+
+
+def _scoped_answers() -> FakeExtractor:
+    def produce(sources: Sequence[SourceRecord]) -> list[Finding]:
+        return [
+            item
+            if item.procedure_assessment is None
+            else replace(
+                item,
+                procedure_assessment=replace(
+                    item.procedure_assessment,
+                    scope_quote="San Francisco parking citation first-level review",
+                    where_quote=(
+                        "Contest by mail SFMTA Customer Service Center ATTN: Citation Review "
+                        "11 South Van Ness Avenue San Francisco, CA 94103"
+                    ),
+                ),
+            )
+            for item in answers().produce(sources)
+        ]
+
+    return FakeExtractor(produce)
+
+
+def _with_saved_page(result: ResearchResult, html: str) -> ResearchResult:
+    url = "https://www.sfmta.com/citations/review-instructions"
+    supplement = fetch_source(
+        url,
+        AuthorityClass.OFFICIAL_PROCEDURE,
+        TEST_AGENCY.source_scopes(),
+        FakeFetcher({url: html_response(url, html)}),
+        TickingClock(),
+    )
+    assert isinstance(supplement, SourceRecord)
+    sources = (*result.sources, supplement)
+    return replace(result, sources=sources)
+
+
+@pytest.mark.parametrize(
+    "restriction",
+    [
+        "No first-class mail.",
+        "Do not send your appeal by regular mail.",
+        "Regular mail is not permitted.",
+        "Send your appeal by certified letter.",
+        "Send your appeal by USPS Certified.",
+        "Send your appeal by U.S.P.S. Certified Mail.",
+        "Send your appeal by U.S. Postal Service Certified Mail.",
+        "Certified\nMail is required.",
+        "Send your appeal by registered mail.",
+        "Send your appeal by registered letter.",
+        "Proof of mailing is required.",
+        "A certificate of mailing is required.",
+        "A certificate of\nmailing is required.",
+        "A trackable method is required.",
+        "Appeals must be sent with tracking.",
+        "Appeals must be hand-delivered.",
+        "Deliver your appeal by hand.",
+        "Appeals must be submitted by courier.",
+        "Appeals must be submitted in person.",
+        "Delivery confirmation is required.",
+        "Signature confirmation is required.",
+        "A return receipt is required.",
+        "You may submit your appeal by ordinary mail only if approved.",
+        "You may submit your appeal by regular mail or certified mail only if approved.",
+        "Mailing your appeal requires prior permission.",
+        "Written approval is required.",
+        "Only if approved.",
+        "Use certified mail to include the administrative hearing decision.",
+        "Administrative hearings and initial reviews must use certified mail.",
+        "We do not accept appeals by mail.",
+        "Appeals must be submitted online.",
+        "Mail filings are prohibited.",
+        "Mail the request with proof of delivery.",
+        "No mailed appeals are accepted.",
+        "Mailed appeals cannot be accepted.",
+        "Only electronic submissions through the portal are accepted.",
+        "Submit the original notice by certified mail.",
+        "We will mail you the decision, but you must send your appeal by certified mail.",
+        "Send payments by registered mail, but appeals must be sent by certified mail.",
+        "First\u2011Class Mail isn\u2019t accepted.",
+        "We won\u2019t accept appeals by mail.",
+    ],
+)
+@pytest.mark.parametrize("separate_section", [False, True])
+def test_first_class_vetoes_restrictions_in_every_applicable_section(
+    store: SqliteTransactionStore, restriction: str, separate_section: bool
+) -> None:
+    heading = "<h2>San Francisco parking citation first-level review</h2>"
+    html = SCOPED_CONTEST.replace(
+        "</main>", f"{heading if separate_section else ''}<p>{restriction}</p></main>"
+    )
+    result = run_research(
+        TICKET,
+        TEST_AGENCY,
+        SEEDS,
+        _pages(SCOPED_CONTEST),
+        _scoped_answers(),
+        TickingClock(),
+        wait=lambda _: None,
+    )
+    assert result.decision.ok
+    _save(store, _with_saved_page(result, html))
+    with pytest.raises(MonitorConflict, match="official_contest_passage_unverified"):
+        case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
+
+
+@pytest.mark.parametrize(
+    "other_instruction",
+    [
+        "<h2>Administrative hearing</h2><p>Appeals must use certified mail.</p>",
+        "<p>Administrative hearings must use certified mail.</p>",
+        "<h2>Oakland parking citation first-level review</h2>"
+        "<p>Appeals must use certified mail.</p>",
+        "<p>You may also submit your appeal in person.</p>",
+        "<p>You may submit your appeal online.</p>",
+        "<p>Appeals must be submitted online or by mail.</p>",
+        "<p>Appeals must be submitted by mail or through the portal.</p>",
+        "<p>Payments must be submitted online.</p>",
+        "<p>Send payments by certified mail.</p>",
+        "<p>Mail your payment with proof of delivery.</p>",
+        "<p>We will send notices about appeals by USPS Certified Mail.</p>",
+        "<p>We will mail you the decision by certified mail.</p>",
+    ],
+)
+def test_first_class_keeps_other_stages_issuers_and_optional_in_person_routes_separate(
+    store: SqliteTransactionStore, other_instruction: str
+) -> None:
+    html = SCOPED_CONTEST.replace("</main>", f"{other_instruction}</main>")
+    result = run_research(
+        TICKET,
+        TEST_AGENCY,
+        SEEDS,
+        _pages(SCOPED_CONTEST),
+        _scoped_answers(),
+        TickingClock(),
+        wait=lambda _: None,
+    )
+    assert result.decision.ok
+    _save(store, _with_saved_page(result, html))
+    (evidence,) = case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
+    assert UNQUALIFIED_MAIL in evidence.source_quote
+    assert evidence.first_class_basis == "inferred_from_unqualified_contest_mail"
+
+
+@pytest.mark.parametrize(
+    "restriction",
+    [
+        "Certified\nMail is required.",
+        "A certificate of\nmailing is required.",
+        "Send appeals by U.S.P.S.\nCertified Mail.",
+        "Send appeals by U.S.\nPostal Service Certified Mail.",
+    ],
+)
+def test_first_class_rejects_wrapped_requirements_in_saved_extracted_text(
+    store: SqliteTransactionStore, restriction: str
+) -> None:
+    result = run_research(
+        TICKET,
+        TEST_AGENCY,
+        SEEDS,
+        _pages(SCOPED_CONTEST),
+        _scoped_answers(),
+        TickingClock(),
+        wait=lambda _: None,
+    )
+    supplement = saved_source(
+        f"San Francisco parking citation first-level review\n\n{restriction}",
+        url="https://www.sfmta.com/citations/extracted-instructions",
+    )
+    assert "\n" in supplement.text
+    _save(store, replace(result, sources=(*result.sources, supplement)))
+    with pytest.raises(MonitorConflict, match="official_contest_passage_unverified"):
+        case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
+
+
+@pytest.mark.parametrize(
+    "supplement_html",
+    [
+        "<h1>San Francisco parking citation first-level review</h1>"
+        "<p>Appeals must be sent by USPS Certified.</p>",
+        "<p>For initial review, appeals must be sent by certified mail.</p>"
+        "<p>An administrative hearing follows a denied review.</p>",
+    ],
+)
+def test_first_class_rechecks_all_saved_official_sources_before_enrollment(
+    store: SqliteTransactionStore, supplement_html: str
+) -> None:
+    result = run_research(
+        TICKET,
+        TEST_AGENCY,
+        SEEDS,
+        _pages(SCOPED_CONTEST),
+        answers(),
+        TickingClock(),
+        wait=lambda _: None,
+    )
+    _save(store, result)
+    (evidence,) = case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
+    _save(store, _with_saved_page(result, supplement_html))
+    with pytest.raises(MonitorConflict, match="official_contest_passage_unverified"):
+        case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
+    pages = _pages(SCOPED_CONTEST)
+    with pytest.raises(MonitorConflict, match="official_contest_passage_unverified"):
+        enroll_route(
+            store,
+            pages,
+            lambda: NOW,
+            case_id=CASE_ID,
+            evidence_sha256=evidence.evidence_sha256,
+            fingerprint=evidence.address_fingerprint,
+            valid_until=EXPIRY,
+            expected_revision=0,
+            command_id="stale-first-class-evidence",
+            mail_class=MailClass.FIRST_CLASS,
+        )
+    assert pages.calls == []
+    assert not store.monitored_routes()
+
+
+@pytest.mark.parametrize(
+    ("instruction", "basis"),
+    [
+        (UNQUALIFIED_MAIL, "inferred_from_unqualified_contest_mail"),
+        ("You may submit your appeal by regular mail.", "explicit_ordinary_mail"),
+        (
+            "To submit your Administrative\nReview by Mail, send your written request and\n"
+            "supporting documentation to:",
+            "inferred_from_unqualified_contest_mail",
+        ),
+    ],
+)
+def test_first_class_operator_evidence_and_saved_revision_show_the_basis(
+    store: SqliteTransactionStore,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    instruction: str,
+    basis: str,
+) -> None:
+    html = SCOPED_CONTEST.replace(
+        UNQUALIFIED_MAIL, f"{instruction}</p><p>Keep a copy for your records."
+    )
+    result = run_research(
+        TICKET, TEST_AGENCY, SEEDS, _pages(html), answers(), TickingClock(), wait=lambda _: None
+    )
+    _save(store, result)
+    database_args = ["--database", str(tmp_path / "parkingbreaker.sqlite")]
+    assert (
+        main([*database_args, "evidence", "--case-id", CASE_ID, "--mail-class", "first_class"]) == 0
+    )
+    (evidence,) = json.loads(capsys.readouterr().out)
+    assert evidence["first_class_basis"] == basis
+    assert " ".join(instruction.split()) in evidence["source_quote"]
+    assert basis not in evidence["source_quote"]
+    route = enroll_route(
+        store,
+        _pages(html),
+        lambda: NOW,
+        case_id=CASE_ID,
+        evidence_sha256=evidence["evidence_sha256"],
+        fingerprint=evidence["address_fingerprint"],
+        valid_until=EXPIRY,
+        expected_revision=0,
+        command_id="first-class-operator-basis",
+        mail_class=MailClass.FIRST_CLASS,
+    )
+    assert route.source_quote == evidence["source_quote"]
+    assert (
+        main(
+            [
+                *database_args,
+                "show",
+                "--issuer",
+                route.scope.issuer,
+                "--stage",
+                route.scope.stage,
+                "--mail-class",
+                "first_class",
+            ]
+        )
+        == 0
+    )
+    assert json.loads(capsys.readouterr().out)["first_class_basis"] == basis
+    pages = _pages(html)
+    (checked,) = check_routes(store, pages, lambda: NOW + timedelta(minutes=1))
+    assert checked.result == "unchanged"
+    assert pages.calls == [CONTEST_URL]
+
+
+@pytest.mark.parametrize("earlier_unqualified", [False, True])
+def test_first_class_rejects_a_passage_that_cannot_reproduce_its_selected_basis(
+    store: SqliteTransactionStore, earlier_unqualified: bool
+) -> None:
+    # Paragraphs distinguish the address from this instruction in the source. The
+    # persisted passage normalizes them, so the class-specific instruction must still
+    # be independently identifiable before enrolling that exact saved evidence.
+    html = CONTEST.replace(
+        "</address>", "</address><p>You may submit your appeal by regular mail.</p>"
+    )
+    if earlier_unqualified:
+        html = html.replace("</h1>", f"</h1><p>{UNQUALIFIED_MAIL}</p>")
+
+    def produce(sources: Sequence[SourceRecord]) -> list[Finding]:
+        return [
+            replace(item, verbatim_quote=UNQUALIFIED_MAIL)
+            if earlier_unqualified and item.key is FactKey.MAIL_IN_ACCEPTED
+            else item
+            for item in answers().produce(sources)
+        ]
+
+    result = run_research(
+        TICKET,
+        TEST_AGENCY,
+        SEEDS,
+        _pages(html),
+        FakeExtractor(produce),
+        TickingClock(),
+        wait=lambda _: None,
+    )
+    assert result.decision.ok
+    _save(store, result)
+    assert case_route_evidence(store, CASE_ID)
+    with pytest.raises(MonitorConflict, match="official_contest_passage_unverified"):
+        case_route_evidence(store, CASE_ID, MailClass.FIRST_CLASS)
 
 
 def test_enrollment_requires_a_fresh_unchanged_official_page(

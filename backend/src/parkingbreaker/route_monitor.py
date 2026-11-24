@@ -22,6 +22,8 @@ from parkingbreaker.mail_config import MailClass
 from parkingbreaker.research.findings import normalize_whitespace, verify_quote
 from parkingbreaker.research.fulfilment import verified_findings
 from parkingbreaker.research.procedure import (
+    jurisdiction_in_text,
+    procedure_sections,
     quote_jurisdiction_matches,
     quote_procedure_section,
     quote_procedure_stage,
@@ -56,6 +58,7 @@ class RouteEvidence:
     source_quote: str = field(repr=False)
     evidence_sha256: str
     source_text_sha256: str
+    first_class_basis: str | None = None
 
 
 def _text_sha256(text: str) -> str:
@@ -93,48 +96,198 @@ def _attention_matches(text: str, address: MailingAddress) -> bool:
     return all(attention == label for label in labels)
 
 
-def _ordinary_mail_quote(text: str, address_quote: str) -> str | None:
-    """Look for an affirmative ordinary-post contest instruction in the address section."""
-    section = quote_procedure_section(text, address_quote)
-    if section is None:
-        return None
-    ordinary = r"(?:ordinary|regular|first[- ]class) mail"
-    special = r"(?:certified|registered) mail"
-    # Either order is explicit permission. A separate requirement elsewhere still vetoes it.
-    either_class = re.compile(
-        rf"\b(?:{ordinary} or (?:by )?{special}|{special} or (?:by )?{ordinary})\b", re.I
-    )
-    section_text = normalize_whitespace(section.text)
-    restricted = (
-        r"\b(?:certified|registered)\s+(?:USPS\s+)?mail\b"
-        r"|\b(?:return receipt|signature confirmation)\b"
-        r"|\b(?:not|never|cannot|no longer|do not|can't|won't|cannot be)\b"
-        r"[^.!?;]{0,90}\b(?:ordinary|regular|first[- ]class) mail\b"
-        r"|\b(?:ordinary|regular|first[- ]class) mail\b[^.!?;]{0,65}"
-        r"\b(?:not accepted|prohibited|ineligible|isn't accepted|no longer accepted)\b"
-    )
-    if re.search(restricted, either_class.sub("ordinary mail", section_text), re.I):
-        return None
-    for sentence in re.split(r"(?<=[.!?])\s+|\n+", section.text):
-        filing = either_class.sub("ordinary mail", normalize_whitespace(sentence))
-        plain, count = re.subn(rf"\b{ordinary}\b", "mail", filing, flags=re.I)
+_ORDINARY_MAIL = r"(?:ordinary|regular|first[- ]class) mail"
+_POSTAL_SERVICE = r"(?:USPS|U\.S\.P\.S\.|U\.S\. Postal Service)"
+_SPECIAL_MAIL = rf"(?:{_POSTAL_SERVICE} )?(?:certified|registered) mail"
+# An unconditional alternative expressly permits ordinary post. Conditions are checked
+# before this replacement, and a requirement elsewhere in the saved sources still vetoes it.
+_EITHER_CLASS = re.compile(
+    rf"\b(?:{_ORDINARY_MAIL} or (?:by )?{_SPECIAL_MAIL}"
+    rf"|{_SPECIAL_MAIL} or (?:by )?{_ORDINARY_MAIL})\b",
+    re.I,
+)
+_CONDITION = re.compile(
+    r"\b(?:if|unless|except|provided|subject to|only|instead|rather|but)\b"
+    r"|\b(?:approval|permission)\b[^.!?;]{0,65}\b(?:required|needed|necessary)\b"
+    r"|\b(?:obtain|receive|seek|requires?)\b[^.!?;]{0,65}\b(?:approval|permission)\b",
+    re.I,
+)
+_STAGE_NAME = (
+    r"(?:initial reviews?|first-level reviews?|administrative reviews?"
+    r"|administrative hearings?|hearing requests?|second.level(?: reviews?)?"
+    r"|delinquency reviews?)"
+)
+_STAGE_TERM = re.compile(rf"\b{_STAGE_NAME}\b", re.I)
+
+
+def _mail_statements(text: str) -> Iterator[str]:
+    """Preserve wrapped wording and periods in postal abbreviations."""
+    text = normalize_whitespace(text)
+    abbreviations = {m.end() for m in re.finditer(r"\b(?:[A-Za-z]\.){2,}", text)}
+    start = 0
+    for boundary in re.finditer(r"(?<=[.!?;])\s+", text):
+        if boundary.start() not in abbreviations:
+            yield text[start : boundary.start()]
+            start = boundary.end()
+    if start < len(text):
+        yield text[start:]
+
+
+def _filing_instruction(text: str) -> tuple[str, str] | None:
+    """An affirmative contest-mail instruction, never a timing or passive mail mention."""
+    inferred = None
+    # HTML paragraphs can separate an instruction from a heading without punctuation.
+    # A single line break may just be a wrapped PDF line or a <br> inside the instruction.
+    for sentence in (
+        sentence
+        for paragraph in re.split(r"\n\s*\n", text)
+        for sentence in _mail_statements(paragraph)
+    ):
+        filing = normalize_whitespace(sentence)
+        if _CONDITION.search(filing) or re.search(
+            r"\b(?:online|payments?|pay|refunds?|waivers?|notices?|decisions?|responses?)\b",
+            filing,
+            re.I,
+        ):
+            continue
+        filing = _EITHER_CLASS.sub("ordinary mail", filing)
+        plain, count = re.subn(rf"\b{_ORDINARY_MAIL}\b", "mail", filing, flags=re.I)
         if (
-            count == 1
-            and re.search(
-                rf"\b(?:appeals?|disputes?|contests?|protests?|hearings?|reviews?|adjudication)"
-                rf"(?: (?:requests?|sent|submitted))? (?:by|via) {ordinary}\b",
-                filing,
-                re.I,
-            )
-            and not re.search(
-                r"\b(?:if|except|unless|only|instead|rather|but|online|payments?|pay)\b",
+            count <= 1
+            and re.match(
+                r"^(?:you (?:may|can)|to (?:submit|send|file|request)"
+                r"|we accept|the agency accepts)\b",
                 plain,
                 re.I,
             )
             and value_supported_by_quote(FactKey.MAIL_IN_ACCEPTED, True, plain)
         ):
-            return sentence.strip()
-    return None
+            if count:
+                return sentence.strip(), "explicit_ordinary_mail"
+            if inferred is None:
+                inferred = sentence.strip(), "inferred_from_unqualified_contest_mail"
+    return inferred
+
+
+def _first_class_restricted(sources: Sequence[SourceRecord], scope: RouteScope) -> bool:
+    """No applicable saved official procedure may leave a conflicting mail requirement."""
+    restricted = re.compile(
+        rf"\b(?:certified|registered)\s+(?:{_POSTAL_SERVICE}\s+)?(?:mail|letters?|post)\b"
+        rf"|\b{_POSTAL_SERVICE}\s+(?:certified|registered)\b"
+        r"|\bby (?:certified|registered)\b"
+        r"|\b(?:return receipts?|(?:delivery|signature) confirmation"
+        r"|proof of (?:postage|mailing|delivery)|certificates? of mailing)\b"
+        r"|\b(?:do not|does not|cannot|can't|never|no longer|won't|will not)\b"
+        r"[^.!?;]{0,90}\b(?:mail|mailed|mailing)\b|\bno (?:mail|mailed)\b"
+        r"|\b(?:mail|mailed|mailing)\b[^.!?;]{0,90}"
+        r"\b(?:not (?:be )?(?:accepted|allowed|permitted)|cannot be accepted|prohibited)\b"
+        rf"|\b(?:no|not|never|cannot|can't|do not|no longer|won't)\b"
+        rf"[^.!?;]{{0,90}}\b{_ORDINARY_MAIL}\b"
+        rf"|\b{_ORDINARY_MAIL}\b[^.!?;]{{0,65}}"
+        r"\b(?:not accepted|not allowed|not permitted|prohibited|ineligible"
+        r"|isn't accepted|no longer accepted)\b",
+        re.I,
+    )
+    nonordinary = re.compile(
+        r"\b(?:track(?:able|ed|ing)|traceable|courier|hand[- ]deliver\w*|in person"
+        r"|online|electronically|portal|website)\b"
+        r"|\b(?:by hand|personal delivery)\b",
+        re.I,
+    )
+    required = re.compile(
+        r"\b(?:must|shall|required|requires|only|exclusively|have to|has to|need to)\b"
+        r"|^(?:submit|send|file|deliver|use)\b",
+        re.I,
+    )
+    for source in sources:
+        for section in procedure_sections(source.text):
+            lines = section.text.splitlines()
+            heading = normalize_whitespace(lines[0]) if lines else ""
+            named_heading = heading == section.issuer_heading or re.fullmatch(
+                rf"(?:(?:optional|later) )?{_STAGE_NAME}(?: requests?)?[.:]?", heading, re.I
+            )
+            if (
+                named_heading
+                and section.stage is not None
+                and not same_stage(section.stage, scope.stage)
+            ) or (
+                section.issuer_heading is not None
+                and not jurisdiction_in_text(scope.issuer, section.issuer_heading)
+            ):
+                continue
+            body = "\n".join(lines[1:]) if named_heading else section.text
+            for filing in _mail_statements(body):
+                # Fold punctuation only for veto matching, never in preserved evidence.
+                filing = filing.replace("\u2019", "'").replace("\u2018", "'").replace("\u2011", "-")
+                # Exempt only complete payment-only or outgoing-agency clauses. A
+                # notice can be a required enclosure, and a mixed clause can also
+                # direct the customer to use a special method for the appeal.
+                method = rf"(?:by|via) (?:{_ORDINARY_MAIL}|{_SPECIAL_MAIL})"
+                if re.fullmatch(
+                    r"(?:(?:send|mail|submit|deliver) (?:your |the )?payments? "
+                    r"|(?:your |the )?payments? (?:must|shall) be "
+                    r"(?:sent|mailed|submitted|delivered) )"
+                    rf"(?:{method}|online|electronically|with proof of (?:delivery|mailing))"
+                    r"[.!?;]?",
+                    filing,
+                    re.I,
+                ) or re.fullmatch(
+                    r"(?:we|the (?:agency|city|department)) (?:will|shall|must) "
+                    r"(?:send|mail|deliver) (?:you )?(?:your |the |a )?"
+                    r"(?:notices?|decisions?|responses?)"
+                    r"(?: about (?:your )?(?:appeals?|contests?|reviews?|requests?))?"
+                    rf"(?: {method}| to you)?[.!?;]?",
+                    filing,
+                    re.I,
+                ):
+                    continue
+                stages = _STAGE_TERM.findall(filing)
+                if (
+                    stages
+                    and not any(same_stage(stage, scope.stage) for stage in stages)
+                    and re.match(
+                        rf"^(?:(?:for|at|during|when requesting) (?:an? |the )?"
+                        rf"{_STAGE_NAME}(?: requests?)?(?: stage)?[, :]|"
+                        rf"{_STAGE_NAME}(?: requests?)? "
+                        rf"(?:must|shall|requires?|may|can|are required|is required)\b)",
+                        filing,
+                        re.I,
+                    )
+                ):
+                    continue
+                if _CONDITION.search(filing) and re.search(
+                    r"\b(?:mail|mailing|post|courier|approval|approved|permission|authorized)\b",
+                    filing,
+                    re.I,
+                ):
+                    return True
+                ordinary_alternative = _EITHER_CLASS.sub("ordinary mail", filing)
+                elective_portal = re.search(
+                    r"\b(?:online|electronically|(?:through |via )?(?:the )?portal) "
+                    r"or (?:by )?mail\b|\b(?:by )?mail or "
+                    r"(?:online|electronically|(?:through |via )?(?:the )?portal)\b",
+                    filing,
+                    re.I,
+                )
+                if restricted.search(ordinary_alternative) or (
+                    nonordinary.search(filing)
+                    and not elective_portal
+                    and (
+                        required.search(filing)
+                        or (
+                            re.search(r"\b(?:submit|send|file|deliver|use)\b", filing, re.I)
+                            and not re.search(r"\b(?:may|can|optional)\b", filing, re.I)
+                        )
+                    )
+                ):
+                    return True
+    return False
+
+
+def _first_class_basis(quote: str | None) -> str | None:
+    """Derive the operator label from preserved evidence, including older saved revisions."""
+    instruction = _filing_instruction(quote or "")
+    return instruction[1] if instruction is not None else None
 
 
 def case_route_evidence(
@@ -164,6 +317,8 @@ def case_route_evidence(
         and is_allowed(source.final_url, scopes)
         and (source.jurisdiction is None or source.jurisdiction == issuer)
     )
+    if mail_class is MailClass.FIRST_CLASS and _first_class_restricted(official, scope):
+        raise MonitorConflict("official_contest_passage_unverified")
     findings = verified_findings(research.findings, official, research.ticket)
     addresses = [item.value for item in findings if item.key is FactKey.MAILING_ADDRESS]
     if len(addresses) != 1 or not isinstance(addresses[0], dict):
@@ -200,11 +355,16 @@ def case_route_evidence(
         )
         if not address_quote or not mail_quote or not _attention_matches(source.text, address):
             continue
+        basis = None
         if mail_class is MailClass.FIRST_CLASS:
-            ordinary = _ordinary_mail_quote(source.text, address_quote)
-            if ordinary is None:
+            section = quote_procedure_section(source.text, address_quote)
+            instruction = _filing_instruction(section.text) if section is not None else None
+            if instruction is None:
                 continue
-            passage = _passage(source.text, mail_quote, address_quote, ordinary)
+            passage = _passage(source.text, mail_quote, address_quote, instruction[0])
+            basis = _first_class_basis(passage)
+            if basis != instruction[1]:
+                continue
         else:
             passage = _passage(source.text, mail_quote, address_quote)
         if _quote_in_scope(source.text, passage, scope) and value_supported_by_quote(
@@ -218,6 +378,7 @@ def case_route_evidence(
                     passage,
                     source.sha256,
                     _text_sha256(source.text),
+                    basis,
                 )
             )
     if not evidence:
@@ -449,6 +610,11 @@ def _route_summary(
         "observed_change": store.route_invalidation(route),
         "address_fingerprint": route.address_fingerprint,
         "evidence_sha256": route.evidence_sha256,
+        "first_class_basis": (
+            _first_class_basis(route.source_quote)
+            if route.scope.mail_class == MailClass.FIRST_CLASS
+            else None
+        ),
         "valid_until": route.valid_until.isoformat() if route.valid_until is not None else None,
     }
 

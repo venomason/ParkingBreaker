@@ -41,10 +41,23 @@ with the agency for confirmation. Qualify the actual print, return handling, aut
 postal events, feedback delivery and restart behavior on the intended durable deployment.
 The paid Certified Mail and Stripe qualification remains a separate release decision.
 
-On an authorized target, use the route `evidence` and `enroll` commands below with
-`--mail-class first_class`. The ordinary-mail checker looks for an explicit affirmative
-instruction in the contest address section. If the ordinary postage question remains
-unresolved, enrollment waits for a current, publishable agency source.
+On an authorized target, run the route `evidence` and `enroll` commands below with
+`--mail-class first_class`. The official instructions must direct the customer to file
+the contest by mail in the same issuer and filing stage as the verified address.
+The `first_class_basis` field in `evidence` and `show` explains how the route qualified.
+
+- `explicit_ordinary_mail` means the agency names ordinary, regular or First-Class Mail.
+  An unconditional choice between ordinary and Certified Mail also qualifies.
+- `inferred_from_unqualified_contest_mail` means the agency authorizes filing by mail
+  without specifying a special service. The operator can inspect the preserved official
+  passage supporting that inference.
+
+At enrollment, the checker examines applicable instructions across the saved official
+sources. A ban on ordinary mail, required tracking or proof of mailing, mandatory
+courier or online filing, or a requirement for prior permission blocks enrollment.
+A payment address, a mailing deadline or a notice sent by the agency cannot establish
+a contest route. An unrecognized stage heading leaves the route unresolved.
+
 Once the monitor is running, use the private command below to open the reviewed route.
 
 ```sh
@@ -96,10 +109,10 @@ python -m parkingbreaker.route_monitor --database /data/parkingbreaker.sqlite en
 
 On an approved private VM deployment, install the route monitor service and timer from
 `deploy/systemd/`, then enable `parkingbreaker-route-monitor.timer`. Inspect the service
-journal for each route's result. The timer checks every 15 minutes. A changed normalized
-page, a missing official passage, or an HTTP 404/410 fences the old revision. An unavailable
-page cannot refresh the last good check. After one hour without a successful check, new mail
-stops even if the timer itself has failed. The enrollment also has a hard expiry.
+journal for each route's result. The timer checks every 15 minutes. Changed normalized text
+on the single enrolled URL, a missing official passage, or an HTTP 404/410 fences the old
+revision. An unavailable page cannot refresh the last good check. After one hour without a
+successful check, new mail stops even if the timer itself has failed. The enrollment also has a hard expiry.
 If an office moves while its published page stays the same, the watcher has no signal
 of that move. A department confirmation can trigger an immediate scoped revocation.
 
