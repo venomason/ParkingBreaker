@@ -84,6 +84,13 @@ directly through their case.
 Use the private report for counts of selected cases, acceptances, dated handoffs and scans,
 and the customer answers. Each question includes its own count of unreported answers.
 
+For a first-stage pilot, tell drivers before approval what they would be deciding if the
+agency upholds the ticket. For example, SFMTA generally requires a deposit equal to the fine
+to request a second-level hearing. It lists waiver categories and refunds the deposit if
+the citation is dismissed. Link to the current waiver instructions and use the driver's
+denial letter to identify the applicable deadline. The driver decides whether to continue.
+[SFMTA contest and hearing instructions](https://www.sfmta.com/getting-around/drive-park/citations/contest-citation)
+
 ```sh
 python -m parkingbreaker.beta_campaign_cli --database /data/parkingbreaker.sqlite report
 ```

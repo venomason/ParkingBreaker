@@ -118,6 +118,19 @@ _STAGE_NAME = (
     r"|delinquency reviews?)"
 )
 _STAGE_TERM = re.compile(rf"\b{_STAGE_NAME}\b", re.I)
+_ONLINE_QUESTIONNAIRE = re.compile(
+    r"(?:to|you may) (?:submit|file) (?:your |the |an? )?"
+    r"(?:administrative review|review|appeal|dispute) "
+    r"online(?:, (?:please )?answer| by answering) the following(?: questions?)?: "
+    r"(?:is|was) the information on (?:the|your) (?:citation|ticket) (?:accurate|correct)\?",
+    re.I,
+)
+_EXCLUSIVE_METHOD = re.compile(
+    r"\b(?:(?:only|sole) (?:(?:this|that) )?|no other )(?:way|method|option|means|channel)\b"
+    r"(?! to pay\b| for (?:paying|payments?)\b)"
+    r"|\b(?:this|that) (?:form|step|method|process) is (?:mandatory|required)\b",
+    re.I,
+)
 
 
 def _mail_statements(text: str) -> Iterator[str]:
@@ -216,6 +229,7 @@ def _first_class_restricted(sources: Sequence[SourceRecord], scope: RouteScope) 
             ):
                 continue
             body = "\n".join(lines[1:]) if named_heading else section.text
+            exclusive_method = _EXCLUSIVE_METHOD.search(normalize_whitespace(body))
             for filing in _mail_statements(body):
                 # Fold punctuation only for veto matching, never in preserved evidence.
                 filing = filing.replace("\u2019", "'").replace("\u2018", "'").replace("\u2011", "-")
@@ -269,6 +283,11 @@ def _first_class_restricted(sources: Sequence[SourceRecord], scope: RouteScope) 
                     filing,
                     re.I,
                 )
+                # In a web questionnaire, "to submit ... online" introduces the questions.
+                # A restriction elsewhere in the section can still make that method compulsory.
+                questionnaire = _ONLINE_QUESTIONNAIRE.fullmatch(filing)
+                if questionnaire and exclusive_method:
+                    return True
                 if restricted.search(ordinary_alternative) or (
                     nonordinary.search(filing)
                     and not elective_portal
@@ -277,6 +296,7 @@ def _first_class_restricted(sources: Sequence[SourceRecord], scope: RouteScope) 
                         or (
                             re.search(r"\b(?:submit|send|file|deliver|use)\b", filing, re.I)
                             and not re.search(r"\b(?:may|can|optional)\b", filing, re.I)
+                            and not questionnaire
                         )
                     )
                 ):

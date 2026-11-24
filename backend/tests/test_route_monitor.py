@@ -54,6 +54,8 @@ CASE_ID = "case_1"
 NOW = RETRIEVED_AT + timedelta(minutes=5)
 EXPIRY = NOW + timedelta(days=7)
 CONTEST = fixture("sfmta_contest.html")
+ONLINE_QUESTIONNAIRE = "To submit your Administrative Review online, answer the following:"
+CITATION_QUESTION = "Is the information on the citation accurate?"
 
 
 @pytest.fixture
@@ -195,6 +197,7 @@ def test_explicit_first_level_section_controls_a_page_with_a_hearing_header(
         ("You may submit your payment by mail.", False),
         ("You may submit your appeal online and send payment by mail.", False),
         ("You may submit your appeal by mail if approved.", False),
+        (f"{ONLINE_QUESTIONNAIRE} {CITATION_QUESTION}", False),
     ],
 )
 def test_first_class_route_requires_its_own_filing_instruction(
@@ -312,6 +315,13 @@ def _with_saved_page(result: ResearchResult, html: str) -> ResearchResult:
         "Administrative hearings and initial reviews must use certified mail.",
         "We do not accept appeals by mail.",
         "Appeals must be submitted online.",
+        f"{ONLINE_QUESTIONNAIRE} you must complete these steps.",
+        f"{ONLINE_QUESTIONNAIRE} {CITATION_QUESTION} Appeals must use certified mail.",
+        f"{ONLINE_QUESTIONNAIRE} {CITATION_QUESTION} This is the only way to submit your appeal.",
+        "You may submit your appeal online by answering the following: "
+        f"{CITATION_QUESTION} Only this method is accepted.",
+        f"{ONLINE_QUESTIONNAIRE} register through the portal before mailing your appeal.",
+        f"{ONLINE_QUESTIONNAIRE} Are paper filings refused?",
         "Mail filings are prohibited.",
         "Mail the request with proof of delivery.",
         "No mailed appeals are accepted.",
@@ -356,6 +366,11 @@ def test_first_class_vetoes_restrictions_in_every_applicable_section(
         "<p>Appeals must use certified mail.</p>",
         "<p>You may also submit your appeal in person.</p>",
         "<p>You may submit your appeal online.</p>",
+        f"<p>{ONLINE_QUESTIONNAIRE}</p><p>{CITATION_QUESTION}</p>",
+        f"<p>{ONLINE_QUESTIONNAIRE} {CITATION_QUESTION}</p>"
+        "<p>A credit card is the only way to pay by phone.</p>",
+        "<p>You may submit your Administrative Review online by answering the following: "
+        f"{CITATION_QUESTION}</p>",
         "<p>Appeals must be submitted online or by mail.</p>",
         "<p>Appeals must be submitted by mail or through the portal.</p>",
         "<p>Payments must be submitted online.</p>",
