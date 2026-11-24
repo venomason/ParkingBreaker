@@ -85,6 +85,8 @@ class LetterInput:
     encloses_citation: bool = False
     evidence_photos: int = 0
     encloses_citation_back: bool = False
+    require_plate_label: bool = False
+    required_plate_state: str | None = None
 
 
 @dataclass(frozen=True)
@@ -207,13 +209,18 @@ def render_letter(inp: LetterInput) -> Letter:
     paragraphs = body_paragraphs(inp.draft)
     if not paragraphs:
         raise LetterError("the draft has no sentences")
+    citation = _required(inp.citation_number, "citation number")
+    plate = _required(inp.plate, "plate")
+    reference = f"Re: Citation {citation}, Plate {plate}"
+    if inp.require_plate_label or inp.required_plate_state is not None:
+        reference = f"Re: Citation {citation}\nLicense Plate: {plate}"
+        if inp.required_plate_state is not None:
+            reference += f" ({_required(inp.required_plate_state, 'plate state')})"
     sections = [
         _lines([name, *inp.sender.address_lines, inp.sender.phone, inp.sender.email]),
         f"{inp.letter_date.strftime('%B')} {inp.letter_date.day}, {inp.letter_date.year}",
         address_block(inp.mailing_address),
-        "Re: Citation "
-        f"{_required(inp.citation_number, 'citation number')}, "
-        f"Plate {_required(inp.plate, 'plate')}",
+        reference,
         _required(inp.salutation, "salutation"),
         *paragraphs,
     ]

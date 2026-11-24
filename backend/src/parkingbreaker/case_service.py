@@ -201,10 +201,15 @@ from parkingbreaker.prehold import (
 from parkingbreaker.prices import CERTIFIED_CENTS, STANDARD_CENTS
 from parkingbreaker.research.extractor import Extractor
 from parkingbreaker.research.findings import FindingStatus, verify_quote
-from parkingbreaker.research.fulfilment import complete_required_forms, verified_findings
+from parkingbreaker.research.fulfilment import (
+    complete_required_forms,
+    required_vehicle_identifiers,
+    verified_findings,
+)
 from parkingbreaker.research.jurisdiction import IssuerQuery
 from parkingbreaker.research.known_sources import known_seeds
 from parkingbreaker.research.ladder import CustomerQuestion
+from parkingbreaker.research.letter_identifiers import IdentifierKind
 from parkingbreaker.research.questions import RETIRED_KEYS, FactKey, PacketPlan, Ticket
 from parkingbreaker.research.resolution import (
     ResearchAnswers,
@@ -430,6 +435,7 @@ def _intake_form_plan(intake: s.SubmitIntake) -> PacketPlan:
         customer_fields=(
             ("citation_number", intake.ticket.citation_number),
             ("plate", intake.ticket.license_plate),
+            ("plate_state", intake.ticket.license_plate_state),
             ("customer_name", contact.name),
             ("customer_phone", contact.phone),
             ("customer_email", contact.email),
@@ -3195,6 +3201,9 @@ class CaseService:
         if drafted.spans:
             assert mailing is not None
             try:
+                identifiers = required_vehicle_identifiers(
+                    result.findings, result.sources, result.ticket
+                )
                 text = render_letter(
                     LetterInput(
                         Sender(
@@ -3222,6 +3231,10 @@ class CaseService:
                         encloses_citation=intake.citation_photo_ref is not None,
                         evidence_photos=len(intake.photo_refs),
                         encloses_citation_back=intake.citation_back_photo_ref is not None,
+                        require_plate_label=IdentifierKind.PLATE_NUMBER in identifiers,
+                        required_plate_state=ticket.license_plate_state
+                        if IdentifierKind.PLATE_STATE in identifiers
+                        else None,
                     )
                 ).text
             except LetterError:

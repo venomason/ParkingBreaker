@@ -63,6 +63,11 @@ def test_letter_frame_in_order() -> None:
     )
 
 
+def test_required_registration_state_comes_from_the_confirmed_plate() -> None:
+    text = render_letter(dataclasses.replace(INPUT, required_plate_state="OR")).text
+    assert "Re: Citation SF-998877\nLicense Plate: 7ABC123 (OR)" in text
+
+
 def test_closing_sentence_is_one_explicit_input() -> None:
     custom = dataclasses.replace(INPUT, closing_sentence="Please reduce the fine.")
     text = render_letter(custom).text

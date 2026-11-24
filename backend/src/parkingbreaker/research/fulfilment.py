@@ -27,6 +27,11 @@ from pypdf.generic import (
 )
 
 from parkingbreaker.mail_pages import prints_as_letter
+from parkingbreaker.research.letter_identifiers import (
+    IdentifierKind,
+    classify_identifier_item,
+    plan_identifier_fulfilled,
+)
 from parkingbreaker.research.questions import FactKey, PacketPlan, Ticket
 from parkingbreaker.research.route_requirements import compulsory_route_stage, quoted_route_stage
 from parkingbreaker.research.sources import AuthorityClass, SourceRecord
@@ -169,6 +174,29 @@ def required_declarations(
                 raise ValueError("required declaration wording is not established")
             result.append(wording)
     return tuple(dict.fromkeys(result))
+
+
+def required_vehicle_identifiers(
+    findings: Sequence[Finding], sources: Sequence[SourceRecord], ticket: Ticket
+) -> frozenset[IdentifierKind]:
+    """Written identifiers required by guarded, applicable agency instructions."""
+    required: set[IdentifierKind] = set()
+    for finding in verified_findings(findings, sources, ticket):
+        if finding.key not in {
+            FactKey.REQUIRED_ITEMS,
+            FactKey.TICKET_SPECIFIC_REQUIREMENTS,
+        } or not isinstance(finding.value, list):
+            continue
+        quote = finding.verbatim_quote or ""
+        for item in finding.value:
+            if not isinstance(item, str) or not requirement_interpretable(finding.key, item, quote):
+                continue
+            kind = _identifier_requirement_kind(finding.key, item, quote)
+            if kind is IdentifierKind.PLATE_AND_STATE:
+                required.update((IdentifierKind.PLATE_NUMBER, IdentifierKind.PLATE_STATE))
+            elif kind is not None:
+                required.add(kind)
+    return frozenset(required)
 
 
 def _widgets(page: PageObject) -> list[DictionaryObject]:
@@ -618,6 +646,12 @@ def _requirement_scope(item: str, quote: str) -> str:
     return " ".join(relevant) if relevant else quote
 
 
+def _identifier_requirement_kind(key: FactKey, item: str, quote: str) -> IdentifierKind | None:
+    if key not in {FactKey.REQUIRED_ITEMS, FactKey.TICKET_SPECIFIC_REQUIREMENTS}:
+        return None
+    return classify_identifier_item(_inventory_item(item), _requirement_scope(item, quote))
+
+
 def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
     """Whether the evidenced rule has a supported, deterministic fulfilment check.
 
@@ -647,6 +681,8 @@ def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
     ):
         return False
     if _physical_item(item):
+        return True
+    if _identifier_requirement_kind(key, item, scoped_quote) is not None:
         return True
     if key is FactKey.CONTEST_ELIGIBILITY:
         return standing_question_applies(quote) and not re.search(
@@ -880,6 +916,12 @@ def packet_fulfillment_pending(
         return False
     if _physical_item(item):
         return False
+    if (kind := _identifier_requirement_kind(key, item, quote)) is not None:
+        return (
+            requirement_interpretable(key, item, quote)
+            and plan is not None
+            and plan_identifier_fulfilled(kind, plan, letter_page_texts=None)
+        )
     if key is FactKey.MANDATORY_FORMS or (
         key in {FactKey.REQUIRED_ITEMS, FactKey.TICKET_SPECIFIC_REQUIREMENTS}
         and re.search(r"\bforms?\b", item, re.I)
@@ -909,6 +951,21 @@ def requirement_fulfilled(
         return True
     if not requirement_interpretable(key, item, quote) or _physical_item(item):
         return False
+    if (kind := _identifier_requirement_kind(key, item, quote)) is not None:
+        if plan.frozen_pdf is None:
+            return plan_identifier_fulfilled(kind, plan, letter_page_texts=None)
+        # The packet renderer owns the letter boundary. Its adopted-text comparison
+        # prevents attached forms, copy pages and customer photos from proving that an
+        # identifier appears in the written request.
+        from parkingbreaker.appeal.packet import PacketError, frozen_letter_text
+
+        try:
+            text = frozen_letter_text(
+                plan.frozen_pdf, citation_reference=_expected_citation_reference(plan)
+            )
+        except PacketError:
+            return False
+        return plan_identifier_fulfilled(kind, plan, letter_page_texts=(text,))
     if key is FactKey.TICKET_SPECIFIC_REQUIREMENTS:
         return requirement_fulfilled(
             FactKey.REQUIRED_ITEMS,

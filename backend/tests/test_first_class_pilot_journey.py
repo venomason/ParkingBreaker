@@ -21,7 +21,9 @@ from parkingbreaker.lob_submission import LetterEvidence, LobResponse
 from parkingbreaker.mail_config import MailClass
 from parkingbreaker.payment_records import PaymentClient
 from parkingbreaker.payment_state import PaymentState
+from parkingbreaker.research.questions import FactKey
 from parkingbreaker.research.resolution import VehicleRelationship
+from parkingbreaker.research.run import ResearchResult
 from parkingbreaker.service_phase import ServicePhase
 from parkingbreaker.transaction_store import GATE_REFUSED_REASON, SqliteTransactionStore
 from prepared_packet_support import fetched_at
@@ -29,20 +31,36 @@ from samples import SAN_FRANCISCO
 from test_beta_dispatch_timing import ForbiddenPayments
 from test_case_service import ALICE, INTAKE, NOW, Resolved, approve_with_preview, service, submit
 from test_route_revocation_dispatch import SCOPE, change_route
-from test_tier_acceptance import extract_case, model_answers
+from test_tier_acceptance import extract_case, model_answers, policy_page, requirement
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("office_moved", [False, True])
+@pytest.mark.parametrize(
+    ("office_moved", "identifiers_required"),
+    [(False, False), (True, False), (False, True)],
+)
 async def test_free_pilot_first_class_packet_survives_restart(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, office_moved: bool
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, office_moved: bool, identifiers_required: bool
 ) -> None:
     scope = replace(SCOPE, mail_class=MailClass.FIRST_CLASS)
     agency = replace(SAN_FRANCISCO, id=scope.issuer, official_domains=("sandiego.gov",))
     monkeypatch.setattr(prehold, "resolve_ticket_issuer", lambda *_a, **_k: Resolved(agency))
     monkeypatch.setitem(INTAKE["ticket"], "stage", scope.stage)
-    result, _, _ = extract_case(model_answers())
-    monkeypatch.setattr(case_service, "run_research", lambda *_a, **_kw: fetched_at(result, NOW))
+    findings = model_answers()
+    policy = None
+    if identifiers_required:
+        monkeypatch.setitem(INTAKE["ticket"], "license_plate_state", "OR")
+        quote = "Include your license plate number and registration state."
+        policy = policy_page(quote)
+        findings = [f for f in findings if f["key"] != FactKey.TICKET_SPECIFIC_REQUIREMENTS]
+        findings.append(requirement(FactKey.TICKET_SPECIFIC_REQUIREMENTS, quote))
+    result, _, _ = extract_case(findings, policy=policy)
+
+    def researched(*_args: Any, **kwargs: Any) -> ResearchResult:
+        current = replace(result, packet_plan=kwargs["packet_plan"])
+        return fetched_at(current, NOW)
+
+    monkeypatch.setattr(case_service, "run_research", researched)
     real = service(tmp_path / "cases.sqlite", cast(PaymentClient, ForbiddenPayments()))
     unused: Any = object()
     lob = FakeLobClient([LobResponse(200, "ltr_pilot", evidence=LetterEvidence.PRODUCTION)])
@@ -99,6 +117,8 @@ async def test_free_pilot_first_class_packet_survives_restart(
             )
         real.step(case_id, s.WorkerStep(step_id="draft"))
         draft = real.draft(case_id)
+        if identifiers_required:
+            assert "License Plate: SYN123 (OR)" in draft.text
         real.adopt_text(case_id, s.AdoptText(text=draft.text, text_sha256=draft.text_sha256))
         real.approve(case_id, approve_with_preview(real, case_id, draft.text_sha256))
         token = real._intake(case_id).case_token

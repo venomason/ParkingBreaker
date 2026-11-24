@@ -575,6 +575,47 @@ def _confirm_letter_boundary(
         raise PacketError("frozen letter page boundary is not recoverable")
 
 
+def _frozen_letter_pages(reader: PdfReader) -> tuple[str, Sequence[PageObject]]:
+    embedded = reader.attachments[ATTACHMENT_NAME]
+    if len(embedded) != 1:
+        raise PacketError("frozen letter text is not recoverable")
+    text = embedded[0].decode("utf-8")
+    letter = _PacketPdf()
+    letter.add_page()
+    letter.text_block(text)
+    if PAGE_BREAK in text or letter.page > LETTER_MAX_PAGES or len(reader.pages) <= letter.page:
+        raise PacketError("frozen letter page boundary is not recoverable")
+    expected = PdfReader(io.BytesIO(bytes(letter.output()))).pages
+    _confirm_letter_boundary(text, expected, reader.pages, letter.page)
+    return text, reader.pages[: letter.page]
+
+
+def frozen_letter_text(pdf: bytes, *, citation_reference: str | None = None) -> str:
+    """Recover the adopted line breaks only if the printed letter has the same words.
+
+    A renderer can wrap a plate label across a line or a page. Verify every printed
+    word before restoring the logical lines. Repeated citation headers are generated
+    by the renderer and carry no evidence for a plate or a registration state.
+    """
+    try:
+        reader = PdfReader(io.BytesIO(pdf))
+        text, pages = _frozen_letter_pages(reader)
+        printed = [(page.extract_text() or "").splitlines() for page in pages]
+        if citation_reference and all(
+            lines and lines[0] == citation_reference for lines in printed
+        ):
+            body = [line for lines in printed for line in lines[1:]]
+            if " ".join(body).split() == text.split():
+                return text
+        if " ".join(line for lines in printed for line in lines).split() == text.split():
+            return text
+        raise PacketError("printed letter differs from the adopted words")
+    except PacketError:
+        raise
+    except Exception as exc:
+        raise PacketError("frozen letter text is not recoverable") from exc
+
+
 def frozen_signature_artwork(pdf: bytes) -> bytes | None:
     """Recover the frozen signature as an image that re-prints unchanged; None means unsigned.
 
@@ -590,18 +631,8 @@ def frozen_signature_artwork(pdf: bytes) -> bytes | None:
         # The same renderer places all letter pages before the citation, photos and
         # forms. Recompute that boundary from the frozen adopted text, as approval_gate
         # does; agency /Sig widgets on later pages are never our captured artwork.
-        embedded = reader.attachments[ATTACHMENT_NAME]
-        if len(embedded) != 1:
-            raise PacketError("frozen letter text is not recoverable")
-        text = embedded[0].decode("utf-8")
-        letter = _PacketPdf()
-        letter.add_page()
-        letter.text_block(text)
-        if letter.page > LETTER_MAX_PAGES or len(reader.pages) <= letter.page:
-            raise PacketError("frozen letter page boundary is not recoverable")
-        expected = PdfReader(io.BytesIO(bytes(letter.output()))).pages
-        _confirm_letter_boundary(text, expected, reader.pages, letter.page)
-        for page in reader.pages[: letter.page]:
+        _, pages = _frozen_letter_pages(reader)
+        for page in pages:
             for reference in page.get("/Annots", []):
                 widget = reference.get_object()
                 if (
