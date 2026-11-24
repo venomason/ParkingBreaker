@@ -58,6 +58,7 @@ from parkingbreaker.payment_state import (
     ReleaseRequested,
 )
 from parkingbreaker.prices import CERTIFIED_CENTS
+from parkingbreaker.research_records import agency_json
 from parkingbreaker.returned_mail import Remedy, RemedyKind, ReturnCause
 from parkingbreaker.support_comms import (
     FIXED_HELD_ACKNOWLEDGMENT,
@@ -75,6 +76,7 @@ from parkingbreaker.support_store import (
 )
 from parkingbreaker.transaction_store import SqliteTransactionStore
 from parkingbreaker.workspace import Workspace
+from samples import SAN_FRANCISCO
 from test_case_service import anyio_backend as anyio_backend
 
 NOW = datetime(2026, 11, 20, 18, 0, tzinfo=UTC)
@@ -170,7 +172,6 @@ def _seed_case(
             },
         }
     )
-    agency_json = json.dumps({"issuer_name": AGENCY, "mailing_address": MAIL_TO_LINE1})
     db.execute("BEGIN IMMEDIATE")
     db.execute(
         "INSERT INTO pb_intake_records "
@@ -182,7 +183,7 @@ def _seed_case(
             ws.workspace_token,
             intake_json,
             "{}",
-            agency_json,
+            agency_json(SAN_FRANCISCO),
             "CERTIFIED" if mail_class is MailClass.CERTIFIED else "STANDARD",
             case.case_token,
             NOW.isoformat(),
