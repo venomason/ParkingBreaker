@@ -34,7 +34,6 @@ SECOND_WINDOW_DAYS = 30
 RESPONSE_GRACE_DAYS = 30
 _FOLLOW_UP_DOMAIN = b"parkingbreaker:outcome-follow-up:v1\0"
 _PILOT_FEEDBACK_DOMAIN = b"parkingbreaker:pilot-feedback:v1\0"
-_LINK_DOMAIN = b"parkingbreaker:email-access:v1\0"
 
 
 def derive_follow_up_token(key: str, case_token: str) -> str:

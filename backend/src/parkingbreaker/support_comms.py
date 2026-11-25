@@ -33,12 +33,10 @@ from parkingbreaker.llm import LlmBudgetExceeded, LlmClient
 from parkingbreaker.llm_gateway import CallLoggingLlmClient
 from parkingbreaker.oplog.ai_journal import AiWorker
 from parkingbreaker.payment_state import PaymentState
-from parkingbreaker.returned_mail import RemedyKind, ReturnCause
 from parkingbreaker.support_projection import (
     SupportCaseContext,
     SupportProjection,
     build_support_context,
-    format_cents,
 )
 from parkingbreaker.support_store import (
     SUPPORT_CODE_PATTERN,
@@ -534,41 +532,6 @@ def _deterministic_stop_reply(projection: SupportProjection, sign_in_link: str |
     lines.append("")
     lines.append("ParkingBreaker Support")
     return "\n".join(lines)
-
-
-def _returned_mail_summary(projection: SupportProjection) -> str:
-    cause_text = {
-        ReturnCause.OUR_ERROR: "a mailing error on our side",
-        ReturnCause.AGENCY_SIDE: "an agency-side return",
-        ReturnCause.UNKNOWN: "an unconfirmed delivery issue",
-    }.get(projection.return_cause or ReturnCause.UNKNOWN, "a recorded return")
-
-    remedy_text = {
-        RemedyKind.FREE_REMAIL: (
-            "a free re-mail (one re-mail per case, requiring your approval on your appeal page)"
-        ),
-        RemedyKind.FULL_REFUND: (
-            f"a full refund of {format_cents(projection.return_refund_cents)}"
-            if projection.return_refund_cents
-            else "a full refund"
-        ),
-        RemedyKind.PROOF_PACKET: (
-            "a proof-of-timely-mailing packet (no refund applies for an agency-side return)"
-            + (
-                " and a free re-mail to another verified address pending your approval "
-                "on your appeal page"
-                if projection.return_remails_allowed
-                else ""
-            )
-        ),
-        RemedyKind.PARTIAL_REFUND: (
-            f"a refund of {format_cents(projection.return_refund_cents)} (price minus mailing cost)"
-            if projection.return_refund_cents
-            else "a partial refund minus mailing cost"
-        ),
-    }.get(projection.return_remedy_kind or RemedyKind.PROOF_PACKET, "the recorded return remedy")
-
-    return f"Your letter was returned due to {cause_text}. The recorded remedy is {remedy_text}."
 
 
 class SupportCommsService:

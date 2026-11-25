@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-import io
 import json
 from dataclasses import replace
 
 import pytest
-from fpdf import FPDF
-from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject, NumberObject, TextStringObject
 
 from parkingbreaker.appeal.adoption import adopt
 from parkingbreaker.appeal.packet import ApprovalRefused, approval_gate, build_packet
@@ -151,52 +147,6 @@ def test_procedural_silence_is_not_an_inventory_or_deadline_waiver(key: FactKey)
     assert (
         apply_quote_guard([complete_page_claim(key)], [source(PROCEDURE)])[0].status is ST.UNKNOWN
     )
-
-
-def completed_form_pdf(*, filled: bool) -> bytes:
-    """A small fillable agency-style form with a citation and explanation field."""
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Helvetica", size=12)
-    pdf.multi_cell(
-        0,
-        8,
-        "agency form A\nParking Citation Initial Review\nCitation number\nExplanation"
-        + ("\nSF-998877\nThe sign was covered by a tree." if filled else ""),
-    )
-    writer = PdfWriter(clone_from=io.BytesIO(bytes(pdf.output())))
-    widgets = []
-    for index, (name, value) in enumerate(
-        (
-            ("Citation number", "SF-998877"),
-            ("Explanation", "The sign was covered by a tree."),
-        )
-    ):
-        widget = DictionaryObject(
-            {
-                NameObject("/Type"): NameObject("/Annot"),
-                NameObject("/Subtype"): NameObject("/Widget"),
-                NameObject("/FT"): NameObject("/Tx"),
-                NameObject("/T"): TextStringObject(name),
-                NameObject("/V"): TextStringObject(value if filled else ""),
-                NameObject("/Ff"): NumberObject(2),
-                NameObject("/Rect"): ArrayObject(
-                    [NumberObject(v) for v in (30, 650 - index * 40, 300, 675 - index * 40)]
-                ),
-            }
-        )
-        widgets.append(writer._add_object(widget))
-    writer.pages[0][NameObject("/Annots")] = ArrayObject(widgets)
-    writer._root_object[NameObject("/AcroForm")] = writer._add_object(
-        DictionaryObject(
-            {
-                NameObject("/Fields"): ArrayObject(widgets),
-            }
-        )
-    )
-    output = io.BytesIO()
-    writer.write(output)
-    return output.getvalue()
 
 
 def test_explicit_form_overrides_silence_until_completed_form_is_in_frozen_packet() -> None:

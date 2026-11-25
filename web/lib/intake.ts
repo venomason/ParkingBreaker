@@ -76,22 +76,6 @@ export const TICKET_LITERAL_LABELS: Record<TicketLiteralFieldName, string> = {
   stage_text: "Stage as printed",
 };
 
-export const TICKET_ADOPTED_LABELS: Record<TicketAdoptedFieldName, string> = {
-  citation_number: "Citation number",
-  license_plate: "License plate",
-  license_plate_state: "Plate state",
-  issuer_hint: "Who issued it",
-  issued_city: "City where issued",
-  issued_state: "State where issued",
-  issuer_kind: "Issuer kind",
-  violation_code: "Violation code",
-  violation_description: "Violation description",
-  issue_date: "Issue date (calendar)",
-  stage: "Stage",
-  notice_date: "Notice date (calendar)",
-  printed_deadline: "Printed deadline (calendar)",
-};
-
 /** The literal field that a customer's adopted fact corresponds to, if any. */
 export const ADOPTED_TO_LITERAL: Partial<Record<TicketAdoptedFieldName, TicketLiteralFieldName>> = {
   citation_number: "citation_number",
