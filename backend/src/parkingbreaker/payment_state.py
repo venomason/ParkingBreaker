@@ -165,12 +165,16 @@ class ReturnedMailRefundRequested:
 
     def __post_init__(self) -> None:
         if (
-            self.kind not in {"FULL_REFUND", "PARTIAL_REFUND"}
+            self.kind not in {"FULL_REFUND", "PARTIAL_REFUND", "NEVER_MAILED"}
             or type(self.amount_cents) is not int
             or not any(1 <= self.amount_cents <= price for price in prices.ALLOWED_PRICE_CENTS)
-            or (self.kind == "FULL_REFUND" and self.amount_cents not in prices.ALLOWED_PRICE_CENTS)
+            or (
+                self.kind != "PARTIAL_REFUND"
+                and self.amount_cents not in prices.ALLOWED_PRICE_CENTS
+            )
             or type(self.attempt) is not int
             or self.attempt not in {1, 2}
+            or (self.kind == "NEVER_MAILED" and self.attempt != 1)
         ):
             raise ValueError("invalid returned-mail refund intent")
 

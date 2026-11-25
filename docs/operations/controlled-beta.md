@@ -226,9 +226,99 @@ pre-case authorizations across all dates, so older uncertain effects stay visibl
 Use the prior window's actual start time when reviewing a different cohort.
 
 Check unknown capture outcomes, unknown refund amounts and expired holds against
-the original provider records before closing the review. The aggregates contain no
-customer or provider identifiers. Fees, payouts, disputes, attribution and other
-operating costs require separate evidence to calculate contribution.
+the original provider records before closing the review. Fees, payouts, disputes,
+attribution and other operating costs require separate contribution evidence.
+
+The report also includes an all-date original-capture review independent of
+`--since`. Its fallback share uses all unique successful original charges, including
+sales later refunded. Each fallback record carries subsequent USPS evidence, verified
+city receipt, confirmed non-mailing, conflicting evidence, refund progress or an
+unresolved finding. The report may include an internal operations reference. Keep it
+private. It contains no raw customer, provider or payment evidence.
+
+At the twentieth recorded successful capture with Stripe-confirmed live mode,
+the report marks the first-20 review due. In the production database, membership
+is fixed by recorded capture order, even when evidence, disputes or refunds arrive
+later. That snapshot covers the denominator, fallback numerator and share, unknown
+bases, and each fallback outcome. Test-mode and mode-unknown records appear in
+their own totals. Review any historical mode-unknown records separately before
+calling the sample the first 20 actual customer sales.
+
+The owner or assigned operations reviewer records the first review in the paid
+activation record, reconciles any conflicts, confirms full refunds against the
+original charge and assigns unresolved items. Rerun this report as new evidence arrives
+until each item is resolved or recorded as unresolved with an owner and a next check
+date. Record the decision about the cap or paid intake through the existing R07
+process. The report has no checkout controls.
+
+### Paid charge timing and exact-letter follow-up
+
+The checkout, rules, status and legal pages use the shared
+[`PAID_CAPTURE_TERMS` and `NONMAILING_REFUND`](../../web/lib/legal.ts) copy.
+The customer sees the usual USPS scan trigger before authorizing, alongside the
+hold-expiry condition and full original-charge refund promise. The fallback
+requires a fresh, exact original-letter lookup when the hold is close to expiry,
+PDF rendered, scheduled processing time passed, no qualifying scan and no
+failure, deletion or cancellation. Lob describes this date as when processing
+can start and the earlier cancellation window ends. A rendered PDF, even after
+that date, does not prove printing or postal handoff. The FTC guidance covers
+substantiation of express and implied claims and placing material qualifications
+beside the claim. Source review completed November 25, 2026. Human counsel review
+is pending. [Lob scheduling documentation](https://help.lob.com/print-and-mail/building-a-mail-strategy/choosing-a-delivery-strategy) · [Lob letter events](https://docs.lob.com/#tag/Letters) · [FTC advertising guidance](https://www.ftc.gov/business-guidance/resources/advertising-faqs-guide-small-business)
+
+Retain the original response body, letter ID, observed time, send date and
+SHA-256 in the restricted transaction database as part of the same write as
+the fallback decision. The active worker removes raw bodies after 90 days
+unless a recorded preservation hold applies. The restricted decision fields
+and digest remain for financial review. This is provider evidence that may
+include personal information, so keep it out of diagnostics, exports and
+customer-facing responses. Existing WAL files and backups follow the private
+backup lifecycle. Restoration and backup-copy retention still require target
+verification under R05. Use the protected evidence and direct provider access
+for reconciliation. Older fallback charges may have an explicit capture
+reason and no raw response on file. The 90-day active period is shorter than the
+published ticket-data and financial-record maximums. The mixed-content body is
+removed separately from the financial decision record.
+
+Authenticated, exact-letter Lob cancellation can support an automatic full
+refund. A generic failure notification triggers an exact-letter lookup.
+The worker can recheck unresolved fallback cases once per day, up to 30 attempts,
+so a missed webhook can still be recovered. Signed webhooks and verified city
+records can update later. Nonreceipt, no scan, a missing lookup and a returned item are insufficient
+to establish non-mailing. A verified USPS scan, city receipt or credible printer
+handoff conflicting with a non-mailing record stops a new automatic refund
+mutation and calls for operations review. A settled full refund is counted once.
+The existing worker checks the original charge and its complete refund list,
+and can refund the amount remaining after a confirmed partial refund. A Stripe
+refusal or unresolved refund remains in the report for reconciliation. A historical
+capture without enough original-charge evidence requires staff reconciliation.
+Conflicting evidence recorded after a full refund remains visible to staff.
+
+Cities do not provide a uniform machine-readable receipt for this service.
+Authorized staff may separately verify an official agency response and tie it to
+the exact original letter using the agency case and correspondence details. For
+non-mailing, require an affirmative authoritative record that establishes the
+original was never mailed. A search that found no matching letter at the city or
+a customer's report does not establish that fact. Keep the source record under
+existing private evidence controls and record its digest as the database owner
+through the host-local intake. Use one official evidence record per finding.
+
+```bash
+backend/.venv/bin/python -m parkingbreaker.verify_city_mail /path/to/private.sqlite \
+  /path/to/private-official-record --case INTERNAL_TOKEN --letter ORIGINAL_LETTER_ID \
+  --finding city_receipt --attest-verified
+```
+
+Select `never_mailed` only for affirmative non-mailing evidence. The command
+records the OS verifier, exact match and evidence digest locally. It does not
+make a provider call. The normal worker reconciles and dispatches any resulting
+refund intent.
+
+On the intended qualification candidate, exercise the scan-triggered path and the
+hold-expiry fallback with Stripe test mode and controlled Lob evidence, including
+late scans, unknown evidence and a never-mailed refund after restart. A scan-only
+walkthrough covers one route. Live-mode self-charges are excluded from testing.
+Record the results against the existing paid release gates. [Stripe testing guidance](https://docs.stripe.com/testing#how-to-use-test-cards)
 
 Three terminal declines or confirmed cancellations on an appeal within 24 hours
 pause new card attempts for that appeal. Existing intent replay and reconciliation

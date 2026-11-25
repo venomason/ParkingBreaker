@@ -129,7 +129,15 @@ def run_payment_step(
                 assert claimed.mutation_key is not None
                 assert claimed.authorization_charge_ref is not None
                 replay = previous is not None and claimed.mutation_key == previous.mutation_key
-                if replay and not store.refund_replay_valid(previous, claimed, now=clock()):
+                request = store.returned_mail_refund(case_id)
+                disputed_nonmailing = (
+                    request is not None
+                    and request.kind == "NEVER_MAILED"
+                    and not store.nonmailing_refund_supported(case_id)
+                )
+                if disputed_nonmailing or (
+                    replay and not store.refund_replay_valid(previous, claimed, now=clock())
+                ):
                     outcome = PaymentOutcome(
                         "uncertain", claimed.authorization_ref, case.amount_cents
                     )
@@ -137,7 +145,7 @@ def run_payment_step(
                     outcome = client.refund(
                         claimed.authorization_ref,
                         claimed.authorization_charge_ref,
-                        claimed.amount_cents,
+                        claimed.refund_call_amount,
                         claimed.mutation_key,
                         captured_cents=case.amount_cents,
                     )

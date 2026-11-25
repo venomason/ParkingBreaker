@@ -1,6 +1,6 @@
 # Controlled-beta readiness
 
-Updated November 23, 2026 (Pacific). **NO-GO for live paid beta.**
+Updated November 25, 2026 (Pacific). **NO-GO for live paid beta.**
 Paid activation requires the R07 owner packet; the roadmap gates own it.
 
 The November 23 [ordinary First-Class feedback pilot](operations/controlled-beta.md#ordinary-first-class-feedback-pilot)
@@ -23,6 +23,13 @@ The [temporary family preview receipt](verification/family-preview-2026-11-18.js
 The [execution roadmap](ROADMAP.md) owns remaining tasks and acceptance criteria. This page owns the evidence summary and release decision. The [controlled-beta operating packet](operations/controlled-beta.md) owns the activation/recovery procedure. No source export, test run, GitHub publication or roadmap is itself deployment authority.
 
 ## Current source status
+
+**November 25 paid capture.** The local candidate adds the hold-expiry disclosure
+before authorization, decision-time Lob evidence, the original charge basis after
+settlement, automatic full refunds for verified original non-mailing, and an
+on-demand first-20 review. The customer and provider claims were checked against
+Lob and FTC sources. Human counsel review, intended-target qualification and
+production measurements remain open. [Paid timing and follow-up](operations/controlled-beta.md#paid-charge-timing-and-exact-letter-follow-up)
 
 **November 22 code review.** The customer checkout can recover an uncertain card hold after reload. The mail deadline calculation now skips printer closures throughout production, and the private backup monitor measures the age of the last replicated source snapshot. The [repository review](verification/code-review-2026-11-22.json) records fixes, regression checks and outstanding evidence. Paid release still requires deployed qualification.
 

@@ -348,7 +348,9 @@ def run_submission_step(
                 # captured, never released: only Lob's confirmation frees the hold.
                 token = prepared.request.submission_token
                 found = _fallback_lookup(client, token, original_id)
-                step = fallback_resolution(found, original_id, call_at, last_safe_capture)
+                step = fallback_resolution(
+                    found, original_id, call_at, last_safe_capture, observed_at=clock()
+                )
                 if isinstance(step, CancelRequest):
                     if case.letter_state is CaseState.SUBMITTING:
                         tracking = (
@@ -452,18 +454,6 @@ def run_submission_step(
         # stay uncertain. Release requires fresh authoritative absence, voiding or
         # confirmed cancellation through the existing fallback policy (H1).
         finished_at = clock()
-        if (
-            isinstance(outcome, Accepted)
-            and store.get_approval_manifest(case_id, attempt) is not None
-        ):
-            store.record_dispatch_manifest(
-                case_id,
-                attempt,
-                provider_letter_id=outcome.letter_id,
-                expected_delivery=None,
-                dispatched_pdf=prepared.request.pdf,
-                dispatched_at=finished_at,
-            )
         return store.finish_submission(
             claimed, outcome, now=finished_at, effect_ids=effect_ids, new_effect_id=new_effect_id
         )

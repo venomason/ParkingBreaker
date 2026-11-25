@@ -1,5 +1,6 @@
 "use client";
 
+import { NONMAILING_REFUND, PAID_CAPTURE_TERMS } from "../lib/legal";
 import { CERTIFIED_CENTS } from "../lib/prices";
 import React, { useState, useEffect } from "react";
 import { ConciergeMark } from "./ConciergeMark";
@@ -44,7 +45,7 @@ export function Step4Offer({
   useEffect(() => {
     if (!selectedTier) {
       setActionBar(
-        "No charge unless your letter is mailed",
+        "Card hold first. See when we charge below.",
         <button
           className="btn btn-primary"
           id="actChooseCertified"
@@ -69,7 +70,7 @@ export function Step4Offer({
     }
 
     setActionBar(
-      <><Icon id="shield" size={14} /> {termsAccepted ? "No charge unless your letter is mailed" : "Agree to the mailing terms above to continue"}</>,
+      <><Icon id="shield" size={14} /> {termsAccepted ? "Card hold first. See when we charge below." : "Agree to the mailing terms above to continue"}</>,
       <button
         className="btn btn-primary"
         type="button"
@@ -191,7 +192,7 @@ export function Step4Offer({
               </li>
               <li>
                 <Icon id="check" size={14} style={{ color: "var(--sage)" }} />
-                PDF copy of your exact mailed packet
+                PDF copy of your exact approved packet
               </li>
             </ul>
           </label>
@@ -200,10 +201,11 @@ export function Step4Offer({
 
       <p className="nocharge">
         <Icon id="shield" size={18} />
-        No charge unless your letter is mailed.
+        You authorize a hold before reviewing your packet.
       </p>
 
       <LegalDisclosure id="offerAttorneyDisclosure" />
+      <p id="paymentTerms">{PAID_CAPTURE_TERMS} {NONMAILING_REFUND}</p>
 
       <label className={`packet-inspect ${termsAccepted ? "is-checked" : ""}`} htmlFor="termsAccepted">
         <input
@@ -237,7 +239,7 @@ export function Step4Offer({
             <span className="status-pill is-next"><Icon id="lock" size={12} /> Hold only</span>
           </div>
           <p className="muted small" id="payP" style={{ marginTop: "4px", marginBottom: "10px" }}>
-            We’ll place a ${price} hold on your card. Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed. If mailing stops first, we check the saved payment status and release any remaining hold. Our mailing mistakes are ours to fix under the return policy.
+            We’ll place a ${price} hold on your card.
           </p>
           {cardSlot ? cardSlot : (
             <div className="stripe">

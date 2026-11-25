@@ -228,7 +228,7 @@ export function Step1Ticket({
       setActionBar(
         <>
           <Icon id="shield" size={14} />{" "}
-          {canCharge ? "No charge unless your letter is mailed" : "Nothing is mailed without your exact approval"}
+          {canCharge ? "See the fee and charge conditions before authorizing a hold" : "Nothing is mailed without your exact approval"}
         </>,
         <button
           className="btn btn-primary"

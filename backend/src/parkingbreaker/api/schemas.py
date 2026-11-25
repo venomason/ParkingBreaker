@@ -585,12 +585,27 @@ class ReturnedMailRemedy(Model):
     proof_packet: ReturnProofPacket | None = None
 
 
+class CaptureBasis(StrEnum):
+    USPS_SCAN = "usps_scan"
+    HOLD_EXPIRY_FALLBACK = "hold_expiry_fallback"
+    UNKNOWN = "unknown"
+
+
 class CaseStatus(Model):
     case_id: str
     support_code: str | None = Field(default=None, exclude_if=lambda value: value is None)
     workspace_id: str
     state: CaseState
     payment_state: PaymentState | None
+    original_capture_basis: CaptureBasis | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    original_mailing_evidence: Literal["usps_scan", "city_receipt"] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    nonmailing_refund: Literal["confirmed", "pending", "refunded", "evidence_conflict"] | None = (
+        Field(default=None, exclude_if=lambda value: value is None)
+    )
     authorization_pending: bool | None = Field(default=None, exclude_if=lambda value: value is None)
     selected_tier: MailTier | None
     amount_cents: int | None = Field(default=None, exclude_if=lambda value: value is None)

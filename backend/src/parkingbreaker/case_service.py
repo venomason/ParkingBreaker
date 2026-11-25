@@ -162,6 +162,7 @@ from parkingbreaker.lob_submission import (
     CancelableLobClient,
     Canceled,
     CancelOutcome,
+    LetterEvidence,
     LetterOptions,
     LetterRequest,
     LobResponse,
@@ -318,7 +319,7 @@ ADDRESS_REFUND_POLICY_VERSION = "address-responsibility-v1"
 # Version of the published Terms/Refund/Privacy pages the customer accepts at the
 # paid authorization step. Bump when that copy changes so the accepted version is
 # recorded on the payment hold for dispute evidence.
-TERMS_VERSION = "terms-2026-11-23"
+TERMS_VERSION = "terms-2026-11-25"
 # The recorded Stopped detail for a customer's decline of the customer-directed destination.
 DESTINATION_DECLINED = "DESTINATION_DECLINED"
 # States where a pending destination choice can be made: before any draft exists.
@@ -1883,15 +1884,40 @@ class CaseService:
         expired = now >= window_deadline
         saved = self._store.get_research(case_id)
         draft = self._store.get_draft(case_id)
-        # TODO: Expose the original mailing's capture basis in customer status. Once payment
-        # confirms the charge, label the basis as a USPS scan or the hold-expiry fallback.
-        # Legacy records with missing evidence should report the basis as unknown.
+        paid_settled = case.payment_state in {PaymentState.CAPTURED, PaymentState.REFUNDED}
+        mail_facts = (
+            self._store.original_mail_facts(case.case_token)
+            if case.amount_cents > 0
+            and case.letter_state
+            in {
+                CaseState.IN_TRANSIT,
+                CaseState.DELIVERED,
+                CaseState.RETURNED,
+                CaseState.CLOSED_RETURNED,
+            }
+            else frozenset()
+        )
         return s.CaseStatus(
             case_id=case_id,
             support_code=self._public_support_code(case.case_token),
             workspace_id=record.workspace_token,
             state=case.letter_state,
             payment_state=case.payment_state,
+            original_capture_basis=(
+                s.CaptureBasis(self._store.original_capture_basis(case.case_token))
+                if paid_settled
+                else None
+            ),
+            original_mailing_evidence=(
+                "usps_scan"
+                if "usps_scan" in mail_facts
+                else "city_receipt"
+                if "city_receipt" in mail_facts
+                else None
+            ),
+            nonmailing_refund=(
+                self._store.nonmailing_refund_status(case.case_token) if paid_settled else None
+            ),
             selected_tier=tier,
             amount_cents=case.amount_cents,
             window_started_at=case.authorized_at,
@@ -3857,6 +3883,11 @@ class CaseService:
                 raise ServiceConflict("remail_not_available")
         if case is None:
             return None
+        refund_request = self._store.returned_mail_refund(case.case_token)
+        if refund_request is not None and refund_request.kind == "NEVER_MAILED":
+            if review is not None:
+                raise ServiceConflict("remail_not_available")
+            return None
         if case.letter_state is CaseState.CLOSED_RETURNED:
             # Definitive failed re-mails use the same returned-mail refund path, on a
             # later sweep after both completion transactions have committed. A pending
@@ -4286,6 +4317,7 @@ class CaseService:
         A malformed case row is isolated as storage_corruption; database-level errors
         propagate (fail closed).
         """
+        self._store.expire_raw_fallback_lookups(self._deps.clock())
         advanced = 0
         failed: dict[str, str] = {}
 
@@ -4523,6 +4555,13 @@ class CaseService:
             }
             if pilot_printer_handoff_at is not None:
                 envelope_data["pilot_printer_handoff_at"] = pilot_printer_handoff_at
+            if (
+                event_type == "letter.deleted"
+                and obj.get("deleted") is True
+                and obj.get("tracking_events") in (None, [])
+                and (saved is None or data.get("untracked_deletion") is True)
+            ):
+                envelope_data["untracked_deletion"] = True
             envelope = json.dumps(envelope_data)
 
         if token is None:
@@ -4636,6 +4675,14 @@ class CaseService:
                     **evidence,
                 }
                 if (
+                    event_type == "letter.mailed"
+                    and attempt == 1
+                    and case.amount_cents > 0
+                    and prepared is not None
+                    and submission_token == prepared.request.submission_token
+                ):
+                    safe_data["printer_handoff_evidence"] = True
+                if (
                     pilot_printer_handoff_at is not None
                     and attempt == 1
                     and held == ref
@@ -4662,6 +4709,7 @@ class CaseService:
                         ref,
                         tracking_number if isinstance(tracking_number, str) else None,
                         scans=scans,
+                        verified_scan_webhook=True,
                     )
                 if (
                     provider == "lob"
@@ -4691,6 +4739,11 @@ class CaseService:
                     submission_identity=(attempt, str(ref))
                     if provider == "lob" and attempt is not None
                     else None,
+                    original_cancellation=(
+                        failure_matches
+                        and case.amount_cents > 0
+                        and json.loads(envelope).get("untracked_deletion") is True
+                    ),
                 )
         except RevisionConflict:
             raise ServiceConflict("webhook_busy") from None
@@ -5097,11 +5150,21 @@ class CaseService:
                     )
                     events.append(
                         s.TrackingEvent(
-                            event="accepted",
+                            event=(
+                                "processing_cutoff_passed"
+                                if cursor.outcome.evidence is LetterEvidence.EXPIRY_FALLBACK
+                                else "accepted"
+                            ),
                             occurred_at=accepted_at,
                             description=(
-                                "The mail provider accepted the letter; "
-                                "this is not delivery confirmation."
+                                "The mail provider prepared the PDF and its "
+                                "scheduled processing time passed. "
+                                "A postal handoff had not been confirmed at this update."
+                                if cursor.outcome.evidence is LetterEvidence.EXPIRY_FALLBACK
+                                else (
+                                    "The mail provider accepted the letter; "
+                                    "this is not delivery confirmation."
+                                )
                             ),
                         )
                     )
@@ -5126,7 +5189,7 @@ class CaseService:
             events=sorted(events, key=lambda e: e.occurred_at),
             delivery_confirmation_title=(
                 "ParkingBreaker Mailing Record"
-                if ordinary
+                if ordinary or any(event.event == "processing_cutoff_passed" for event in events)
                 else "ParkingBreaker Delivery Confirmation"
             ),
             fake=False,

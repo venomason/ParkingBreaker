@@ -1,5 +1,6 @@
 import React from "react";
 import type { MailTier } from "../lib/api";
+import { NONMAILING_REFUND, PAID_CAPTURE_TERMS } from "../lib/legal";
 import { FIRST_CLASS_LIMITS, mailClassName } from "../lib/fulfillment";
 import type { FundingState, PhaseState } from "./CustomerAccess";
 import { Icon } from "./Icons";
@@ -102,7 +103,7 @@ export function DesktopAside({
           ) : savedPending ? (
             <><b>We’re checking your existing payment.</b> No new card or replacement payment is requested; use Check my appeal for the latest update.</>
           ) : newCharge ? (
-            <><b>No charge unless mailed.</b> Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.</>
+            <><b>Card hold first.</b> {PAID_CAPTURE_TERMS} {NONMAILING_REFUND}</>
           ) : betaCase ? (
             <><b>No card and no payment in this selected free beta.</b> {betaTier && <>{mailClassName(betaTier)} for $0. </>}{betaTier === "STANDARD" && FIRST_CLASS_LIMITS}</>
           ) : (

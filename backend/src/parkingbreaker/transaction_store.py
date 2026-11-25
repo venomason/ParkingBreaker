@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import fcntl
+import hashlib
 import json
 import os
+import re
 import sqlite3
 import stat
 import uuid
@@ -13,7 +15,7 @@ from contextlib import contextmanager
 from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from parkingbreaker import prices
 from parkingbreaker.access_email_store import AccessEmailStoreMixin, initialize_access_email
@@ -110,6 +112,7 @@ from parkingbreaker.lob_submission import (
     VERIFIED_IDEMPOTENCY_WINDOW,
     Accepted,
     Canceled,
+    LetterEvidence,
     LetterRequest,
     LookupByMetadata,
     NotSent,
@@ -142,6 +145,16 @@ from parkingbreaker.outcome_follow_up_store import (
     initialize_outcome_follow_up,
 )
 from parkingbreaker.overseer_feed import OverseerFeedStoreMixin, initialize_ops_ids
+from parkingbreaker.paid_capture_evidence import (
+    CAPTURE_ACCEPTANCE_JOIN_SQL,
+    CAPTURE_BASIS_SQL,
+    automatic_nonmailing_refund_supported,
+    expire_raw_fallback_lookups,
+    initialize_original_mail_findings,
+    initialize_paid_capture_evidence,
+    original_mail_facts,
+    record_fallback_lookup,
+)
 from parkingbreaker.payment_records import (
     PaymentCursor,
     PaymentOutcome,
@@ -1070,6 +1083,8 @@ class SqliteTransactionStore(
             )
             _initialize_transactions(self._require_open())
             _initialize_payment(self._require_open())
+            initialize_paid_capture_evidence(self._require_open())
+            initialize_original_mail_findings(self._require_open())
             initialize_intake(self._require_open())
             initialize_ticket_intake(self._require_open())
             initialize_address_store(self._require_open())
@@ -2204,7 +2219,12 @@ class SqliteTransactionStore(
             yield str(row[0])
 
     def request_returned_mail_refund(
-        self, case_id: str, kind: RemedyKind, amount_cents: int, *, now: datetime
+        self,
+        case_id: str,
+        kind: RemedyKind | Literal["NEVER_MAILED"],
+        amount_cents: int,
+        *,
+        now: datetime,
     ) -> CaseRecord:
         """Persist one exact refund intent/outbox row; no provider call or remedy decision.
 
@@ -2220,7 +2240,7 @@ class SqliteTransactionStore(
             case = self._payment_case(case_id)
             request = ReturnedMailRefundRequested(kind, amount_cents, case.attempt)
             if not 1 <= amount_cents <= case.amount_cents or (
-                kind == "FULL_REFUND" and amount_cents != case.amount_cents
+                kind != "PARTIAL_REFUND" and amount_cents != case.amount_cents
             ):
                 raise ValueError("returned-mail refund differs from case amount")
             previous_request = self.returned_mail_refund(case_id)
@@ -2232,7 +2252,13 @@ class SqliteTransactionStore(
                 return case
             cursor = self.payment_cursor(case_id)
             if (
-                case.letter_state not in {CaseState.RETURNED, CaseState.CLOSED_RETURNED}
+                (
+                    case.letter_state is not CaseState.IN_TRANSIT
+                    or case.attempt != 1
+                    or not self.nonmailing_refund_supported(case_id)
+                    if kind == "NEVER_MAILED"
+                    else case.letter_state not in {CaseState.RETURNED, CaseState.CLOSED_RETURNED}
+                )
                 or case.payment_state is not PaymentState.CAPTURED
                 or cursor is None
                 or cursor.kind != "capture"
@@ -2820,11 +2846,15 @@ class SqliteTransactionStore(
                                 refund_requested is not None
                                 or not 1 <= event.amount_cents <= case.amount_cents
                                 or (
-                                    event.kind == "FULL_REFUND"
+                                    event.kind != "PARTIAL_REFUND"
                                     and event.amount_cents != case.amount_cents
                                 )
-                                or letter_state
-                                not in {CaseState.RETURNED, CaseState.CLOSED_RETURNED}
+                                or (
+                                    letter_state not in {CaseState.IN_TRANSIT, CaseState.DELIVERED}
+                                    if event.kind == "NEVER_MAILED"
+                                    else letter_state
+                                    not in {CaseState.RETURNED, CaseState.CLOSED_RETURNED}
+                                )
                                 or event.attempt != attempt
                             ):
                                 raise ValueError("invalid returned-mail refund history")
@@ -3033,6 +3063,10 @@ class SqliteTransactionStore(
                             previous.owner is not None
                             or (
                                 not previous.outcome.refundable
+                                and (
+                                    returned_refund is None
+                                    or returned_refund.kind != "NEVER_MAILED"
+                                )
                                 if intent.kind == "refund"
                                 else previous.outcome.status != "requires_capture"
                             )
@@ -3059,6 +3093,10 @@ class SqliteTransactionStore(
                     ):
                         raise ValueError("changed intent charge anchor")
                     if intent.contract_version >= 2:
+                        if intent.refund_mutation_cents is not None and (
+                            returned_refund is None or returned_refund.kind != "NEVER_MAILED"
+                        ):
+                            raise ValueError("unexpected remaining refund mutation")
                         if intent.call_kind == "retrieve" and intent.mutation_key != (
                             None if previous is None else previous.mutation_key
                         ):
@@ -3074,6 +3112,12 @@ class SqliteTransactionStore(
                                 if decision is None:
                                     raise ValueError("refund mutation without sufficient evidence")
                                 mode, anchor = decision
+                                if (
+                                    previous is None
+                                    or intent.refund_call_amount
+                                    != self._refund_call_amount(returned_refund, previous)
+                                ):
+                                    raise ValueError("invalid original refund mutation amount")
                                 expected_key = (
                                     mutation_key(
                                         "returned-mail",
@@ -3095,6 +3139,7 @@ class SqliteTransactionStore(
                                         intent.effect_id != anchor.effect_id
                                         or intent.authorization_ref != anchor.authorization_ref
                                         or intent.amount_cents != anchor.amount_cents
+                                        or intent.refund_call_amount != anchor.refund_call_amount
                                         or intent.key != anchor.key
                                         or intent.authorization_charge_ref
                                         != anchor.authorization_charge_ref
@@ -3157,6 +3202,7 @@ class SqliteTransactionStore(
                             previous.mutation_key,
                             previous.final_capture,
                             previous.contract_version,
+                            previous.refund_mutation_cents,
                         ) != (
                             intent.case_token,
                             intent.effect_id,
@@ -3169,6 +3215,7 @@ class SqliteTransactionStore(
                             intent.mutation_key,
                             intent.final_capture,
                             intent.contract_version,
+                            intent.refund_mutation_cents,
                         ):
                             raise ValueError("changed payment outcome anchor")
                         if intent.contract_version == 3:
@@ -3352,6 +3399,18 @@ class SqliteTransactionStore(
                 raise StorageCorruption(f"invalid payment history: {exc}") from exc
             raise
 
+    @staticmethod
+    def _refund_call_amount(
+        request: ReturnedMailRefundRequested | None, previous: PaymentCursor
+    ) -> int:
+        if request is None or request.kind != "NEVER_MAILED":
+            return previous.amount_cents
+        return request.amount_cents - sum(
+            refund.amount_cents
+            for refund in previous.outcome.refunds or ()
+            if refund.status == "succeeded"
+        )
+
     def _refund_mutation_decision(
         self,
         case_id: str,
@@ -3365,9 +3424,19 @@ class SqliteTransactionStore(
             or previous.call_kind != "retrieve"
             or not previous.outcome.full_object
             or previous.outcome.evidence_version != 1
-            or not previous.outcome.refundable
+            or previous.outcome.refunds is None
             or previous.outcome.original_charge_ref != previous.authorization_charge_ref
         ):
+            return None
+        request = self.returned_mail_refund(case_id)
+        nonmailing = request is not None and request.kind == "NEVER_MAILED"
+        if nonmailing:
+            if not 0 < self._refund_call_amount(request, previous) <= previous.amount_cents or any(
+                r.status not in {"succeeded", "failed", "canceled"}
+                for r in previous.outcome.refunds
+            ):
+                return None
+        elif not previous.outcome.refundable:
             return None
         attempts: list[tuple[PaymentCursor, PaymentCursor]] = []
         for op_id, intent_text, result_text in self._require_open().execute(
@@ -3382,24 +3451,28 @@ class SqliteTransactionStore(
                 result = intent if result_text is None else decode_cursor(result_text)
                 attempts.append((intent, result))
         if not attempts:
-            return ("new", None) if previous.outcome.refunds == () else None
+            return ("new", None) if nonmailing or previous.outcome.refunds == () else None
         latest_intent, latest = attempts[-1]
         attempted = latest.outcome.refunds
         if (
             attempted is not None
             and len(attempted) == 1
             and attempted[0].status in {"failed", "canceled"}
-            and attempted[0].amount_cents == previous.amount_cents
+            and attempted[0].amount_cents == latest_intent.refund_call_amount
             and any(r == attempted[0] for r in previous.outcome.refunds or ())
         ):
             # Returned-mail has one stable request/key. A definitively failed refund
             # remains pending; only the older compensation policy rotates attempts.
-            return ("new", None) if self.returned_mail_refund(case_id) is None else None
+            return ("new", None) if request is None else None
         # A complete empty lookup permits only a same-key replay, before Stripe may
         # prune the idempotency result. Anchor to the first durable intent using it.
         if latest.outcome.status != "uncertain" or latest.mutation_key is None:
             return None
-        if previous.outcome.refunds != ():
+        if (
+            previous.outcome.refunds != ()
+            if not nonmailing
+            else latest_intent.refund_call_amount != self._refund_call_amount(request, previous)
+        ):
             return None
         anchor = next(
             (
@@ -3416,6 +3489,7 @@ class SqliteTransactionStore(
             or latest_intent.effect_id != previous.effect_id
             or latest_intent.authorization_ref != previous.authorization_ref
             or latest_intent.amount_cents != previous.amount_cents
+            or latest_intent.refund_call_amount != anchor.refund_call_amount
             or latest_intent.authorization_charge_ref != previous.authorization_charge_ref
             or now >= anchor.next_at + REFUND_REPLAY_WINDOW
         ):
@@ -3447,6 +3521,7 @@ class SqliteTransactionStore(
             and claimed.effect_id == anchor.effect_id
             and claimed.authorization_ref == anchor.authorization_ref
             and claimed.amount_cents == anchor.amount_cents
+            and claimed.refund_call_amount == anchor.refund_call_amount
             and claimed.authorization_charge_ref == anchor.authorization_charge_ref
             and claimed.key == anchor.key
         )
@@ -3637,6 +3712,7 @@ class SqliteTransactionStore(
                 previous is not None and previous.contract_version == 3
             )
             call_kind = "retrieve"
+            refund_mutation_cents = None
             refund_decision: tuple[str, PaymentCursor | None] | None = None
             if (
                 previous is not None
@@ -3670,8 +3746,15 @@ class SqliteTransactionStore(
                 and previous.call_kind == "retrieve"
             ):
                 refund_decision = self._refund_mutation_decision(case_id, previous, now=now)
-                if refund_decision is not None:
+                if refund_decision is not None and (
+                    returned_refund is None
+                    or returned_refund.kind != "NEVER_MAILED"
+                    or self.nonmailing_refund_supported(case_id)
+                ):
                     call_kind = "refund"
+                    remaining = self._refund_call_amount(returned_refund, previous)
+                    if remaining < previous.amount_cents:
+                        refund_mutation_cents = remaining
             cursor = PaymentCursor(
                 case_id,
                 effect.effect_id,
@@ -3723,6 +3806,7 @@ class SqliteTransactionStore(
                     previous.authorization_charge_ref
                     or (previous.outcome.original_charge_ref if kind == "refund" else None)
                 ),
+                refund_mutation_cents=refund_mutation_cents,
             )
             encoded = cursor_json(cursor)
             database.execute(
@@ -3815,7 +3899,8 @@ class SqliteTransactionStore(
             claimed.call_kind == "refund"
             and outcome.refunds is not None
             and (
-                len(outcome.refunds) != 1 or outcome.refunds[0].amount_cents != claimed.amount_cents
+                len(outcome.refunds) != 1
+                or outcome.refunds[0].amount_cents != claimed.refund_call_amount
             )
         ):
             raise ValueError("refund response differs from intent")
@@ -3963,6 +4048,12 @@ class SqliteTransactionStore(
                     ids,
                     manage_transaction=False,
                     new_effect_id=new_effect_id,
+                )
+            # Stopped-case compensation discovers a charge with an unknown trigger.
+            if any(isinstance(e, CaptureSucceeded) for e in events):
+                database.execute(
+                    "INSERT INTO pb_original_capture_basis VALUES (?, ?)",
+                    (case.case_token, self._historical_capture_basis(case.case_token)),
                 )
             if complete:
                 self._update_effect(
@@ -4364,6 +4455,40 @@ class SqliteTransactionStore(
                 case Accepted(letter_id):
                     if outcome.evidence is None:
                         raise ValueError("new acceptance requires explicit evidence")
+                    prepared = self.get(case.case_token, claimed.attempt)
+                    if outcome.evidence is LetterEvidence.EXPIRY_FALLBACK:
+                        if (
+                            claimed.attempt != 1
+                            or case.payment_state is PaymentState.NO_CHARGE
+                            or operation[1] != "lookup"
+                            or prepared is None
+                            or _record_datetime(operation[0], "call start")
+                            < case.authorization_expires_at - EXPIRY_MARGIN - FALLBACK_LEAD
+                        ):
+                            raise ValueError("fallback requires original paid lookup")
+                        record_fallback_lookup(
+                            database,
+                            self.path,
+                            case.case_token,
+                            claimed.owner,
+                            prepared.request.submission_token,
+                            outcome,
+                            _record_datetime(operation[0], "call start"),
+                            now,
+                        )
+                    if (
+                        prepared is not None
+                        and self.get_approval_manifest(case.case_token, claimed.attempt) is not None
+                    ):
+                        self.record_dispatch_manifest(
+                            case.case_token,
+                            claimed.attempt,
+                            provider_letter_id=letter_id,
+                            expected_delivery=None,
+                            dispatched_pdf=prepared.request.pdf,
+                            dispatched_at=now,
+                            manage_transaction=False,
+                        )
                     if case.letter_state is CaseState.SUBMITTING:
                         event = SubmitConfirmed(letter_id)
                 case Rejected(_, reason):
@@ -4471,6 +4596,188 @@ class SqliteTransactionStore(
                 rollback_preserving_error(database)
             raise
 
+    def original_letter_id(self, case_id: str) -> str | None:
+        cursor = self.submission_cursor(case_id, 1)
+        if cursor is not None and isinstance(cursor.outcome, Accepted):
+            return cursor.outcome.letter_id
+        return None
+
+    def original_mail_facts(self, case_id: str) -> frozenset[str]:
+        cursor = self.submission_cursor(case_id, 1)
+        if cursor is None or not isinstance(cursor.outcome, Accepted):
+            return frozenset()
+        facts = original_mail_facts(self._require_open(), case_id, cursor.outcome.letter_id)
+        if cursor.outcome.scans or cursor.outcome.verified_scan_webhook:
+            facts |= {"usps_scan"}
+        elif cursor.outcome.evidence is LetterEvidence.PRODUCTION:
+            # Old production records without proof are unknown to the customer
+            # but are still a reason to pause an automatic non-mailing refund.
+            facts |= {"legacy_production"}
+        return facts
+
+    def nonmailing_refund_supported(self, case_id: str) -> bool:
+        return automatic_nonmailing_refund_supported(self.original_mail_facts(case_id))
+
+    def nonmailing_refund_status(
+        self, case_id: str
+    ) -> Literal["confirmed", "pending", "refunded", "evidence_conflict"] | None:
+        facts = self.original_mail_facts(case_id)
+        if "never_mailed" not in facts:
+            return None
+        if not automatic_nonmailing_refund_supported(facts):
+            return "evidence_conflict"
+        case = self._payment_case(case_id)
+        if any(
+            h.event_name == "RefundIssued"
+            and json.loads(h.event_json).get("amount_cents") == case.amount_cents
+            for h in self._iter_transition_history(case_id)
+        ):
+            return "refunded"
+        request = self.returned_mail_refund(case_id)
+        if request is not None and request.kind == "NEVER_MAILED":
+            return "pending"
+        return "confirmed"
+
+    def record_original_mail_finding(
+        self,
+        case_id: str,
+        letter_id: str,
+        source: str,
+        finding: str,
+        digest: str,
+        verifier: str,
+        *,
+        now: datetime,
+    ) -> bool:
+        """Restricted ingress; the caller owns source authentication and verification."""
+        allowed = {
+            "lob_lookup": {"usps_scan", "never_mailed"},
+            "lob_webhook": {"never_mailed"},
+            "verified_city": {"city_receipt", "never_mailed"},
+        }
+        if (
+            finding not in allowed.get(source, set())
+            or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+            or re.fullmatch(r"[a-zA-Z0-9_.-]{1,64}", verifier) is None
+            or not self._submission_locked
+        ):
+            raise ValueError("invalid or unowned original mailing evidence")
+        now = _aware(now, "now")
+        db = self._require_open()
+        own = not db.in_transaction
+        try:
+            if own:
+                db.execute("BEGIN IMMEDIATE")
+            case = self._payment_case(case_id)
+            if case.amount_cents <= 0 or self.original_letter_id(case_id) != letter_id:
+                raise ValueError("evidence requires exact original paid letter")
+            existing = db.execute(
+                "SELECT case_token, letter_id, finding FROM pb_original_mail_findings "
+                "WHERE source=? AND evidence_sha256=?",
+                (source, digest),
+            ).fetchone()
+            if existing is not None and existing != (case_id, letter_id, finding):
+                raise ValueError("evidence digest already bound")
+            if existing is None:
+                db.execute(
+                    "INSERT INTO pb_original_mail_findings VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (case_id, letter_id, source, finding, digest, verifier, now.isoformat()),
+                )
+            self.queue_nonmailing_refund(case_id, now)
+            if own:
+                db.execute("COMMIT")
+            return existing is None
+        except Exception:
+            if own and db.in_transaction:
+                rollback_preserving_error(db)
+            raise
+
+    def queue_nonmailing_refund(self, case_id: str, now: datetime) -> bool:
+        case = self.get_case(case_id)
+        if (
+            case is None
+            or case.attempt != 1
+            or case.payment_state is not PaymentState.CAPTURED
+            or case.letter_state is not CaseState.IN_TRANSIT
+            or self.returned_mail_refund(case_id) is not None
+            or not self.nonmailing_refund_supported(case_id)
+        ):
+            return False
+        cursor = self.payment_cursor(case_id)
+        if cursor is None or not (
+            cursor.kind == "capture"
+            and cursor.done
+            and cursor.outcome.full_object
+            and cursor.outcome.evidence_version == 1
+            and cursor.outcome.charge_ref == cursor.outcome.original_charge_ref
+        ):
+            return False
+        self.request_returned_mail_refund(case_id, "NEVER_MAILED", case.amount_cents, now=now)
+        return True
+
+    def claim_original_mail_recheck(self, case_id: str, now: datetime) -> tuple[str, str] | None:
+        """Bound exact-letter follow-up for no-scan captures, including missed webhooks."""
+        case = self.get_case(case_id)
+        if case is None or case.payment_state is not PaymentState.CAPTURED or case.attempt != 1:
+            return None
+        cursor = self.submission_cursor(case_id, 1)
+        if cursor is None or not isinstance(cursor.outcome, Accepted):
+            return None
+        if self.original_mail_facts(case_id) & {"usps_scan", "city_receipt", "never_mailed"}:
+            return None
+        failed = self.mail_failure_recorded(case_id, 1)
+        if cursor.outcome.evidence is not LetterEvidence.EXPIRY_FALLBACK and not failed:
+            return None
+        db = self._require_open()
+        row = db.execute(
+            "SELECT checked_at, checks FROM pb_original_mail_rechecks WHERE case_token=?",
+            (case_id,),
+        ).fetchone()
+        if row is not None:
+            if (
+                row[1] >= 30
+                or _record_datetime(row[0], "last mail check") + timedelta(days=1) > now
+            ):
+                return None
+        elif not failed and cursor.next_at + timedelta(days=1) > now:
+            return None
+        prepared = self.get(case_id, 1)
+        if prepared is None:
+            return None
+        db.execute(
+            "INSERT INTO pb_original_mail_rechecks VALUES (?, ?, 1) ON CONFLICT(case_token) "
+            "DO UPDATE SET checked_at=excluded.checked_at, checks=checks+1",
+            (case_id, now.isoformat()),
+        )
+        return cursor.outcome.letter_id, prepared.request.submission_token
+
+    def expire_raw_fallback_lookups(self, now: datetime) -> None:
+        expire_raw_fallback_lookups(self._require_open(), now)
+
+    def original_capture_basis(self, case_id: str) -> str:
+        row = (
+            self._require_open()
+            .execute(
+                "SELECT basis FROM pb_original_capture_basis WHERE case_token=?",
+                (case_id,),
+            )
+            .fetchone()
+        )
+        return self._historical_capture_basis(case_id) if row is None else str(row[0])
+
+    def _historical_capture_basis(self, case_id: str) -> str:
+        row = (
+            self._require_open()
+            .execute(
+                f"SELECT {CAPTURE_BASIS_SQL} FROM pb_case_history h {CAPTURE_ACCEPTANCE_JOIN_SQL} "
+                "WHERE h.case_token=? AND h.machine='payment' AND h.target='CAPTURED' "
+                "AND h.event_name IN ('CaptureSucceeded', 'UnexpectedCaptureConfirmed')",
+                (case_id,),
+            )
+            .fetchone()
+        )
+        return "unknown" if row is None else str(row[0])
+
     def case_ids(self) -> tuple[str, ...]:
         return tuple(
             row[0]
@@ -4494,6 +4801,7 @@ class SqliteTransactionStore(
         submission_token: str | None = None,
         expected_envelope: str | None = None,
         submission_identity: tuple[int, str] | None = None,
+        original_cancellation: bool = False,
     ) -> bool:
         """Persist early evidence, or atomically bind it with dedup and machine events.
 
@@ -4576,19 +4884,6 @@ class SqliteTransactionStore(
                         evidence=True,
                         manage_transaction=False,
                     )
-                    if (
-                        frozen is not None
-                        and self.get_approval_manifest(case_id, case.attempt) is not None
-                    ):
-                        self.record_dispatch_manifest(
-                            case_id,
-                            case.attempt,
-                            provider_letter_id=submission_acceptance.letter_id,
-                            expected_delivery=None,
-                            dispatched_pdf=frozen.request.pdf,
-                            dispatched_at=occurred_at,
-                            manage_transaction=False,
-                        )
                     self.finish_submission(
                         claimed,
                         submission_acceptance,
@@ -4621,6 +4916,23 @@ class SqliteTransactionStore(
                 "INSERT INTO pb_webhooks VALUES (?, ?, ?, ?)",
                 (provider, event_id, case_id, payload),
             )
+            if (
+                original_cancellation
+                and provider == "lob"
+                and case_id is not None
+                and submission_identity is not None
+                and submission_identity[0] == 1
+                and self.original_letter_id(case_id) == submission_identity[1]
+            ):
+                self.record_original_mail_finding(
+                    case_id,
+                    submission_identity[1],
+                    "lob_webhook",
+                    "never_mailed",
+                    hashlib.sha256(event_id.encode()).hexdigest(),
+                    "lob_signature",
+                    now=occurred_at,
+                )
             db.execute(
                 "DELETE FROM pb_webhook_backlog WHERE provider=? AND event_id=?",
                 (provider, event_id),

@@ -48,6 +48,7 @@ class PaymentOutcome:
     # None means unavailable/incomplete. Only retrieve_refunds supplies a complete list;
     # mutation responses retain their single object and cannot settle the cursor.
     refunds: tuple[RefundEvidence, ...] | None = None
+    livemode: bool | None = None
 
     @property
     def full_refund(self) -> bool:
@@ -173,6 +174,13 @@ class PaymentCursor:
     contract_version: int = 1
     authorization_charge_ref: str | None = None
     compensation_started: bool = False
+    refund_mutation_cents: int | None = None
+
+    @property
+    def refund_call_amount(self) -> int:
+        return (
+            self.amount_cents if self.refund_mutation_cents is None else self.refund_mutation_cents
+        )
 
 
 def outcome_json(value: PaymentOutcome) -> str:
@@ -199,6 +207,10 @@ def outcome_json(value: PaymentOutcome) -> str:
     ):
         raise ValueError("invalid payment outcome")
     data = asdict(value)
+    if value.livemode is None:
+        del data["livemode"]
+    elif type(value.livemode) is not bool or value.evidence_version != 1:
+        raise ValueError("invalid payment environment")
     if value.refunds is None:
         del data["refunds"]
     else:
@@ -364,6 +376,14 @@ def cursor_json(value: PaymentCursor) -> str:
     ):
         raise ValueError("refund requires immutable original charge evidence")
     data = asdict(value)
+    if value.refund_mutation_cents is None:
+        del data["refund_mutation_cents"]
+    elif (
+        value.call_kind != "refund"
+        or type(value.refund_mutation_cents) is not int
+        or not 0 < value.refund_mutation_cents < value.amount_cents
+    ):
+        raise ValueError("invalid remaining refund mutation")
     if not value.compensation_started:
         del data["compensation_started"]
     if value.authorization_charge_ref is None:

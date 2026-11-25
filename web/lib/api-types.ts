@@ -1018,6 +1018,11 @@ export interface components {
             accepted_at: string | null;
         };
         /**
+         * CaptureBasis
+         * @enum {string}
+         */
+        CaptureBasis: "usps_scan" | "hold_expiry_fallback" | "unknown";
+        /**
          * CaseState
          * @enum {string}
          */
@@ -1032,6 +1037,11 @@ export interface components {
             workspace_id: string;
             state: components["schemas"]["CaseState"];
             payment_state: components["schemas"]["PaymentState"] | null;
+            original_capture_basis?: components["schemas"]["CaptureBasis"] | null;
+            /** Original Mailing Evidence */
+            original_mailing_evidence?: ("usps_scan" | "city_receipt") | null;
+            /** Nonmailing Refund */
+            nonmailing_refund?: ("confirmed" | "pending" | "refunded" | "evidence_conflict") | null;
             /** Authorization Pending */
             authorization_pending?: boolean | null;
             selected_tier: components["schemas"]["MailTier"] | null;

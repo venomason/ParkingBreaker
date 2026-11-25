@@ -127,6 +127,8 @@ def test_each_supported_scan_webhook_reaches_existing_capture(
             dispatch_once(store, wire.client, payments, lambda: NOW, new_id)
     assert payments.captures == 1
     assert len(wire.creates) == 1
+    with SqliteTransactionStore(path) as store:
+        assert store.original_capture_basis(case.case_token) == "usps_scan"
 
 
 def test_legacy_accepted_codec_is_not_capture_eligible() -> None:
@@ -337,11 +339,9 @@ def test_webhook_acceptance_and_dedup_roll_back_together(
 
 
 def signed_event(
-    body: dict[str, object], event_type: str, at: datetime
+    body: dict[str, object], event_type: str, at: datetime, *, event_id: str = "evt_scan"
 ) -> tuple[bytes, dict[str, str]]:
-    payload = json.dumps(
-        {"id": "evt_scan", "event_type": {"id": event_type}, "body": body}
-    ).encode()
+    payload = json.dumps({"id": event_id, "event_type": {"id": event_type}, "body": body}).encode()
     stamp = str(int(at.timestamp()))
     signature = hmac.new(b"secret", stamp.encode() + b"." + payload, hashlib.sha256).hexdigest()
     return payload, {"lob-signature": signature, "lob-signature-timestamp": stamp}

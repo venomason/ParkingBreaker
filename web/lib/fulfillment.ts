@@ -1,9 +1,10 @@
+import { NONMAILING_REFUND, PAID_CAPTURE_TERMS } from "./legal";
 import type { CaseStatus, MailTier, Tracking } from "./api";
 
 type SubmissionStatus = Pick<CaseStatus, "case_id" | "state" | "payment_state">;
 type SubmissionTracking = Pick<Tracking, "case_id" | "state">;
 
-/** A paid mailing is accepted only after durable handoff plus capture. */
+/** A paid mailing record requires the saved original and a confirmed charge. */
 const PAID_ACCEPTED_STATES: readonly SubmissionStatus["state"][] = ["IN_TRANSIT", "DELIVERED"];
 
 /** A free beta mailing has no payment to capture, so its original saved mailing record is
@@ -64,18 +65,35 @@ export function customerStage(status: CaseStatus): number {
 
 export function paymentCopy(status: CaseStatus): string {
   const amount = status.amount_cents == null ? "" : `$${(status.amount_cents / 100).toFixed(2)} `;
+  let captureExplanation: string;
+  switch (status.original_capture_basis) {
+    case "usps_scan":
+      captureExplanation = "We charged after a qualifying USPS scan for your original letter.";
+      break;
+    case "hold_expiry_fallback":
+      captureExplanation = "We charged as your card hold neared expiry. At that time, there was no qualifying USPS scan. Our mailing provider had prepared the exact PDF, and its scheduled processing time had passed without a reported failure, deletion or cancellation.";
+      break;
+    default:
+      captureExplanation = "The saved record does not show what triggered the charge.";
+  }
   switch (status.payment_state) {
     case "NO_CHARGE": return status.selected_tier === "STANDARD"
       ? "Your selected beta appeal costs $0. No card hold or payment is required."
       : "Your selected beta appeal is free. No card hold or payment is required.";
-    case "AUTHORIZED": return `${amount}card hold authorized. Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.`;
+    case "AUTHORIZED": return `${amount}card hold authorized. ${PAID_CAPTURE_TERMS} ${NONMAILING_REFUND}`;
     case "CAPTURE_PENDING": return "We’re checking your existing payment. There is no need to authorize another payment.";
     case "CAPTURE_RETRYING": return "We’re still checking your existing card payment. No new payment is requested.";
-    // TODO: Explain a settled charge using its saved basis. A delayed scan can appear in the
-    // tracking timeline after the driver was already charged under the hold-expiry fallback.
-    case "CAPTURED": return `${amount}card payment confirmed.`;
+    case "CAPTURED": {
+      const payment = `${amount}card payment confirmed. ${captureExplanation}`;
+      if (status.nonmailing_refund === "pending") return `${payment} We confirmed the letter was never mailed and are processing a full refund.`;
+      if (status.nonmailing_refund === "confirmed") return `${payment} We confirmed the letter was never mailed and are checking the original charge for your full refund.`;
+      if (status.nonmailing_refund === "evidence_conflict") return `${payment} We’re reviewing conflicting records for the original mailing.`;
+      return payment;
+    }
     case "RELEASED": return "Your card hold has been released.";
-    case "REFUNDED": return "Your original card payment is recorded as refunded.";
+    case "REFUNDED": return status.nonmailing_refund === "refunded"
+      ? `Your full original charge was refunded. ${captureExplanation}`
+      : `Your original card payment is recorded as refunded. ${captureExplanation}`;
     case "WRITTEN_OFF": return "Payment collection has closed. We will not request another card payment for this mailing.";
     default: return "Payment status is not available yet. Check the saved status before trying another payment.";
   }
@@ -84,6 +102,23 @@ export function paymentCopy(status: CaseStatus): string {
 export function fulfillmentCopy(status: CaseStatus, tracking: Tracking | null): {title: string; detail: string} {
   const matched = matchingTracking(status, tracking);
   const firstClass = (status.selected_tier ?? matched?.tier) === "STANDARD";
+  if (status.nonmailing_refund === "evidence_conflict") {
+    return {title:"Checking conflicting mailing records.", detail:"We’re reviewing the evidence for your original letter."};
+  }
+  if (status.nonmailing_refund) {
+    return {title:"Your original letter was never mailed.", detail:"The verified mailing record shows your original letter was never mailed. See Payment for your refund status."};
+  }
+  const fallbackObserved = status.original_capture_basis === "hold_expiry_fallback"
+    || matched?.events.some(event => event.event === "processing_cutoff_passed");
+  if (status.state === "IN_TRANSIT" && fallbackObserved) {
+    if (status.original_mailing_evidence === "city_receipt") {
+      return {title:"The agency confirmed receipt.", detail:"We verified that the agency received your original letter. Check with the agency for its decision."};
+    }
+    if (status.original_mailing_evidence !== "usps_scan") {
+      return {title:"Your packet was prepared.", detail:"The scheduled processing time passed. We’re waiting for independent evidence that your letter was mailed."};
+    }
+    return {title:"USPS reported a scan.", detail:"A postal scan for your original letter was recorded after the hold-expiry check."};
+  }
   switch (status.state) {
     case "FROZEN": return {title:"Mailing authorized.",detail:"Your approved packet is saved for mailing. Submission has not been confirmed yet."};
     case "SUBMITTING": return {title:"Your mailing is being confirmed.",detail:"We are checking the original mailing request. Please keep this appeal’s link; you do not need to approve or pay again."};

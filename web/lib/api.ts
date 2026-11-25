@@ -673,7 +673,7 @@ export function sampleTrackingEvents(certified: boolean) {
       w: "ParkingBreaker",
       d: "Oct 16 · 9:40 AM",
       t: `Mail provider accepted the ${certified ? "Certified Mail" : "First-Class Mail"} letter`,
-      s: `$${CERTIFIED_CENTS / 100} charged after mailing acceptance.`,
+      s: `$${CERTIFIED_CENTS / 100} payment confirmed after a USPS scan in this preview.`,
     },
   ];
 

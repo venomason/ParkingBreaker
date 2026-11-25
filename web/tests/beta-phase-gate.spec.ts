@@ -260,6 +260,12 @@ test("stale paid UI 409 refreshes actual phase, removes every paid affordance, a
   const shell = await page.$("#main");
   expect(shell).not.toBeNull();
   await expect(page.locator("#actAuthBtn")).toBeDisabled();
+  const paymentTerms = page.locator("#paymentTerms");
+  await expect(paymentTerms).toBeVisible();
+  await expect(paymentTerms).toContainText("after the first USPS scan");
+  await expect(paymentTerms).toContainText("card hold is close to expiring");
+  await expect(paymentTerms).toContainText("scheduled processing time has passed");
+  await expect(paymentTerms).toContainText("automatically refund the full original charge");
   await page.locator("#termsAccepted").check();
   await expect(page.locator("#actAuthBtn")).toBeEnabled();
   await page.locator("#actAuthBtn").click();

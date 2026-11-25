@@ -53,6 +53,7 @@ import { CustomerGate, savedFundingKind, useServicePhase } from "../components/C
 import { PREVIEW_AUTH } from "../lib/api";
 import { useWorkspaceAutosave } from "../lib/useWorkspaceAutosave";
 import { emptyFactDraft, factDraftFromAdopted, factDraftFromReading, factDraftFromValues, literalFromReading, literalFromSnapshot, ticketFactsFromAdopted, ticketFormWithDraft, restoredTicketStep, validateFactDraft, type AdoptedFacts, type FactDraft, type TicketLiteral } from "../lib/intake";
+import { HOLD_REFUND_RULES, NONMAILING_REFUND, PAID_CAPTURE_TERMS } from "../lib/legal";
 import { FIRST_CLASS_LIMITS, customerStage, dispatchSettled, fulfillmentCopy, mailClassName, mailingConfirmed, matchingTracking, offlinePaymentAllowed } from "../lib/fulfillment";
 
 // The real flow against the API (fake, test or live providers behind it). Off: the prototype.
@@ -2028,7 +2029,7 @@ function Journey() {
             <span className="how-pillar-tag">Clear billing</span>
             <p>
               {newPaidAccess ? (
-                <><strong>No charge unless mailed.</strong> Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.</>
+                <><strong>Card hold first.</strong> {PAID_CAPTURE_TERMS} {NONMAILING_REFUND}</>
               ) : admittedPaid ? (
                 <><strong>Your existing payment stays the same.</strong> This appeal keeps its own saved mailing choice, payment status and window; no new card or payment is requested.</>
               ) : savedPending ? (
@@ -2048,14 +2049,14 @@ function Journey() {
           <li><div><strong>Choose your mailing.</strong><span>{LIVE ? (newPaidAccess ? "You choose from the mailing options and prices confirmed for this appeal. Nothing is pre-selected." : admittedPaid ? "Your existing mailing choice and payment status stay as recorded; no new payment is requested." : savedPending ? "We’re checking your existing payment; no new payment is requested." : betaFunding ? "This selected free beta offers no paid mailing option, and no card or payment is requested." : phase === "controlled_free_beta" ? "This controlled beta offers no new paid mailing option. No new card or payment is requested now; use Check my appeal for the latest update." : "No paid mailing options are shown until this appeal’s service phase and funding are confirmed.") : `You choose Certified Mail ($${CERTIFIED_CENTS / 100}). Nothing is pre-selected.`}</span></div></li>
           <li><div><strong>Check the requirements.</strong><span>We check the agency’s official pages and show you the sources and exact wording.</span></div></li>
           <li><div><strong>Approve your packet.</strong><span>Review and edit the letter, inspect the exact PDF, and approve it before anything is sent.</span></div></li>
-          <li><div><strong>Keep your mailing record.</strong><span>Keep a copy of your exact mailed packet. {betaTier === "STANDARD" ? FIRST_CLASS_LIMITS : "Your appeal shows postal updates when available for its mailing class."}</span></div></li>
+          <li><div><strong>Keep your mailing record.</strong><span>Keep a copy of your exact approved packet. {betaTier === "STANDARD" ? FIRST_CLASS_LIMITS : "Your appeal shows postal updates when available for its mailing class."}</span></div></li>
         </ol>
         <h3 className="how-section-title">What we never do</h3>
         <ul className="never">
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>Predict how the agency will decide, or judge the strength of your case.</span></li>
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>Suggest arguments or add facts you didn&#39;t give us.</span></li>
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>State an agency rule without its official source and exact words.</span></li>
-          <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>{betaFunding ? "Charge you in a selected free beta where no payment is requested." : "Charge you before mailing is confirmed."}</span></li>
+          <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>{betaFunding ? "Charge you in a selected free beta where no payment is requested." : "Charge you without the payment conditions shown before authorization."}</span></li>
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>Claim that the agency has opened, read or decided your appeal. We report the postal updates available for your mailing.</span></li>
           <li><span className="never-badge" aria-hidden="true"><Icon id="x" size={14} /></span><span>Pre-select options or hide prices.</span></li>
         </ul>
@@ -2107,10 +2108,7 @@ function Journey() {
         {betaFunding ? (
           <p>{betaTier ? `${mailClassName(betaTier)} for $0. ` : "$0. "}No card hold and no payment. One mailing attempt after your exact packet approval. {betaTier === "STANDARD" && `${FIRST_CLASS_LIMITS} `}Beta participation does not extend a ticket deadline.</p>
         ) : <ul className="never">
-          <li>If we stop before mailing, the hold is released and you are not charged.</li>
-          <li>A duplicate charge is refunded.</li>
-          <li>If a destination we verified proves wrong, you receive a full refund. For other mailing errors of ours: a free re-mail where feasible, otherwise a full refund. Agency-side returns do not receive a refund. When the cause is unknown, a re-mail or refund minus mailing cost may apply.</li>
-          <li>After mailing, a change of mind or the agency&#39;s decision is not a refund reason.</li>
+          {HOLD_REFUND_RULES.map((rule) => <li key={rule}>{rule}</li>)}
         </ul>}
         <CustomerChoiceRules />
         <LegalDisclosure id="termsAttorneyDisclosure" />
@@ -2175,7 +2173,7 @@ function Journey() {
           <>
             <p className="small" style={{ marginBottom: "10px" }}>This is the actual PDF generated from the text and sender details you approved. {pdfPreview.pages.length} page{pdfPreview.pages.length === 1 ? "" : "s"}; no signature or exhibit page is added in this sample. <a href={pdfPreview.url} download="parkingbreaker-letter-sample.pdf">Download exact PDF</a>.</p>
             <div className="pdf-canvas-wrap" id="pdfCanvasMount">{pdfPreview.pages.map((c, i) => <PdfCanvasDisplay key={i} canvas={c} />)}</div>
-            <div className="guard" style={{ marginTop: "12px" }}><Icon id="shield" size={18} /><span>Only this PDF would be mailed by Certified Mail. Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.</span></div>
+            <div className="guard" style={{ marginTop: "12px" }}><Icon id="shield" size={18} /><span>Only this PDF would be mailed by Certified Mail. {PAID_CAPTURE_TERMS} {NONMAILING_REFUND}</span></div>
           </>
         )}
       </BottomSheet>}

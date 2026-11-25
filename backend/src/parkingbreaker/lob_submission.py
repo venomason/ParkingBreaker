@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import Protocol
@@ -92,6 +92,13 @@ class UspsScan:
         return record
 
 
+@dataclass(frozen=True, repr=False)
+class FallbackLookupProof:
+    send_date: datetime
+    observed_at: datetime
+    body: bytes
+
+
 @dataclass(frozen=True)
 class Accepted:
     letter_id: str
@@ -101,6 +108,9 @@ class Accepted:
     evidence: LetterEvidence | None = LetterEvidence.PRODUCTION
     # USPS scan proof for this exact attempt, from webhook or lookup acceptance.
     scans: tuple[UspsScan, ...] = ()
+    # Transient until the transaction writes the private body and decision record.
+    fallback_lookup: FallbackLookupProof | None = field(default=None, repr=False, compare=False)
+    verified_scan_webhook: bool = False
 
 
 @dataclass(frozen=True)
@@ -392,6 +402,8 @@ class MetadataLookup:
     tracking_number: str | None = None
     # The provider's own tracking events for this exact letter, kept as sent.
     scans: tuple[UspsScan, ...] = ()
+    raw_body: bytes | None = field(default=None, repr=False, compare=False)
+    canceled_before_mailing: bool = False
 
 
 def resolve_lookup(
@@ -457,6 +469,8 @@ def fallback_resolution(
     original_id: str | None,
     now: datetime,
     last_safe_capture: datetime,
+    *,
+    observed_at: datetime | None = None,
 ) -> SubmissionOutcome | CancelRequest:
     """No-scan fallback decision from one fresh lookup (section 20.19, as amended).
 
@@ -468,7 +482,11 @@ def fallback_resolution(
     stream is still Accepted, never released: the payment machine owns the late capture.
     """
     resolved = resolve_lookup(found, original_id)
-    if not isinstance(found, MetadataLookup) or not isinstance(resolved, Uncertain):
+    if (
+        not isinstance(found, MetadataLookup)
+        or type(found.authoritative) is not bool
+        or not isinstance(resolved, Uncertain)
+    ):
         return resolved
     letter_id = found.letter_id
     if not isinstance(letter_id, str) or not letter_id.strip():
@@ -478,15 +496,21 @@ def fallback_resolution(
     if found.evidence is LetterEvidence.VOIDED:
         return Canceled(letter_id)
     if found.evidence is LetterEvidence.RENDERED:
+        observed = now if observed_at is None else observed_at
         if (
             found.send_date is not None
-            and found.send_date.tzinfo is not None
-            and found.send_date < now
-            and now.tzinfo is not None
+            and found.send_date.utcoffset() is not None
+            and observed.utcoffset() is not None
+            and found.send_date < observed
         ):
-            # TODO: Carry the observed send_date and lookup time into the saved fallback outcome.
-            # Recovery should be able to explain this decision after the Lob object changes.
-            return Accepted(letter_id, found.tracking_number, LetterEvidence.EXPIRY_FALLBACK)
+            if not found.raw_body:
+                return Uncertain("fresh lookup body unavailable", original_id)
+            return Accepted(
+                letter_id,
+                found.tracking_number,
+                LetterEvidence.EXPIRY_FALLBACK,
+                fallback_lookup=FallbackLookupProof(found.send_date, observed, found.raw_body),
+            )
         return CancelRequest(letter_id)
     if found.evidence is LetterEvidence.CREATED:
         return CancelRequest(letter_id)

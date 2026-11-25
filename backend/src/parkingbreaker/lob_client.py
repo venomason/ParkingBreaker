@@ -12,7 +12,6 @@ import json
 import logging
 import re
 from datetime import datetime
-from typing import cast
 from urllib.parse import SplitResult, parse_qs, urlsplit
 
 from lob_python.api.letters_api import LettersApi  # type: ignore[import-untyped]
@@ -53,6 +52,7 @@ _TRACKING_NUMBER = re.compile(r"[A-Za-z0-9]{10,40}\Z", re.ASCII)
 _VERSION = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}\Z", re.ASCII)
 _PAGE_SIZE = 100
 _MAX_METADATA_PAGES = 10
+_MAX_LOOKUP_BYTES = 1_048_576
 _DEFINITIVE_VALIDATION_CODES = frozenset(
     {
         "address_length_exceeds_limit",
@@ -273,14 +273,14 @@ class LobSdkClient:
                     if not matches:
                         return MetadataLookup(None, authoritative=False)
                     letter_id = next(iter(matches))
-                    current = self._get_letter(letter_id)
+                    current, body = self._get_letter_response(letter_id)
                     if not _is_render_candidate(current, letter_id, submission_token):
                         raise MetadataLookupFailure
                     rendered = _is_rendered_letter(current, letter_id, submission_token)
                     scanned = has_usps_scan(_value(current, "tracking_events"))
                     if not rendered and not scanned:
                         raise MetadataLookupFailure
-                    send_date = _value(current, "send_date")
+                    send_date = _send_date(current)
                     tracking = _value(current, "tracking_number")
                     return MetadataLookup(
                         letter_id,
@@ -301,6 +301,7 @@ class LobSdkClient:
                             else None
                         ),
                         scans=scan_proof(_value(current, "tracking_events")),
+                        raw_body=body if rendered and not scanned else None,
                     )
                 if not page.data or not page_ids.difference(seen_ids):
                     raise MetadataLookupFailure
@@ -326,7 +327,7 @@ class LobSdkClient:
         """
         if not isinstance(letter_id, str) or _LETTER_ID.fullmatch(letter_id) is None:
             raise ValueError("letter_id must be a Lob letter id")
-        current = self._get_letter(letter_id)
+        current, body = self._get_letter_response(letter_id)
         if not _matches_letter_identity(current, letter_id, submission_token):
             raise MetadataLookupFailure
         assert current is not None
@@ -336,7 +337,7 @@ class LobSdkClient:
             tracking if isinstance(tracking, str) and _TRACKING_NUMBER.fullmatch(tracking) else None
         )
         if _is_render_candidate(current, letter_id, submission_token):
-            send_date = _value(current, "send_date")
+            send_date = _send_date(current)
             rendered = _is_rendered_letter(current, letter_id, submission_token)
             return MetadataLookup(
                 letter_id,
@@ -351,9 +352,18 @@ class LobSdkClient:
                 send_date=send_date if rendered and isinstance(send_date, datetime) else None,
                 tracking_number=tracking_number,
                 scans=scan_proof(_value(current, "tracking_events")),
+                raw_body=body if rendered or scanned else None,
             )
         if not scanned and _is_voided(current):
-            return MetadataLookup(letter_id, authoritative=False, evidence=LetterEvidence.VOIDED)
+            # Lob documents successful deletion as cancellation. Generic failure can be a
+            # rendering error or a tracking issue, so it cannot prove post-charge non-mailing.
+            canceled = _value(current, "deleted") is True and not _has_tracking_history(current)
+            return MetadataLookup(
+                letter_id,
+                evidence=LetterEvidence.VOIDED,
+                canceled_before_mailing=canceled,
+                raw_body=body if canceled else None,
+            )
         raise MetadataLookupFailure
 
     def cancel_letter(self, letter_id: str) -> CancelOutcome:
@@ -386,16 +396,29 @@ class LobSdkClient:
 
     def _get_letter(self, letter_id: str) -> object | None:
         """Fetch one existing object by ID; never create or recover by another key."""
+        return self._get_letter_response(letter_id)[0]
+
+    def _get_letter_response(self, letter_id: str) -> tuple[dict[str, object] | None, bytes]:
+        """Read an authenticated GET and its original body without shared SDK response state."""
         try:
-            letter = cast(object, self._letters.get(letter_id, _request_timeout=self._timeout))
-            response_status = getattr(self._api_client.last_response, "status", None)
-            if not isinstance(response_status, int) or not 200 <= response_status < 300:
-                return None
-            return letter
+            response = self._letters.get(
+                letter_id, _request_timeout=self._timeout, _preload_content=False
+            )
+            try:
+                if not 200 <= response.status < 300:
+                    return None, b""
+                body = response.data
+                if not isinstance(body, bytes) or len(body) > _MAX_LOOKUP_BYTES:
+                    return None, b""
+                letter = json.loads(body)
+                if not isinstance(letter, dict) or letter.get("object") != "letter":
+                    return None, b""
+                return letter, body
+            finally:
+                response.close()
         except Exception:
-            # Provider exception text can contain customer data; callers receive only
-            # an uncertain outcome and must not capture or release the hold.
-            return None
+            # Provider exception text can contain customer data.
+            return None, b""
 
     def verify_address(self, address: MailingAddress) -> LobVerification:
         """Assess deliverability without returning or adopting Lob's standardized address."""
@@ -447,6 +470,23 @@ def _address_model(address: MailingAddress) -> AddressEditable:
     )
 
 
+def _send_date(letter: object) -> datetime | None:
+    raw = _value(letter, "send_date")
+    if not isinstance(raw, str):
+        return None
+    try:
+        result = datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    return result if result.utcoffset() is not None else None
+
+
+def _has_tracking_history(letter: object) -> bool:
+    # Even a printer handoff or a tracking value we do not understand makes a
+    # deletion unsafe as definitive post-charge non-mailing evidence.
+    return _value(letter, "tracking_events") not in (None, [])
+
+
 def _value(record: object, key: str) -> object:
     if isinstance(record, dict):
         return record.get(key)
@@ -496,8 +536,11 @@ def _has_render_failure(letter: object) -> bool:
     deleted = _value(letter, "deleted")
     if deleted is not None and (type(deleted) is not bool or deleted):
         return True
-    failure_reason = _value(letter, "failure_reason")
-    return failure_reason is not None
+    for flag in ("canceled", "cancelled"):
+        value = _value(letter, flag)
+        if value is not None and value is not False:
+            return True
+    return _value(letter, "failure_reason") is not None
 
 
 def _next_cursor(next_url: str, configured_host: str) -> str:

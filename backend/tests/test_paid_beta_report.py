@@ -108,3 +108,74 @@ def test_cli_refuses_missing_database_without_creating_it(
     assert main([str(path), "--since", NOW.isoformat()]) == 2
     assert json.loads(capsys.readouterr().out)["status"] == "unavailable"
     assert not path.exists()
+
+
+def test_first_twenty_live_captures_stay_fixed_as_results_arrive(tmp_path: Path) -> None:
+    from typing import Any, cast
+
+    path = tmp_path / "review.sqlite"
+    with SqliteTransactionStore(path) as store:
+        db = store._require_open()
+
+        def capture(index: int, mode: bool | None, basis: str, *, charge: str | None = None) -> str:
+            workspace = f"synthetic-{index}"
+            store.save_workspace(workspace, Workspace(), NOW)
+            case = store.start_case(workspace, f"pi_Synthetic{index}", NOW, NOW + timedelta(days=1))
+            charge = charge or f"ch_Synthetic{index}"
+            db.execute(
+                "INSERT INTO pb_case_history VALUES (?, 2, 'payment', 'CAPTURE_PENDING', "
+                "'CAPTURED', 'CaptureSucceeded', ?, ?)",
+                (case.case_token, json.dumps({"charge_ref": charge}), NOW.isoformat()),
+            )
+            db.execute(
+                "INSERT INTO pb_original_capture_basis VALUES (?, ?)", (case.case_token, basis)
+            )
+            if mode is not None:
+                result = {
+                    "outcome": {"status": "succeeded", "charge_ref": charge, "livemode": mode}
+                }
+                db.execute(
+                    "INSERT INTO pb_payment_operations VALUES (?, ?, '{}', ?, ?)",
+                    (workspace, case.case_token, json.dumps(result), NOW.isoformat()),
+                )
+            return case.case_token
+
+        capture(0, False, "usps_scan")
+        capture(1, None, "unknown")
+        for index in range(2, 21):
+            capture(index, True, "usps_scan")
+        as_of = NOW + timedelta(days=1)
+        before = cast(dict[str, Any], paid_beta_report(path, since=NOW, now=as_of))
+        assert not before["original_capture_review_all_dates"]["first_20_live_review"]["review_due"]
+        twentieth = capture(21, True, "hold_expiry_fallback")
+        view = cast(dict[str, Any], paid_beta_report(path, since=NOW, now=as_of))
+        review = view["original_capture_review_all_dates"]["first_20_live_review"]
+        assert review["review_due"]
+        assert review["successful_original_captures"] == 20
+        assert review["hold_expiry_fallback_captures"] == 1
+        assert review["hold_expiry_fallback_share"] == 0.05
+        capture(22, True, "hold_expiry_fallback")
+        capture(23, True, "hold_expiry_fallback", charge="ch_Synthetic21")
+        db.execute(
+            "INSERT INTO pb_case_history VALUES (?, 3, 'payment', 'CAPTURED', "
+            "'REFUNDED', 'RefundIssued', ?, ?)",
+            (
+                twentieth,
+                json.dumps({"amount_cents": 2999, "captured_cents": 2999}),
+                NOW.isoformat(),
+            ),
+        )
+    updated = cast(dict[str, Any], paid_beta_report(path, since=NOW, now=as_of))
+    overall = updated["original_capture_review_all_dates"]
+    revised = overall["first_20_live_review"]
+    assert revised["review_due"]
+    assert revised["hold_expiry_fallback_captures"] == 1
+    assert revised["full_refund_confirmed"] == 1
+    assert [r["capture_number"] for r in revised["captures"]] == [
+        r["capture_number"] for r in review["captures"]
+    ]
+    assert overall["successful_original_captures"] == 23
+    assert overall["hold_expiry_fallback_captures"] == 2
+    assert overall["unknown_capture_basis"] == 1
+    assert overall["by_environment"]["test"]["successful_original_captures"] == 1
+    assert overall["by_environment"]["unknown"]["successful_original_captures"] == 1

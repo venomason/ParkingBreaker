@@ -1,5 +1,6 @@
 """Bounded scheduler dispatch through the existing durable coordinators."""
 
+import hashlib
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -19,6 +20,7 @@ from parkingbreaker.lob_submission import (
     TIMING_REFUSAL_REASON,
     CancelableLobClient,
     CancelOutcome,
+    LetterEvidence,
     LetterRequest,
     LobResponse,
     MetadataLookup,
@@ -354,6 +356,35 @@ def dispatch_once(
                         store.complete_effect(row.effect_id, "resolved", clock())
                 case = store.get_case(token)
                 assert case is not None
+                if case.payment_state is PaymentState.CAPTURED:
+                    checked_at = clock()
+                    recheck = store.claim_original_mail_recheck(token, checked_at)
+                    if recheck is not None:
+                        try:
+                            found = lob.lookup_letter(*recheck)
+                        except Exception:
+                            found = None
+                        if found is not None and found.letter_id == recheck[0] and found.raw_body:
+                            finding = (
+                                "never_mailed"
+                                if found.canceled_before_mailing
+                                else "usps_scan"
+                                if found.evidence is LetterEvidence.PRODUCTION and found.scans
+                                else None
+                            )
+                            if finding is not None:
+                                store.record_original_mail_finding(
+                                    token,
+                                    found.letter_id,
+                                    "lob_lookup",
+                                    finding,
+                                    hashlib.sha256(found.raw_body).hexdigest(),
+                                    "lob_authenticated_lookup",
+                                    now=clock(),
+                                )
+                    store.queue_nonmailing_refund(token, clock())
+                    case = store.get_case(token)
+                    assert case is not None
                 payment = store.payment_cursor(token)
                 money_due = (
                     next(
@@ -372,10 +403,6 @@ def dispatch_once(
                     is not None
                 ) or (payment is not None and not payment.done)
                 submission = store.submission_cursor(token, 1)
-                # TODO(T05): When evidence is overdue, schedule a lookup of the original attempt
-                # through its coordinator. Persist backoff and cap attempts and spend. Escalate
-                # before the hold or filing cutoff. Park disputed actions while read-only checks
-                # continue, so a late receipt can still resolve what happened to the original.
                 if submission is not None and pending_evidence(submission.outcome):
                     # Legacy accepted cursors must obtain evidence before any capture.
                     money_due = False

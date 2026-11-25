@@ -191,6 +191,9 @@ def _parse(value: object, ref: str) -> PaymentOutcome:
         amount if status == "requires_capture" else 0
     ):
         raise ValueError("contradictory amounts")
+    livemode = obj.get("livemode")
+    if livemode is not None and type(livemode) is not bool:
+        raise ValueError("invalid payment environment")
     charge_ref: str | None = None
     expiry: int | None = None
     charge = obj.get("latest_charge")
@@ -198,7 +201,8 @@ def _parse(value: object, ref: str) -> PaymentOutcome:
         ch = _mapping(charge)
         charge_ref = _reference(ch.get("id"), "ch_")
         if (
-            ch.get("object") != "charge"
+            (ch.get("livemode") is not None and ch.get("livemode") is not livemode)
+            or ch.get("object") != "charge"
             or ch.get("payment_intent") != ref
             or ch.get("currency") != "usd"
             or _integer(ch.get("amount")) != amount
@@ -257,6 +261,7 @@ def _parse(value: object, ref: str) -> PaymentOutcome:
         original_charge_ref=charge_ref,
         capture_before=expiry,
         classification="verified_object",
+        livemode=livemode,
     )
     return result
 

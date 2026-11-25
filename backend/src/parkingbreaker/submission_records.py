@@ -92,6 +92,12 @@ def outcome_json(outcome: SubmissionOutcome) -> str:
                 data["tracking_number"] = outcome.tracking_number
             if outcome.scans:
                 data["scans"] = [_scan_json(scan) for scan in outcome.scans]
+            if type(outcome.verified_scan_webhook) is not bool:
+                raise ValueError("invalid scan webhook marker")
+            if outcome.verified_scan_webhook:
+                if outcome.evidence is not LetterEvidence.PRODUCTION:
+                    raise ValueError("scan webhook requires scan acceptance")
+                data["verified_scan_webhook"] = True
         case Rejected(status, reason):
             if (
                 type(status) is not int
@@ -138,6 +144,7 @@ def decode_outcome(text: str) -> SubmissionOutcome:
                 data.get("tracking_number"),
                 None if evidence is None else LetterEvidence(evidence),
                 scans=_decode_scans(data.get("scans", [])),
+                verified_scan_webhook=data.get("verified_scan_webhook", False),
             )
         case {"kind": "rejected", "status": status, "reason": reason}:
             result = Rejected(status, reason)

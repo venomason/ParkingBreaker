@@ -255,6 +255,7 @@ class FakeStripeTransport:
                 self.objects[ref] = {
                     "id": ref,
                     "object": "payment_intent",
+                    "livemode": False,
                     "status": "requires_capture",
                     "amount": amount,
                     "currency": "usd",
@@ -264,6 +265,7 @@ class FakeStripeTransport:
                     "latest_charge": {
                         "id": "ch_" + uuid4().hex,
                         "object": "charge",
+                        "livemode": False,
                         "payment_intent": ref,
                         "amount": amount,
                         "currency": "usd",

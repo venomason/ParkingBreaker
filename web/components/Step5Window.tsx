@@ -1,6 +1,7 @@
 "use client";
 
 import { CERTIFIED_CENTS } from "../lib/prices";
+import { NONMAILING_REFUND, PAID_CAPTURE_TERMS } from "../lib/legal";
 import { FIRST_CLASS_LIMITS, mailClassName } from "../lib/fulfillment";
 import { formatSupportCaseId } from "../lib/support-case-id";
 import React, { useEffect } from "react";
@@ -77,7 +78,7 @@ export function Step5Window({
             {free ? (
               <>{tierName}, $0. No card hold and no payment.{tier === "standard" && ` ${FIRST_CLASS_LIMITS}`} Beta participation does not extend any ticket deadline.{live ? " The countdown uses your saved review deadline." : " You have 2 hours to review and approve."}</>
             ) : (
-              <>{tierName}{price == null ? "" : `, $${price}`}, authorized. Your card is charged only after the first USPS scan, or confirmed mailing production if scans are delayed.{live ? " The countdown uses your saved review deadline." : " You have 2 hours to review and approve."}</>
+              <>{tierName}{price == null ? "" : `, $${price}`}, authorized. {PAID_CAPTURE_TERMS} {NONMAILING_REFUND}{live ? " The countdown uses your saved review deadline." : " You have 2 hours to review and approve."}</>
             )}
           </p>
         </div>

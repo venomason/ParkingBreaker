@@ -3,16 +3,20 @@
 // without touching layout code. Entity name, contact and effective date are the
 // three values still awaiting the owner's decision (LEGAL-PAGES-DRAFT.md, L2-L5).
 //
-// The hold/refund rules duplicate the in-app terms sheet in app/page.tsx
-// (`#termsDlg`); keep both in sync. The customer-choice rule itself is rendered
+// The hold/refund rules also appear in the in-app terms sheet. The customer-choice rule itself is rendered
 // from components/CustomerChoiceRules.tsx so its policy version stays single-source.
 
 export const LEGAL_ENTITY = "ParkingBreaker";
 export const LEGAL_CONTACT_EMAIL = "support@parkingbreaker.com";
-export const LEGAL_EFFECTIVE_DATE = "2026-11-23";
+export const LEGAL_EFFECTIVE_DATE = "2026-11-25";
+
+export const PAID_CAPTURE_TERMS = "We usually charge the agreed fee after the first USPS scan showing your letter is in the mail. If the card hold is close to expiring and we have no such scan, we charge the same fee only if a fresh check with our mailing provider shows that the PDF for your exact approved letter was prepared, its scheduled processing time has passed, and the letter shows no failure, deletion or cancellation. The provider’s scheduled time does not confirm printing or handoff to USPS.";
+export const NONMAILING_REFUND = "If we later confirm that the charged letter was never mailed, we automatically refund the full original charge.";
 
 export const HOLD_REFUND_RULES: readonly string[] = [
-  "If we stop before mailing, the hold is released and you are not charged.",
+  PAID_CAPTURE_TERMS,
+  NONMAILING_REFUND,
+  "If we confirm mailing stopped before a charge, we release any remaining hold.",
   "A duplicate charge is refunded.",
   "If a destination we verified proves wrong, you receive a full refund. For other mailing errors of ours: a free re-mail where feasible, otherwise a full refund. Agency-side returns do not receive a refund. When the cause is unknown, a re-mail or refund minus mailing cost may apply.",
   "After mailing, a change of mind or the agency's decision is not a refund reason.",
@@ -38,7 +42,9 @@ export const TERMS_SECTIONS: readonly LegalSection[] = [
   {
     title: "Card holds and charges",
     paragraphs: [
-      "For paid appeals, we place a card hold when you authorize payment. If we stop before mailing, the hold is released and you are not charged. We charge only when we mail your packet.",
+      "For paid appeals, we place a card hold when you authorize payment. If we confirm mailing stopped before a charge, we release any remaining hold.",
+      PAID_CAPTURE_TERMS,
+      NONMAILING_REFUND,
       "A duplicate charge is refunded.",
     ],
   },
@@ -89,6 +95,7 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
     title: "Retention",
     paragraphs: [
       "Business and financial records: up to 7 years. Ticket photos and extracted facts: 2 years. Diagnostic logs: 90 days. Session cookies: 30 days. Access links: 24 hours.",
+      "If we charge near the end of a card hold without a USPS scan, we keep the mailing provider’s response in restricted records to document the charge. We remove the raw response from active records after 90 days unless a preservation hold applies. We retain the decision record for payment review.",
       "Exact periods are fixed in our retention policy and may be adjusted where a legal obligation or preservation hold applies.",
     ],
   },

@@ -12,6 +12,11 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from parkingbreaker.case_state import CaseState
+from parkingbreaker.paid_capture_evidence import (
+    CAPTURE_ACCEPTANCE_JOIN_SQL,
+    CAPTURE_BASIS_SQL,
+    original_mail_facts,
+)
 from parkingbreaker.payment_state import PaymentState
 
 _OPEN_HOLD = {
@@ -78,6 +83,152 @@ def _confirmed_refund(payload: str, capture_cents: int) -> int | None:
     return None
 
 
+_FIRST_PAID_REVIEW_SIZE = 20
+_ORIGINAL_CAPTURES = """
+    SELECT h.case_token, h.occurred_at, c.amount_cents,
+           json_extract(h.event_json, '$.charge_ref') AS charge_ref,
+           json_extract(s.outcome_json, '$.letter_id') AS letter_id,
+           {basis} AS basis,
+           (SELECT json_extract(p.result, '$.outcome.livemode')
+            FROM pb_payment_operations p
+            WHERE p.case_token=h.case_token
+              AND json_extract(p.result, '$.outcome.status')='succeeded'
+              AND json_extract(p.result, '$.outcome.charge_ref')=
+                  json_extract(h.event_json, '$.charge_ref')
+              AND p.completed_at=h.occurred_at
+            ORDER BY p.rowid LIMIT 1) AS livemode,
+           (SELECT f.event_json FROM pb_case_history f
+            WHERE f.case_token=h.case_token AND f.machine='payment'
+              AND f.event_name='RefundIssued'
+            ORDER BY f.revision DESC LIMIT 1) AS refund_record,
+           (SELECT json_extract(f.event_json, '$.kind') FROM pb_case_history f
+            WHERE f.case_token=h.case_token AND f.machine='payment'
+              AND f.event_name='ReturnedMailRefundRequested'
+            ORDER BY f.revision DESC LIMIT 1) AS refund_intent
+    FROM pb_case_history h
+    JOIN pb_cases c ON c.case_token=h.case_token
+    LEFT JOIN pb_submission_cursors s ON s.case_token=h.case_token AND s.attempt=1
+    {acceptance_join}
+    WHERE h.machine='payment' AND h.target='CAPTURED' AND c.amount_cents>0
+      AND h.event_name IN ('CaptureSucceeded', 'UnexpectedCaptureConfirmed')
+    ORDER BY h.rowid
+"""
+
+
+def _capture_totals(records: list[dict[str, object]]) -> dict[str, object]:
+    fallback_captures = sum(r["basis"] == "hold_expiry_fallback" for r in records)
+    return {
+        "successful_original_captures": len(records),
+        "hold_expiry_fallback_captures": fallback_captures,
+        "hold_expiry_fallback_share": fallback_captures / len(records) if records else None,
+        "usps_scan_captures": sum(r["basis"] == "usps_scan" for r in records),
+        "unknown_capture_basis": sum(r["basis"] == "unknown" for r in records),
+        "full_refund_confirmed": sum(r["refund"] == "full_refund_confirmed" for r in records),
+        "partial_refund_confirmed": sum(r["refund"] == "partial_refund_confirmed" for r in records),
+        "open_nonmailing_refunds": sum(r["refund"] == "refund_intent_open" for r in records),
+        "unresolved_fallback_mailings": sum(bool(r["unresolved_mailing"]) for r in records),
+        "conflicting_fallback_evidence": sum(bool(r["evidence_conflict"]) for r in records),
+    }
+
+
+def _original_capture_review(db: sqlite3.Connection, now: datetime) -> dict[str, object]:
+    """Freeze live cohort membership by the order successful captures were recorded."""
+    records: list[dict[str, object]] = []
+    seen: set[str] = set()
+    evidence_available = (
+        db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='pb_original_mail_findings'"
+        ).fetchone()
+        is not None
+    )
+    basis_sql = CAPTURE_BASIS_SQL
+    if (
+        db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='pb_original_capture_basis'"
+        ).fetchone()
+        is not None
+    ):
+        basis_sql = (
+            "COALESCE((SELECT b.basis FROM pb_original_capture_basis b "
+            f"WHERE b.case_token=h.case_token), {CAPTURE_BASIS_SQL})"
+        )
+    ops_table = (
+        db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='pb_case_ops_ids'"
+        ).fetchone()
+        is not None
+    )
+    for row in db.execute(
+        _ORIGINAL_CAPTURES.format(basis=basis_sql, acceptance_join=CAPTURE_ACCEPTANCE_JOIN_SQL)
+    ):
+        charge_ref = row["charge_ref"]
+        if not isinstance(charge_ref, str) or not charge_ref or charge_ref in seen:
+            continue
+        if _utc(row["occurred_at"]) > now:
+            continue
+        seen.add(charge_ref)
+        basis = row["basis"]
+        facts = (
+            original_mail_facts(
+                db, row["case_token"], row["letter_id"], has_findings_tables=evidence_available
+            )
+            if basis == "hold_expiry_fallback" and row["letter_id"]
+            else frozenset()
+        )
+        refund_cents = _confirmed_refund(row["refund_record"], row["amount_cents"])
+        if refund_cents == row["amount_cents"]:
+            refund = "full_refund_confirmed"
+        elif refund_cents is not None:
+            refund = "partial_refund_confirmed"
+        elif row["refund_intent"] == "NEVER_MAILED":
+            refund = "refund_intent_open"
+        else:
+            refund = "none_recorded"
+        ops_ref = (
+            db.execute(
+                "SELECT ops_id FROM pb_case_ops_ids WHERE case_token=?", (row["case_token"],)
+            ).fetchone()
+            if ops_table
+            else None
+        )
+        records.append(
+            {
+                "capture_number": len(records) + 1,
+                "operations_ref": None if ops_ref is None else ops_ref[0],
+                "environment": "live"
+                if row["livemode"] == 1
+                else "test"
+                if row["livemode"] == 0
+                else "unknown",
+                "basis": basis,
+                "refund": refund,
+                "usps_scan_reported": "usps_scan" in facts,
+                "city_receipt_verified": "city_receipt" in facts,
+                "never_mailed_confirmed": "never_mailed" in facts,
+                "evidence_conflict": "never_mailed" in facts
+                and bool(facts & {"usps_scan", "city_receipt", "printer_handoff"}),
+                "unresolved_mailing": basis == "hold_expiry_fallback"
+                and not bool(facts & {"usps_scan", "city_receipt", "never_mailed"}),
+            }
+        )
+    live = [item for item in records if item["environment"] == "live"]
+    first_twenty = live[:_FIRST_PAID_REVIEW_SIZE]
+    return {
+        **_capture_totals(records),
+        "by_environment": {
+            mode: _capture_totals([item for item in records if item["environment"] == mode])
+            for mode in ("live", "test", "unknown")
+        },
+        "fallback_outcomes": [item for item in records if item["basis"] == "hold_expiry_fallback"],
+        "first_20_live_review": {
+            "review_due": len(first_twenty) == _FIRST_PAID_REVIEW_SIZE,
+            "target": _FIRST_PAID_REVIEW_SIZE,
+            **_capture_totals(first_twenty),
+            "captures": first_twenty,
+        },
+    }
+
+
 def paid_beta_report(database: Path, *, since: datetime, now: datetime) -> dict[str, object]:
     """Group paid cases by hold start. Include older unresolved pre-case attempts separately."""
     if since.utcoffset() is None or now.utcoffset() is None:
@@ -122,6 +273,7 @@ def paid_beta_report(database: Path, *, since: datetime, now: datetime) -> dict[
                     totals["recorded_refund_cents"] += cents
             elif row["refunds"]:
                 totals["refund_amount_unknown"] += 1
+        capture_review = _original_capture_review(db, now)
         unresolved = dict(
             db.execute(
                 "SELECT state, COUNT(*) FROM pb_intake_authorization_attempts "
@@ -131,6 +283,7 @@ def paid_beta_report(database: Path, *, since: datetime, now: datetime) -> dict[
 
     return {
         "scope": "recorded SQLite state",
+        "original_capture_review_all_dates": capture_review,
         "cohort_authorized_since": since.isoformat(),
         "observed_at": now.isoformat(),
         "paid_cases": payment_states.total(),

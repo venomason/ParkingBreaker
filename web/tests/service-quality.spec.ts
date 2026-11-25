@@ -232,3 +232,44 @@ test.describe("T37 accessible names contain their visible text", () => {
     expect(html).toMatch(/aria-label="Move supporting photo 1 down"[^>]*>Down<\/button>/);
   });
 });
+
+test("paid checkout discloses the no-scan charge and refund before authorization", () => {
+  const offer = render("Step4Offer",{
+    selectedTier:"certified",
+    liveOffer:{issuerName:"Synthetic agency",decidingBody:"Synthetic review office",standardOffered:false,testMode:false,certifiedCents:2999,standardCents:null},
+    cardSlot:"Card entry",
+  });
+  expect(offer.indexOf("Card entry")).toBeGreaterThan(offer.indexOf("automatically refund the full original charge"));
+  expect(offer).toContain("after the first USPS scan showing your letter is in the mail");
+  expect(offer).toContain("card hold is close to expiring");
+  expect(offer).toContain("the PDF for your exact approved letter was prepared");
+  expect(offer).toContain("scheduled processing time has passed");
+  expect(offer).toContain("no failure, deletion or cancellation");
+  expect(offer).toContain("does not confirm printing or handoff to USPS");
+  expect(offer).not.toMatch(/no charge unless|confirmed mailing production/i);
+});
+
+test("fallback settlement preserves its basis when a scan arrives and shows refund progress", () => {
+  const settled = {...status,payment_state:"CAPTURED",original_capture_basis:"hold_expiry_fallback"};
+  const props = {tracking,busy:false,error:null};
+  const beforeSettlement = render("LiveFulfillment",{
+    ...props,
+    status:{...status,payment_state:"CAPTURE_PENDING"},
+    tracking:{...tracking,events:[{event:"processing_cutoff_passed",occurred_at:"2026-11-25T00:00:00Z",description:"Packet prepared."}]},
+  });
+  expect(beforeSettlement).toContain("Your packet was prepared.");
+  expect(beforeSettlement).not.toContain("card payment confirmed");
+  const first = render("LiveFulfillment",{...props,status:settled});
+  expect(first).toContain("Your packet was prepared.");
+  expect(first).toContain("there was no qualifying USPS scan");
+  const late = render("LiveFulfillment",{...props,status:{...settled,original_mailing_evidence:"usps_scan"}});
+  expect(late).toContain("USPS reported a scan.");
+  expect(late).toContain("there was no qualifying USPS scan");
+  const pending = render("LiveFulfillment",{...props,status:{...settled,nonmailing_refund:"pending"}});
+  expect(pending).toContain("processing a full refund");
+  expect(pending).not.toContain("Your full original charge was refunded");
+  const refunded = render("LiveFulfillment",{...props,status:{...settled,payment_state:"REFUNDED",nonmailing_refund:"refunded"}});
+  expect(refunded).toContain("Your full original charge was refunded");
+  expect(refunded).toContain("there was no qualifying USPS scan");
+  expect(decide("fulfillment","paymentCopy",{...settled,original_capture_basis:"unknown"})).toContain("saved record does not show");
+});

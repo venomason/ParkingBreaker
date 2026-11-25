@@ -157,6 +157,10 @@ _RESTRICTED_FINANCIAL_PROVIDER_EVIDENCE: Final = frozenset(
         "pb_submission_cursors",
         "pb_submission_operations",
         "pb_approval_manifests",
+        "pb_capture_fallback_evidence",
+        "pb_original_capture_basis",
+        "pb_original_mail_findings",
+        "pb_original_mail_rechecks",
     }
 )
 _RESTRICTED_IDENTITY_OPERATIONAL: Final = frozenset(

@@ -164,7 +164,8 @@ export function LiveFulfillment({ status, tracking, busy, error, onRefresh }: Pr
     return () => { active = false; if (url) URL.revokeObjectURL(url); };
   }, [proof]);
 
-  const paymentSettled = ["NO_CHARGE", "CAPTURED", "AUTHORIZED", "RELEASED", "REFUNDED"].includes(status.payment_state ?? "");
+  const refundUnderReview = status.nonmailing_refund != null && status.nonmailing_refund !== "refunded";
+  const paymentSettled = !refundUnderReview && ["NO_CHARGE", "CAPTURED", "AUTHORIZED", "RELEASED", "REFUNDED"].includes(status.payment_state ?? "");
   const isReturned = status.state === "RETURNED" || status.state === "CLOSED_RETURNED";
 
   return (
@@ -235,7 +236,7 @@ export function LiveFulfillment({ status, tracking, busy, error, onRefresh }: Pr
         )}
         {mailed && (
           <p className="small muted">
-            Your mailing record is a copy of the exact packet the mail provider accepted.{!firstClass && " Postal tracking, when available, is shown above. This is not proof of delivery or a USPS Return Receipt."}
+            Your mailing record contains a copy of your exact approved packet.{!firstClass && " Postal tracking, when available, is shown above. This is not proof of delivery or a USPS Return Receipt."}
           </p>
         )}
         {recordError && <p className="err" role="alert">{recordError}</p>}

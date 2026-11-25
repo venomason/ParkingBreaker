@@ -40,6 +40,13 @@ Prepare this sandbox case while waiting for the agency. Earlier drills released 
 
 ### 4. Decide whether to repeat or expand
 
+**Review the first 20 live original captures.** The paid report marks review due
+when Stripe-confirmed live captures reach 20. Start with the fixed original-capture
+cohort, including any refunded sale. Review the fallback share, unknown capture
+bases, subsequent USPS or city evidence, refund settlement, and every unresolved
+or conflicting result. Record the decision and follow-up owners in the paid
+activation record. [First-20 procedure](operations/controlled-beta.md#paid-cohort-payment-and-mailing-review)
+
 **Before increasing the cap, extend the existing paid report.** It counts local captures, refunds and open work. Join those records to actual fees, postage, remails and payout evidence. Verify the first cohort against statements and mark missing invoices as unknown. Start from gross captures, deduct refunds and costs once, and use the bank payout as a cross-check. Include acquisition, support and OCR/research for stopped intakes. Deduct monthly fixed costs once. Alongside surplus, report how many people started, qualified, saw an offer, approved and paid, and where others stopped. [Paid cohort report](../backend/src/parkingbreaker/paid_beta_report.py) · [Price funnel](../backend/src/parkingbreaker/price_funnel.py)
 
 With positive measured contribution per paid order, monthly orders needed for the target are `ceil((monthly fixed costs + $100) / contribution per paid order)`. Compare that with actual order volume. With zero or negative contribution, work on price, cost or conversion before buying traffic.
