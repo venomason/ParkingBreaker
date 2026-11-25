@@ -1,20 +1,52 @@
 # ParkingBreaker Execution Roadmap
 
-Updated November 22, 2026 (Pacific). This is the authoritative execution plan for completing software qualification, activating the live paid service, and operating the first customer cohort. Product boundaries remain governed by [Customer Choice Rules](CUSTOMER-CHOICE-RULES.md) and [OCR routing](OCR-ROUTING.md); release evidence lives in [beta readiness](BETA-READINESS.md) and `docs/verification/`.
+Updated November 24, 2026 (Pacific). This plan orders engineering work. [Beta readiness](BETA-READINESS.md) owns the release decision. Paid activation is **NO-GO** and the free First-Class pilot is closed.
 
-**Current release state: NO-GO for live paid customer activation.**
-A fake-provider preview is deployed at [parkingbreaker.com](https://parkingbreaker.com), but its Cloud Run `/data` volume is ephemeral in-memory storage and its providers are set to `fake`. Live customer charging, physical Certified Mail dispatch, and paid advertising remain unauthorized until every Phase 1 (`BETA` and `PAID`) gate below has inspectable evidence on the exact shipping commit and an owner-signed `R07` activation packet.
+## Destination and next work
 
-**Next sandbox step.** Qualify official-source discovery and issuer assessment on a supported synthetic case before repeating the joined Stripe/Lob drill. The November 22 San Francisco case reached intake and stopped before a hold. The project’s supported Gemini Flash-Lite preset could read the clear synthetic ticket, but automated review and issuer assessment had provider failures. R05 now has explicit local snapshot classifications for all 98 application tables. Retention schedules, external copies and standing-target access checks remain open. [November 22 qualification receipt](verification/p06-r05-2026-11-22.json)
+**The public launch is nationwide from day one.** Drivers across the U.S. can bring a fresh municipal parking citation for first-stage review. Identify the printed issuer and stage from the ticket, apply the existing service-policy holds, and offer paid Certified Mail only when the filing route, recipient, deadline and packet requirements are verified for that case. The same path must work for an unfamiliar issuer. The optional five-case First-Class pilot exercises the mailing operation at one office and does not set the public market boundary.
+
+**Success for the driver** is completing a timely filing from a phone, reading and approving the exact packet, and getting an accurate mailing record. When we cannot verify a filing, the driver needs a timely explanation and a safe stop. **Success for the business** is repeat paid demand that leaves at least **$100 a month above operating break-even**, the owner's early profitability target. Plan within the $450 total budget. Record the remaining cash and authorized spend before each provider trial. A free mailing can teach us about routing and customer effort. Paid orders, settled funds and actual costs establish whether the business works.
+
+### 1. Replay the customer path and its stop reason
+
+Run `python3 build-kit/scripts/synthetic_rehearsal.py --timed-first-class` from the project root. The local replay sends two synthetic images through ticket reading and customer confirmation, then runs the normal issuer resolver and research worker. The supported case requires approval of the exact PDF and produces one fake First-Class mailing across two service restarts. The second case changes the wording above the same address to “Mail payments only to.” The saved finding identifies the payment wording and dispatch produces zero mailings. Both cases require zero payment calls. [Rehearsal runner](../build-kit/scripts/synthetic_rehearsal.py) · [Two-case rehearsal](../backend/tests/test_timed_first_class_rehearsal.py)
+
+The receipt records the software fingerprint, source hashes, saved decision, observed milestones and elapsed times. The OCR provider is scripted and the simulated customer supplies the ticket fields. The next timing measurement belongs on the intended deployment with its actual providers.
+
+### 2. Qualify one receiving office and run a bounded free pilot
+
+Use the ticket back to lead the search. San Diego publishes the same box for Step 1 appeals and payments. Its older ticket names “Parking Administration – Citation Appeals.” Seek a current official posting or form that names the recipient and directs first-stage appeals there. The enrollment code requires both in the same source. If the office takes time to respond, use another issuer with complete evidence for the rehearsal. San Diego stays closed while its recipient is unresolved. [City appeal instructions](https://www.sandiego.gov/parking/citations/appeal) · [City payment instructions](https://www.sandiego.gov/parking/contact/parkingadmin) · [City ticket instructions](https://www.sandiego.gov/sites/default/files/legacy/parking/pdf/citation_instructions.pdf)
+
+**How we calibrate a disputed rule.** A reviewer uses the confirmed ticket front and back to locate the issuing agency, the deciding office and the driver's filing stage. One model interprets the dated official passage; a second tests the interpretation against a similar instruction that would change the outcome. Use the same questions across jurisdictions: What does mailing accomplish? Who receives it for that purpose? What must be enclosed? Which mailing methods are allowed? Which event starts the clock, and what must happen by the deadline? Keep each agency's own wording with its answer. A fact missing from one source triggers a search for better evidence. A documented alternative, such as a legible copy, counts only where the procedure offers it.
+
+For a shared mailbox, test two cases with the same address. The positive needs official first-stage filing instructions identifying the receiving office and box. Payment instructions or a later hearing's address cannot supply that evidence. Preserve competing readings, their cited passages and the check that settles the disagreement in the existing benchmark or verification receipt. Report separate counts of incorrect mail approvals, incorrect stops and cases with missing evidence, including results on other issuers held out from rule design. [Research questions](../backend/src/parkingbreaker/research/questions.py) · [Cross-jurisdiction answer key](bench/answer-key.jsonl)
+
+**Next interpretation experiment.** Start with Cambridge's archived first-stage instructions. They recommend the web form and also tell the driver how and where to mail a dispute. In the existing research call, have the model identify each action, who takes it, the filing stage, and whether the method is required, offered, or preferred. Ask it to cite the supporting passage and flag contrary instructions or missing evidence. Use the same reading to distinguish a payment address from a filing address and a later hearing deposit from a first-stage requirement. An exact quote proves the words appeared on the page. Whether those words support the conclusion needs a separate check. [Cambridge instructions in the test archive](../backend/tests/fixtures/unfamiliar_issuers/cambridge.txt) · [Existing research extractor](../backend/src/parkingbreaker/research/extractor.py)
+
+Run the first comparison offline using archived pages and independently recorded answers. Include Cambridge, an online-only issuer, a payment-only address, a later-stage requirement and a previously unseen issuer. Compare unsafe approvals, unnecessary refusals and correctly unresolved cases with the current checker. Measure time and model cost per case. Keep the experiment out of dispatch. If safe filing decisions improve on held-out cases, review the change to the live gate separately. Source identity, freshness, exact quotes, packet approval and dispatch authorization remain software checks.
+
+**Code this route needs.** Commit `fc6fc03` handles San Diego's citation-accuracy questionnaire. The separate numbered-stage parser patches still need an owner freeze exception. A shared-box change must pass the exact confirmed recipient for this issuer and stage and refuse payment-only, wrong-issuer and wrong-stage evidence. Enrollment checks multiple sources, while the timer watches one URL. If the route relies on a second page, save and recheck that page too. Change the office or an essential mail rule after approval and verify zero new mail requests. A reported move can trigger immediate scoped revocation. [Route monitor](../backend/src/parkingbreaker/route_monitor.py) · [Office monitoring and revocation](operations/controlled-beta.md#monitoring-a-confirmed-mailing-office)
+
+**Pilot decision.** After the authorized target rehearsal covers print, return handling, postal events, access, feedback and restart, the owner can open up to five free First-Class cases for one issuer and stage over 14 days. Count every selected case. Record assistance, wait, agency acknowledgment, returns and unresolved outcomes. An upheld ticket can still show that we reached the right office. Pause the affected route on a routing error and support its accepted cases. [Pilot procedure](operations/controlled-beta.md#ordinary-first-class-feedback-pilot)
+
+### 3. Prove the paid Certified Mail path
+
+Prepare this sandbox case while waiting for the agency. Earlier drills released test holds and rendered a Certified proof. The November 22 deployed case stopped in issuer research. The missing proof is one transaction tying the approved PDF and envelope to a test hold, qualifying Lob evidence, a Lob-signed callback and one Stripe capture. Interrupt between the provider response and the local write. Restore in quarantine and find the original objects. Pass with exactly one letter and one capture. [Qualification receipt](verification/p06-r05-2026-11-22.json) · [Recovery procedure](operations/controlled-beta.md#recovery-and-rollback)
+
+**Code where the drill fails.** Repair the first broken step in issuer discovery, submission or payment recovery and retain its regression case. In parallel, qualify the physical-phone experience, delivered access email, privacy controls and acknowledged outage alert. Paid activation still requires a qualified shipping candidate, funded postage and refund reserves, staffed support, and the owner's signed cap, dates and stop rules.
+
+### 4. Decide whether to repeat or expand
+
+**Before increasing the cap, extend the existing paid report.** It counts local captures, refunds and open work. Join those records to actual fees, postage, remails and payout evidence. Verify the first cohort against statements and mark missing invoices as unknown. Start from gross captures, deduct refunds and costs once, and use the bank payout as a cross-check. Include acquisition, support and OCR/research for stopped intakes. Deduct monthly fixed costs once. Alongside surplus, report how many people started, qualified, saw an offer, approved and paid, and where others stopped. [Paid cohort report](../backend/src/parkingbreaker/paid_beta_report.py) · [Price funnel](../backend/src/parkingbreaker/price_funnel.py)
+
+With positive measured contribution per paid order, monthly orders needed for the target are `ceil((monthly fixed costs + $100) / contribution per paid order)`. Compare that with actual order volume. With zero or negative contribution, work on price, cost or conversion before buying traffic.
+
+**Decision after each cohort.** Hold increases to volume and spend while payouts or outcomes are unknown. Pause affected intake on a safety failure. If customers drop out or costs exceed revenue, fix the largest measured cause and repeat within the approved cap. Increase volume when repeat cohorts show demand, reliable fulfillment and enough margin and cash to fund the next cohort.
+
+**Work discipline.** Keep one product change in progress. Each session ends with a receipt or a reproducible blocker and the decision it supports. Revisit bulk city preloading, more parser variants, dashboards and autonomous repair when real filings, support incidents or measured costs give them priority.
 
 ---
-
-The November 22 [repository review](verification/code-review-2026-11-22.json) recorded the Cambridge guard mismatch and captured-page comparison. The November 23 owner-directed reconciliation records the Cambridge exception and the hash of the existing signed change in [the guard freeze](../build-kit/state/guard-freeze.json). A separate tested change for business-day deadlines awaits evidence from an applicable official filing procedure.
-
-Municipal office monitoring has a local enrollment and dispatch guard. Before counting an
-issuer as monitored in production, qualify its official evidence, timer execution and a
-move observed between packet approval and dispatch on the owning host.
-[Controlled beta operating procedure](operations/controlled-beta.md#monitoring-a-confirmed-mailing-office)
 
 ## 1. Non-Negotiable Product, Legal & Financial Rules
 
@@ -31,11 +63,10 @@ move observed between packet approval and dispatch on the owning host.
 
 ---
 
-## 2. DSH Operating Model & Single-Writer Protocol
+## 2. Engineering ownership and verification
 
-- **DSH-only architecture:** Execute engineering and qualification strictly through DSH plus human owner (Amir) participation where required. Do not depend on OpenClaw or any external autonomous agent daemon for launch or production operations. Production workers, follow-ups, backups, and monitoring must run independently of an open DSH session.
-- **Keep one writer on this checkout; another model reviews after implementation stops.**
-- **Writer & reviewer roles:** Detect active locks, background test runs, or concurrent checkouts before editing. Use the configured primary coding model (`deepseek-flash` at `max` effort where supported) for implementation and test execution. Once a candidate freezes, run a separate read-only audit pass (`mimo-v2.6-pro` in an isolated read-only context, or `mimo-v2.6-flash` for bounded log triage) inspecting actual `git diff`, failure paths, and `docs/verification/` receipts—never rubber-stamping a summary.
+- One writer owns each change. Use the owner's selected engineering tool for bounded work. The integrating engineer verifies the actual diff, runs the affected checks and records the result.
+- Qualify production dispatch, follow-ups, backups and monitoring with the founder’s workstation offline.
 - **Continuous evidence-bound execution:** Track work across five distinct states: **implemented -> tested -> configured -> live -> measured**. Reuse valid historical receipts when source digests, configuration, and acceptance criteria still match; re-run only checks invalidated by edits or required once on the frozen release candidate. Do not stop at status reports—complete all unblocked authorized work and surface a single concise request when owner input or spend approval is required.
 - **Credential & secret safety:** Never commit, echo, pass in CLI `argv`, or log secret keys, bearer links, or raw customer content. Verify any previously exposed development credential (including MiMo Token Plan keys) is rotated and stored write-only. Inject live production credentials via Secret Manager references rather than plaintext environment variables.
 
@@ -43,15 +74,15 @@ move observed between packet approval and dispatch on the owning host.
 
 ## 3. Phase 1: Critical Path to Launch (`BETA` + `PAID` Gates)
 
-Launch requires closing **Steps 1 through 7** below. (`AUTO`, `SCALE`, and `OPTIONAL` tasks in Phase 3 do **not** block launch.)
+Steps 1 through 7 are the detailed gates for paid activation. Reuse matching receipts for implemented items and close the remaining gaps on the shipping candidate. The free pilot has its own admission and rehearsal criteria above.
 
 ### Step 1 — Unify Worktrees & Freeze Release Candidate (`R01`)
 
 | ID / Gate | Scope | Acceptance Criteria & Required Evidence |
 | --- | --- | --- |
-| **R01 · BETA** | Reconcile working tree changes and scratch patches into one clean, committed candidate on `main`; verify CI and Cloud Build provenance. | 1. Reconcile uncommitted worktree changes and reviewed fixes (including strict `StorageCorruption` validation on malformed/tz-less decline timestamps in `intake_store.py`) into a clean commit; keep `output/`, temp DBs, and local artifacts out of Git.<br>2. Update or parameterize `cloudbuild.yaml` and `cloudbuild-backend.yaml` so builds produce candidate-specific, immutable `sha256` image digests rather than relying on mutable `:staging` tags.<br>3. Pass `make check` (ruff lint, format, strict `mypy`, full disk-backed pytest suite + short-path socket fixture), `make web-check` (lint, `tsc`, production build — run sequentially, never concurrently), `make qualification-check`, and all three synthetic browser campaigns (`paid`, `paid` + `--ticket-reading-preview`, and `controlled_free_beta` `375x812` mobile OCR) sharing one `application_fingerprint`.<br>4. Record commit SHA, tree hash, test counts, and immutable image digests in `docs/verification/r01-candidate-YYYY-MM-DD.json`. |
+| **R01 · BETA** | Select one clean shipping commit on `main` and verify its CI and Cloud Build provenance. | 1. Select the reviewed changes needed for this candidate and record the clean commit. The decline-timestamp fix is already integrated.<br>2. Use the existing candidate-tagged Cloud Build recipes, record the immutable image digests and verify CI test and promotion steps for this commit. [Build receipt](verification/increment-2026-11-21a.json)<br>3. Pass `make check` (ruff lint, format, strict `mypy`, full disk-backed pytest suite + short-path socket fixture), `make web-check` (lint, `tsc`, production build — run sequentially, never concurrently), `make qualification-check`, and all three synthetic browser campaigns (`paid`, `paid` + `--ticket-reading-preview`, and `controlled_free_beta` `375x812` mobile OCR) sharing one `application_fingerprint`.<br>4. Record commit SHA, tree hash, test counts, and immutable image digests in `docs/verification/r01-candidate-YYYY-MM-DD.json`. |
 
-### Step 2 — Complete Remaining Launch-Blocking Code Paths (`P01`, `P03`, `J01–J05`, `R05`, `M02`)
+### Step 2 — Verify the core customer and money paths (`P01`, `P03`, `J01–J05`, `R05`, `M02`)
 
 | ID / Gate | Scope | Acceptance Criteria & Required Evidence |
 | --- | --- | --- |
@@ -61,7 +92,7 @@ Launch requires closing **Steps 1 through 7** below. (`AUTO`, `SCALE`, and `OPTI
 | **R05 · BETA** | Privacy, data retention, and access lifecycle (`retention_inventory.py`, `retention_plan.py`). | Verify retention inventory covers all active tables (including support tables), bearer links/revocation, and backups; legal/financial retention rules verified; diagnostic bundles leak zero secrets or raw ticket PII. |
 | **M02 · PAID** | Evidence-backed ledger cost & obligation ingestion (`ledger.py`, `paid_beta_report.py`). | Captures, refunds, disputes, processor fees, postage/remail obligations, and AI usage reservations distinguish `estimated`, `reserved`, and `billed` states; verify the local aggregate cohort report (`operations/controlled-beta.md`) runs cleanly. |
 
-*Checkpoint:* Freeze the candidate commit after Step 1 & Step 2 pass, run the **read-only MiMo Pro review** against the diff and receipts, fix any concrete findings, and lock the shipping SHA.
+At the candidate freeze, review the integrated diff and receipts, resolve concrete failures and record the shipping commit.
 
 ### Step 3 — Durable Target Preflight & Qualification Deployment (`R02`)
 
@@ -104,13 +135,9 @@ Launch requires closing **Steps 1 through 7** below. (`AUTO`, `SCALE`, and `OPTI
 
 ## 4. Phase 2: Initial Business Launch & First Cohort (`R08` & GTM)
 
-Execute immediately after Step 7 (`R07`) is live and verified:
+After paid activation, recruit nationally through a channel that reaches drivers with current tickets. Apply the funded cohort cap across all issuers. Before opening, replay first-stage cases across multiple issuers, including an unfamiliar issuer with a verifiable route and an issuer where the service must refuse. During launch, track how many in-scope intakes reach a verified paid offer, broken down by issuer and reason for stopping. Include the cost of refused intakes when judging whether the channel pays for itself.
 
-1. **Compliant Gig-Driver Paid Acquisition Test (Pre-`SCALE` Bounded Learning):**
-   - **Target:** Mobile drivers in `r/uberdrivers`, `r/lyftdrivers`, `r/doordash_drivers`, `r/InstacartShoppers`, `r/AmazonFlexDrivers`, plus high-intent keyword threads (`"parking ticket"`, `"loading zone ticket"`, `"citation"`). Disable Reddit Automated Targeting Expansion.
-   - **Compliant Clerical Creative:** Lead with time/hassle savings and verified `.gov` Certified Mail fulfillment—never "dismissal angles," legal strategy, or guaranteed wins. State clearly: clerical preparation + USPS Certified Mail at the live price, with $0 charged if an official timely mail-in path cannot be verified.
-   - **Zero-CSP-Risk Attribution:** Launch Cohort #1 using registered first-party UTM parameters without adding third-party ad pixels that weaken frontend CSP.
-   - **Budget & Auto-Pause Discipline:** Account for Reddit Ads' up-to-$20\%$ daily overdelivery allowance when setting daily caps (e.g., a $\$25/\text{day}$ setting requires $\$30/\text{day}$ funded headroom). Pause campaigns immediately when `PB_PAID_COHORT_CAP` reaches $80\%$ capacity or if any `R04` stop triggers.
+1. **Measure demand within the approved budget.** Begin with a small owner-approved outreach channel and record eligible drivers, offers, purchases, acquisition cost and reasons for stopping. Use existing first-party attribution. Any paid campaign requires its own approved channel, cash limit and stop rule. Review spendable cash and reserves before increasing exposure.
 2. **First Paid-Cohort Reconciliation (`R08 · PAID`):**
    - Reconcile every Cohort #1 journey from photo start -> verified offer -> refusal/exit -> hold -> capture -> actual billed Lob Certified Mail invoice -> first Stripe bank payout settlement -> customer/agency outcome (dismissed, denied, clerical rejection, pending/unknown).
    - Calculate true net unit contribution including AI/OCR/support costs of non-converting stopped tickets before raising `PB_PAID_COHORT_CAP` or ad spend.
@@ -119,7 +146,7 @@ Execute immediately after Step 7 (`R07`) is live and verified:
 
 ## 5. Phase 3: Post-Launch Backlog (`SCALE`, `AUTO` & `OPTIONAL`)
 
-Queued behind `R08` Cohort #1 reconciliation unless a specific item is needed earlier to resolve an observed operational gap:
+Review this backlog after the first paid cohort reconciliation, or earlier for a demonstrated operational gap. The separate business-day deadline change still needs evidence from an applicable official filing procedure. The [guard freeze](../build-kit/state/guard-freeze.json) records the earlier Cambridge exception.
 
 ### A. Autonomous Diagnosis & Bounded Repair (`AUTO`)
 - **T01 (TESTED):** Pure read-only `journey_timeline.py` reconstruction.
@@ -147,7 +174,7 @@ Queued behind `R08` Cohort #1 reconciliation unless a specific item is needed ea
 
 | Action Category | Permitted Execution | Hard Boundary |
 | --- | --- | --- |
-| Local code, tests, dry-runs & read-only audits | Autonomous in DSH single-writer checkout | Preserve unrelated edits; never weaken assertions or trusted gates |
+| Local code, tests, dry-runs & read-only audits | Authorized in the active single-writer checkout | Preserve unrelated edits, assertions and trusted gates |
 | Read-only provider & cloud inspection (`GET` / `describe`) | Permitted when scoped to $\ge \text{2026-11-16}$ | Never echo, log, or commit keys, raw PII, or out-of-scope pre-launch history |
 | Cloud builds, VMs, disks & deployments | Requires explicit owner scope, window & dollar cap | Pin immutable `sha256` digests; verify live health and rollback spec |
 | Refunds & remails on accepted cases | Existing deterministic evidence-backed controls | Never block a proven system-address-error refund behind manual chat approval |

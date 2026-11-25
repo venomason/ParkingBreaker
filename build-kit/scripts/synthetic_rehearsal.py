@@ -24,9 +24,11 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.request import HTTPSHandler, ProxyHandler, build_opener
+from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[2]
 ORIGIN = "https://portal.example.test"
@@ -441,6 +443,68 @@ def proxy(runtime: Path, web_port: int, tls_port: int) -> None:
     server.serve_forever()
 
 
+def new_evidence_directory(output: Path) -> Path:
+    output = output.absolute()
+    if output.exists() or any(
+        parent.is_symlink() for parent in (output, *output.parents)
+    ):
+        raise RuntimeError("Evidence destination must be a new path without symlinks")
+    output.mkdir(parents=True)
+    return output
+
+
+def timed_first_class(kit, output: Path) -> int:
+    """Run exactly two offline customer journeys and publish only their checked measurements."""
+    before = kit.application_fingerprint()
+    output = new_evidence_directory(output)
+    with tempfile.TemporaryDirectory(prefix="pb-timed-pilot-") as runtime:
+        junit = Path(runtime) / "results.xml"
+        run = subprocess.run(
+            [
+                str(ROOT / "backend/.venv/bin/python"),
+                "-m",
+                "pytest",
+                "tests/test_timed_first_class_rehearsal.py",
+                "--tb=short",
+                "--junitxml",
+                str(junit),
+                "--basetemp",
+                str(Path(runtime) / "tests"),
+            ],
+            cwd=ROOT / "backend",
+            env={**clean_environment(), "PB_PROVIDER_MODE": "preview"},
+        )
+        if run.returncode:
+            return run.returncode
+        props = ElementTree.parse(junit).findall("./testsuite/properties/property")
+        cases = {
+            prop.attrib["name"]: json.loads(prop.attrib["value"]) for prop in props
+        }
+        if len(props) != 2 or cases.keys() != {"supported", "payment_only"}:
+            raise RuntimeError("Missing or duplicate timed rehearsal results")
+    if before != kit.application_fingerprint():
+        raise RuntimeError("Application changed during the rehearsal")
+    receipt = output / "timed-first-class.json"
+    receipt.write_text(
+        json.dumps(
+            {
+                "finished_utc": datetime.now(UTC).isoformat(),
+                "application_fingerprint": before,
+                "mode": "local simulated providers",
+                "timing_basis": (
+                    "Local elapsed milliseconds with scripted customer actions and provider replies"
+                ),
+                "cases": cases,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    print(receipt)
+    return 0
+
+
 def rehearse(output: Path, service_phase: str = "paid", project: str | None = None) -> int:
     if service_phase not in {"paid", "controlled_free_beta"}:
         raise ValueError("Unknown synthetic service phase")
@@ -450,12 +514,7 @@ def rehearse(output: Path, service_phase: str = "paid", project: str | None = No
     if ticket_reading_preview and not (ROOT / "web" / kit.TICKET_READING_SPEC).is_file():
         raise ValueError("Ticket-reading preview requires " + kit.TICKET_READING_SPEC)
     tools = prerequisites()
-    output = output.absolute()
-    if output.exists() or any(
-        parent.is_symlink() for parent in (output, *output.parents)
-    ):
-        raise RuntimeError("Evidence destination must be a new path without symlinks")
-    output.mkdir(parents=True)
+    output = new_evidence_directory(output)
     runtime = Path(tempfile.mkdtemp(prefix="pb-synthetic-"))
     (runtime / "SYNTHETIC_ONLY").write_text(MARKER)
     api_port, web_port, tls_port = ports()
@@ -755,6 +814,11 @@ def build_parser(kit) -> argparse.ArgumentParser:
         action="store_true",
         help="Set PB_TICKET_READING_PREVIEW=1 and require the ticket-vision browser suite",
     )
+    parser.add_argument(
+        "--timed-first-class",
+        action="store_true",
+        help="Run the offline two-case First-Class backend rehearsal and save its timings",
+    )
     parser.add_argument("--proxy", type=Path, help=argparse.SUPPRESS)
     parser.add_argument(
         "--connect-proxy",
@@ -764,8 +828,7 @@ def build_parser(kit) -> argparse.ArgumentParser:
     parser.add_argument(
         "--service-phase",
         choices=("paid", "controlled_free_beta"),
-        default="paid",
-        help="Server phase to exercise with fake providers (default: paid)",
+        help="Server phase to exercise with fake providers (default: paid in browser mode)",
     )
     parser.add_argument("--web-port", type=int, help=argparse.SUPPRESS)
     parser.add_argument("--proxy-port", type=int, help=argparse.SUPPRESS)
@@ -775,7 +838,26 @@ def build_parser(kit) -> argparse.ArgumentParser:
 
 def main(argv=None) -> int:
     kit = kit_module()
-    args = build_parser(kit).parse_args(argv)
+    parser = build_parser(kit)
+    args = parser.parse_args(argv)
+    if args.timed_first_class:
+        if any(
+            (
+                args.preflight,
+                args.proxy,
+                args.connect_proxy,
+                args.browser_project,
+                args.ticket_reading_preview,
+                args.web_port,
+                args.proxy_port,
+                args.tls_port,
+            )
+        ):
+            parser.error("--timed-first-class is a standalone backend rehearsal")
+        if args.service_phase == "paid":
+            parser.error("--timed-first-class exercises the controlled free beta")
+        output = args.out or ROOT / f"build-kit/evidence/timed-first-class-{time.time_ns()}"
+        return timed_first_class(kit, output)
     if args.ticket_reading_preview:
         os.environ["PB_TICKET_READING_PREVIEW"] = "1"
     if args.proxy is not None:
@@ -795,7 +877,7 @@ def main(argv=None) -> int:
     signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     return rehearse(
         args.out or ROOT / f"build-kit/evidence/synthetic-{time.time_ns()}",
-        args.service_phase,
+        args.service_phase or "paid",
         args.browser_project,
     )
 
