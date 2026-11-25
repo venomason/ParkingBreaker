@@ -32,7 +32,6 @@ export const LIGHT_EDGES = CITY_LINKS.map(([a,b])=>{
   const [from,to]=distances[a]<=distances[b]?[a,b]:[b,a];
   return {from,to,start:NODE_ARRIVAL[from],duration:length(from,to)/speed,path:`M${CITY_NODES[from]}L${CITY_NODES[to]}`};
 });
-export const SEQUENCE_SECONDS = Math.max(...LIGHT_EDGES.map(edge=>edge.start+edge.duration))+.45;
 
 export function completedNodeIds(completed:number,total:number):Set<number> {
   if(!Number.isFinite(completed)||!Number.isFinite(total)||total<=0)return new Set();

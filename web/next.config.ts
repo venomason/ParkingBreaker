@@ -16,6 +16,7 @@ if (mode === "test" || mode === "live") {
 }
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   reactStrictMode: true,
   devIndicators: false,
   async headers() {

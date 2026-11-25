@@ -167,17 +167,6 @@ def decision_history(real: CaseService, case: str) -> int:
     return len(real._store.destination_decision_history(case, record.owner))
 
 
-async def choose_address(
-    client: AsyncClient,
-    case: str,
-    address: dict[str, str] = ADDRESS,
-    headers: dict[str, str] = ALICE,
-) -> Any:
-    response = await post(client, case, "address", address, headers)
-    assert response.status_code == 200, response.text
-    return response.json()
-
-
 async def accept(client: AsyncClient, case: str, receipt: dict[str, Any]) -> Any:
     response = await post(client, case, "consent", consent_body(receipt))
     assert response.status_code == 200, response.text

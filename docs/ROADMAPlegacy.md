@@ -1,6 +1,6 @@
-# ParkingBreaker execution roadmap
+# Archived ParkingBreaker roadmap
 
-Updated November 19, 2026 (Pacific). This is the authoritative remaining-work plan for the current checkout. It replaces the raw external review dump and the stopped Figma handoff. Product rules remain in [Customer Choice Rules](CUSTOMER-CHOICE-RULES.md), [OCR routing](OCR-ROUTING.md), and the source; release evidence remains in [beta readiness](BETA-READINESS.md). Historical receipts qualify only their recorded inputs.
+Snapshot from November 19, 2026 (Pacific). For the current plan and release decision, see the [execution roadmap](ROADMAP.md) and [beta readiness](BETA-READINESS.md). The plan below records the priorities and evidence from that date.
 
 **Current release state: NO-GO for live paid beta. Preview is deployed at [parkingbreaker.com](https://parkingbreaker.com) with fake providers; see [deployment evidence](verification/deployment-preview-2026-11-17.json).** The durable journey ledger and T01 read-only reconstruction are implemented and locally tested. Full capture provenance, durable attempt history, persistent analysis, autonomous repair, marketing measurement, and production qualification remain open. Owner direction: beta is paid; new intake requires ticket images and OCR before customer confirmation. The intended correct-office/on-time commitment still requires live qualification. A roadmap is neither a deployment approval nor proof that a business will be profitable.
 

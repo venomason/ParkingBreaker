@@ -85,15 +85,6 @@ def database(db_path: Path) -> Iterator[sqlite3.Connection]:
         connection.close()
 
 
-def retention_object_rows(connection: sqlite3.Connection) -> tuple[tuple[object, ...], ...]:
-    return tuple(
-        connection.execute(
-            "SELECT type, name, sql FROM sqlite_master WHERE name GLOB 'pb_retention_*' "
-            "ORDER BY type, name"
-        ).fetchall()
-    )
-
-
 def existing_object_rows(
     connection: sqlite3.Connection,
 ) -> tuple[tuple[object, ...], ...]:
