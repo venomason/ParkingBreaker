@@ -58,12 +58,10 @@ interface Step1TicketProps {
   setPlateState: (state: string) => void;
   backPhoto: boolean;
   setBackPhoto: (value: boolean) => void;
-
   onComplete: (data: { fields: TicketField[]; plate: string; plateState: string; backPhoto: boolean }) => void;
   setActionBar: (sub: React.ReactNode, buttons: React.ReactNode) => void;
-  // Real flow: the customer types each detail (no sample reading); photos come later.
   live?: boolean;
-  // Real owner-scoped ticket reading/review/confirmation path, discovered after workspace restore/creation.
+  canCharge?: boolean;
   vision?: Step1VisionProps;
   scenePhotos?: React.ReactNode;
 }
@@ -78,7 +76,22 @@ function readingStateText(reading: TicketReadingSnapshot | null) {
   return "Reading complete. These are unverified suggestions; check them below.";
 }
 
-export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, setPlateState, backPhoto, setBackPhoto, onComplete, setActionBar, live = false, vision, scenePhotos }: Step1TicketProps) {
+export function Step1Ticket({
+  fields,
+  setFields,
+  plate,
+  setPlate,
+  plateState,
+  setPlateState,
+  backPhoto,
+  setBackPhoto,
+  onComplete,
+  setActionBar,
+  live = false,
+  canCharge = !live,
+  vision,
+  scenePhotos,
+}: Step1TicketProps) {
   const savedCount = live ? fields.findIndex(field => !field.v.trim()) : 0;
   const initialIndex = savedCount === -1 ? fields.length : savedCount;
   const hasSaved = live && fields.some(field => field.v.trim());
@@ -95,6 +108,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
 
   const reviewCard = useRef<HTMLDivElement>(null);
 
+  const photoModeAvailable = Boolean(vision && vision.mode !== "legacy");
   const visionActive = live && Boolean(vision) && (vision?.mode === "vision" || (started && vision?.mode !== "legacy"));
 
   useEffect(() => {
@@ -105,7 +119,8 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
   useEffect(() => {
     if (!isScanning) return;
     const timer = setTimeout(() => {
-      setIsScanning(false); setHasScanned(true);
+      setIsScanning(false);
+      setHasScanned(true);
       setThought("We found five details. Let’s check them together, one at a time.");
     }, 1200);
     return () => clearTimeout(timer);
@@ -120,10 +135,8 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
 
   const handleStartScan = useCallback(() => {
     if (live) {
-      if (vision) {
+      if (vision && vision.mode !== "legacy") {
         setStarted(true);
-        // The capability answer decides whether this stays on the reading path or falls
-        // back to the legacy manual entry; no state is set from an effect.
         void vision.onStart().then((mode) => {
           if (mode === "legacy") beginLegacyEntry();
         }).catch(() => {});
@@ -132,12 +145,18 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
       beginLegacyEntry();
       return;
     }
-    setHasScanned(true); setIsScanning(true); setThought("Reading your ticket…");
+    setHasScanned(true);
+    setIsScanning(true);
+    setThought("Reading your ticket…");
   }, [live, vision, beginLegacyEntry]);
 
   const handleSaveField = useCallback(() => {
     const val = editValue.trim();
-    if (!val) { setFieldErr(true); document.getElementById("fixIn")?.focus(); return; }
+    if (!val) {
+      setFieldErr(true);
+      document.getElementById("fixIn")?.focus();
+      return;
+    }
     setFieldErr(false);
     const next = [...fields];
     next[fieldIdx] = {
@@ -171,29 +190,45 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
   useEffect(() => {
     if (visionActive && vision) {
       if (vision.checking) {
-        setActionBar("Checking how your ticket is read…", <button className="btn btn-primary" type="button" disabled><span className="spinner" /> Checking…</button>);
+        setActionBar(
+          "Checking how your ticket is read…",
+          <button className="btn btn-primary" type="button" disabled>
+            <span className="spinner" /> Checking…
+          </button>
+        );
         return;
       }
       if (vision.error) {
-        setActionBar("We couldn’t check the ticket reading service.", <button className="btn btn-primary" type="button" id="visionRetryCheck" onClick={() => { void vision.onStart(); }}>Try again</button>);
+        setActionBar(
+          "Needs attention · Check the message above",
+          <button className="btn btn-primary" type="button" id="visionRetryCheck" onClick={() => { void vision.onStart(); }}>
+            Try again
+          </button>
+        );
         return;
       }
       if (!vision.frontRef) {
-        setActionBar("Add a front photo of your ticket to read it.", null);
+        setActionBar("Next: add a clear photo of the front of your ticket above", null);
         return;
       }
       if (vision.confirmedCommandId && !vision.dirty) {
-        setActionBar("Ticket facts confirmed for these exact photos.", <button className="btn btn-primary" type="button" id="actContinueTicket" onClick={continueFromVision}>Continue to your side →</button>);
+        setActionBar(
+          "Saved · Ticket facts confirmed for these exact photos",
+          <button className="btn btn-primary" type="button" id="actContinueTicket" onClick={continueFromVision}>
+            Continue to your side →
+          </button>
+        );
         return;
       }
-      setActionBar("Confirm your ticket facts before continuing.", null);
+      setActionBar("Next: check and confirm your ticket facts above", null);
       return;
     }
 
     if (!hasScanned && !isScanning) {
       setActionBar(
         <>
-          <Icon id="shield" size={14} /> No charge unless your letter is mailed
+          <Icon id="shield" size={14} />{" "}
+          {canCharge ? "No charge unless your letter is mailed" : "Nothing is mailed without your exact approval"}
         </>,
         <button
           className="btn btn-primary"
@@ -201,7 +236,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
           id="actSnap"
           onClick={handleStartScan}
         >
-          {live ? (vision ? "Add ticket photo →" : "Enter ticket details →") : "Use sample front photo →"}
+          {live ? (photoModeAvailable ? <><Icon id="camera" size={18} /> Add ticket photo →</> : "Enter ticket details →") : "Use sample front photo →"}
         </button>
       );
       return;
@@ -220,7 +255,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
     if (fieldIdx < fields.length) {
       if (editingField) {
         setActionBar(
-          `Correcting ${currentField.label}`,
+          `Entering detail ${fieldIdx + 1} of ${fields.length} · ${currentField.label}`,
           <>
             <button
               className="btn btn-ghost"
@@ -278,7 +313,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
 
     // All fields confirmed
     setActionBar(
-      "Step 1 complete · Plate stays local",
+      "Saved · Ticket details ready",
       <button
         className="btn btn-primary"
         type="button"
@@ -297,84 +332,162 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
         Continue to your side →
       </button>
     );
-  }, [visionActive, vision, hasScanned, isScanning, fieldIdx, editingField, editValue, currentField, plate, plateState, fields, backPhoto, onComplete, setActionBar, handleSaveField, handleStartScan, live, continueFromVision]);
+  }, [visionActive, vision, photoModeAvailable, canCharge, hasScanned, isScanning, fieldIdx, editingField, editValue, currentField, plate, plateState, fields, backPhoto, onComplete, setActionBar, handleSaveField, handleStartScan, live, continueFromVision]);
+
+  const isFirstLanding = !hasScanned && !visionActive;
 
   return (
     <section className="screen on" id="s1" aria-labelledby="h-s1">
-      <div className="voice">
+      <div className={`voice${isFirstLanding ? " curbside-hero-voice" : ""}`}>
         <HurtleGuide pose="ticket" />
         <div>
-          <p className="eyebrow">Step 1 · Your ticket</p>
-          <h2 id="h-s1" tabIndex={-1}>
-            Start with your ticket.
-          </h2>
+          <p className="eyebrow">{isFirstLanding ? "Curbside parking appeal · Clerical mail service" : "Step 1 · Your ticket"}</p>
+          <h1 id="h-s1" tabIndex={-1}>
+            {isFirstLanding
+              ? "Appeal your parking ticket in your own words."
+              : visionActive
+                ? "Add and confirm your ticket."
+                : "Check your ticket details."}
+          </h1>
           <p className="lead">
-            {visionActive
-              ? "Upload your ticket photos, check the unverified reading suggestions, and confirm the facts we will use for your letter."
-              : live
-                ? (vision ? "Start with the front. Check the issuing agency and ticket details before you continue." : "Enter each detail as printed on your ticket. Keep the front and back handy.")
-                : "Try the sample ticket. You’ll check the details one at a time."}
+            {isFirstLanding
+              ? live
+                ? photoModeAvailable
+                  ? "We read your ticket photo, check the agency’s official mailing instructions, and format your statement into a ready-to-mail packet. You approve the exact PDF before anything is sent."
+                  : "Enter the details printed on your ticket. We check the agency’s official mailing instructions and prepare a packet you inspect and approve before mailing."
+                : "Try a sample parking ticket appeal from curbside check to exact-PDF approval. Nothing is sent or charged in this prototype."
+              : visionActive
+                ? "Upload your ticket photos, check the unverified reading suggestions, and confirm every fact we will print in your letter."
+                : live
+                  ? "Enter each detail exactly as printed on your ticket. Keep the front and back handy."
+                  : "Check the five sample details one at a time."}
           </p>
-          <p className="thought" aria-live="polite">
-            {thought}
-          </p>
+          {thought && (
+            <p className="thought" aria-live="polite">
+              {thought}
+            </p>
+          )}
         </div>
       </div>
 
+      {isFirstLanding && (
+        <div id="capture" className="card capture curbside-start-card">
+          <div className="curbside-route-strip" aria-label="How ParkingBreaker works">
+            <div className="route-chip is-active">
+              <span className="route-num">01</span>
+              <span>{live && !photoModeAvailable ? "Enter ticket" : "Ticket photo"}</span>
+            </div>
+            <div className="route-chip">
+              <span className="route-num">02</span>
+              <span>Your account</span>
+            </div>
+            <div className="route-chip">
+              <span className="route-num">03</span>
+              <span>Exact PDF mail</span>
+            </div>
+          </div>
+          <div className="ticket-prep">
+            <p>
+              <strong>{live && !photoModeAvailable ? "Have the paper ticket in hand" : "Keep all four corners of the ticket in frame"}</strong>
+              <span>Make sure the citation number, issue date, and issuing agency are clear and readable.</span>
+            </p>
+            <details className="guide-notes">
+              <summary>Photo tips, back of ticket &amp; privacy</summary>
+              <p>Photograph the front first, plus the back if it prints appeal instructions. Keep glare off the printed lines.</p>
+              <p className="small muted" style={{ marginTop: "6px" }}>
+                {live
+                  ? "Uploaded ticket photos are processed by an AI reading service, which may see your plate, name, or address on the ticket. You confirm or correct every fact before it is used."
+                  : "Your name, plate, and address never go to an AI in this sample. Prototype uses a synthetic citation."}
+              </p>
+              {!live && (
+                <button
+                  className="chip"
+                  type="button"
+                  id="backCapture"
+                  aria-pressed={backPhoto}
+                  onClick={() => setBackPhoto(!backPhoto)}
+                >
+                  {backPhoto ? "✓ Back photo added" : "Add sample back photo"}
+                </button>
+              )}
+            </details>
+          </div>
+        </div>
+      )}
+
       {visionActive && vision && (
         <div id="s1grid">
-          <section className="card" id="ticketVision" aria-labelledby="visionTitle" aria-busy={Boolean(vision.busy)}>
-            <p className="eyebrow">Read from your photos</p>
-            <h2 id="visionTitle" style={{ margin: "4px 0 8px" }}>Your ticket photos</h2>
-            <p id="ticketPhotoFormats" className="muted small">{PHOTO_UPLOAD_GUIDANCE}</p>
-            <p className="muted small" style={{ marginBottom: "10px" }}>
-              The front photo is required. Your uploaded photos are processed by an AI reading
-              service, which may see your plate, name or address printed on the ticket. The reading is only a set of
-              suggestions; you confirm every fact below.
-            </p>
-            {vision.error && <p className="err" role="alert">{vision.error}</p>}
-            {vision.checking && <p className="small" role="status">Checking how your ticket is read…</p>}
-            <div className="local-ids single">
+          <section className="card status-card" id="ticketVision" aria-labelledby="visionTitle" aria-busy={Boolean(vision.busy)}>
+            <div className="section-head-row">
               <div>
-                <strong>Front of ticket · Required</strong>
+                <p className="eyebrow">Step 1A · Ticket photos</p>
+                <h2 id="visionTitle">Your ticket photos</h2>
+              </div>
+              <span className={`status-pill ${vision.frontRef ? "is-saved" : "is-attention"}`}>
+                {vision.frontRef ? "✓ Front saved" : "Required next"}
+              </span>
+            </div>
+            {vision.error && <p className="err" role="alert">{vision.error}</p>}
+            {vision.checking && <p className="status-banner is-attention" role="status">Checking how your ticket is read…</p>}
+
+            <div className="ticket-upload-slots">
+              <div className={`ticket-slot ${vision.frontRef ? "is-saved" : "is-attention"}`}>
+                <div className="ticket-slot-head">
+                  <strong>Front of ticket</strong>
+                  <span className={`bdg ${vision.frontRef ? "s-ok" : "t-imp"}`}>{vision.frontRef ? "Saved" : "Required"}</span>
+                </div>
                 <div className="picker-row">
-                  <PhotoPicker id="visionFrontCamera" label="Take front photo" camera disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("ticket", files[0])} />
+                  <PhotoPicker id="visionFrontCamera" label="Take front photo" camera primary={!vision.frontRef} disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("ticket", files[0])} />
                   <PhotoPicker id="visionFrontPhoto" label="Choose front photo" disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("ticket", files[0])} />
                 </div>
-                {vision.frontRef && <span className="small" id="visionFrontSaved">Front photo saved for this appeal.</span>}
+                {vision.frontRef && <span className="slot-saved-note" id="visionFrontSaved"><Icon id="check" size={14} /> Front photo saved for this appeal.</span>}
               </div>
-              <div>
-                <strong>Back of ticket</strong>
+
+              <div className={`ticket-slot ${vision.backRef ? "is-saved" : ""}`}>
+                <div className="ticket-slot-head">
+                  <strong>Back of ticket</strong>
+                  <span className={`bdg ${vision.backRef ? "s-ok" : "s-na"}`}>{vision.backRef ? "Saved" : "Optional"}</span>
+                </div>
                 <div className="picker-row">
                   <PhotoPicker id="visionBackCamera" label="Take back photo" camera disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("back", files[0])} />
                   <PhotoPicker id="visionBackPhoto" label="Choose back photo" disabled={Boolean(vision.busy) || vision.checking} onPick={files => vision.onPickPhoto("back", files[0])} />
                 </div>
-                {vision.backRef && <span className="small" id="visionBackSaved">Back photo saved for this appeal.</span>}
+                {vision.backRef && (
+                  <div className="row" style={{ justifyContent: "space-between", marginTop: "6px" }}>
+                    <span className="slot-saved-note" id="visionBackSaved"><Icon id="check" size={14} /> Back photo saved for this appeal.</span>
+                    <button className="chip" type="button" disabled={Boolean(vision.busy)} onClick={() => vision.onPickPhoto("back", null)}>Remove back of ticket</button>
+                  </div>
+                )}
               </div>
-              {vision.backRef && (
-                <button className="btn" type="button" disabled={Boolean(vision.busy)} onClick={() => vision.onPickPhoto("back", null)}>Remove back of ticket</button>
-              )}
             </div>
-            <div className="row" style={{ gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
+
+            <p id="ticketPhotoFormats" className="muted small" style={{ marginTop: "12px" }}>{PHOTO_UPLOAD_GUIDANCE}</p>
+            <p className="muted small" style={{ marginTop: "6px" }}>
+              Uploaded photos are processed by an AI reading service, which may see your plate, name, or address printed on the ticket. Reading results are unverified suggestions—you confirm every fact below.
+            </p>
+
+            <div className="row" style={{ gap: "8px", flexWrap: "wrap", marginTop: "14px" }}>
               {(!vision.reading || vision.reading.status === "missing" || !vision.reading.current) && (
                 <button className="btn btn-primary" type="button" id="visionReadBtn" disabled={!vision.frontRef || Boolean(vision.busy)} onClick={vision.onRead}>
-                  {vision.busy === "reading" ? <><span className="spinner" /> Reading…</> : "Read my ticket photos"}
+                  {vision.busy === "reading" ? <><span className="spinner" /> Reading ticket…</> : "Read my ticket photos →"}
                 </button>
               )}
               {(vision.reading?.status === "pending" || vision.reading?.status === "unknown") && (
-                <button className="btn" type="button" id="visionCheckReading" disabled={Boolean(vision.busy)} onClick={vision.onCheckReading}>
+                <button className="btn btn-ghost" type="button" id="visionCheckReading" disabled={Boolean(vision.busy)} onClick={vision.onCheckReading}>
                   {vision.busy === "reading" ? "Checking…" : "Check reading status"}
                 </button>
               )}
             </div>
-            <p className="small" id="visionReadingState" role="status" aria-live="polite">{readingStateText(vision.reading)}</p>
+
+            <p className="small status-line" id="visionReadingState" role="status" aria-live="polite">{readingStateText(vision.reading)}</p>
             {vision.status?.synthetic && <p className="muted small" id="visionSynthetic">This environment returns synthetic readings for acceptance testing; no provider is called.</p>}
             {vision.reading && vision.reading.status !== "success" && vision.reading.status !== "missing" && (
               <p className="muted small">You can supply and confirm the facts yourself. If an essential fact is unavailable, stop here until you can provide it.</p>
             )}
             {vision.confirmedCommandId && !vision.dirty && (
-              <p id="visionConfirmed" role="status" className="small" style={{ marginTop: "8px", color: "var(--sage)" }}>
-                Ticket facts confirmed for these exact photos and facts. Any photo or fact change requires a new comparison and confirmation.
+              <p id="visionConfirmed" role="status" className="status-banner is-saved">
+                <Icon id="check" size={16} />
+                <span>Ticket facts confirmed for these exact photos and facts. Any photo or fact change requires a new comparison and confirmation.</span>
               </p>
             )}
             {vision.dirty && (
@@ -384,7 +497,6 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             )}
           </section>
 
-          {scenePhotos}
           {vision.frontRef ? (
             <TicketFactReview
               key={vision.workspaceId ?? "no-workspace"}
@@ -404,104 +516,77 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
               onOpenRules={vision.onOpenRules}
             />
           ) : null}
+
+          {scenePhotos}
         </div>
       )}
-
-      {!hasScanned && !visionActive && (
-        <div id="capture" className="card capture">
-          <div className="ticket-prep">
-            <p><strong>Front of your ticket</strong><span>Keep the citation number, date and issuing agency readable.</span></p>
-            <details className="guide-notes">
-              <summary>Photo tips and the back of the ticket</summary>
-              <p>Photograph both sides in good light. Keep all four corners in frame so dates, the issuing agency and any instructions stay readable.</p>
-              {!live && <button className="chip" type="button" id="backCapture" aria-pressed={backPhoto}
-                onClick={() => setBackPhoto(!backPhoto)}>
-                {backPhoto ? "✓ Back photo added" : "Add sample back photo"}
-              </button>}
-            </details>
-          </div>
-          <div className="privacy-line">
-            <Icon id="lock" size={18} style={{ flex: "none" }} />
-            <span>
-              {live
-                ? "Your uploaded ticket photos are processed by an AI reading service. Because the photos may show your plate, name or address, those details may reach that service. You confirm or correct every fact before it is used."
-                : "Your name, plate and address never go to an AI. They’re added to your letter only at the end."}
-            </span>
-          </div>
-          {!live && <p className="muted small" style={{ fontSize: "12.5px" }}>
-            Prototype uses a synthetic citation. The plate is omitted from the sample image.
-          </p>}
-        </div>
-      )}
-
-      {!visionActive && scenePhotos}
 
       {hasScanned && !visionActive && (
         <div id="s1grid">
-          {!live && <div className="vf" id="ticketWrap">
-            <div className="vf-bar">
-              <span>Sample Citation Optical Loupe</span>
-              <span className="vf-badge" id="loupeBadge">
-                {isScanning
-                  ? "Scanning…"
-                  : fieldIdx < fields.length
-                  ? `${fieldIdx + 1} of ${fields.length} · ${fields[fieldIdx].label}`
-                  : "5/5 Confirmed"}
-              </span>
-            </div>
-            <div
-              className={`ticket ${compact && fieldIdx < fields.length ? "compact" : ""} ${
-                isScanning ? "scanning" : ""
-              }`}
-              id="ticket"
-              aria-label="Photo of your ticket (sample)"
-            >
-              <div className="th">
-                CITY OF SAN DIEGO<small>NOTICE OF PARKING VIOLATION</small>
+          {!live && (
+            <div className="vf" id="ticketWrap">
+              <div className="vf-bar">
+                <span>Sample Citation Optical Loupe</span>
+                <span className="vf-badge" id="loupeBadge">
+                  {isScanning
+                    ? "Scanning…"
+                    : fieldIdx < fields.length
+                      ? `${fieldIdx + 1} of ${fields.length} · ${fields[fieldIdx].label}`
+                      : "5/5 Confirmed"}
+                </span>
               </div>
-              {fields.map((f, i) => {
-                const isHl = i === fieldIdx;
-                const isOk = i < fieldIdx;
-                return (
-                  <div
-                    key={f.k}
-                    className={`tr ${isHl ? "hl" : ""} ${isOk ? "ok" : ""}`}
-                    data-f={f.k}
+              <div
+                className={`ticket ${compact && fieldIdx < fields.length ? "compact" : ""} ${isScanning ? "scanning" : ""}`}
+                id="ticket"
+                aria-label="Photo of your ticket (sample)"
+              >
+                <div className="th">
+                  CITY OF SAN DIEGO<small>NOTICE OF PARKING VIOLATION</small>
+                </div>
+                {fields.map((f, i) => {
+                  const isHl = i === fieldIdx;
+                  const isOk = i < fieldIdx;
+                  return (
+                    <div
+                      key={f.k}
+                      className={`tr ${isHl ? "hl" : ""} ${isOk ? "ok" : ""}`}
+                      data-f={f.k}
+                    >
+                      <span>{f.label.toUpperCase()}</span>
+                      <span data-v={f.k}>{f.t}</span>
+                    </div>
+                  );
+                })}
+                <div className="tr na">
+                  <span>PLATE</span>
+                  <span>(omitted)</span>
+                </div>
+              </div>
+              <div className="ticket-foot">
+                {fieldIdx < fields.length ? (
+                  <button
+                    type="button"
+                    className="ticket-toggle"
+                    id="toggleTicketView"
+                    onClick={() => setCompact(!compact)}
                   >
-                    <span>{f.label.toUpperCase()}</span>
-                    <span data-v={f.k}>{f.t}</span>
-                  </div>
-                );
-              })}
-              <div className="tr na">
-                <span>PLATE</span>
-                <span>(omitted)</span>
-              </div>
-            </div>
-            <div className="ticket-foot">
-              {fieldIdx < fields.length ? (
+                    {compact ? "Show all ticket lines" : "Focus active line"}
+                  </button>
+                ) : (
+                  <span />
+                )}
                 <button
                   type="button"
                   className="ticket-toggle"
-                  id="toggleTicketView"
-                  onClick={() => setCompact(!compact)}
+                  id="backLater"
+                  aria-pressed={backPhoto}
+                  onClick={() => setBackPhoto(!backPhoto)}
                 >
-                  {compact ? "Show all ticket lines" : "Focus active line"}
+                  {backPhoto ? "✓ Back photo added" : "+ Back photo"}
                 </button>
-              ) : (
-                <span />
-              )}
-              <button
-                type="button"
-                className="ticket-toggle"
-                id="backLater"
-                aria-pressed={backPhoto}
-                onClick={() => setBackPhoto(!backPhoto)}
-              >
-                {backPhoto ? "✓ Back photo added" : "+ Back photo"}
-              </button>
+              </div>
             </div>
-          </div>}
+          )}
 
           <div id="fieldsWrap">
             <div className="fprog" id="fprog" aria-hidden="true">
@@ -538,7 +623,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             {fieldIdx < fields.length && (
               <div key={fieldIdx} id="fcur" ref={reviewCard}>
                 {editingField ? (
-                  <div className="card fcur" aria-live="polite">
+                  <div className="card fcur is-next-task" aria-live="polite">
                     <p className="k">
                       Editing detail {fieldIdx + 1} of {fields.length} · {currentField.label}
                     </p>
@@ -550,7 +635,7 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
                       aria-invalid={fieldErr}
                       aria-describedby="fieldEntryError"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => { setEditValue(e.target.value); setFieldErr(false); }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -560,11 +645,13 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
                       autoComplete="off"
                       autoFocus
                     />
-                    <p className="err" role="alert" id="fieldEntryError">{fieldErr ? "Enter this detail as printed on your ticket." : ""}</p>
-                    <p className="hint">Press Enter or tap Save below.</p>
+                    <p className="err" role="alert" id="fieldEntryError">
+                      {fieldErr ? "Enter this detail as printed on your ticket." : ""}
+                    </p>
+                    <p className="hint">{currentField.hint} Press Enter or tap Save &amp; continue below.</p>
                   </div>
                 ) : (
-                  <div className="card fcur" aria-live="polite">
+                  <div className="card fcur is-next-task" aria-live="polite">
                     <p className="k">
                       Detail {fieldIdx + 1} of {fields.length} · {currentField.label}
                     </p>
@@ -576,19 +663,23 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
             )}
 
             {fieldIdx >= fields.length && (
-              <div id="s1done" className="card fcur" ref={reviewCard}>
+              <div id="s1done" className="card fcur is-saved-head" ref={reviewCard}>
                 <p className="k" style={{ color: "var(--sage)" }}>
                   {live ? "✓ Ticket details entered" : "✓ All five read details confirmed"}
                 </p>
                 <h2 style={{ margin: "4px 0 8px" }}>Your ticket is ready.</h2>
                 <p className="muted small">
-                  {live ? "Enter the plate number and state exactly as printed on your ticket. These identifiers are added to your letter and never sent to an AI." : "San Diego asks for the plate number and state in the letter. This entry stays local to the letter and never goes to an AI."}
+                  {live
+                    ? "Enter the plate number and state exactly as printed on your ticket. These identifiers are added to your letter and never sent to an AI."
+                    : "San Diego asks for the plate number and state in the letter. This entry stays local to the letter and never goes to an AI."}
                 </p>
                 <div className="local-ids">
                   <label>
                     Plate number
                     <input
-                      id="plateIn" aria-invalid={plateErr} aria-describedby="plateErr"
+                      id="plateIn"
+                      aria-invalid={plateErr}
+                      aria-describedby="plateErr"
                       autoComplete="off"
                       value={plate}
                       onChange={(e) => {
@@ -602,7 +693,9 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
                   <label>
                     State
                     <input
-                      id="plateState" aria-invalid={plateErr} aria-describedby="plateErr"
+                      id="plateState"
+                      aria-invalid={plateErr}
+                      aria-describedby="plateErr"
                       autoComplete="off"
                       value={plateState}
                       maxLength={2}
@@ -625,6 +718,8 @@ export function Step1Ticket({ fields, setFields, plate, setPlate, plateState, se
           </div>
         </div>
       )}
+
+      {!visionActive && scenePhotos}
     </section>
   );
 }

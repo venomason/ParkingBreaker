@@ -70,6 +70,14 @@ export function SvgDefs() {
           <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
           <path d="M3.5 12h17M12 3.5c2.6 2.6 2.6 14.4 0 17M12 3.5c-2.6 2.6-2.6 14.4 0 17" fill="none" stroke="currentColor" strokeWidth="1.8" />
         </symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24">
+          <path d="M4 8.5A2.5 2.5 0 016.5 6h2l1.3-1.8A1.5 1.5 0 0111 3.5h2a1.5 1.5 0 011.2.7L15.5 6h2A2.5 2.5 0 0120 8.5v9a2.5 2.5 0 01-2.5 2.5h-11A2.5 2.5 0 014 17.5v-9z" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
+          <circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" strokeWidth="1.9" />
+        </symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24">
+          <rect x="3" y="5.5" width="18" height="13" rx="2.2" fill="none" stroke="currentColor" strokeWidth="1.9" />
+          <path d="M4 7l8 5.8L20 7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+        </symbol>
       </defs>
     </svg>
   );

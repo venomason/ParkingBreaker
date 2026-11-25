@@ -1,10 +1,9 @@
 "use client";
 
 import { HurtleGuide } from "./HurtleGuide";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ConciergeMark } from "./ConciergeMark";
 import { Icon } from "./Icons";
-
 import { SAMPLE_STORY as SAMPLE } from "../lib/api";
 
 interface Step2YourSideProps {
@@ -21,7 +20,18 @@ interface Step2YourSideProps {
   liveSlot?: React.ReactNode;
 }
 
-export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhoto, onComplete, setActionBar, onRulesClick, liveSlot }: Step2YourSideProps) {
+export function Step2YourSide({
+  story,
+  setStory,
+  owner,
+  setOwner,
+  photo,
+  setPhoto,
+  onComplete,
+  setActionBar,
+  onRulesClick,
+  liveSlot,
+}: Step2YourSideProps) {
   const live = liveSlot !== undefined;
   const unsupported = live && Array.from(story).some(character => {
     const code = character.codePointAt(0) ?? 0;
@@ -29,15 +39,22 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
   });
   const restored = live && !unsupported && Boolean(owner && story.trim());
   const [messages, setMessages] = useState<Array<{ sender: "c" | "u" | "g"; text?: string; html?: React.ReactNode }>>([
-    { sender: "c", text: live ? "Your ticket details are recorded. You can check them before continuing." : "Thanks. All five details on your ticket are confirmed." },
     {
       sender: "c",
-      text: "Now tell us what happened, in your own words. We’ll keep your wording, and we won’t add facts or arguments.",
+      text: live
+        ? "Tell us what happened in your own words. We keep your exact wording and never invent facts or arguments."
+        : "Thanks—all five details on your ticket are confirmed. Now tell us what happened in your own words.",
     },
-    ...(restored ? [{ sender: "u" as const, text: story }, { sender: "c" as const, text: "Your saved account and ownership answer are here. Continue with your contact details and photos." }] : []),
+    ...(restored
+      ? [
+          { sender: "u" as const, text: story },
+          { sender: "c" as const, text: "Your saved account and ownership answer are ready below. Finish your contact and return-address details to continue." },
+        ]
+      : []),
   ]);
   const [stage, setStage] = useState<"story" | "owner" | "photo" | "done">(restored ? "done" : "story");
   const [storyErr, setStoryErr] = useState<boolean>(false);
+  const composerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (stage === "story") {
@@ -51,19 +68,22 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
             const val = story.trim();
             if (!val || unsupported) {
               setStoryErr(true);
-              document.getElementById("story")?.focus();
+              requestAnimationFrame(() => {
+                const storyEl = document.getElementById("story");
+                composerRef.current?.scrollIntoView({ block: "center", behavior: "instant" });
+                storyEl?.focus({ preventScroll: true });
+              });
               return;
             }
             setStoryErr(false);
             setMessages((prev) => [
               ...prev,
               { sender: "u", text: val },
-              { sender: "c", text: "Thank you. Two quick questions so the letter is accurate." },
               {
                 sender: "c",
                 text: live
-                  ? "Were you the registered owner of the vehicle on the date of the ticket?"
-                  : "Were you the registered owner of the vehicle on October 2, 2026?",
+                  ? "Thank you. Were you the registered owner of the vehicle on the date of the ticket?"
+                  : "Thank you. Were you the registered owner of the vehicle on October 2, 2026?",
               },
             ]);
             setStage("owner");
@@ -73,14 +93,14 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
         </button>
       );
     } else if (stage === "owner") {
-      setActionBar("Tap one answer above", null);
+      setActionBar("Next: choose your relationship to the vehicle above", null);
     } else if (stage === "photo") {
-      setActionBar("Tap one answer above", null);
+      setActionBar("Next: choose whether to include a supporting photo above", null);
     } else if (stage === "done" && live) {
-      setActionBar("Fill in the details below", null);
+      setActionBar(null, null);
     } else if (stage === "done") {
       setActionBar(
-        "Step 2 complete",
+        "Saved · Step 2 complete",
         <button
           className="btn btn-primary"
           type="button"
@@ -102,10 +122,10 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
         html: (
           <div>
             <div className="gl">
-              <Icon id="shield" size={14} /> A gentle note
+              <Icon id="shield" size={14} /> Clerical boundary
             </div>
             We can’t predict how the agency will decide, and we won’t judge your case. What we
-            can do: format your own words, check the mailing requirements and show you the exact packet before you authorize mailing.{" "}
+            do: format your own words, check the mailing requirements, and show you the exact packet before you authorize mailing.{" "}
             <button
               type="button"
               className="chip"
@@ -134,7 +154,7 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
       });
     }
     if (live) {
-      nextMsgs.push({ sender: "c", text: "Thanks. Last, a few details the agency asks for." });
+      nextMsgs.push({ sender: "c", text: "Saved. Now add your return address and contact details for the letter." });
       setMessages(nextMsgs);
       setStage("done");
       return;
@@ -207,14 +227,16 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
           <h2 id="h-s2" tabIndex={-1}>
             Tell us what happened.
           </h2>
-
+          <p className="lead">
+            Plain facts in your own voice—times, signs, meter screens, receipts, or markings you observed.
+          </p>
         </div>
       </div>
 
       <div className="chat" id="chatlog" aria-live="polite" aria-relevant="additions text">
         {messages.map((m, i) => (
           <div key={i} className={m.sender === "u" ? "row-u" : "row-c"}>
-            {m.sender !== "u" && <ConciergeMark size={28} state="idle" />}
+            {m.sender !== "u" && <ConciergeMark size={30} state="idle" />}
             <div className={`msg ${m.sender}`}>
               {m.html ? m.html : m.text}
             </div>
@@ -223,7 +245,7 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
       </div>
 
       {stage === "story" && (
-        <div className="composer" id="composer">
+        <div className="composer is-next-task" id="composer" ref={composerRef}>
           <form
             id="storyForm"
             onSubmit={(e) => {
@@ -231,22 +253,31 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
               document.getElementById("actSendStory")?.click();
             }}
           >
-            <label className="sr" htmlFor="story">
-              Your side, in your own words
+            <label className="composer-label" htmlFor="story">
+              <span>Your side, in your own words</span>
+              <span className="status-pill is-next">Required</span>
             </label>
             <textarea
               id="story"
               aria-invalid={storyErr}
-              aria-describedby="storyHelp storyErr"
-              placeholder="What happened? Write it the way you’d tell a friend."
+              aria-describedby="storyErr storyHelp storyCompletenessPrompt"
+              placeholder="What happened? Write it plainly, the way you’d explain it to a clerk."
               value={story}
               onChange={(e) => { setStory(e.target.value); setStoryErr(false); }}
             />
-            <p className="dictate-tip" id="storyHelp">🎙️ Tip: You can tap your phone keyboard’s microphone to dictate.</p>
-            <p className="muted small" id="storyCompletenessPrompt">
-              Include any relevant dates, times, locations, or sign details in your own words. We format your exact account without adding arguments or judging your case.
+            <p className="err" id="storyErr" role="alert">
+              {storyErr
+                ? unsupported
+                  ? "Replace characters the letter cannot print. Use straight quotes or apostrophes in place of curly ones, and use a plain hyphen in place of a long dash."
+                  : live
+                    ? "Enter your reason in your own words."
+                    : "Write a sentence or two, or tap “Use sample answer”."
+                : ""}
             </p>
-            <p className="err" id="storyErr" role="alert">{storyErr ? unsupported ? "Replace characters the letter cannot print. Use straight quotes or apostrophes in place of curly ones, and use a plain hyphen in place of a long dash." : live ? "Enter your reason in your own words." : "Write a sentence or two, or tap “Use sample answer”." : ""}</p>
+            <p className="dictate-tip" id="storyHelp">Tip: You can tap your phone keyboard’s microphone to dictate.</p>
+            <p className="muted small" id="storyCompletenessPrompt">
+              Include relevant dates, times, locations, or sign details. We format your exact account without adding arguments or judging your case.
+            </p>
             <div className="crow">
               {!live && (
                 <button
@@ -273,7 +304,8 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
       )}
 
       {stage === "owner" && (
-        <div className="composer" id="composer">
+        <div className="composer is-next-task" id="composer">
+          <p className="eyebrow" style={{ marginBottom: "8px" }}>Next · Registered owner check</p>
           <div className="choices" role="group" aria-label="Tap one answer above">
             {[
               ["yes", "Yes"],
@@ -287,18 +319,25 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
                 onClick={() => handleChooseOwner(v, l)}
               >
                 <span>{l}</span>
-                <span style={{ color: "var(--coral-ink)" }}>→</span>
+                <span aria-hidden="true">→</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {stage === "done" && live && <button type="button" className="chip" onClick={() => setStage("story")}>Edit my account or ownership answer</button>}
+      {stage === "done" && live && (
+        <div className="saved-statement-bar">
+          <span className="status-pill is-saved"><Icon id="check" size={12} /> Account &amp; ownership saved</span>
+          <button type="button" className="chip" onClick={() => setStage("story")}>
+            Edit my account or ownership answer
+          </button>
+        </div>
+      )}
       {stage === "done" && liveSlot}
 
       {stage === "photo" && (
-        <div className="composer" id="composer">
+        <div className="composer is-next-task" id="composer">
           <div className="choices" role="group" aria-label="Tap one answer above">
             {[
               [true, "Yes, save it"],
@@ -311,7 +350,7 @@ export function Step2YourSide({ story, setStory, owner, setOwner, photo, setPhot
                 onClick={() => handleChoosePhoto(Boolean(v), String(l))}
               >
                 <span>{String(l)}</span>
-                <span style={{ color: "var(--coral-ink)" }}>→</span>
+                <span aria-hidden="true">→</span>
               </button>
             ))}
           </div>

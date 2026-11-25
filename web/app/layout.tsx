@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./fonts.css";
 import "./globals.css";
 import "./journey.css";
+import "./street-guide.css";
 import "./brand-logo.css";
 import { InteractivePulse } from "../components/InteractivePulse";
 

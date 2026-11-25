@@ -89,10 +89,13 @@ export function Step4BetaOffer({
         </div>
       </div>
 
-      <div className="card" id="betaOfferCard">
-        <p className="small" style={{ fontWeight: 750 }}>
-          ✓ Selected for this appeal from the owner-approved beta
-        </p>
+      <div className="card is-saved-card postal-frank-card" id="betaOfferCard">
+        <div className="section-head-row">
+          <span className="status-pill is-saved">
+            <Icon id="check" size={12} /> Selected for this appeal from the owner-approved beta
+          </span>
+          <span className="postmark-stamp" aria-hidden="true">BETA · $0</span>
+        </div>
         <p className="dl-big">
           <strong>{mailClass}</strong> · <strong>$0</strong>
         </p>
@@ -106,14 +109,14 @@ export function Step4BetaOffer({
       <div className="card" style={{ marginTop: "14px" }} id="betaDisclosureCard">
         <h3>What you are accepting</h3>
         {/* Verbatim server text. Never substitute local copy or add promises. */}
-        <p className="small" id="betaDisclosureText" style={{ whiteSpace: "pre-wrap" }}>
+        <p className="small" id="betaDisclosureText" style={{ whiteSpace: "pre-wrap", marginTop: "8px" }}>
           {offer.disclosure_text}
         </p>
       </div>
 
       <LegalDisclosure id="betaLegalDisclosure" />
 
-      <label className="check" htmlFor="betaConsent" style={{ marginTop: "14px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
+      <label className={`packet-inspect ${consented ? "is-checked" : ""}`} htmlFor="betaConsent" style={{ marginTop: "14px" }}>
         <input
           id="betaConsent"
           type="checkbox"

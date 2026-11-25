@@ -92,7 +92,8 @@ for(const phase of ["paid","controlled_free_beta"] as const){
       await page.route("**/api/auth/pricing",r=>r.fulfill({json:{experiment_id:"certified-price-v1",service_phase:phase,amount_cents:phase==="paid"?2499:null,arm:phase==="paid"?"P2499":null}}));
       await page.goto("/");
       await expect(page.locator("#actSnap")).toBeVisible();
-      await expect(page.getByRole("heading",{level:1})).toHaveText("As soon as you spot a ticket, start taking photos.");
+      await expect(page.getByRole("heading",{level:1})).toHaveText("Appeal your parking ticket in your own words.");
+      await expect(page.locator("#intake-title")).toHaveText("As soon as you spot a ticket, start taking photos.");
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       await page.locator("#actSnap").focus();
       expect(await page.locator("#actSnap").evaluate(e=>getComputedStyle(e).outlineStyle)).not.toBe("none");

@@ -317,16 +317,13 @@ function ControlledBetaWaiting({
           <p className="lead" id="controlledBetaLead">{lead}</p>
         </div>
       </div>
-      <div className="card">
+      <div className="card is-attention-card">
         <p className="small" id="controlledBetaStatus">
           The server reports the controlled free beta for new paid orders. Your saved appeal may already
           hold a selected free beta or an earlier payment; any such saved record stays exactly as the
           server reports it. Refresh the server phase and use Check my appeal for the latest update before choosing anything.
         </p>
-        {phaseRefreshFailed && <p className="small" role="status" id="phaseRefreshFailed">We couldn’t refresh the server phase. No price or card is shown; use Check my appeal for the latest update.</p>}
-        <button className="btn btn-primary" type="button" onClick={onRetry} disabled={busy}>
-          {busy ? "Checking…" : action}
-        </button>
+        {phaseRefreshFailed && <p className="small status-banner is-attention" role="status" id="phaseRefreshFailed" style={{ marginTop: "10px" }}>We couldn’t refresh the server phase. No price or card is shown; use Check my appeal for the latest update.</p>}
       </div>
     </section>
   );
@@ -554,7 +551,42 @@ function Journey() {
       document.documentElement.style.setProperty("--kb-offset", offset > 80 ? `${offset}px` : "0px");
     };
     sync(); viewport?.addEventListener("resize", sync); viewport?.addEventListener("scroll", sync);
-    return () => { viewport?.removeEventListener("resize", sync); viewport?.removeEventListener("scroll", sync); };
+    return () => {
+       ControlledCleanup();
+    };
+    function ControlledCleanup() {
+      viewport?.removeEventListener("resize", sync);
+      viewport?.removeEventListener("scroll", sync);
+    }
+  }, []);
+
+  useEffect(() => {
+    let focusTimer = 0;
+    const onFocusIn = (event: FocusEvent) => {
+      if (window.innerWidth >= 1024) return;
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (!target.matches("input, textarea, select")) return;
+      if (target.closest("dialog")) return;
+      window.clearTimeout(focusTimer);
+      focusTimer = window.setTimeout(() => {
+        const bar = document.getElementById("actionBar");
+        const barTop = bar ? bar.getBoundingClientRect().top : (window.visualViewport?.height ?? window.innerHeight);
+        const container = target.closest("label, .fcur, .composer") ?? target;
+        const rect = container.getBoundingClientRect();
+        const headerBottom = (document.querySelector("header.top")?.getBoundingClientRect().bottom ?? 76) + 12;
+        if (rect.bottom > barTop - 16) {
+          window.scrollBy({ top: rect.bottom - (barTop - 24), behavior: "instant" });
+        } else if (rect.top < headerBottom) {
+          window.scrollBy({ top: rect.top - headerBottom, behavior: "instant" });
+        }
+      }, 90);
+    };
+    document.addEventListener("focusin", onFocusIn);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("focusin", onFocusIn);
+    };
   }, []);
 
   useEffect(() => () => {
@@ -1938,15 +1970,14 @@ function Journey() {
 
       <Header now={now} step={step} timerEnd={timerEnd} lapsed={lapsed} evidenceCount={LIVE ? liveStatus?.research ? `${liveStatus.research.findings.filter(f => f.status === "CONFIRMED").length}/${liveStatus.research.findings.length}` : "pending" : `${evidenceCount}/${SAMPLE_FACTS.length}`} onBrandClick={() => { if (LIVE && liveCase) { if (liveStatus) goTo(customerStage(liveStatus)); } else goTo(1); }} onEvidenceClick={() => setSheetChk(true)} onRulesClick={openRules} fulfillmentLabel={LIVE && step === 7 && liveStatus ? fulfillmentCopy(liveStatus,liveTracking).title : undefined} />
 
-      {LIVE && !PREVIEW_AUTH && !liveCase && <div className="access-session" role="status"><span>{photoUploads ? "Saving photo…" : autosaveState === "error" ? "Save paused. Your entries remain on this page; another tab may have changed this appeal." : autosaveState === "saving" ? "Saving your entries…" : autosaveState === "saved" ? "Entries saved for this appeal" : "Your entries will save as you go"}</span>{autosaveState === "error" && <button className="chip" onClick={() => {void flushWorkspace().catch(() => {});}}>Retry save</button>}</div>}
+      {LIVE && !PREVIEW_AUTH && !liveCase && (Boolean(photoUploads) || Boolean(workspaceId) || autosaveState === "error") && <div className="autosave-strip" role="status"><span>{photoUploads ? "Saving photo…" : autosaveState === "error" ? "Save paused. Your entries remain on this page; another tab may have changed this appeal." : autosaveState === "saving" ? "Saving your entries…" : "Entries saved for this appeal"}</span>{autosaveState === "error" && <button className="chip" onClick={() => {void flushWorkspace().catch(() => {});}}>Retry save</button>}</div>}
       <main id="main" className={`app-shell${step === 1 ? " intake-shell" : ""}`}>
-        {step === 1 && <IntakeIntroduction />}
         <div className="stream-col">
           <Receipts receipts={LIVE && liveCase ? receipts.map(receipt => ({...receipt,reopenable:receipt.stepNum === 3})) : receipts} onReopen={goTo} />
           {LIVE && liveError && step !== 2 && step !== 3 && step !== 6 && step !== 7 && <div className="guard action-error" role="alert" id="liveActionError">{liveError}</div>}
           {lapsed && (step === 5 || step === 6) && <div className="guard" role="status"><span>{LIVE ? "The saved review window has ended. Your work stays saved; checking server status is required before another action." : "Your window closed. Nothing was charged and your work is saved."}</span>{LIVE && liveCase ? <button className="chip" type="button" disabled={liveBusy} onClick={async () => { try { setLiveError(null); handleDestinationStatus(await api.status(liveCase.caseId)); } catch (error) { setLiveError(plainError(error)); } }}>Check my appeal</button> : <button className="chip" type="button" onClick={handleRestartWindow}>Start a new window</button>}</div>}
           <JourneyCard step={step}><div key={run}>
-          {step === 1 && <Step1Ticket live={LIVE} fields={fields} setFields={setFields} plate={plate} setPlate={setPlate} plateState={plateState} setPlateState={setPlateState} backPhoto={backPhoto} setBackPhoto={setBackPhoto} onComplete={handleStep1Complete} setActionBar={setActionBar} vision={LIVE && !PREVIEW_AUTH ? step1Vision : undefined}
+          {step === 1 && <Step1Ticket live={LIVE} canCharge={newPaidAccess} fields={fields} setFields={setFields} plate={plate} setPlate={setPlate} plateState={plateState} setPlateState={setPlateState} backPhoto={backPhoto} setBackPhoto={setBackPhoto} onComplete={handleStep1Complete} setActionBar={setActionBar} vision={LIVE && !PREVIEW_AUTH ? step1Vision : undefined}
             scenePhotos={<CurbsidePhotos live={LIVE} samplePhoto={Boolean(photo)} onSamplePhoto={setPhoto} photos={evidencePhotos} onAdd={addEvidencePhotos} onRemove={removeEvidencePhoto} onRetry={uploadEvidencePhoto} />} />}
           {step === 2 && (<Step2YourSide story={story} setStory={setStory} owner={owner} setOwner={setOwner} photo={photo} setPhoto={setPhoto} onComplete={handleStep2Complete} setActionBar={setActionBar} onRulesClick={openRules} liveSlot={LIVE ? <LiveDetails busy={liveBusy || photoUploads > 0} submitting={liveBusy} error={liveError} onSubmit={handleLiveDetails} values={contactValues} onChange={setContactValues} ticketPhoto={photoFiles.ticket} ticketBackPhoto={photoFiles.back} evidencePhotos={evidencePhotos} ticketPhotoRef={photoRefs.ticket} ticketBackPhotoRef={photoRefs.back} onSelectPhoto={(kind,file) => {void selectPhoto(kind,file);}} onAddEvidencePhotos={addEvidencePhotos} onRemoveEvidencePhoto={removeEvidencePhoto} onMoveEvidencePhoto={moveEvidencePhoto} visionRequired={visionRequired} visionFacts={visionAdoptedFacts ? { issuedCity: visionAdoptedFacts.issued_city, issuedState: visionAdoptedFacts.issued_state, issuerKind: visionAdoptedFacts.issuer_kind } : null} /> : undefined} />)}
           {step === 3 && LIVE && (<LiveResearch issuerName={liveOffer?.issuer.issuer_name} status={liveStatus} busy={liveBusy} onDraft={handleLiveDraft} onRetry={handleStep5Complete} caseId={liveCase?.caseId} onStatus={handleDestinationStatus} error={liveError} onAnswer={async answer => { if (!liveCase || liveBusy) return; setLiveBusy(true); setLiveError(null); try { handleDestinationStatus(await api.answer(liveCase.caseId,answer)); } catch (error) { setLiveError(plainError(error)); } finally { setLiveBusy(false); } }} setActionBar={setActionBar} />)}
@@ -1974,7 +2005,8 @@ function Journey() {
             </>
           )}
         </div>
-        {step === 1 ? <IntakeTrust /> : <DesktopAside onEvidenceClick={openChecklist} onRulesClick={openRules} servicePhase={phase} funding={funding} paidCase={admittedPaid} savedPending={savedPending} betaCase={betaFunding} betaTier={betaTier} newPaidBlocked={newPaidBlocked} />}
+        {step === 1 && <IntakeIntroduction />}
+        {step === 1 ? <IntakeTrust /> : <DesktopAside step={step} citation={fv("cit")} onEvidenceClick={openChecklist} onRulesClick={openRules} servicePhase={phase} funding={funding} paidCase={admittedPaid} savedPending={savedPending} betaCase={betaFunding} betaTier={betaTier} newPaidBlocked={newPaidBlocked} />}
       </main>
 
       <div className={step === 1 ? "intake-actions" : undefined}><ActionBar subText={actionSub}>{LIVE && (step === 6 || step === 7) ? null : actionButtons}</ActionBar></div>

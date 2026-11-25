@@ -34,15 +34,28 @@ export function Receipts({ receipts, onReopen }: ReceiptsProps) {
       {receipts.map((r) => (
         <li key={r.stepNum} className="receipt-item">
           <div className="receipt-btn">
-            {MILESTONE_BY_STEP[r.stepNum] !== undefined && <span className="receipt-num" aria-hidden="true">{String(MILESTONE_BY_STEP[r.stepNum]).padStart(2, "0")}</span>}
+            {MILESTONE_BY_STEP[r.stepNum] !== undefined && (
+              <span className="receipt-num" aria-hidden="true">
+                {String(MILESTONE_BY_STEP[r.stepNum]).padStart(2, "0")}
+              </span>
+            )}
             <span className="receipt-ck" aria-hidden="true">
               <Icon id="check" size={12} />
             </span>
             <span className="receipt-body">
-              <span className="receipt-step">{r.stepName}</span>
+              <span className="receipt-step">{r.stepName} · Saved</span>
               <span className="receipt-txt">{r.summary}</span>
             </span>
-            {onReopen && r.reopenable !== false && <button className="chip receipt-edit" type="button" onClick={() => onReopen(r.stepNum)} aria-label={`Reopen ${r.stepName}: ${r.summary}`}>Reopen</button>}
+            {onReopen && r.reopenable !== false && (
+              <button
+                className="chip receipt-edit"
+                type="button"
+                onClick={() => onReopen(r.stepNum)}
+                aria-label={`Reopen ${r.stepName}: ${r.summary}`}
+              >
+                Reopen
+              </button>
+            )}
           </div>
         </li>
       ))}

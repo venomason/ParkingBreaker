@@ -4,6 +4,7 @@ import { TicketFactCards } from "./TicketFactCards";
 import React, { useCallback, useRef, useState } from "react";
 import { useTicketReviewObservation } from "../lib/ticket-observability";
 import { CustomerChoiceNotice } from "./CustomerChoiceRules";
+import { Icon } from "./Icons";
 import type {
   TicketDiscrepancyResolution,
   TicketReadingSnapshot,
@@ -73,36 +74,51 @@ export function TicketFactReview({
   onConfirm,
   onOpenRules,
 }: TicketFactReviewProps) {
-  const telemetry = useTicketReviewObservation({ workspaceId, busy, readingStatus: reading?.status ?? "missing", reviewStatus: review?.status ?? "missing" });
+  const telemetry = useTicketReviewObservation({
+    workspaceId,
+    busy,
+    readingStatus: reading?.status ?? "missing",
+    reviewStatus: review?.status ?? "missing",
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [acknowledgedFor, setAcknowledgedFor] = useState<string | null>(null);
   const reviewKey = JSON.stringify([review?.request_id, draft, resolutions]);
   const accuracyAcknowledged = acknowledgedFor === reviewKey;
   const formRef = useRef<HTMLFormElement>(null);
+
   const changeDraft = (next: FactDraft) => {
     telemetry.interact();
     setAcknowledgedFor(null);
     onDraftChange(next);
   };
   const set = (key: keyof FactDraft) => (value: FactDraft[typeof key]) => changeDraft({ ...draft, [key]: value });
+
+  const literalEntries = TICKET_LITERAL_FIELD_ORDER.map((field) => {
+    const found = reading?.fields.find((entry) => entry.field === field);
+    return { field, entry: found, value: found?.state === "shown" ? found.value : null, state: found?.state ?? null };
+  });
+  const printed = (field: (typeof TICKET_LITERAL_FIELD_ORDER)[number]) => literalEntries.find((entry) => entry.field === field)?.value;
+
   const textField = (key: keyof FactDraft, label: string) => {
     const literalField = ADOPTED_TO_LITERAL[key as keyof AdoptedFacts];
     const suggestion = reading?.current && literalField ? printed(literalField) : null;
-    return <label>
-      {label}
-      <input
-        id={`fact-${key}`}
-        value={String(draft[key] ?? "")}
-        maxLength={200}
-        disabled={locked || busy}
-        aria-invalid={Boolean(errors[`fact-${key}`])}
-        aria-describedby={errors[`fact-${key}`] ? `fact-${key}-error` : undefined}
-        onChange={(event) => set(key)(event.target.value as never)}
-        autoComplete="off"
-      />
-      {errors[`fact-${key}`] && <span className="field-error" id={`fact-${key}-error`}>{errors[`fact-${key}`]}</span>}
-      {suggestion && <span className="muted small">Read from your photo: “{suggestion}”</span>}
-    </label>;
+    return (
+      <label>
+        {label}
+        <input
+          id={`fact-${key}`}
+          value={String(draft[key] ?? "")}
+          maxLength={200}
+          disabled={locked || busy}
+          aria-invalid={Boolean(errors[`fact-${key}`])}
+          aria-describedby={errors[`fact-${key}`] ? `fact-${key}-error` : undefined}
+          onChange={(event) => set(key)(event.target.value as never)}
+          autoComplete="off"
+        />
+        {errors[`fact-${key}`] && <span className="field-error" id={`fact-${key}-error`}>{errors[`fact-${key}`]}</span>}
+        {suggestion && <span className="muted small mono-hint">Read from your photo: “{suggestion}”</span>}
+      </label>
+    );
   };
 
   const submit = useCallback((event: React.FormEvent) => {
@@ -125,11 +141,6 @@ export function TicketFactReview({
     onSaveFacts(result.facts, customerSupplied);
   }, [draft, locked, busy, onSaveFacts, telemetry]);
 
-  const literalEntries = TICKET_LITERAL_FIELD_ORDER.map((field) => {
-    const found = reading?.fields.find((entry) => entry.field === field);
-    return { field, entry: found, value: found?.state === "shown" ? found.value : null, state: found?.state ?? null };
-  });
-  const printed = (field: (typeof TICKET_LITERAL_FIELD_ORDER)[number]) => literalEntries.find((entry) => entry.field === field)?.value;
   const reviewFields = review?.status === "success" && review.current ? review.fields : [];
   const expectedResolutions = reviewFields.filter((field) => field.comparison !== "match").map((field) => field.field);
   const unresolved = dirty || expectedResolutions.some((field) => !resolutions[field]);
@@ -139,41 +150,70 @@ export function TicketFactReview({
 
   return (
     <div id="visionFactReview" className="stack" data-review-variant={telemetry.variant} onFocusCapture={telemetry.interact}>
-      <section aria-labelledby="visionReadingsTitle" className="card" id="visionReadings">
-        <h3 id="visionReadingsTitle" style={{ marginBottom: "6px" }}>{hasReading ? "Check what we read" : "Check your ticket details"}</h3>
-        {reading?.escalation === "completed" && <p className="small" role="status">
-          Gemini independently checked borderline text. Any remaining uncertain or conflicting
-          fields need your input. Agreement between models is not proof of accuracy.
-        </p>}
-        {reading?.escalation && ["unavailable", "budget_exhausted", "failed", "refused"].includes(reading.escalation)
-          && <p className="small" role="status">The additional reading was unavailable or unusable.
-            Enter the remaining facts yourself; no uncertain value has been filled in for you.</p>}
-        <p className="muted small" style={{ marginBottom: "10px" }}>
-          {hasReading ? "Photo suggestions appear next to the fields below. Compare each one with your ticket." : reading?.current && reading.status === "success" ? "We couldn’t read the ticket details. Enter them from your ticket below." : "Check or complete the fields below using your ticket."}
+      <section aria-labelledby="visionReadingsTitle" className="card reading-slip" id="visionReadings">
+        <div className="section-head-row">
+          <div>
+            <p className="eyebrow">Step 1B · Unverified reading</p>
+            <h3 id="visionReadingsTitle">{hasReading ? "Check what we read" : "Check your ticket details"}</h3>
+          </div>
+          <span className={`status-pill ${hasReading ? "is-saved" : "is-neutral"}`}>
+            {hasReading ? "Suggestions ready" : "Manual check"}
+          </span>
+        </div>
+        {reading?.escalation === "completed" && (
+          <p className="status-banner is-attention" role="status">
+            Gemini independently checked borderline text. Any remaining uncertain or conflicting fields need your input. Agreement between models is not proof of accuracy.
+          </p>
+        )}
+        {reading?.escalation && ["unavailable", "budget_exhausted", "failed", "refused"].includes(reading.escalation) && (
+          <p className="status-banner is-attention" role="status">
+            The additional reading was unavailable or unusable. Enter the remaining facts yourself; no uncertain value has been filled in for you.
+          </p>
+        )}
+        <p className="muted small">
+          {hasReading
+            ? "Photo suggestions appear next to the fields below. Compare each character against your paper ticket."
+            : reading?.current && reading.status === "success"
+              ? "We couldn’t read the ticket details. Enter them from your ticket below."
+              : "Check or complete the fields below using your paper ticket."}
         </p>
-        {reading && reading.status !== "missing" && <details id="visionSuggestions" className="guide-notes"><summary>See all reading results</summary>
-        <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {literalEntries.map(({ field, value, state }) => (
-            <li key={field} data-vision-field={field} style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
-              <b className="small">{TICKET_LITERAL_LABELS[field]}</b>{" "}
-              {state === null ? (
-                <span className="muted small">No reading yet.</span>
-              ) : state === "shown" ? (
-                <span className="small">“{value}”</span>
-              ) : (
-                <span className="small">{state === "not_shown" ? "Not shown" : "Unreadable"}</span>
-              )}
-            </li>
-          ))}
-        </ul></details>}
+        {reading && reading.status !== "missing" && (
+          <details id="visionSuggestions" className="guide-notes">
+            <summary>See all reading results</summary>
+            <ul className="reading-results-list">
+              {literalEntries.map(({ field, value, state }) => (
+                <li key={field} data-vision-field={field}>
+                  <b className="small">{TICKET_LITERAL_LABELS[field]}</b>{" "}
+                  {state === null ? (
+                    <span className="muted small">No reading yet.</span>
+                  ) : state === "shown" ? (
+                    <span className="small mono">“{value}”</span>
+                  ) : (
+                    <span className="small muted">{state === "not_shown" ? "Not shown" : "Unreadable"}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </section>
 
-      <form ref={formRef} id="visionFactsForm" className="card" onSubmit={submit} noValidate aria-busy={busy}>
-        <h3 style={{ marginBottom: "6px" }}>Your ticket details</h3>
-        <p className="muted small" style={{ marginBottom: "10px" }}>Fill in anything missing. If a character is unclear, check the ticket or take a clearer photo.</p>
-        {telemetry.variant === "manual_guidance_v1" && <p id="manualReviewGuidance" className="small">
-          Compare one field at a time with your ticket. If a character is unclear, check a clearer photo before continuing. Your entries stay here if you need to correct a field.
-        </p>}
+      <form ref={formRef} id="visionFactsForm" className="card is-next-task" onSubmit={submit} noValidate aria-busy={busy}>
+        <div className="section-head-row">
+          <div>
+            <p className="eyebrow">Step 1C · Your ticket facts</p>
+            <h3>Your ticket details</h3>
+          </div>
+          <span className={`status-pill ${confirmed ? "is-saved" : "is-attention"}`}>
+            {confirmed ? "✓ Confirmed" : "Check all 3 groups"}
+          </span>
+        </div>
+        <p className="muted small">Fill in anything missing. O and zero matter—check unclear characters against the paper ticket.</p>
+        {telemetry.variant === "manual_guidance_v1" && (
+          <p id="manualReviewGuidance" className="small">
+            Compare one field at a time with your ticket. If a character is unclear, check a clearer photo before continuing. Your entries stay here if you need to correct a field.
+          </p>
+        )}
         <TicketFactCards>
           <div className="local-ids single">
             {textField("citation_number", "Citation number")}
@@ -188,10 +228,15 @@ export function TicketFactReview({
               {textField("issued_city", "City where the ticket was issued")}
               {textField("issued_state", "State where issued (two letters)")}
             </div>
-            <fieldset id="fact-issuer_kind" className="local-ids single" style={{ border: 0, padding: 0 }} aria-invalid={Boolean(errors["fact-issuer_kind"])} aria-describedby={errors["fact-issuer_kind"] ? "fact-issuer_kind-error" : undefined}>
-              <legend className="small" style={{ fontWeight: 750 }}>Who issued it?</legend>
+            <fieldset
+              id="fact-issuer_kind"
+              className="local-ids single choice-fieldset"
+              aria-invalid={Boolean(errors["fact-issuer_kind"])}
+              aria-describedby={errors["fact-issuer_kind"] ? "fact-issuer_kind-error" : undefined}
+            >
+              <legend className="small" style={{ fontWeight: 700 }}>Who issued it?</legend>
               {([["GOVERNMENT", "A city or public agency"], ["PRIVATE", "A private parking lot or company"]] as const).map(([value, label]) => (
-                <label key={value} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <label key={value} className={`tap-option ${draft.issuer_kind === value ? "is-selected" : ""}`}>
                   <input
                     type="radio"
                     name="fact-issuer_kind"
@@ -200,9 +245,8 @@ export function TicketFactReview({
                     checked={draft.issuer_kind === value}
                     disabled={locked || busy}
                     onChange={() => set("issuer_kind")(value)}
-                    style={{ width: "auto", minHeight: 0 }}
                   />
-                  {label}
+                  <span>{label}</span>
                 </label>
               ))}
               {errors["fact-issuer_kind"] && <span className="field-error" id="fact-issuer_kind-error">{errors["fact-issuer_kind"]}</span>}
@@ -221,89 +265,104 @@ export function TicketFactReview({
                   aria-describedby={errors["fact-issue_date"] ? "fact-issue_date-error" : undefined}
                   onChange={(event) => set("issue_date")(event.target.value)}
                 />
-                <span className="muted small">Printed on the ticket: {literalText(printed("issue_date"))}</span>
+                <span className="muted small mono-hint">Printed on the ticket: {literalText(printed("issue_date"))}</span>
                 {errors["fact-issue_date"] && <span className="field-error" id="fact-issue_date-error">{errors["fact-issue_date"]}</span>}
               </label>
               {textField("stage", "Stage printed on the ticket")}
             </div>
             <div className="local-ids single">
-              <label>
-                Notice date (calendar date)
-                <input
-                  id="fact-notice_date"
-                  type="date"
-                  value={draft.notice_date}
-                  disabled={locked || busy || draft.notice_date_absent}
-                  aria-invalid={Boolean(errors["fact-notice_date"])}
-                  aria-describedby={errors["fact-notice_date"] ? "fact-notice_date-error" : undefined}
-                  onChange={(event) => set("notice_date")(event.target.value)}
-                />
-                <span className="muted small">Printed on the ticket: {literalText(printed("notice_date"))}</span>
-                <span style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "4px" }}>
+              <div>
+                <label htmlFor="fact-notice_date">
+                  Notice date (calendar date)
+                  <input
+                    id="fact-notice_date"
+                    type="date"
+                    value={draft.notice_date}
+                    disabled={locked || busy || draft.notice_date_absent}
+                    aria-invalid={Boolean(errors["fact-notice_date"])}
+                    aria-describedby={errors["fact-notice_date"] ? "fact-notice_date-error" : undefined}
+                    onChange={(event) => set("notice_date")(event.target.value)}
+                  />
+                </label>
+                <span className="muted small mono-hint" style={{ display: "block", marginTop: "4px" }}>
+                  Printed on the ticket: {literalText(printed("notice_date"))}
+                </span>
+                <label className={`tap-option compact ${draft.notice_date_absent ? "is-selected" : ""}`} htmlFor="fact-notice_date-absent">
                   <input
                     id="fact-notice_date-absent"
                     type="checkbox"
                     checked={draft.notice_date_absent}
                     disabled={locked || busy}
                     onChange={(event) => changeDraft({ ...draft, notice_date_absent: event.target.checked, notice_date: event.target.checked ? "" : draft.notice_date })}
-                    style={{ width: "auto", minHeight: 0 }}
                   />
-                  This ticket does not print a notice date
-                </span>
+                  <span>This ticket does not print a notice date</span>
+                </label>
                 {errors["fact-notice_date"] && <span className="field-error" id="fact-notice_date-error">{errors["fact-notice_date"]}</span>}
-              </label>
-              <label>
-                Printed deadline (calendar date)
-                <input
-                  id="fact-printed_deadline"
-                  type="date"
-                  value={draft.printed_deadline}
-                  disabled={locked || busy || draft.printed_deadline_absent}
-                  aria-invalid={Boolean(errors["fact-printed_deadline"])}
-                  aria-describedby={errors["fact-printed_deadline"] ? "fact-printed_deadline-error" : undefined}
-                  onChange={(event) => set("printed_deadline")(event.target.value)}
-                />
-                <span className="muted small">Printed on the ticket: {literalText(printed("printed_deadline"))}</span>
-                <span style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "4px" }}>
+              </div>
+              <div>
+                <label htmlFor="fact-printed_deadline">
+                  Printed deadline (calendar date)
+                  <input
+                    id="fact-printed_deadline"
+                    type="date"
+                    value={draft.printed_deadline}
+                    disabled={locked || busy || draft.printed_deadline_absent}
+                    aria-invalid={Boolean(errors["fact-printed_deadline"])}
+                    aria-describedby={errors["fact-printed_deadline"] ? "fact-printed_deadline-error" : undefined}
+                    onChange={(event) => set("printed_deadline")(event.target.value)}
+                  />
+                </label>
+                <span className="muted small mono-hint" style={{ display: "block", marginTop: "4px" }}>
+                  Printed on the ticket: {literalText(printed("printed_deadline"))}
+                </span>
+                <label className={`tap-option compact ${draft.printed_deadline_absent ? "is-selected" : ""}`} htmlFor="fact-printed_deadline-absent">
                   <input
                     id="fact-printed_deadline-absent"
                     type="checkbox"
                     checked={draft.printed_deadline_absent}
                     disabled={locked || busy}
                     onChange={(event) => changeDraft({ ...draft, printed_deadline_absent: event.target.checked, printed_deadline: event.target.checked ? "" : draft.printed_deadline })}
-                    style={{ width: "auto", minHeight: 0 }}
                   />
-                  This ticket does not print a deadline
-                </span>
+                  <span>This ticket does not print a deadline</span>
+                </label>
                 {errors["fact-printed_deadline"] && <span className="field-error" id="fact-printed_deadline-error">{errors["fact-printed_deadline"]}</span>}
-              </label>
+              </div>
             </div>
           </div>
         </TicketFactCards>
         {Object.keys(errors).length > 0 && (
           <p className="err" role="alert">Check the marked facts above. Your entries are still here.</p>
         )}
-        <button className="btn btn-primary" type="submit" id="visionReviewBtn" disabled={locked || busy}>
-          {busy ? <><span className="spinner" /> Saving…</> : hasReading ? "Save facts and compare" : "Save my facts for confirmation"}
-        </button>
-        {hasReading && (
-          <button className="btn" type="submit" id="visionCustomerReviewBtn" disabled={locked || busy}>
-            Use my supplied facts without an AI comparison
+        <div className="stack" style={{ marginTop: "12px" }}>
+          <button className="btn btn-primary" type="submit" id="visionReviewBtn" disabled={locked || busy} style={{ width: "100%" }}>
+            {busy ? <><span className="spinner" /> Saving…</> : hasReading ? "Save facts and compare →" : "Save my facts for confirmation →"}
           </button>
-        )}
+          {hasReading && (
+            <button className="btn btn-ghost" type="submit" id="visionCustomerReviewBtn" disabled={locked || busy} style={{ width: "100%" }}>
+              Use my supplied facts without an AI comparison
+            </button>
+          )}
+        </div>
       </form>
 
       {review && (
-        <section className="card" id="visionReview" aria-labelledby="visionReviewTitle">
-          <p className="eyebrow">{customerOnly ? "Customer-supplied facts" : "Independent comparison"}</p>
-          <h3 id="visionReviewTitle" style={{ marginBottom: "6px" }}>{customerOnly ? "Check and confirm your supplied facts" : "What the comparison found"}</h3>
+        <section className={`card ${confirmed ? "is-saved-card" : "is-next-task"}`} id="visionReview" aria-labelledby="visionReviewTitle">
+          <div className="section-head-row">
+            <div>
+              <p className="eyebrow">{customerOnly ? "Step 1D · Customer-supplied facts" : "Step 1D · Independent comparison"}</p>
+              <h3 id="visionReviewTitle">{customerOnly ? "Check and confirm your supplied facts" : "What the comparison found"}</h3>
+            </div>
+            <span className={`status-pill ${confirmed ? "is-saved" : unresolved ? "is-attention" : "is-next"}`}>
+              {confirmed ? "✓ Confirmed" : unresolved ? "Needs resolution" : "Ready to confirm"}
+            </span>
+          </div>
           <p className="muted small" style={{ marginBottom: "10px" }}>
             {customerOnly
               ? "No AI comparison was performed. Confirm that the facts you entered are accurate. If an essential fact is still unknown, correct it before continuing."
               : "This is a model comparison only, not external verification. A match does not prove a fact. For every difference, choose your own resolution before confirming."}
           </p>
           {review.status !== "success" || !review.current ? (
-            <p className="small" role="status" id="visionReviewState">
+            <p className="status-banner is-attention" role="status" id="visionReviewState">
               {review.status === "refused"
                 ? "The comparison returned no usable result. You can use your supplied facts without an AI comparison using the button above."
                 : review.status === "pending" || review.status === "unknown"
@@ -319,14 +378,24 @@ export function TicketFactReview({
                   const expected = item.comparison === "match" ? null : resolutionForComparison(item.comparison);
                   const adoptedField = Object.entries(ADOPTED_TO_LITERAL).find(([, literal]) => literal === item.field)?.[0];
                   const adopted = adoptedField && draft ? adoptedValueForLiteral(draft as unknown as AdoptedFacts, item.field) : null;
+                  const resolvedNow = !expected || Boolean(resolutions[item.field]) || confirmed;
                   return (
-                    <div key={item.field} className="card" data-review-field={item.field} style={{ padding: "10px 12px", background: "var(--amber-soft, #fffdfa)" }}>
-                      <b className="small">{TICKET_LITERAL_LABELS[item.field]}</b>
-                      <p className="small" style={{ margin: "2px 0" }}>{COMPARISON_LABELS[item.comparison] ?? item.comparison}.</p>
-                      {item.visible_text && <p className="small">Visible on the ticket: “{item.visible_text}”</p>}
-                      <p className="small muted">Your fact: {adopted || "—"}</p>
+                    <div
+                      key={item.field}
+                      className={`review-field-card ${expected ? (resolvedNow ? "is-resolved" : "is-attention") : "is-match"}`}
+                      data-review-field={item.field}
+                    >
+                      <div className="section-head-row">
+                        <b className="small">{TICKET_LITERAL_LABELS[item.field]}</b>
+                        <span className={`bdg ${expected ? (resolvedNow ? "s-ok" : "t-imp") : "s-ok"}`}>
+                          {expected ? (resolvedNow ? "Resolved" : "Needs choice") : "Match"}
+                        </span>
+                      </div>
+                      <p className="small" style={{ margin: "4px 0" }}>{COMPARISON_LABELS[item.comparison] ?? item.comparison}.</p>
+                      {item.visible_text && <p className="small mono">Visible on the ticket: “{item.visible_text}”</p>}
+                      <p className="small muted">Your fact: <strong style={{ color: "var(--ink)" }}>{adopted || "—"}</strong></p>
                       {expected && !confirmed && (
-                        <label className="small" style={{ display: "block", marginTop: "6px" }}>
+                        <label className="small review-select-label">
                           Your resolution for this field
                           <select
                             id={`resolve-${item.field}`}
@@ -347,32 +416,48 @@ export function TicketFactReview({
                   );
                 })}
               </div>
-              {review.basis && <p className="muted small">{review.basis}</p>}
+              {review.basis && <p className="muted small" style={{ marginTop: "8px" }}>{review.basis}</p>}
               {!confirmed && (
                 <>
-                  <p className="small" id="ticketAccuracyWarning">
-                    OCR can misread a character even when its confidence is high. Check every fact
-                    against your ticket and correct anything above before continuing. A model’s
-                    confidence estimate is not a guarantee of accuracy.
+                  <p className="small status-banner is-attention" id="ticketAccuracyWarning" style={{ marginTop: "12px" }}>
+                    <Icon id="shield" size={16} />
+                    <span>
+                      OCR can misread a character even when its confidence is high. Check every fact against your ticket and correct anything above before continuing. A model’s confidence estimate is not a guarantee of accuracy.
+                    </span>
                   </p>
                   <CustomerChoiceNotice onOpenRules={onOpenRules} />
-                  <label className="packet-inspect">
-                    <input id="visionAccuracyAcknowledged" type="checkbox"
-                      checked={accuracyAcknowledged} disabled={locked || busy || dirty}
-                      onChange={event => setAcknowledgedFor(event.target.checked ? reviewKey : null)} />
-                    I have checked every ticket fact, corrected any mistakes, and confirm that
-                    the information I am submitting is accurate.
+                  <label className={`packet-inspect ${accuracyAcknowledged ? "is-checked" : ""}`}>
+                    <input
+                      id="visionAccuracyAcknowledged"
+                      type="checkbox"
+                      checked={accuracyAcknowledged}
+                      disabled={locked || busy || dirty}
+                      onChange={event => setAcknowledgedFor(event.target.checked ? reviewKey : null)}
+                    />
+                    <span>
+                      I have checked every ticket fact, corrected any mistakes, and confirm that the information I am submitting is accurate.
+                    </span>
                   </label>
+                  {unresolved && hasReview && (
+                    <p className="status-banner is-attention" role="status">
+                      Resolve every comparison above before confirming.
+                    </p>
+                  )}
                   <button
                     className="btn btn-primary"
                     type="button"
                     id="visionConfirmBtn"
+                    style={{ width: "100%", marginTop: "10px" }}
                     disabled={locked || busy || dirty || unresolved || !hasReview || !accuracyAcknowledged}
-                    onClick={() => { if (accuracyAcknowledged && !dirty) { telemetry.observe("confirm_attempt", "submitted_to_server"); onConfirm(); } }}
+                    onClick={() => {
+                      if (accuracyAcknowledged && !dirty) {
+                        telemetry.observe("confirm_attempt", "submitted_to_server");
+                        onConfirm();
+                      }
+                    }}
                   >
-                    {busy ? <><span className="spinner" /> Confirming…</> : "Confirm these ticket facts"}
+                    {busy ? <><span className="spinner" /> Confirming…</> : "Confirm these ticket facts →"}
                   </button>
-                  {unresolved && hasReview && <p className="muted small" role="status">Resolve every comparison above before confirming.</p>}
                 </>
               )}
             </>

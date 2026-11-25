@@ -41,8 +41,8 @@ export function ExactPacketPages({ url }: { url: string }) {
       try {
         const pdfPage = await pdf.getPage(page);
         if (!active) return;
-        const width = target.parentElement?.clientWidth || 360;
-        const pixels = Math.min(1200, width * Math.min(window.devicePixelRatio, 2));
+        const width = target.parentElement?.clientWidth || 440;
+        const pixels = Math.min(1600, width * Math.max(window.devicePixelRatio || 1, 2));
         const scale = pixels / pdfPage.getViewport({ scale: 1 }).width;
         const viewport = pdfPage.getViewport({ scale });
         target.width = Math.ceil(viewport.width);
@@ -60,17 +60,45 @@ export function ExactPacketPages({ url }: { url: string }) {
     };
   }, [pdf, page]);
 
-  if (unavailable) return <p className="small" role="status">Download the exact PDF to review it. The in-page preview couldn’t open.</p>;
+  if (unavailable) {
+    return (
+      <p className="status-banner is-attention" role="status">
+        Download the exact PDF above to review it. The in-page preview couldn’t open.
+      </p>
+    );
+  }
 
   return (
     <div className="exact-packet-pages">
       <div className="packet-page-controls">
-        <button type="button" className="chip" onClick={() => setPage(page - 1)} disabled={!pageIsReady || page === 1}>Previous page</button>
-        <span className="small" role="status">{pdf ? `Page ${page} of ${pdf.numPages}` : "Loading pages…"}</span>
-        <button type="button" className="chip" onClick={() => setPage(page + 1)} disabled={!pageIsReady || !pdf || page === pdf.numPages}>Next page</button>
+        <button
+          type="button"
+          className="chip"
+          onClick={() => setPage(page - 1)}
+          disabled={!pageIsReady || page === 1}
+        >
+          ← Previous page
+        </button>
+        <span className="packet-page-indicator mono" role="status">
+          {pdf ? `Page ${page} of ${pdf.numPages}` : "Loading pages…"}
+        </span>
+        <button
+          type="button"
+          className="chip"
+          onClick={() => setPage(page + 1)}
+          disabled={!pageIsReady || !pdf || page === pdf.numPages}
+        >
+          Next page →
+        </button>
       </div>
-      <div className="packet-page" aria-busy={!pageIsReady}>
-        <canvas ref={canvas} id="livePacketPage" hidden={!pageIsReady} role="img" aria-label={`Exact PDF, page ${page}`} />
+      <div className="packet-page-mat" aria-busy={!pageIsReady}>
+        <canvas
+          ref={canvas}
+          id="livePacketPage"
+          hidden={!pageIsReady}
+          role="img"
+          aria-label={`Exact PDF, page ${page}`}
+        />
       </div>
     </div>
   );

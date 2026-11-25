@@ -6,6 +6,7 @@ import { formatSupportCaseId } from "../lib/support-case-id";
 import React, { useEffect } from "react";
 import { ConciergeMark } from "./ConciergeMark";
 import { SupportCaseIdCard } from "./SupportCaseIdCard";
+import { Icon } from "./Icons";
 
 interface Step5WindowProps {
   live?: boolean;
@@ -50,7 +51,7 @@ export function Step5Window({
 
   useEffect(() => {
     setActionBar(
-      live && (!timerEnd || lapsed) ? "Checking the saved review-window status" : "Your review window is running",
+      live && (!timerEnd || lapsed) ? "Checking the saved review-window status" : "Saved · Your review window is running",
       <button
         className="btn btn-primary"
         type="button"
@@ -66,9 +67,9 @@ export function Step5Window({
   return (
     <section className="screen on" id="s5" aria-labelledby="h-s5">
       <div className="voice">
-        <ConciergeMark size={44} state="idle" />
+        <ConciergeMark size={44} state="done" />
         <div>
-          <p className="eyebrow">Your review window</p>
+          <p className="eyebrow">Step 3 · Review window</p>
           <h2 id="h-s5" tabIndex={-1}>
             {free ? "Free beta accepted. Take your time with the letter." : "Card authorized. Take your time with the letter."}
           </h2>
@@ -84,7 +85,13 @@ export function Step5Window({
 
       {displayCaseId && <SupportCaseIdCard caseId={displayCaseId} />}
 
-      <div className="card">
+      <div className="card is-next-task">
+        <div className="section-head-row" style={{ marginBottom: "8px" }}>
+          <span className={`status-pill ${lapsed || isWarn ? "is-attention" : "is-saved"}`}>
+            <Icon id="check" size={12} /> {lapsed ? "Window ended" : isWarn ? "5 minutes or less" : "Active review window"}
+          </span>
+          <span className="muted small mono">{tierName}</span>
+        </div>
         <p className={`window-time ${isWarn ? "warn" : ""}`} id="ring">
           <b id="ringT">{ringText}</b>
           <span>left to review and approve</span>
@@ -104,21 +111,27 @@ export function Step5Window({
           <li>
             <span className="n">3</span>
             <span>
-              {free ? <>If the window closes, <b>nothing is charged</b>, your work stays saved, and we check the saved status.</> : live ? "If the window closes, we check the saved payment and mailing status. Your work stays saved." : <>If the window closes, the hold is released, <b>nothing is charged</b>, and all your work stays saved.</>}
+              {free
+                ? <>If the window closes, <b>nothing is charged</b>, your work stays saved, and we check the saved status.</>
+                : live
+                  ? "If the window closes, we check the saved payment and mailing status. Your work stays saved."
+                  : <>If the window closes, the hold is released, <b>nothing is charged</b>, and all your work stays saved.</>}
             </span>
           </li>
         </ul>
-        {!live && <div className="demo">
-          <p className="dl2">Prototype controls</p>
-          <div className="row">
-            <button className="chip" type="button" id="demoWarn" onClick={onDemoWarn}>
-              Jump to 5-minute warning
-            </button>
-            <button className="chip" type="button" id="demoLapse" onClick={onDemoLapse}>
-              Let window lapse
-            </button>
+        {!live && (
+          <div className="demo">
+            <p className="dl2">Prototype controls</p>
+            <div className="row">
+              <button className="chip" type="button" id="demoWarn" onClick={onDemoWarn}>
+                Jump to 5-minute warning
+              </button>
+              <button className="chip" type="button" id="demoLapse" onClick={onDemoLapse}>
+                Let window lapse
+              </button>
+            </div>
           </div>
-        </div>}
+        )}
       </div>
     </section>
   );

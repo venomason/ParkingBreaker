@@ -11,11 +11,22 @@ export function ActionBar({ subText, children }: ActionBarProps) {
   const bar = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const element = bar.current;
-    if (!element) { document.documentElement.style.setProperty("--action-h", "0px"); return; }
-    const observer = new ResizeObserver(() => document.documentElement.style.setProperty("--action-h", `${element.getBoundingClientRect().height}px`));
+    if (!element) {
+      document.documentElement.style.setProperty("--action-h", "0px");
+      return;
+    }
+    const sync = () => {
+      document.documentElement.style.setProperty("--action-h", `${Math.ceil(element.getBoundingClientRect().height + 16)}px`);
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
     observer.observe(element);
-    return () => observer.disconnect();
-  }, [children]);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.setProperty("--action-h", "0px");
+    };
+  }, [children, subText]);
+
   if (!children) return null;
 
   return (

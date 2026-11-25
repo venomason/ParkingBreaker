@@ -30,9 +30,10 @@ for (const phase of ["paid", "controlled_free_beta"] as const) {
       await visitor(page, phase);
       await page.goto("/");
       await expect(page.locator("#actSnap")).toBeVisible();
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("As soon as you spot a ticket, start taking photos.");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Appeal your parking ticket in your own words.");
+      await expect(page.locator("#intake-title")).toHaveText("As soon as you spot a ticket, start taking photos.");
       await expect(page.locator(".workflow-list > li")).toHaveCount(6);
-      await expect(page.locator(".intake-trust")).toContainText("Delivery is not guaranteed");
+      await expect(page.locator(".intake-trust")).toContainText("delivery guarantee");
       await expect(page.locator(".intake-trust")).toContainText("without evaluating the merits");
       await expect(page.locator(".desk-aside")).toHaveCount(0);
       if (phase === "paid") await expect(page.getByLabel("Assigned certified mailing price")).toContainText("$24.99");
@@ -45,9 +46,13 @@ for (const phase of ["paid", "controlled_free_beta"] as const) {
       const intro = (await page.locator(".intake-introduction").boundingBox())!;
       const intake = (await page.locator("#s1").boundingBox())!;
       const workflow = (await page.locator(".intake-support").boundingBox())!;
-      expect(workflow.y).toBeGreaterThanOrEqual(intake.y + intake.height);
-      if (width >= 1024) expect(intro.x + intro.width).toBeLessThan(intake.x);
-      else expect(intro.y + intro.height).toBeLessThanOrEqual(intake.y);
+      if (width >= 1024) {
+        expect(intro.x + intro.width).toBeLessThan(intake.x);
+        expect(workflow.y).toBeGreaterThanOrEqual(intake.y + intake.height);
+      } else {
+        expect(intake.y + intake.height).toBeLessThanOrEqual(intro.y);
+        expect(workflow.y).toBeGreaterThanOrEqual(intro.y + intro.height);
+      }
       await page.locator("#actSnap").focus();
       await page.keyboard.press("Shift+Tab");
       await page.keyboard.press("Tab");
@@ -95,8 +100,8 @@ test("the five photo illustrations use the owner's exact statement and keep tick
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const intro = page.locator(".intake-introduction");
-  await expect(intro.locator("h1")).toHaveText("As soon as you spot a ticket, start taking photos.");
-  await expect(intro.locator("p")).toHaveText("Get both sides of the ticket and photos of the area around your car. You can review them later and choose which ones accurately support what you’re saying.");
+  await expect(intro.locator("#intake-title")).toHaveText("As soon as you spot a ticket, start taking photos.");
+  await expect(intro.locator(".curbside-intro")).toHaveText("Get both sides of the ticket and photos of the area around your car. You can review them later and choose which ones accurately support what you’re saying.");
   const pictures = intro.getByRole("img");
   await expect(pictures).toHaveCount(5);
   await expect(intro.locator("figcaption")).toHaveCount(0);
@@ -106,6 +111,7 @@ test("the five photo illustrations use the owner's exact statement and keep tick
   const next = intro.getByRole("button", { name: "Next illustration" });
   const previous = intro.getByRole("button", { name: "Previous illustration" });
   await expect(previous).toBeDisabled();
+  await intro.scrollIntoViewIfNeeded();
   for (const index of [0, 1, 2, 3, 4]) {
     if (index > 0) await next.click();
     await expect(intro.getByRole("status")).toHaveText(`Illustration ${index + 1} of 5`);

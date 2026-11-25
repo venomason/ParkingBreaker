@@ -25,23 +25,9 @@ export function Step8Stop({
 }: Step8StopProps) {
   useEffect(() => {
     if (liveStop) {
-      setActionBar(
-        "Stopped safely · Nothing was charged",
-        onEditDetails || onStartNew ? (
-          <>
-            {onStartNew && (
-              <button className="btn btn-ghost" type="button" id="actStopStartNew" onClick={onStartNew}>
-                Start a new appeal
-              </button>
-            )}
-            {onEditDetails && (
-              <button className="btn btn-primary" type="button" id="actStopEditDetails" onClick={onEditDetails}>
-                Update my details
-              </button>
-            )}
-          </>
-        ) : null
-      );
+      // Live stop renders its primary recovery controls directly inside the card so
+      // they never duplicate right above a floating bar on small screens.
+      setActionBar(null, null);
       return;
     }
     setActionBar(
@@ -65,7 +51,7 @@ export function Step8Stop({
         </button>
       </>
     );
-  }, [onCopyNotes, onOpenAgencyForm, onEditDetails, onStartNew, setActionBar, liveStop]);
+  }, [onCopyNotes, onOpenAgencyForm, setActionBar, liveStop]);
 
   if (liveStop) {
     return (
@@ -73,17 +59,29 @@ export function Step8Stop({
         <div className="voice">
           <ConciergeMark size={44} state="calm" />
           <div>
-            <p className="eyebrow">A plain stop</p>
+            <p className="eyebrow">Safe stop · No charge</p>
             <h2 id="h-s8" tabIndex={-1}>
               We need to stop here. Nothing was charged.
             </h2>
             <p className="lead" id="liveStopMessage">{liveStop.message}</p>
-            {liveStop.officialUrl?.startsWith("https://") && <p><a href={liveStop.officialUrl} target="_blank" rel="noopener noreferrer">Open the issuer&#39;s official site</a></p>}
+          </div>
+        </div>
+
+        {(liveStop.officialUrl?.startsWith("https://") || onEditDetails || onStartNew) && (
+          <div className="card is-next-task" style={{ marginBottom: "14px" }}>
+            <p className="eyebrow">What you can do next</p>
+            {liveStop.officialUrl?.startsWith("https://") && (
+              <p style={{ marginBottom: "12px" }}>
+                <a className="chip" href={liveStop.officialUrl} target="_blank" rel="noopener noreferrer">
+                  <Icon id="globe" size={14} /> Open the issuer&#39;s official site
+                </a>
+              </p>
+            )}
             {(onEditDetails || onStartNew) && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "12px" }}>
+              <div className="row" style={{ gap: "10px" }}>
                 {onEditDetails && (
                   <button className="btn btn-primary" type="button" id="liveStopEditDetails" onClick={onEditDetails}>
-                    Update my details
+                    Update my details →
                   </button>
                 )}
                 {onStartNew && (
@@ -94,10 +92,24 @@ export function Step8Stop({
               </div>
             )}
           </div>
-        </div>
-        {liveStop.savedWords && <div className="card state-card"><h3>Your saved words</h3><p className="small">Your work remains available. You can copy it for your own records.</p><textarea aria-label="Saved account or letter" value={liveStop.savedWords} readOnly /><button className="btn btn-ghost" type="button" onClick={onCopyNotes}>Copy saved words</button></div>}
+        )}
+
+        {liveStop.savedWords && (
+          <div className="card state-card is-saved-card">
+            <div className="section-head-row">
+              <h3>Your saved words</h3>
+              <span className="status-pill is-saved"><Icon id="check" size={12} /> Saved</span>
+            </div>
+            <p className="small muted">Your work remains available. You can copy it for your own records or the agency’s form.</p>
+            <textarea className="saved-words-textarea" aria-label="Saved account or letter" value={liveStop.savedWords} readOnly />
+            <button className="btn btn-ghost" type="button" onClick={onCopyNotes}>
+              Copy saved words
+            </button>
+          </div>
+        )}
+
         {liveStop.officialQuote && (
-          <div className="card">
+          <div className="card" style={{ marginTop: "14px" }}>
             <p className="eyebrow" style={{ color: "var(--ink-3)" }}>Their exact words</p>
             <div className="qline"><q>{liveStop.officialQuote}</q></div>
           </div>
