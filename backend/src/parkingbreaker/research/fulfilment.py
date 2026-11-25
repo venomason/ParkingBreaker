@@ -44,13 +44,17 @@ if TYPE_CHECKING:
 # Closed mappings: an unfamiliar non-narrative field is an S3 gap, never guessed.
 FORM_FIELDS = {
     "citation number": "citation_number",
+    "citationno": "citation_number",
+    "parking ticket number": "citation_number",
     "plate": "plate",
     "license plate": "plate",
+    "license plate number": "plate",
     "name": "customer_name",
     "phone": "customer_phone",
     "email": "customer_email",
     "address": "customer_address",
     "issue date": "issue_date",
+    "citation issue date": "issue_date",
     "violation code": "violation_code",
 }
 NARRATIVE_FIELDS = frozenset({"explanation", "reason for contest"})
@@ -597,7 +601,7 @@ def _physical_item(item: str) -> bool:
         re.search(
             r"\b(?:SASE|self[ -]addressed(?:[ -]stamped)? envelope|"
             r"(?:return|send|enclose|include|provide) (?:the |an? |your )?original|"
-            r"original (?:ticket|citation|document))\b",
+            r"original (?:(?:parking )?(?:ticket|citation)|document))\b",
             item,
             re.I,
         )
@@ -681,7 +685,17 @@ def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
     ):
         return False
     if _physical_item(item):
-        return True
+        # An inventory that omits an explicit copy alternative cannot prove that
+        # the driver must surrender the original. Leave that requirement unresolved.
+        return not (
+            re.search(r"\boriginal (?:parking )?(?:ticket|citation)\b", item, re.I)
+            and re.search(
+                r"\boriginal (?:parking )?(?:ticket|citation)\s+or\s+"
+                r"(?:(?:provide|include|send) )?(?:a )?(?:legible |clear )?copy\b",
+                scoped_quote,
+                re.I,
+            )
+        )
     if _identifier_requirement_kind(key, item, scoped_quote) is not None:
         return True
     if key is FactKey.CONTEST_ELIGIBILITY:

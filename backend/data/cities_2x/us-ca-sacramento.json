@@ -6,13 +6,12 @@
   "accepts_mail_appeals": true,
   "timezone": "America/Los_Angeles",
   "online_appeal_available": true,
-  "online_appeal_url": "https://www.cityofsacramento.gov/public-works/parking-services/parking-enforcement/parking-citations",
-  "local_rules": "21-day window for Level 1 Review. Postmarks accepted. Verify if the 'Issuing Agency' is City vs. County Sheriff (Sheriff tickets use a different address).",
+  "online_appeal_url": "https://www.cityofsacramento.gov/public-works/parking/citation-services",
+  "local_rules": "The City instructs drivers to contest within 21 calendar days from citation issuance. Check the issuing agency on the ticket.",
   "appeal_deadline_days": 21,
   "appeal_mail_address": {
     "status": "complete",
     "department": "Revenue Division",
-    "attention": "Citation Contest",
     "address1": "915 I Street",
     "address2": "Room 1214",
     "city": "Sacramento",
@@ -28,14 +27,14 @@
     "phone_number_examples": null
   },
   "verification_metadata": {
-    "last_updated": "2026-05-11",
+    "last_updated": "2026-11-24",
     "source": "master_registry_manifest",
     "confidence_score": 0.95,
-    "notes": "Updated from master registry manifest. Address: Revenue Division, Citation Contest, 915 I Street, Room 1214, Sacramento, CA 95814. URL: cityofsacramento.gov/public-works/parking-services/parking-enforcement/parking-citations. 21-day window for Level 1 Review. Postmarks accepted. City vs. County Sheriff tickets use different addresses.",
+    "notes": "City citation services lists the Revenue Division for contests and a separate Revenue Services payment box.",
     "verified_by": "master_registry_manifest",
     "last_verified": "2026-05-11",
     "verified_date": null,
-    "last_change": null
+    "last_change": "Refreshed contest and instruction URLs."
   },
   "routing_rule": "direct",
   "sections": {
@@ -49,7 +48,7 @@
       },
       "special_requirements": {
         "requires_poa": false,
-        "notes": "21-day Level 1 Review window. Postmarks accepted. Sheriff tickets use different address."
+        "notes": "Check the city contest instructions for the required identifiers and evidence."
       }
     }
   },
@@ -67,17 +66,17 @@
   },
   "letter_format": "free_form",
   "human_verified": true,
-  "confirmation_note": "21-day window for Level 1 Review. Postmarks accepted. Verify if the 'Issuing Agency' is City vs. County Sheriff (Sheriff tickets use a different address).",
+  "confirmation_note": "The City lists a 21-day contest window. Check the filing deadline and the issuing agency on your ticket.",
   "service_types": {
     "express": true,
     "appeal_kit": true
   },
   "mail_acceptance_policy": {
-    "basis": "official_address_with_inferred_mail_acceptance",
-    "official_source_url": "https://www.cityofsacramento.gov/public-works/parking-services/parking-enforcement/parking-citations",
-    "official_excerpt": "Official Sacramento city of Sacramento (Revenue Division) — address verified via https://www.cityofsacramento.gov/public-works/parking-services/parking-enforcement/parking-citations",
-    "verified_at": "2026-05-11",
-    "verified_by": "manual_official_source_review",
+    "basis": "explicit_official_text",
+    "official_source_url": "https://www.cityofsacramento.gov/public-works/parking/contact-parking-services/parking-enforcement",
+    "official_excerpt": "Submitting a contest by mail or email Please ensure the following are included in the letter or email:",
+    "verified_at": "2026-11-24",
+    "verified_by": "official_source_review",
     "verification_method": "official_city_source_review"
   },
   "launch_ethics_signal": "GREEN"

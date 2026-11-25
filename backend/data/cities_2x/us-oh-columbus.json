@@ -6,13 +6,12 @@
   "accepts_mail_appeals": true,
   "timezone": "America/New_York",
   "online_appeal_available": true,
-  "online_appeal_url": "https://www.columbus.gov/Services/Parking-Street-Services/Mobility-Parking-Services/Pay-a-Ticket",
-  "local_rules": "All citation hearings and reviews are now centralized at the Impound Lot Road facility. 15-day window remains strict.",
-  "appeal_deadline_days": 15,
+  "online_appeal_url": "https://www.columbus.gov/Services/Parking-Street-Services/Mobility-Parking-Services/Contest-a-Ticket",
+  "local_rules": "Mail is offered if the driver cannot submit online. A written hearing waives the in-person or virtual hearing.",
+  "appeal_deadline_days": null,
   "appeal_mail_address": {
     "status": "complete",
-    "department": "Division of Parking Services",
-    "attention": "Appeal Clerk",
+    "department": "Division of Mobility & Parking Services",
     "address1": "2700 Impound Lot Road",
     "address2": "",
     "city": "Columbus",
@@ -28,14 +27,14 @@
     "phone_number_examples": null
   },
   "verification_metadata": {
-    "last_updated": "2026-05-11",
+    "last_updated": "2026-11-24",
     "source": "master_registry_manifest",
     "confidence_score": 0.95,
-    "notes": "Address updated per master registry manifest: Division of Parking Services, Appeal Clerk, 2700 Impound Lot Road, Columbus, OH 43207. URL updated to columbus.gov/Services/Parking-Services. All citation hearings and reviews now centralized at Impound Lot Road facility. 15-day window remains strict.",
+    "notes": "The contest page distinguishes the late penalty from the court appeal period following a judgment.",
     "verified_by": "master_registry_manifest",
     "last_verified": "2026-05-11",
     "verified_date": null,
-    "last_change": null
+    "last_change": "Replaced payment and directory URLs and removed the later-stage 15-day deadline from the initial-stage field."
   },
   "routing_rule": "direct",
   "sections": {
@@ -49,7 +48,7 @@
       },
       "special_requirements": {
         "requires_poa": false,
-        "notes": "All citation hearings and reviews centralized at Impound Lot Road facility. 15-day window remains strict."
+        "notes": "Mail is offered if the driver cannot submit online. A written hearing waives the in-person or virtual hearing."
       }
     }
   },
@@ -67,17 +66,17 @@
   },
   "letter_format": "free_form",
   "human_verified": true,
-  "confirmation_note": "Updated May 2026. All citation hearings and reviews are now centralized at the Impound Lot Road facility. 15-day window remains strict.",
+  "confirmation_note": "The City describes a penalty after 30 days. The 15-day court appeal period starts after a hearing judgment.",
   "service_types": {
     "certified_express": true,
     "appeal_kit": true
   },
   "mail_acceptance_policy": {
-    "basis": "official_address_with_inferred_mail_acceptance",
-    "official_source_url": "https://www.columbus.gov/Services/Parking-Services",
-    "official_excerpt": "Official Columbus city of Columbus (Division of Parking Services) — address verified via https://www.columbus.gov/Services/Parking-Services",
-    "verified_at": "2026-05-11",
-    "verified_by": "manual_official_source_review",
+    "basis": "conditional_official_text",
+    "official_source_url": "https://www.columbus.gov/Services/Parking-Street-Services/Mobility-Parking-Services/Contest-a-Ticket",
+    "official_excerpt": "If you are unable to submit an appeal online, you may do it by mail, or in-person during business hours at:",
+    "verified_at": "2026-11-24",
+    "verified_by": "official_source_review",
     "verification_method": "official_city_source_review"
   },
   "launch_ethics_signal": "YELLOW"

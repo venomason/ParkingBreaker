@@ -6,11 +6,11 @@
   "accepts_mail_appeals": true,
   "timezone": "America/Chicago",
   "online_appeal_available": true,
-  "online_appeal_url": "https://www.chicago.gov/city/en/depts/fin/supp_info/revenue_and_billing/parking_ticket_payment_options.html",
-  "local_rules": "The Department of Finance (DOF) handles parking ticket appeals in Chicago. Both online contest and mail-in hearing request options are available. Online portal found at chicago.gov parking ticket payment options page which includes dispute/contest links.",
-  "appeal_deadline_days": 30,
+  "online_appeal_url": "https://parkingtickets.chicago.gov/EHearingWeb/FrequentlyAskedQuestions",
+  "local_rules": "The Department of Finance describes correspondence hearings and separate windows for a new ticket and a Notice of Violation.",
+  "appeal_deadline_days": 7,
   "appeal_mail_address": {
-    "status": "complete",
+    "status": "unverified",
     "department": "City of Chicago Department of Administrative Hearings",
     "attention": "Parking Division",
     "address1": "333 South State Street",
@@ -28,13 +28,13 @@
     "phone_number_examples": null
   },
   "verification_metadata": {
-    "last_updated": "2025-01-15",
+    "last_updated": "2026-11-24",
     "source": "verification_of_prior_step_url",
     "confidence_score": 0.48,
-    "notes": "URL is on official .gov domain (chicago.gov) but path contains \"payment_options\" suggesting payment functionality, not contest/dispute. Cannot confirm from URL structure alone that this page supports contesting.",
+    "notes": "The official eHearing FAQ distinguishes the issuance window from the later notice window. It describes correspondence hearings without establishing a mailing address.",
     "verified_by": "minimax_research",
     "verified_date": null,
-    "last_change": null
+    "last_change": "Replaced the payment-page lead and corrected the initial window."
   },
   "routing_rule": "direct",
   "sections": {
@@ -66,7 +66,7 @@
   },
   "letter_format": "free_form",
   "human_verified": true,
-  "confirmation_note": "Chicago, IL allows 30 days to contest. Mark your calendar — missing this window means you lose the right to appeal. Chicago, IL offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "confirmation_note": "The City gives you 7 days from issuance to contest. A later Notice of Violation gives you 21 days to request a hearing. Check which document you received.",
   "service_types": {
     "express": true,
     "appeal_kit": true

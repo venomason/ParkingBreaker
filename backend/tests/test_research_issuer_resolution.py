@@ -86,7 +86,11 @@ class Harness:
     link: FakeLlmClient
 
     def run(
-        self, budget: int = 25, max_candidates: int = 3, max_pages: int = 3
+        self,
+        budget: int = 25,
+        max_candidates: int = 3,
+        max_pages: int = 3,
+        leads: tuple[str, ...] = (),
     ) -> IssuerResolutionRun:
         return resolve_ticket_issuer(
             self.query,
@@ -101,6 +105,7 @@ class Harness:
             budget,
             max_candidates,
             max_pages,
+            candidate_urls=leads,
         )
 
 
@@ -609,3 +614,28 @@ def test_invalid_limits_rejected_before_external_calls(
         harness.run(budget, max_candidates, max_pages)
     assert harness.fetcher.calls == []
     assert harness.issuer.calls == harness.link.calls == []
+
+
+def test_curated_lead_recovers_only_on_the_registry_candidate_host(harness: Harness) -> None:
+    harness.searcher = None
+    harness.fetcher = FakeFetcher(
+        {
+            ROOT: redirect_response(ROOT, "https://www.sfmta.com/"),
+            CONTEST: html_response(CONTEST, HTML),
+        }
+    )
+    result = harness.run(leads=("https://www.sfmta.com/", CONTEST, CONTEST))
+    assert harness.fetcher.calls == [ROOT, CONTEST]
+    assert result.agency is not None
+    assert result.agency.official_domains == ("sfmta.gov",)
+    assert [page.final_url for page in result.pages] == [CONTEST]
+
+
+def test_legacy_leads_do_not_displace_current_search_evidence(harness: Harness) -> None:
+    harness.searcher = FakeSearcher(lambda _: (SearchHit(CONTEST),))
+    harness.fetcher = FakeFetcher(
+        {url: html_response(url, HTML) for url in (ROOT, ROOT + "legacy", CONTEST)}
+    )
+    result = harness.run(max_pages=2, leads=(ROOT + "legacy",))
+    assert result.agency is not None
+    assert harness.fetcher.calls == [ROOT, CONTEST]

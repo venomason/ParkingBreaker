@@ -55,6 +55,7 @@ class PreholdDeps:
     budget_cents: int
     state_basis: Mapping[str, StateBasis]
     controls: Sequence[ServiceControlEntry]
+    candidate_urls: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -97,6 +98,7 @@ def run_prehold(
                     deps.link_assessor,
                     deps.clock,
                     budget_cents=deps.budget_cents,
+                    candidate_urls=deps.candidate_urls,
                 )
             except PROVIDER_ERRORS as exc:
                 error = exc

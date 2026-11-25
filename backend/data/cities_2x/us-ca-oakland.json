@@ -6,14 +6,13 @@
   "accepts_mail_appeals": true,
   "timezone": "America/Los_Angeles",
   "online_appeal_available": true,
-  "online_appeal_url": "https://www.oaklandca.gov/Public-Safety-Streets/Parking-Vehicles/Parking-Tickets/Challenge",
-  "local_rules": "City of Oakland Parking Services handles parking citation appeals; online portal and mail options available. Appealed citations go through the City of Oakland Administrative Hearings process.",
+  "online_appeal_url": "https://www.oaklandca.gov/Public-Safety-Streets/Parking-Vehicles/Parking-Tickets/Challenge-a-Parking-Ticket",
+  "local_rules": "For a mailed challenge the City asks for the contest form or a letter, the original parking ticket and supporting documents.",
   "appeal_deadline_days": 21,
   "appeal_mail_address": {
     "status": "complete",
-    "department": "Oakland Department of Transportation (Oakland Parking Enforcement)",
-    "attention": "Citation Processing / Dispute Unit",
-    "address1": "P.O. Box 7023",
+    "department": "Parking and Mobility Assistance Center",
+    "address1": "270 Frank H. Ogawa Plaza",
     "address2": null,
     "city": "Oakland",
     "state": "CA",
@@ -28,13 +27,13 @@
     "phone_number_examples": null
   },
   "verification_metadata": {
-    "last_updated": "2025-01-17",
+    "last_updated": "2026-11-24",
     "source": "prior_step_locked",
     "confidence_score": 0.82,
-    "notes": "URL confirmed on official .gov domain. Path explicitly references appeals-and-hearings, indicating dispute functionality rather than payment-only. No mail address conflict identified in this verification step — locked address from prior step remains primary.",
+    "notes": "The challenge page names the receiving office and requires the original parking ticket.",
     "verified_by": "minimax_research",
     "verified_date": null,
-    "last_change": null
+    "last_change": "Replaced the legacy box and linked the current challenge instructions."
   },
   "routing_rule": "direct",
   "sections": {
@@ -48,7 +47,7 @@
       },
       "special_requirements": {
         "requires_poa": false,
-        "notes": "Appeals submitted via online portal or by mail to the Administrative Hearings office"
+        "notes": "Consult the current challenge instructions for the first-stage receiving office."
       }
     }
   },
@@ -59,14 +58,16 @@
   "special_requirements": {
     "forbidden_phrases": [],
     "required_phrases": [],
-    "required_attachments": [],
+    "required_attachments": [
+      "original parking ticket"
+    ],
     "mailing_instructions": null,
     "timing_rules": null,
     "required_references": [],
     "notes": null
   },
   "human_verified": true,
-  "confirmation_note": "Oakland gives you 21 days from the notice to contest. After that, the city may add late fees or automatically enter a default judgment. Oakland offers an online dispute portal. You can check the official city site for the most up-to-date contest instructions before mailing.",
+  "confirmation_note": "The City counts 21 days from issuance and asks for the original parking ticket with a mailed challenge.",
   "service_types": {
     "express": true,
     "appeal_kit": true

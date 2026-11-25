@@ -50,6 +50,7 @@ from parkingbreaker.research.extractor import LlmExtractor
 from parkingbreaker.research.fakes import FakeFetcher, FakeSearcher, html_response
 from parkingbreaker.research.issuer_assessment import LlmIssuerAssessor
 from parkingbreaker.research.jurisdiction import DotGovRecord, DotGovSnapshot
+from parkingbreaker.research.known_sources import record_urls
 from parkingbreaker.research.link_assessment import LlmLinkAssessor
 from parkingbreaker.research.search import Searcher, SearchHit
 from parkingbreaker.research.sources import Fetcher
@@ -368,6 +369,7 @@ def build_services(
         assignment = store.pricing_for_scope(owner)
         return assigned_price(owner) if assignment is None else assignment.amount_cents
 
+    records = known_city_records()
     base_prehold = PreholdDeps(
         snapshot,
         searcher,
@@ -378,6 +380,7 @@ def build_services(
         25,
         STATE_BASIS,
         SERVICE_CONTROL,
+        candidate_urls=record_urls(records),
     )
 
     # The store's AI spend mixin is the ledger (its methods take a typed self).
@@ -491,7 +494,7 @@ def build_services(
         LlmExtractor(research_llm),
         searcher,
         time.sleep,
-        known_records=known_city_records(),
+        known_records=records,
         model_label=research_preset,
         tricks=book_of_tricks(),
     )

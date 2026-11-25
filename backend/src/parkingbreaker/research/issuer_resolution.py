@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import date
+from itertools import chain
 from urllib.parse import urldefrag, urlsplit
 
 from parkingbreaker.agencies import ResolvedAgency, SourceScope
@@ -119,6 +120,8 @@ def resolve_ticket_issuer(
     budget_cents: int,
     max_candidates: int = 3,
     max_pages_per_candidate: int = 3,
+    *,
+    candidate_urls: tuple[str, ...] = (),
 ) -> IssuerResolutionRun:
     """Resolve once, then assess one-hop delegations on the resolved issuer's pages.
 
@@ -229,9 +232,11 @@ def resolve_ticket_issuer(
             ),
         )
         urls = [f"https://{candidate.domains[0]}/"]
-        for hit in hits:
-            if is_allowed(hit.url, scopes):
-                url, _ = urldefrag(hit.url)
+        # A record may nominate a page on this candidate's already verified host.
+        # Neither a legacy record nor a redirect authenticates another domain.
+        for lead in chain((hit.url for hit in hits), candidate_urls):
+            if is_allowed(lead, scopes):
+                url, _ = urldefrag(lead)
                 if url not in urls:
                     urls.append(url)
         candidate_pages = 0

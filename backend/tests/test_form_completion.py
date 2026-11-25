@@ -150,6 +150,10 @@ def test_optional_official_form_is_never_added_to_the_packet_inventory() -> None
     [
         ("Plate", "plate", "SYN123"),
         ("License plate", "plate", "SYN123"),
+        ("License Plate Number", "plate", "SYN123"),
+        ("CitationNo", "citation_number", "SF-998877"),
+        ("Parking Ticket Number", "citation_number", "SF-998877"),
+        ("Citation Issue Date", "issue_date", "2026-10-01"),
         ("Name", "customer_name", "Synthetic Customer"),
         ("Phone", "customer_phone", "415-555-0100"),
         ("Email", "customer_email", "synthetic@example.test"),

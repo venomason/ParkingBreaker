@@ -433,3 +433,26 @@ def test_mandatory_photos_wait_for_packet_and_require_uploaded_photo_pages() -> 
 )
 def test_required_documents_stay_required(item: str, quote: str) -> None:
     assert not requirement_fulfilled(FactKey.REQUIRED_ITEMS, item, quote, PacketPlan())
+
+
+@pytest.mark.parametrize(
+    ("quote", "reason"),
+    [
+        (
+            "Return the contest form or letter, the original parking ticket "
+            "and additional documents.",
+            case_state.StopReason.PROCESS_INCOMPATIBLE,
+        ),
+        (
+            "You must mail back the original ticket or provide a legible copy (front & back).",
+            case_state.StopReason.NOT_YET_VERIFIED,
+        ),
+    ],
+)
+def test_original_parking_ticket_depends_on_the_official_copy_alternative(
+    quote: str, reason: case_state.StopReason
+) -> None:
+    research = with_requirement(FactKey.REQUIRED_ITEMS, "original parking ticket", quote)
+    event = resolution_event(research.resolve())
+    assert isinstance(event, case_state.Stopped)
+    assert event.reason is reason

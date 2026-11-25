@@ -27,25 +27,29 @@ def _matches(host: str, domain: str) -> bool:
     return host == domain or host.endswith("." + domain)
 
 
-def known_seeds(
-    agency: ResolvedAgency, records: Iterable[Mapping[str, object]]
-) -> tuple[SeedUrl, ...]:
-    """Official contest pages from 2.x city records on this agency's own hosts."""
-    seeds: dict[str, SeedUrl] = {}
+def record_urls(records: Iterable[Mapping[str, object]]) -> tuple[str, ...]:
+    """Potential starting pages. Only a caller with verified scopes may fetch them."""
+    urls: dict[str, None] = {}
     for record in records:
         if record.get("status") not in USABLE_STATUSES:
             continue
         policy = record.get("mail_acceptance_policy")
-        urls = [
+        for url in (
             policy.get("official_source_url") if isinstance(policy, Mapping) else None,
             record.get("online_appeal_url"),
-        ]
-        for url in urls:
-            if not isinstance(url, str) or not url.startswith("https://"):
-                continue
-            host = urlsplit(url).hostname or ""
-            if any(_matches(host, domain) for domain in _hosts(agency)):
-                seeds.setdefault(
-                    url, SeedUrl(url, AuthorityClass.OFFICIAL_PROCEDURE, CRITICAL_KEYS)
-                )
-    return tuple(seeds.values())
+        ):
+            if isinstance(url, str) and url.startswith("https://"):
+                urls[url] = None
+    return tuple(urls)
+
+
+def known_seeds(
+    agency: ResolvedAgency, records: Iterable[Mapping[str, object]]
+) -> tuple[SeedUrl, ...]:
+    """Nominate same-host leads. The fetch guard records out-of-scope path refusals."""
+    hosts = _hosts(agency)
+    return tuple(
+        SeedUrl(url, AuthorityClass.OFFICIAL_PROCEDURE, CRITICAL_KEYS)
+        for url in record_urls(records)
+        if any(_matches(urlsplit(url).hostname or "", host) for host in hosts)
+    )
