@@ -292,7 +292,7 @@ class FakeStripeTransport:
                 if (
                     obj["amount"] not in prices.ALLOWED_PRICE_CENTS
                     or int(parameters.get("amount_to_capture", ["0"])[0]) != obj["amount"]
-                    or parameters.get("final_capture") != ["true"]
+                    or "final_capture" in parameters
                 ):
                     return "{}", 400, {}
                 obj.update(status="succeeded", amount_received=obj["amount"], amount_capturable=0)

@@ -492,11 +492,12 @@ class StripePaymentClient:
             if kind == "retrieve":
                 obj = service.retrieve(ref, params={"expand": ["latest_charge"]})
             elif kind == "capture":
+                # Single-capture manual holds forbid multicapture; Stripe rejects
+                # final_capture on PaymentIntents without multicapture enabled.
                 obj = service.capture(
                     ref,
                     params={
                         "amount_to_capture": amount_cents,
-                        "final_capture": True,
                         "expand": ["latest_charge"],
                     },
                     options={"idempotency_key": key, "max_network_retries": 0},

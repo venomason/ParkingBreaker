@@ -126,7 +126,6 @@ def test_sdk_exact_request_boundary() -> None:
             f"/v1/payment_intents/{REF}/capture",
             {
                 "amount_to_capture": ["2999"],
-                "final_capture": ["true"],
                 "expand[0]": ["latest_charge"],
             },
             "capture-key",
@@ -835,3 +834,27 @@ def test_fake_authorize_caches_and_checks_idempotency_parameters() -> None:
     assert adapter.authorize(2999, "pm_card_visa", "key", {"smoke": "token"}) == held
     with pytest.raises(ValueError, match="idempotency parameters"):
         adapter.authorize(2999, "pm_other", "key", {"smoke": "token"})
+
+
+def test_fake_stripe_transport_forbids_multicapture_final_capture_parameter() -> None:
+    from parkingbreaker.config_fakes import FakeStripeTransport
+    from parkingbreaker.stripe_payment import STRIPE_API_VERSION
+
+    fake_transport = FakeStripeTransport()
+    adapter = StripePaymentClient(
+        secret_key="sk_test_offline",
+        api_version=STRIPE_API_VERSION,
+        transport=fake_transport,
+    )
+    held = adapter.authorize(2999, "pm_card_visa", "auth-key", {})
+    assert held.status == "requires_capture"
+    _, bad_status, _ = fake_transport.request(
+        "post",
+        f"https://api.stripe.com/v1/payment_intents/{held.authorization_ref}/capture",
+        {"Idempotency-Key": "bad-multicapture-key"},
+        "amount_to_capture=2999&final_capture=true&expand%5B0%5D=latest_charge",
+    )
+    assert bad_status == 400
+    captured = adapter.capture(held.authorization_ref, 2999, "cap-key", final_capture=True)
+    assert captured.status == "succeeded"
+    assert captured.amount_received == 2999

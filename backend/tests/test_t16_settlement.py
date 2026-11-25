@@ -147,7 +147,6 @@ async def test_capture_uses_t14_identity_only_after_durable_lob_acceptance(
         assert mutations[0][1] == f"/v1/payment_intents/{original.authorization_ref}/capture"
         assert mutations[0][2] == {
             "amount_to_capture": [str(original.amount_cents)],
-            "final_capture": ["true"],
             "expand[0]": ["latest_charge"],
         }
         assert mutations[0][3] == cursor.mutation_key
