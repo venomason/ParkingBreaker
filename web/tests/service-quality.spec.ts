@@ -54,7 +54,7 @@ test.describe("M1 optional photos and intake", () => {
     expect(html).toContain('aria-label="Remove supporting photo 2"');
     expect(html).toContain('&lt;private&gt;.png');
     expect(html).toContain('aria-describedby="photoGuide"');
-    expect(html).toContain('class="evidence-item"');
+    expect(html.match(/class="evidence-item(?: [^"]*)?"/g)).toHaveLength(2);
   });
   test("validation names every invalid control, accepts optional omissions and never trims customer account", () => {
     expect(decide("intake","contactErrors",contact,true)).toEqual({});
@@ -193,16 +193,18 @@ test.describe("M3 exact words and customer control", () => {
 test.describe("M4 honest entry and accessible writing", () => {
   test("actual manual ticket entry never claims automatic photo reading", () => {
     const html = render("Step1Ticket",{live:true,fields:[],plate:"",plateState:"",backPhoto:false});
-    expect(html).toContain("Enter each detail as printed on your ticket");
+    expect(html).toContain("Enter the details printed on your ticket.");
     expect(html).not.toContain("I’ll read it");
     expect(html).not.toContain("You confirm every detail I read");
     expect(html).not.toContain("Add sample back photo");
   });
   test("account input links instructions and invalid state to announced errors", () => {
     const html = render("Step2YourSide",{story:"",owner:null,photo:null,liveSlot:"Contact form"});
-    expect(html).toContain('aria-describedby="storyHelp storyErr"');
+    expect(html).toContain('aria-describedby="storyErr storyHelp storyCompletenessPrompt"');
     expect(html).toContain('aria-invalid="false"');
     expect(html).toContain('id="storyErr"');
+    expect(html).toContain('id="storyHelp"');
+    expect(html).toContain('id="storyCompletenessPrompt"');
     expect(html).toContain('role="alert"');
     expect(html).not.toContain("make sure");
   });
