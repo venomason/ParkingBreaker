@@ -4576,6 +4576,19 @@ class SqliteTransactionStore(
                         evidence=True,
                         manage_transaction=False,
                     )
+                    if (
+                        frozen is not None
+                        and self.get_approval_manifest(case_id, case.attempt) is not None
+                    ):
+                        self.record_dispatch_manifest(
+                            case_id,
+                            case.attempt,
+                            provider_letter_id=submission_acceptance.letter_id,
+                            expected_delivery=None,
+                            dispatched_pdf=frozen.request.pdf,
+                            dispatched_at=occurred_at,
+                            manage_transaction=False,
+                        )
                     self.finish_submission(
                         claimed,
                         submission_acceptance,

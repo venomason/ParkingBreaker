@@ -585,3 +585,69 @@ def test_retention_plan_purge_and_restore_cover_approval_manifests(
                 rpurge.validate_retention_restore(backup, db, evaluated_at=evaluated_at)
         finally:
             backup.close()
+
+
+@pytest.mark.anyio
+async def test_webhook_scan_acceptance_records_dispatch_manifest_atomically(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hashlib
+    import hmac
+
+    lob_rendered = FakeLobClient(
+        [LobResponse(200, "ltr_real_rendered", evidence=LetterEvidence.RENDERED)]
+    )
+    client, real, case = await approved(tmp_path, monkeypatch, lob_rendered)
+    object.__setattr__(real._deps, "lob_webhook_secret", "lob-wh-secret")
+    try:
+        case_token = real._intake(case).case_token
+        assert case_token is not None
+        prepared = real._store.get(case_token, 1)
+        manifest_before = real._store.get_approval_manifest(case_token, 1)
+        assert prepared is not None
+        assert manifest_before is not None
+
+        step_resp = await client.post(
+            f"/internal/cases/{case}/step", headers=WORKER, json={"step_id": "dispatch"}
+        )
+        assert step_resp.status_code == 200
+        # Rendered alone is not acceptance: manifest stays undispatched until qualifying scan.
+        mid_manifest = real._store.get_approval_manifest(case_token, 1)
+        assert mid_manifest is not None
+        assert mid_manifest.dispatched_pdf_sha256 is None
+
+        now = real._deps.clock()
+        ts = str(int(now.timestamp()))
+        evt = json.dumps(
+            {
+                "id": "evt_scan_manifest_1",
+                "event_type": {"id": "letter.certified.in_transit"},
+                "date_created": now.isoformat(),
+                "body": {
+                    "id": "ltr_real_rendered",
+                    "status": "rendered",
+                    "deleted": False,
+                    "failure_reason": None,
+                    "metadata": {"submission_token": prepared.request.submission_token},
+                    "tracking_events": [
+                        {"type": "certified", "name": "In Transit", "time": now.isoformat()}
+                    ],
+                },
+            },
+            separators=(",", ":"),
+        ).encode()
+        sig = hmac.new(b"lob-wh-secret", ts.encode() + b"." + evt, hashlib.sha256).hexdigest()
+        wh_resp = await client.post(
+            "/webhooks/lob",
+            content=evt,
+            headers={"Lob-Signature": sig, "Lob-Signature-Timestamp": ts},
+        )
+        assert wh_resp.status_code == 200
+        assert wh_resp.json() == {"received": True, "duplicate": False}
+        after = real._store.get_approval_manifest(case_token, 1)
+        assert after is not None
+        assert after.provider_letter_id == "ltr_real_rendered"
+        assert after.dispatched_pdf_sha256 == manifest_before.packet_pdf_sha256
+        assert after.dispatched_at_utc is not None
+    finally:
+        await client.aclose()
