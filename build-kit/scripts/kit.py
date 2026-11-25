@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import os
 from pathlib import Path
@@ -19,8 +18,9 @@ from urllib.parse import urlsplit
 KIT = Path(__file__).resolve().parents[1]
 REPO = KIT.parent
 STATES = {"pending", "in_progress", "blocked", "accepted"}
+UNITTEST_DISCOVER = [sys.executable, "-m", "unittest", "discover", "-s"]
 CHECKS = {
-    "kit-check": [sys.executable, "-m", "unittest", "discover", "-s", "build-kit/tests", "-v"],
+    "kit-check": [*UNITTEST_DISCOVER, "tools/tests", "-v"],
     "backend-check": ["make", "check"],
     "web-lint": ["npm", "--prefix", "web", "run", "lint"],
     "web-types": ["npm", "--prefix", "web", "run", "type-check"],
@@ -547,6 +547,10 @@ def browser_receipt_valid(check: dict, root: Path) -> bool:
 
 def expected_check_command(check: dict):
     """A project receipt binds its own explicit command; every other check stays canonical."""
+    if check.get("check_id") == "kit-check":
+        archived = [*UNITTEST_DISCOVER, "build-kit/tests", "-v"]
+        if check.get("command") == archived:
+            return archived
     project = check.get("browser_project")
     try:
         preview = check.get("ticket_reading_preview", False)
@@ -636,6 +640,8 @@ def guard_freeze_errors(root: Path = KIT, repo: Path = REPO) -> list[str]:
         freeze = read(path)
     except json.JSONDecodeError:
         return ["Guard freeze file is not valid JSON"]
+    if not isinstance(freeze, dict):
+        return ["Guard freeze must be a JSON object"]
     files, exception = freeze.get("files"), freeze.get("owner_approved_exception")
     if not isinstance(files, dict) or set(files) != set(GUARD_BASELINE):
         return ["Guard freeze must list exactly the four frozen research guard files"]
@@ -650,21 +656,22 @@ def guard_freeze_errors(root: Path = KIT, repo: Path = REPO) -> list[str]:
 
 
 def doctor() -> dict:
-    """Read-only workspace checks, using the existing verification and journal paths."""
-    errors = verify()
-    errors.extend(guard_freeze_errors())
-    spec = importlib.util.spec_from_file_location("parkingbreaker_checkpoint", KIT / "scripts/checkpoint.py")
-    checkpoint = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(checkpoint)
-    errors.extend(checkpoint.status_errors())
-    for name in ("AGENTS.md", "CLAUDE.md"):
-        path = REPO / name
-        if not path.is_symlink() or path.readlink() != Path("STATUS.md"):
-            errors.append(name + " must point to the single living STATUS.md")
+    """Read-only checks for the current checkout."""
+    errors = guard_freeze_errors(KIT, REPO)
+    roadmap = "docs/ROADMAP.md"
+    required_files = (
+        "AGENTS.md",
+        roadmap,
+        "docs/BETA-READINESS.md",
+        "backend/pyproject.toml",
+        "web/package.json",
+    )
+    errors.extend(f"Missing workspace file: {name}" for name in required_files
+                  if not (REPO / name).is_file())
     commands = {name: bool(shutil.which(name)) for name in ("python3", "git", "uv", "node", "npm")}
     errors.extend("Missing development command: " + name for name, present in commands.items() if not present)
     return {"workspace_ready": not errors, "errors": errors, "commands": commands,
-            "living_status": "STATUS.md", "launch_acceptance": "separate and unchanged"}
+            "living_status": roadmap, "launch_acceptance": "separate and unchanged"}
 
 
 def main(argv=None) -> int:

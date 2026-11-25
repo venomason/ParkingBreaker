@@ -48,7 +48,7 @@ On Ubuntu, make sync selects /usr/bin/python3.12 and checks Linux OFD file-lock 
 - tools/deepseek-delegate is a retained optional helper, not the current default coding workflow. AGENTS.md defines the direct-coding default and delegation limits.
 - Local dependency environments, generated builds, run logs, customer data, credentials and source exports stay out of Git. Preserve user editor settings.
 
-Historical build-kit governance commands (doctor, status, next, accept) require archived local state and are not the active roadmap. Its run-check command works independently in this checkout.
+`python3 build-kit/scripts/kit.py doctor` checks the current checkout, required development commands and research guard hashes. `python3 build-kit/scripts/kit.py run-check kit-check` runs the tooling tests and records a local receipt. Historical governance commands (`verify`, `preflight`, `status`, `next`, `accept`) require archived state.
 
 Local browser campaigns use synthetic providers and temporary stores:
 
