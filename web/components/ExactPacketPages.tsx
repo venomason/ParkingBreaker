@@ -77,7 +77,7 @@ export function ExactPacketPages({ url }: { url: string }) {
           onClick={() => setPage(page - 1)}
           disabled={!pageIsReady || page === 1}
         >
-          ← Previous page
+          <span aria-hidden="true">←</span> Previous page
         </button>
         <span className="packet-page-indicator mono" role="status">
           {pdf ? `Page ${page} of ${pdf.numPages}` : "Loading pages…"}
@@ -88,7 +88,7 @@ export function ExactPacketPages({ url }: { url: string }) {
           onClick={() => setPage(page + 1)}
           disabled={!pageIsReady || !pdf || page === pdf.numPages}
         >
-          Next page →
+          Next page <span aria-hidden="true">→</span>
         </button>
       </div>
       <div className="packet-page-mat" aria-busy={!pageIsReady}>
