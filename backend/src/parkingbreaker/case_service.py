@@ -1306,14 +1306,27 @@ class CaseService:
             and not self._store.has_active_authorization_attempt(case_id)
         ):
             intake = s.SubmitIntake.model_validate_json(record.intake_json)
+            check_date = self._deps.clock().date() if today is None else today
             stop = intake_customer_stop(
                 intake.ticket.issue_date,
-                self._deps.clock().date() if today is None else today,
+                check_date,
                 intake.rental_company_paid,
             )
             stopped = None
             if stop is not None:
                 stopped = intake_stop_view(case_id, stop)
+            elif (
+                intake.ticket.printed_deadline is not None
+                and intake.ticket.printed_deadline < check_date
+            ):
+                stopped = s.Stop(
+                    case_id=case_id,
+                    family=StopFamily.NOT_YET_VERIFIED,
+                    hard_stop=HardStop.S4,
+                    reason_key="printed_deadline_passed",
+                    message="The deadline printed on this ticket has passed. "
+                    "No card hold was placed. Check with the issuer about your review options.",
+                )
             elif (
                 self._deps.paid_cohort_cap is not None
                 and self.service_phase is ServicePhase.PAID

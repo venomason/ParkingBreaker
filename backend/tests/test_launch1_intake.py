@@ -264,3 +264,42 @@ async def test_day_ten_offer_expires_before_new_hold_but_preserves_existing_auth
     assert payments.calls == calls
     assert fake_resolution == resolutions
     assert payments.captures == payments.releases == 0
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("already_held", [False, True])
+async def test_ticket_printed_deadline_expires_before_first_hold(
+    tmp_path: Path, fake_resolution: list[str], already_held: bool
+) -> None:
+    clock = Clock()
+    payments = FakePaymentClient(REF)
+    real = service(tmp_path / "printed-deadline.sqlite", payments, clock)
+    body = copy.deepcopy(INTAKE)
+    body["ticket"]["issue_date"] = (NOW.date() - timedelta(days=2)).isoformat()
+    body["ticket"]["printed_deadline"] = NOW.date().isoformat()
+    async with AsyncClient(
+        transport=ASGITransport(app=create_app(real)), base_url="http://offline.test"
+    ) as api:
+        _, receipt = await submit(api, body)
+        case_id = receipt["case_id"]
+        chosen = await api.put(f"/cases/{case_id}/tier", headers=ALICE, json={"tier": "CERTIFIED"})
+        assert chosen.status_code == 200
+        path = f"/cases/{case_id}/authorization"
+        request = {"terms_accepted": True, "payment_method_id": "pm_card_visa"}
+        if already_held:
+            first = await api.post(path, headers=ALICE, json=request)
+            assert first.status_code == 200
+        calls = list(payments.calls)
+        clock.now += timedelta(days=1)
+        result = await api.post(path, headers=ALICE, json=request)
+        assert result.status_code == (200 if already_held else 409)
+        if already_held:
+            assert result.json() == first.json()
+        else:
+            stop = (await api.get(f"/cases/{case_id}/pre-hold", headers=ALICE)).json()
+            assert stop["family"] == "NOT_YET_VERIFIED"
+            assert stop["hard_stop"] == "S4"
+            assert stop["reason_key"] == "printed_deadline_passed"
+            assert stop["official_url"] == "https://sfmta.com/"
+            assert not real._store.has_active_authorization_attempt(case_id)
+        assert payments.calls == calls
