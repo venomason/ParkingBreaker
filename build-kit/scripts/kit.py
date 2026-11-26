@@ -249,7 +249,7 @@ def application_fingerprint(repo: Path = REPO) -> str:
     paths = subprocess.check_output(
         ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z", "--",
          "backend", "web", "deploy", "legacy/backend", "legacy/deploy",
-         "Makefile", "compose.yaml"], cwd=repo,
+         "Makefile", "compose.yaml", "cloudbuild.yaml", "cloudbuild-backend.yaml"], cwd=repo,
     ).split(b"\0")
     parts = []
     for raw in sorted(set(paths)):

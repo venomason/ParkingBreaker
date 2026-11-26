@@ -362,8 +362,11 @@ verified off-host copy and raises a critical alert once that snapshot is over 60
 minutes old. Record the installed cadence and measure the actual restore point in
 the recovery drill. The single-VM timer runs hourly.
 
-Build the backend from the reviewed commit using the `PB_BUILD_COMMIT` build
-argument (`_PB_BUILD_COMMIT` in Cloud Build). Build the qualification frontend
+Submit both builds from a clean export of the same signed commit. Pass its full
+SHA as `_PB_BUILD_COMMIT` to both Cloud Build recipes and set `_IMAGE_TAG`
+to a candidate-specific value (for example, the SHA followed by `-test`).
+Both final images carry the OCI revision label. Verify it against the signed
+commit on each returned digest before promotion. Build the qualification frontend
 with `_PB_API_ORIGIN` set to the trusted private HTTPS origin on port 8443.
 Set `_PB_PROVIDER_MODE=test` and `_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` to the
 matching Stripe test publishable key for the sandbox rehearsal. The Docker build

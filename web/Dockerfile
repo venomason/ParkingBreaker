@@ -12,6 +12,8 @@ ENV PB_API_ORIGIN=$PB_API_ORIGIN PB_PROVIDER_MODE=$PB_PROVIDER_MODE NEXT_PUBLIC_
 RUN npm run build
 
 FROM node:24.11.0-slim
+ARG PB_BUILD_COMMIT
+LABEL org.opencontainers.image.revision=$PB_BUILD_COMMIT
 WORKDIR /app/web
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 COPY --from=build /app/web ./
