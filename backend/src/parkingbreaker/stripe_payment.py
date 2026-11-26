@@ -48,6 +48,7 @@ _FIELDS = frozenset(
         "created",
         "id",
         "object",
+        "livemode",
         "status",
         "amount",
         "currency",
@@ -75,6 +76,8 @@ _FIELDS = frozenset(
 
 def _safe_object(value: object) -> object:
     if isinstance(value, dict):
+        if value.get("livemode") is not None and type(value["livemode"]) is not bool:
+            raise ValueError("invalid payment environment")
         return {k: _safe_object(v) for k, v in value.items() if k in _FIELDS}
     if isinstance(value, list):
         return [_safe_object(v) for v in value]

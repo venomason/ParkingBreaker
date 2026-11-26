@@ -294,6 +294,31 @@ def test_malformed_json(body: str) -> None:
     assert client(Transport(body)).retrieve(REF).status == "uncertain"
 
 
+@pytest.mark.parametrize("mode", [True, False])
+def test_sdk_preserves_provider_environment_on_original_charge(mode: bool) -> None:
+    body = fixture("succeeded")
+    body["livemode"] = mode
+    charge = body["latest_charge"]
+    assert isinstance(charge, dict)
+    charge["livemode"] = mode
+    result = client(Transport(body)).retrieve(REF)
+    assert result.status == "succeeded"
+    assert result.livemode is mode
+
+    charge["livemode"] = not mode
+    assert client(Transport(body)).retrieve(REF).status == "uncertain"
+
+
+def test_invalid_provider_environment_stays_out_of_sdk_logs(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG, logger="stripe")
+    body = fixture("succeeded")
+    body["livemode"] = "PRIVATE INVALID VALUE"
+    assert client(Transport(body)).retrieve(REF).status == "uncertain"
+    assert "PRIVATE" not in caplog.text
+
+
 def test_safe_sdk_logging_and_repr(caplog: pytest.LogCaptureFixture) -> None:
     caplog.set_level(logging.DEBUG, logger="stripe")
     adapter = client(Transport(fixture()))
