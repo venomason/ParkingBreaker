@@ -16,6 +16,14 @@ steps:
       '-f', 'web/Dockerfile',
       '.'
     ]
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'sh'
+    args:
+      - '-ec'
+      - >-
+        docker run --rm --network none -i --entrypoint node
+        us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend:${_IMAGE_TAG}
+        --input-type=module - < deploy/check-frontend-start.mjs
 images:
   - 'us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/frontend:${_IMAGE_TAG}'
 substitutions:
