@@ -330,15 +330,24 @@ async def test_a_hold_recorded_while_waiting_for_drafting_ownership_still_wins(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("legacy_order", [False, True])
 async def test_a_hold_recorded_while_research_waits_for_ownership_stops_paid_research(
-    runtime: tuple[CaseService, AsyncClient], monkeypatch: pytest.MonkeyPatch
+    runtime: tuple[CaseService, AsyncClient], monkeypatch: pytest.MonkeyPatch, legacy_order: bool
 ) -> None:
     service, client = runtime
     case = await held_case(client)
     token = token_of(service, case)
     assert state(service, token) is CaseState.RESEARCHING
+    saved = service._store.get_research(case)
+    assert saved is not None
+    if legacy_order:
+        # Before prepayment filing checks, a newly held order had no research yet.
+        service._store._require_open().execute(
+            "DELETE FROM pb_intake_research WHERE intake_id=?", (case,)
+        )
+        saved = None
     assert service.hold_case(token, HoldReason.INCIDENT, "h1")[0] is CommandOutcome.APPLIED
-    assert service._store.get_research(case) is None
+    assert service._store.get_research(case) == saved
     called: list[str] = []
     real = service._deps.research
 
@@ -356,6 +365,7 @@ async def test_a_hold_recorded_while_research_waits_for_ownership_stops_paid_res
         service._research_owned(case)
     service._research(case)
     assert called == []
+    assert service._store.get_research(case) == saved
     assert state(service, token) is CaseState.RESEARCHING
 
 
