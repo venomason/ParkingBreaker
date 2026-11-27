@@ -102,6 +102,9 @@ class _Connection(http.client.HTTPConnection):
 
 
 class _TlsConnection(_Connection):
+    # HTTPConnection uses this port when formatting the Host header.
+    default_port = http.client.HTTPS_PORT
+
     def connect(self) -> None:
         super().connect()
         assert self.sock is not None

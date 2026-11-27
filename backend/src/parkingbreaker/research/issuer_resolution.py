@@ -7,6 +7,7 @@ No provider, clock, filesystem or network is accessed directly here.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, replace
 from datetime import date
 from itertools import chain
@@ -15,7 +16,13 @@ from urllib.parse import urldefrag, urlsplit
 from parkingbreaker.agencies import ResolvedAgency, SourceScope
 from parkingbreaker.case_state import HardStop, StopFamily
 from parkingbreaker.llm import BudgetExhaustedResult, Usage
-from parkingbreaker.research.delegation import DelegationOutcome, DelegationResult, extract_links
+from parkingbreaker.research.delegation import (
+    DelegationOutcome,
+    DelegationResult,
+    LinkPurpose,
+    extract_links,
+    has_purpose_term,
+)
 from parkingbreaker.research.issuer_assessment import (
     IssuerAssessor,
     IssuerEvidence,
@@ -49,6 +56,31 @@ from parkingbreaker.research.veto_codes import VetoCode
 # Six lead fetches across all candidates allow recovery without unbounded retries.
 # Each fetch_source call retains its own existing allowlisted redirect-hop bound.
 MAX_ISSUER_FETCH_ATTEMPTS = 6
+
+
+def _parking_navigation(page: SourceRecord, scopes: tuple[SourceScope, ...]) -> list[str]:
+    """Same-authority discovery leads only. A link cannot verify the issuer or filing route."""
+    contest: list[str] = []
+    parking: list[str] = []
+    for link in extract_links(page.html or "", page.final_url):
+        label = link.anchor_text.casefold()
+        url = link.href
+        if url == page.final_url or not is_allowed(url, scopes):
+            continue
+        if re.search(r"\b(?:parking|tickets?|citations?)\b", label) and has_purpose_term(
+            label, LinkPurpose.CONTEST
+        ):
+            contest.append(url)
+        elif label in {
+            "parking",
+            "parking information",
+            "parking services",
+            "parking tickets",
+            "parking citations",
+            "parking enforcement",
+        }:
+            parking.append(url)
+    return list(dict.fromkeys(contest + parking))
 
 
 @dataclass(frozen=True)
@@ -131,7 +163,8 @@ def resolve_ticket_issuer(
     Root fetches come first so even a one-page cap tries the required fallback.
     Only saved, distinct evidence pages consume page slots. Lead fetch attempts
     across all candidates are capped at MAX_ISSUER_FETCH_ATTEMPTS, including failures;
-    provider searches are never retried here.
+    provider searches are never retried here. For a single directory match without
+    a specific lead, use the remaining slots for navigation on its own official sites.
     """
     if type(budget_cents) is not int or budget_cents < 0:
         raise ValueError("budget_cents must be a nonnegative integer")
@@ -239,6 +272,7 @@ def resolve_ticket_issuer(
                 url, _ = urldefrag(lead)
                 if url not in urls:
                     urls.append(url)
+        use_navigation = outcome is MatchOutcome.SINGLE and len(urls) == 1
         candidate_pages = 0
         for url in urls:
             if (
@@ -262,6 +296,12 @@ def resolve_ticket_issuer(
                 candidate_pages += 1
                 root = next(scope for scope in scopes if is_allowed(fetched.final_url, (scope,)))
                 fetched_scopes.append((fetched, root))
+                if use_navigation and candidate_pages < max_pages_per_candidate:
+                    for lead in _parking_navigation(fetched, scopes):
+                        if len(urls) >= MAX_ISSUER_FETCH_ATTEMPTS:
+                            break
+                        if lead not in urls:
+                            urls.append(lead)
 
     if usage.cost_cents >= budget_cents:
         attempts.append(IssuerResolutionAttempt("issuer_assessment", error="budget exhausted"))

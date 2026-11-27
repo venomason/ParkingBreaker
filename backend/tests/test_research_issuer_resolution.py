@@ -403,6 +403,35 @@ def test_no_pages_skips_ai(harness: Harness) -> None:
     assert harness.issuer.calls == harness.link.calls == []
 
 
+@pytest.mark.parametrize(("max_pages", "verified"), [(2, False), (3, True)])
+def test_without_search_official_parking_navigation_can_find_issuer_evidence(
+    harness: Harness, max_pages: int, verified: bool
+) -> None:
+    parking = ROOT + "parking"
+    root_html = (
+        '<a href="/permits">Parking permits</a>'
+        '<a href="https://other.gov/contest">Contest parking ticket</a>'
+        '<a href="/parking">Parking Information</a>'
+    )
+    parking_html = (
+        '<a href="/pay">Pay a parking ticket</a>'
+        '<a href="/parking#top">Parking Information</a>'
+        '<a href="/contest">Pay or dispute a parking ticket</a>'
+    )
+    harness.searcher = None
+    harness.fetcher = FakeFetcher(
+        {
+            ROOT: html_response(ROOT, root_html),
+            parking: html_response(parking, parking_html),
+            CONTEST: html_response(CONTEST, HTML),
+        }
+    )
+    result = harness.run(max_pages=max_pages)
+    assert harness.fetcher.calls == [ROOT, parking, CONTEST][:max_pages]
+    # Only the final page contains the assessor's independent issuer and deciding-office quotes.
+    assert (result.agency is not None) is verified
+
+
 def test_off_domain_search_hits_and_redirects_never_fetched(harness: Harness) -> None:
     hostile = "https://sfmta.gov.evil.org/contest"
     harness.searcher = FakeSearcher(lambda _: (SearchHit(hostile), SearchHit(CONTEST)))

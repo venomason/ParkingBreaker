@@ -14,6 +14,7 @@ from parkingbreaker.http_fetcher import (
     USER_AGENT,
     HttpFetcher,
     _Connection,
+    _TlsConnection,
     urllib_transport,
 )
 from parkingbreaker.research.sources import MAX_BODY_BYTES, FetchError, FetchResponse
@@ -263,6 +264,18 @@ def test_default_fetcher_pins_validated_addresses_without_dns_or_environment_pro
     with pytest.raises(FetchError, match="request failed"):
         f.get("https://city.example.gov/contest")
     assert calls == [(PUBLIC[0], 443)]
+
+
+def test_https_default_port_sends_the_bare_hostname() -> None:
+    connection = _TlsConnection("city.example.gov", 443, 2.0, PUBLIC)
+    client, server = socket.socketpair()
+    with client, server:
+        connection.sock = client
+        connection.request("GET", "/parking")
+        client.shutdown(socket.SHUT_WR)
+        with server.makefile("rb") as wire:
+            headers = wire.readlines()
+    assert b"Host: city.example.gov\r\n" in headers
 
 
 def test_pinned_tls_keeps_original_hostname_and_certificate_verification(
