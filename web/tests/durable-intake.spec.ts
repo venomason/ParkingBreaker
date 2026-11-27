@@ -5,6 +5,29 @@ const base = process.env.SECURE_BASE;
 test.use({ ignoreHTTPSErrors: true });
 test.skip(!base, "requires the isolated HTTPS cookie-auth API rehearsal");
 
+test("the intake discloses its pricing cookie and clears private access on logout", async ({ page, context }) => {
+  const cookieNames = async () => (await context.cookies(base)).map(cookie => cookie.name).sort();
+  const price = "__Host-pb-price";
+  await page.goto(new URL("/privacy", base).href);
+  await expect(page.getByRole("heading", { name: "Cookies and browser storage" })).toBeVisible();
+  await expect(page.getByText(price, { exact: false })).toContainText("400 days");
+  await expect(page.getByText(/Emailed sign-in links expire/)).toContainText("15 minutes");
+  await expect(cookieNames()).resolves.toEqual([]);
+
+  await page.goto(base!);
+  const privacy = page.getByRole("link", { name: "How we use cookies and ticket data" });
+  await expect(privacy).toBeVisible();
+  await expect(privacy).toHaveAttribute("href", "/privacy");
+  await expect.poll(cookieNames).toEqual([price]);
+  const priceCookie = (await context.cookies(base)).find(cookie => cookie.name === price)!;
+  expect(priceCookie.secure && priceCookie.httpOnly).toBe(true);
+  expect(Math.round((priceCookie.expires - Date.now() / 1000) / 86400)).toBe(400);
+  await page.getByRole("button", { name: "Start an appeal", exact: true }).click();
+  await expect.poll(cookieNames).toEqual(["__Host-pb-csrf", price, "__Host-pb-session"]);
+  await page.getByRole("button", { name: "Close private access" }).click();
+  await expect.poll(cookieNames).toEqual([price]);
+});
+
 function syntheticPng(value: number) {
   const crc = (buf: Buffer) => {
     let c = ~0;

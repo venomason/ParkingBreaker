@@ -300,6 +300,7 @@ export function CustomerGate({ children }: { children: ReactNode }) {
       <div className="access-session">
         <div className="access-session-in">
           <span className="access-session-note">Each ticket has its own private appeal</span>
+          <Link href="/privacy">How we use cookies and ticket data</Link>
           {priceVisible && (
             <span className="access-price-pill" aria-label="Assigned certified mailing price">
               Early beta price: ${(pricing / 100).toFixed(2)} · Certified Mail, everything included

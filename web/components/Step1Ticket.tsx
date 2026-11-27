@@ -429,6 +429,10 @@ export function Step1Ticket({
             </div>
             {vision.error && <p className="err" role="alert">{vision.error}</p>}
             {vision.checking && <p className="status-banner is-attention" role="status">Checking how your ticket is read…</p>}
+            <p className="muted small">
+              An AI reading service may see the plate, name or address on your ticket photos. You check and confirm the details it reads.{" "}
+              <a href="/privacy" target="_blank" rel="noreferrer">How we use your ticket data (opens in a new tab)</a>
+            </p>
 
             <div className="ticket-upload-slots">
               <div className={`ticket-slot ${vision.frontRef ? "is-saved" : "is-attention"}`}>
@@ -462,9 +466,6 @@ export function Step1Ticket({
             </div>
 
             <p id="ticketPhotoFormats" className="muted small" style={{ marginTop: "12px" }}>{PHOTO_UPLOAD_GUIDANCE}</p>
-            <p className="muted small" style={{ marginTop: "6px" }}>
-              Uploaded photos are processed by an AI reading service, which may see your plate, name, or address printed on the ticket. Reading results are unverified suggestions—you confirm every fact below.
-            </p>
 
             <div className="row" style={{ gap: "8px", flexWrap: "wrap", marginTop: "14px" }}>
               {(!vision.reading || vision.reading.status === "missing" || !vision.reading.current) && (

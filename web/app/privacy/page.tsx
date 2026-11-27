@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import {
   LEGAL_CONTACT_EMAIL,
-  LEGAL_EFFECTIVE_DATE,
+  PRIVACY_REVISION_DATE,
   LEGAL_ENTITY,
   PRIVACY_SECTIONS,
 } from "../../lib/legal";
@@ -16,7 +16,7 @@ export default function PrivacyPage() {
     <main className="access-shell">
       <section className="access-card">
         <h1>Privacy Policy</h1>
-        <p className="small muted">Effective {LEGAL_EFFECTIVE_DATE}</p>
+        <p className="small muted">Last revised {PRIVACY_REVISION_DATE}</p>
         {PRIVACY_SECTIONS.map((section) => (
           <section key={section.title}>
             <h2>{section.title}</h2>

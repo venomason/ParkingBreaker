@@ -9,6 +9,7 @@
 export const LEGAL_ENTITY = "ParkingBreaker";
 export const LEGAL_CONTACT_EMAIL = "support@parkingbreaker.com";
 export const LEGAL_EFFECTIVE_DATE = "2026-11-25";
+export const PRIVACY_REVISION_DATE = "2026-11-27";
 
 export const PAID_CAPTURE_TERMS = "We usually charge the agreed fee after the first USPS scan showing your letter is in the mail. If the card hold is close to expiring and we have no such scan, we charge the same fee only if a fresh check with our mailing provider shows that the PDF for your exact approved letter was prepared, its scheduled processing time has passed, and the letter shows no failure, deletion or cancellation. The provider’s scheduled time does not confirm printing or handoff to USPS.";
 export const NONMAILING_REFUND = "If we later confirm that the charged letter was never mailed, we automatically refund the full original charge.";
@@ -88,13 +89,15 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
   {
     title: "Who processes it",
     paragraphs: [
-      "Stripe processes payments. Lob handles printing and mailing. Resend delivers email. AI model providers read documents for extraction only. Each processes data on our instructions and only as needed for the service.",
+      "AI providers read ticket photos, check the extracted details and help turn the facts and notes you provide into a draft for you to review. We use search and AI providers to research the issuing agency’s public filing instructions. Lob prints and mails approved packets. Resend delivers email.",
+      "When you open the card form, Stripe processes card details directly and can collect device and activity information to prevent payment fraud.",
     ],
   },
   {
     title: "Retention",
     paragraphs: [
-      "Business and financial records: up to 7 years. Ticket photos and extracted facts: 2 years. Diagnostic logs: 90 days. Session cookies: 30 days. Access links: 24 hours.",
+      "Business and financial records: up to 7 years. Ticket photos and extracted facts: 2 years. Diagnostic logs: 90 days.",
+      "Emailed sign-in links expire 15 minutes after you request them.",
       "If we charge near the end of a card hold without a USPS scan, we keep the mailing provider’s response in restricted records to document the charge. We remove the raw response from active records after 90 days unless a preservation hold applies. We retain the decision record for payment review.",
       "Exact periods are fixed in our retention policy and may be adjusted where a legal obligation or preservation hold applies.",
     ],
@@ -106,9 +109,11 @@ export const PRIVACY_SECTIONS: readonly LegalSection[] = [
     ],
   },
   {
-    title: "Cookies",
+    title: "Cookies and browser storage",
     paragraphs: [
-      "We use strictly necessary cookies only: a session cookie and a CSRF cookie. We do not use advertising or analytics cookies.",
+      "When you open a private appeal, two cookies keep you signed in and protect your account against forged requests. They expire within 30 days. Closing private access clears both cookies from this browser.",
+      "When the intake checks its pricing, it sets a separate cookie called __Host-pb-price. We use it to compare prices and keep the assigned price consistent when this browser returns. Each time we set it, it can last up to 400 days.",
+      "The ticket-review screen stores an identifier in your browser tab and sends us counts of review actions and time spent on that screen. These measurements exclude what you typed. The browser can also remember display preferences and whether you paused a letter. You can clear site data in your browser settings.",
     ],
   },
   {
