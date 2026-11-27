@@ -1,0 +1,665 @@
+{
+  "recorded_utc": "2026-11-27T22:46:59.880424+00:00",
+  "launch_decision": "NO-GO",
+  "release_owner": "Amir",
+  "signed_application_revision": "8e88e2ed676393b133b5f24947f3804f3980bb1d",
+  "branch": "qualification/filing-checkout-20261127",
+  "github_main_readback": "5808e38ebb7a777aa6c2da819985084b82a9b4ec",
+  "previous_rehearsed_revision": "7db2a277766109582d595f23d0fbc3c36fb54308",
+  "local_evidence_root": "/home/ghostmonday/Vault/Ops/runs/pb-filing-20261127-lzNDp0",
+  "qualification": {
+    "fresh_customer_upload_and_correction": "passed locally on three independent browser orders",
+    "official_positive_filing_and_checkout": "failed locally at the filing guard",
+    "customer_packet_approval_on_these_orders": "untested",
+    "customer_payment_or_letter_on_these_orders": "untested",
+    "private_google_customer_journey": "untested",
+    "same_deployed_order_restart_callbacks_and_restore": "untested",
+    "local_stopped_order_backup_readback": "passed for each order; no provider operation had started",
+    "fresh_provider_transactions": 0,
+    "new_cloud_window": false,
+    "new_metered_model_or_research_api_calls": 0,
+    "actual_spend_initiated_usd": 0,
+    "public_route_changes": 0,
+    "real_customer_charges": 0,
+    "physical_letters": 0,
+    "paid_ad_spend_usd": 0
+  },
+  "filing_fix": {
+    "status": "passed locally",
+    "cause": "With no recognized standalone stage heading the old parser applied one hearing label to all answers on the West Covina FAQ. The fix keeps a question with its own accordion answer and withholds a stage from mixed or ambiguous text.",
+    "first_stage_recipient": "City of West Covina, Adjudication Services, P.O. Box 2081, Tustin, CA 92781-2081",
+    "later_15_day_deadline_rejected_for_first_appeal": true,
+    "violation_date_not_treated_as_issue_date": true,
+    "new_paid_authorizations_require_saved_current_resolved_government_filing_and_feasible_deadline": true,
+    "pending_identical_reservation_still_recoverable": true,
+    "regressions": [
+      "backend/tests/test_filing_faq.py",
+      "backend/tests/test_unfamiliar_issuers_api.py",
+      "backend/tests/test_beta_payment_boundary.py"
+    ],
+    "captured_faq": "build-kit/evidence/bench-pages/4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e"
+  },
+  "local_method": "Each signed run began with an empty private SQLite store, a new browser session, new fictional images and the regular website customer workflow. Tesseract read the uploaded image bytes through a local vision adapter. The second vision review used a scripted response, so the exercise establishes local confirmation behavior only. Deterministic model proposals, stored municipal page bytes, the November 26 CISA directory and fake provider transports were used. Each loopback fake store had one fictional slot to exercise the paid path. The public cap and provider configuration were untouched. The normal issuer resolver, quote guards, case service, clock/feasibility computation and database were used. No order, eligible decision or provider object was inserted for the browser. These runs establish local behavior with those provider inputs. They do not measure production OCR or research-model quality.",
+  "fresh_source_trials": [
+    {
+      "ticket": "PB-SIM-1127-SIGNED-WC",
+      "issuer": {
+        "issuer_id": "CA:westcovina.gov",
+        "issuer_name": "City of West Covina",
+        "deciding_body": "City of West Covina Police Department",
+        "stage": "first-level review"
+      },
+      "inputs": {
+        "issued_city": "West Covina",
+        "issued_state": "CA",
+        "issue_date": "2026-11-27",
+        "violation_code": "METER",
+        "stage": "first-level review",
+        "printed_deadline": null,
+        "notice_date": null
+      },
+      "fictional_front_sha256": "f35c8f8dc28ff8268793cf7900d56b9ff69987a1e7a7278858f1cb8c4e848b6c",
+      "fictional_back_sha256": "fd6fc37b248b5bb9c9c5559b0d2e99e6af37b41ab70a493eb9bf7f7f7b47cd18",
+      "read_fields": {
+        "citation_number": "PB-SIM-1127-SIGNED-WC",
+        "issue_date": "2026-11-27",
+        "issuer_name": "City of West Covina",
+        "issued_city": "West Covina",
+        "issued_state": "CA",
+        "license_plate_state": "CA",
+        "violation_text": "Meter expired",
+        "stage_text": "Initial review"
+      },
+      "customer_plate_after_correction": "SIM273",
+      "ocr_operations": [
+        [
+          "extract",
+          "success"
+        ],
+        [
+          "review",
+          "success"
+        ]
+      ],
+      "customer_confirmation": {
+        "images_sha256": "cdc177a0f6bc23d0542ce6482d6fb78bd6aa720237eedd55c1659845eb3addd0",
+        "fields_sha256": "e0eb394ac19a3fbf568ffe4843275b39e3ff6a2acd2bd4907a79392f2ea2ecf8",
+        "review_result_sha256": "d7db4aeceb93c9e3f401ce9251bd5e65f9a11b14bb27c3e6cc4bbaf9b3b8df81",
+        "discrepancy_status": "resolved",
+        "confirmed_at": "2026-11-27T22:19:54.793328+00:00"
+      },
+      "submitted_http": 200,
+      "state": "STOPPED_NO_CHARGE",
+      "stop_family": "NOT_YET_VERIFIED",
+      "reason": "filing_evidence_unverified",
+      "sources": [
+        {
+          "url": "https://www.westcovina.gov/m/faq?cat=19",
+          "sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e",
+          "parsed_characters": 19706
+        }
+      ],
+      "findings": {
+        "MAIL_IN_ACCEPTED": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: value not in quote"
+        },
+        "DEADLINE_DAYS": {
+          "status": "CONFIRMED",
+          "reason": null,
+          "value": 21
+        },
+        "DEADLINE_CLOCK_START": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: value not in quote"
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: value not in quote"
+        },
+        "MAILING_ADDRESS": {
+          "status": "CONFIRMED",
+          "reason": null,
+          "value": {
+            "attention": "Adjudication Services",
+            "city": "Tustin",
+            "line1": "P.O. Box 2081",
+            "line2": null,
+            "recipient": "City of West Covina",
+            "state": "CA",
+            "zip_code": "92781-2081"
+          }
+        },
+        "REQUIRED_ITEMS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "REQUIRED_DECLARATIONS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "FINE_AMOUNT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "CONTEST_ELIGIBILITY": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "MANDATORY_FORMS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "SIGNATURE_REQUIREMENT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "PRIOR_STEP_REQUIREMENT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "TICKET_SPECIFIC_REQUIREMENTS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "DEADLINE_ABSOLUTE": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        }
+      },
+      "official_deadline_established": false,
+      "filing_decision_passed": false,
+      "same_database_counts": {
+        "pb_intake_records": 1,
+        "pb_ticket_intake_confirmations": 1,
+        "pb_approval_manifests": 0,
+        "pb_intake_authorization_attempts": 0,
+        "pb_payment_operations": 0,
+        "pb_mail_attempts": 0,
+        "pb_cases": 0,
+        "pb_webhooks": 0,
+        "pb_webhook_final_events": 0
+      },
+      "same_stopped_order_restored_and_compared": true,
+      "isolated_backup_sha256": "484992e928fead29526c8e943639af7d16eb5b050bbc99c39682050d830e0778",
+      "customer_screenshot_sha256": "0debfe4d229c3f9fcf9764d7218ba625516d0477caacdf36784ef9e6ab0db01d",
+      "browser_log_sha256": "a9f73e28bbe796554798cd8f338545d365bcb076ac05c13d3552c9d13f882541",
+      "research_record_sha256": "974d4c224e8f7e2245d9085a82ebdb16540b42097e32e4b4127eb6a03afb7aa6"
+    },
+    {
+      "ticket": "PB-SIM-1127-SIGNED-SD",
+      "issuer": {
+        "issuer_id": "CA:sandiego.gov",
+        "issuer_name": "City of San Diego",
+        "deciding_body": "issuing agency",
+        "stage": "first-level review"
+      },
+      "inputs": {
+        "issued_city": "San Diego",
+        "issued_state": "CA",
+        "issue_date": "2026-11-27",
+        "violation_code": "METER",
+        "stage": "first-level review",
+        "printed_deadline": null,
+        "notice_date": null
+      },
+      "fictional_front_sha256": "eb2801a566df37318e7e24ab2c0871612f1f0672ed76dc75d44a2f0a647643f6",
+      "fictional_back_sha256": "fd6fc37b248b5bb9c9c5559b0d2e99e6af37b41ab70a493eb9bf7f7f7b47cd18",
+      "read_fields": {
+        "citation_number": "PB-SIM-1127-SIGNED-SD",
+        "issue_date": "2026-11-27",
+        "issuer_name": "City of San Diego",
+        "issued_city": "San Diego",
+        "issued_state": "CA",
+        "license_plate_state": "CA",
+        "violation_text": "Meter expired",
+        "stage_text": "Initial review"
+      },
+      "customer_plate_after_correction": "SIM273",
+      "ocr_operations": [
+        [
+          "extract",
+          "success"
+        ],
+        [
+          "review",
+          "success"
+        ]
+      ],
+      "customer_confirmation": {
+        "images_sha256": "9b3cdb7e59461969c52c19a7a11ba7e255c9db44aac3294b475f253d96e66da8",
+        "fields_sha256": "304334b431762abbe360e270203fa2c73c1175477d5d47e1bf3322a952b0bb54",
+        "review_result_sha256": "dd88a5a6b57433e1a2cf6f985030c7a680ab9fd7b39dfea96cf28dd566cad520",
+        "discrepancy_status": "resolved",
+        "confirmed_at": "2026-11-27T22:20:04.377039+00:00"
+      },
+      "submitted_http": 200,
+      "state": "STOPPED_NO_CHARGE",
+      "stop_family": "NOT_YET_VERIFIED",
+      "reason": "filing_evidence_unverified",
+      "sources": [
+        {
+          "url": "https://www.sandiego.gov/parking/citations/appeal",
+          "sha256": "990ea13f3f62968d807f7e6a66de1eb86b15b859f1155abab07f2f7035314854",
+          "parsed_characters": 5957
+        }
+      ],
+      "findings": {
+        "MAIL_IN_ACCEPTED": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_CLOCK_START": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "REQUIRED_ITEMS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "REQUIRED_DECLARATIONS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "FINE_AMOUNT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "CONTEST_ELIGIBILITY": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "MANDATORY_FORMS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "SIGNATURE_REQUIREMENT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "PRIOR_STEP_REQUIREMENT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "TICKET_SPECIFIC_REQUIREMENTS": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "DEADLINE_ABSOLUTE": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        }
+      },
+      "official_deadline_established": false,
+      "filing_decision_passed": false,
+      "same_database_counts": {
+        "pb_intake_records": 1,
+        "pb_ticket_intake_confirmations": 1,
+        "pb_approval_manifests": 0,
+        "pb_intake_authorization_attempts": 0,
+        "pb_payment_operations": 0,
+        "pb_mail_attempts": 0,
+        "pb_cases": 0,
+        "pb_webhooks": 0,
+        "pb_webhook_final_events": 0
+      },
+      "same_stopped_order_restored_and_compared": true,
+      "isolated_backup_sha256": "acd852a4be1bac814ce669f1caf5d50005850321d8826bc41fd3a6af3ee30324",
+      "customer_screenshot_sha256": "90717a59c2a2963f82e6a86719b7b7e83c15ed209e12bf72153eda81fc0c808b",
+      "browser_log_sha256": "aa2373b7315f08008d5e88b7c82769c8413d5a81f20329d715bebf5d66db9ff4",
+      "research_record_sha256": "a86f4764dba093c7fa7e1bf0920f7d52980bc9dcd02096b2a8b18cc6ec2a4920"
+    },
+    {
+      "ticket": "PB-SIM-1127-SIGNED-MA",
+      "issuer": {
+        "issuer_id": "MA:saugus-ma.gov",
+        "issuer_name": "Town of Saugus",
+        "deciding_body": "Parking Hearings Officer",
+        "stage": "first-level review"
+      },
+      "inputs": {
+        "issued_city": "Saugus",
+        "issued_state": "MA",
+        "issue_date": "2026-11-27",
+        "violation_code": "METER",
+        "stage": "first-level review",
+        "printed_deadline": null,
+        "notice_date": null
+      },
+      "fictional_front_sha256": "bc0f5b12cefa445d0561d560c2c67e0628af59e2a13e3273deaff4695823eee9",
+      "fictional_back_sha256": "fd6fc37b248b5bb9c9c5559b0d2e99e6af37b41ab70a493eb9bf7f7f7b47cd18",
+      "read_fields": {
+        "citation_number": "PB-SIM-1127-SIGNED-MA",
+        "issue_date": "2026-11-27",
+        "issuer_name": "Town of Saugus",
+        "issued_city": "Saugus",
+        "issued_state": "MA",
+        "license_plate_state": "MA",
+        "violation_text": "Meter expired",
+        "stage_text": "Initial review"
+      },
+      "customer_plate_after_correction": "SIM273",
+      "ocr_operations": [
+        [
+          "extract",
+          "success"
+        ],
+        [
+          "review",
+          "success"
+        ]
+      ],
+      "customer_confirmation": {
+        "images_sha256": "d46c3410a26b21c8230bdd856d5f602ed9022362d868c5cc2ba5139ad9a1cd56",
+        "fields_sha256": "a30b9a15c22d84b82865128d81b226d5474fd189c6d31c2f5a62b776271388d0",
+        "review_result_sha256": "76b03c86e14583259e9bb2a832c2ed8d3f242b006df8dc25a1df133c071b91cf",
+        "discrepancy_status": "resolved",
+        "confirmed_at": "2026-11-27T22:20:12.959264+00:00"
+      },
+      "submitted_http": 200,
+      "state": "STOPPED_NO_CHARGE",
+      "stop_family": "NOT_YET_VERIFIED",
+      "reason": "filing_evidence_unverified",
+      "sources": [
+        {
+          "url": "https://www.saugus-ma.gov/m/faq?cat=21",
+          "sha256": "c514380fb9ded25e85a2849c6a4b020176be9759dfee887139b1c64f78488279",
+          "parsed_characters": 31760
+        },
+        {
+          "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId=",
+          "sha256": "aa33522df2ed4d5ee26e399f097178d538368c416d6814a5a717f013aa15c70c",
+          "parsed_characters": 4669
+        }
+      ],
+      "findings": {
+        "MAIL_IN_ACCEPTED": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_CLOCK_START": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "REQUIRED_ITEMS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "REQUIRED_DECLARATIONS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: incomplete or truncated procedure text; quote guard: procedural silence must be CONFIRMED"
+        },
+        "FINE_AMOUNT": {
+          "status": "UNKNOWN",
+          "reason": "MISSING_ANSWER"
+        },
+        "CONTEST_ELIGIBILITY": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: incomplete or truncated procedure text; quote guard: procedural silence must be CONFIRMED"
+        },
+        "MANDATORY_FORMS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: incomplete or truncated procedure text; quote guard: procedural silence must be CONFIRMED"
+        },
+        "SIGNATURE_REQUIREMENT": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: incomplete or truncated procedure text; quote guard: procedural silence must be CONFIRMED"
+        },
+        "PRIOR_STEP_REQUIREMENT": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: incomplete or truncated procedure text; quote guard: procedural silence must be CONFIRMED"
+        },
+        "TICKET_SPECIFIC_REQUIREMENTS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        },
+        "DEADLINE_ABSOLUTE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage"
+        }
+      },
+      "official_deadline_established": false,
+      "filing_decision_passed": false,
+      "same_database_counts": {
+        "pb_intake_records": 1,
+        "pb_ticket_intake_confirmations": 1,
+        "pb_approval_manifests": 0,
+        "pb_intake_authorization_attempts": 0,
+        "pb_payment_operations": 0,
+        "pb_mail_attempts": 0,
+        "pb_cases": 0,
+        "pb_webhooks": 0,
+        "pb_webhook_final_events": 0
+      },
+      "same_stopped_order_restored_and_compared": true,
+      "isolated_backup_sha256": "dd44fab9b2e75f819d021fc9de39b3cd1900cbeb9dc46911299e3e41405e9ecd",
+      "customer_screenshot_sha256": "8907550566e8838d18e89f565e8aec6cdb3f026a5fdb3b28d4c8bb385b5cf999",
+      "browser_log_sha256": "abeb41b328baa1b9e5b1f6d9b5d241537e6c68dd732511319bc8e91c959e3691",
+      "research_record_sha256": "ad26a932a9598841993a3623d0ba02cc82963770cf3f7b66525dad46dcf3f925"
+    }
+  ],
+  "offline_saugus_investigation": {
+    "signed_candidate": "8e88e2ed676393b133b5f24947f3804f3980bb1d",
+    "facts": [
+      {
+        "key": "MAIL_IN_ACCEPTED",
+        "published_literal_found": true,
+        "stage_attributed": null,
+        "literal_value_validator": false,
+        "guarded": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage"
+      },
+      {
+        "key": "MAILING_ADDRESS",
+        "published_literal_found": true,
+        "stage_attributed": null,
+        "literal_value_validator": true,
+        "guarded": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage"
+      },
+      {
+        "key": "DEADLINE_DAYS",
+        "published_literal_found": true,
+        "stage_attributed": null,
+        "literal_value_validator": true,
+        "guarded": "UNKNOWN",
+        "reason": "quote guard: source section has another or unknown issuer"
+      },
+      {
+        "key": "DEADLINE_CLOCK_START",
+        "published_literal_found": true,
+        "stage_attributed": null,
+        "literal_value_validator": false,
+        "guarded": "UNKNOWN",
+        "reason": "quote guard: source section has another or unknown issuer"
+      },
+      {
+        "key": "DEADLINE_RULE",
+        "published_literal_found": true,
+        "stage_attributed": null,
+        "literal_value_validator": true,
+        "guarded": "UNKNOWN",
+        "reason": "quote guard: source section has another or unknown issuer"
+      },
+      {
+        "key": "REQUIRED_ITEMS",
+        "published_literal_found": true,
+        "stage_attributed": null,
+        "literal_value_validator": true,
+        "guarded": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage"
+      }
+    ],
+    "sections": 57,
+    "parsed_characters": 31760,
+    "maximum_whole_procedure_for_silence": 30000,
+    "town_published_destination": "Town of Saugus, Parking Hearings Officer, 298 Central Street, Suite 5, Saugus, MA 01906",
+    "town_published_rule": "Initial mailed appeal must arrive within 21 days of the ticket date. Include a ticket copy and a placard copy if applicable.",
+    "conditional_timing_only": {
+      "deadline": "2026-12-18",
+      "mailing_date": "2026-12-01",
+      "arrival_date": "2026-12-10",
+      "latest_safe_send_date": "2026-12-07",
+      "reachable": true
+    },
+    "qualification": "Manual interpretation and a mail-timing calculation. The deployed app and local guard did not approve this route.",
+    "normalized_procedure_characters": 31364,
+    "primary_source": "https://www.saugus-ma.gov/m/faq?cat=21#question-139",
+    "linked_form": "https://www.saugus-ma.gov/DocumentCenter/View/1497",
+    "receipt_deadline_quote": "Your appeal must be received within 21 days of the ticket date."
+  },
+  "other_source_checks": [
+    {
+      "issuer": "San Diego",
+      "sources": [
+        "https://www.sandiego.gov/",
+        "https://www.sandiego.gov/parking/citations/appeal",
+        "https://www.sandiego.gov/parking/contact/parkingadmin"
+      ],
+      "result": "The corrected issuer quote on the city homepage cleared identity. The appeal page supplies the PO box without naming the recipient beside it. The payment-office page cannot provide that missing filing purpose."
+    },
+    {
+      "issuer": "Gloucester",
+      "source": "https://www.gloucester-ma.gov/1034/Parking-Ticket-Payments",
+      "result": "Reviewed published first-stage letter destination, ticket-copy requirement and 21 days from issuance. The page did not specify postmark versus receipt."
+    },
+    {
+      "issuer": "Vallejo",
+      "source": "https://www.vallejo.gov/our_city/departments_divisions/police_department_1_archived/our_bureaus_and_divisions_archived/traffic",
+      "result": "The archived municipal URL and current police site both returned 403 to the direct capture in this run. Search snippets were not admitted as runtime evidence."
+    }
+  ],
+  "local_checks": {
+    "full_backend": {
+      "status": "passed",
+      "command": "make check, six independent pytest workers grouped by file",
+      "signed_verification_revision": "15b15cee435041d9e946b3ce0acc83f1bcd4eb57",
+      "runtime_diff_from_signed_browser_candidate": [],
+      "only_changed_path": "backend/tests/test_t74_case_hold.py",
+      "initial_signed_check": "The original full suite observed a failing test precondition requiring no saved research on an already held order. Paid intake now saves that evidence earlier. Both legacy and current held-order setups were checked in the test-only follow-up.",
+      "incident_hold_suite": "12 passed",
+      "collected": 14322,
+      "exit": 0,
+      "ruff_files": 528,
+      "strict_mypy_source_files": 528,
+      "log_sha256": "866d7ca782fe04cf5f4a1ffcd72a45cb87dbec7bdc29bd491b7333e39f224075"
+    },
+    "focused": "121 passed in 55.97s",
+    "qualification_self_checks": "passed with no provider calls",
+    "kit_doctor": true,
+    "ticket_reading_browser": {
+      "status": "passed",
+      "fixture": "synthetic fixtures and fake providers; paid packet and delayed-capture browser controls include a seeded draft",
+      "local_browser_total": 17,
+      "application_fingerprint": "b33bf17bd94261e3da9519024952242bd2bfd2440781ec6f87f0db53f455002e",
+      "report_sha256": "bbe1dbf73c5a2f6316ba8ef86950a3345474b1f0bd1aee18284b701cd6a8fb6a",
+      "unchanged_during_run": true
+    },
+    "paid_browser": {
+      "status": "passed",
+      "fixture": "synthetic fixtures and fake providers; paid packet and delayed-capture browser controls include a seeded draft",
+      "local_browser_total": 166,
+      "application_fingerprint": "b33bf17bd94261e3da9519024952242bd2bfd2440781ec6f87f0db53f455002e",
+      "report_sha256": "3182faffc06ac2f119f5ac2de48e8282e4484b207c8aa386e78ee6150fdd6393",
+      "unchanged_during_run": true
+    },
+    "free_beta_browser_matrix": {
+      "status": "passed",
+      "simulated_projects": {
+        "chromium-desktop1280x900": 61,
+        "chromium-mobile375x812": 61,
+        "firefox-desktop1280x900": 61,
+        "firefox-mobile375x812": 61
+      },
+      "total": 244,
+      "application_fingerprint": "b33bf17bd94261e3da9519024952242bd2bfd2440781ec6f87f0db53f455002e",
+      "sha256": "a83f1d02b1b19850e18ebf77d37969055f20ec8b4e6e6960c6081fc4dacda7de",
+      "physical_devices_tested": false
+    },
+    "total_simulated_browser_executions": 427
+  },
+  "target_preparation": {
+    "signed_commit": "8e88e2ed676393b133b5f24947f3804f3980bb1d",
+    "git_tree": "440b60630edca518f6e1f41ab5fd5c4904b74175",
+    "archive_sha256": "b0d5640cf836716eee0a73edd9cf7a3970d309b2b14e01e209a6642500efa0ad",
+    "files": 464,
+    "bytes": 11580519,
+    "source_modes_and_blobs_verified": true,
+    "local_browser_web_source_files_matched": 198,
+    "build_tag": "8e88e2ed676393b133b5f24947f3804f3980bb1d-filing-qualification",
+    "prospective_target": "neuraldraft-parkingbreaker/us-west1-a/pb-qual-backend-01",
+    "private_origin": "https://pb-qual-1127.parkingbreaker.test",
+    "access": "IAP loopback only; previous listener closed",
+    "stripe_test_publishable_prefix": true,
+    "historical_sandbox_key_pair_readback": true,
+    "live_keys_loaded": false,
+    "image_digests": null,
+    "cloud_submission": false,
+    "provider_requests": false,
+    "google_read_only_vm_state": "RUNNING",
+    "image_build_or_cloud_upload": "untested; verified source archive and both build definitions prepared offline. No resulting OCI digests.",
+    "builder_limit": "Automatic approval review rejected the privileged local Docker image inventory and directed a user-run script. No privileged inventory was retried.",
+    "original_site_access": "The previous customer listener and rehearsal window were closed. VM status is a control-plane observation only.",
+    "staged_unsent_fictional_ticket": {
+      "ticket": "PB-SIM-13E244920A",
+      "fictional": true,
+      "uploaded": false,
+      "issue_date": "2026-11-27",
+      "photo_sha256": {
+        "front": "b5fa1bd27804206f9aabec8bd91c31dddcd7d277ef35d8d78c14ccc3cf0138b8",
+        "back": "5cccbd0bc84e61f55cdd9bacd3dbc090dc8e34319f49323e50bd8b45c6ec89a6"
+      },
+      "required_manual_correction": "fictional license plate",
+      "qualification": "Use a fresh dated generation only after source-qualified local checkout and target approval."
+    },
+    "private_run_card": "candidate/window.md",
+    "new_approval_requested": false,
+    "earliest_approval_condition": "A fresh genuine-source order must approve its packet and finish local checkout first. Sign and retest any further application change before requesting a bounded window."
+  },
+  "previous_provider_evidence": {
+    "receipt": "docs/verification/launch-qualification-2026-11-27.json",
+    "outcome": "Earlier seeded case on 7db2a27 joined one genuine Stripe test capture and one Lob test letter after a worker interruption. The release also has a separate private Google health/startup receipt. Neither observation came from a fresh browser checkout on the intended deployment."
+  },
+  "remaining_and_owner": [
+    {
+      "owner": "Engineering",
+      "action": "Reproduce the Saugus initial mailed appeal independently of the optional form, payment instructions and later court review. Verify stage, required documents, absence claims and the official receipt clock before a new fresh positive browser checkout."
+    },
+    {
+      "owner": "Engineering and Amir as rehearsal approver",
+      "action": "After a genuine local pass, pin both matching images and request one private, costed, expiring window. Verify private HTTPS and the complete same-order sandbox checkout, provider-accepted interruption, signed callbacks, quarantined backup, recovery and rollback before teardown."
+    },
+    {
+      "owner": "Operations, equipment/print reviewer and outage responder",
+      "action": "Verify actual access-email receipt, physical iPhone and Android, readable printed Certified packet and human outage acknowledgment."
+    },
+    {
+      "owner": "Amir with engineering and operations",
+      "action": "Resolve the outstanding privacy choice, verify deposited postage and refund reserves, billed cost and live callback configuration, then sign the cohort cap and stop rules for B01/R07."
+    }
+  ]
+}
