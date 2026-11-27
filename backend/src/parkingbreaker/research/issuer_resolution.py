@@ -78,6 +78,8 @@ def _parking_navigation(page: SourceRecord, scopes: tuple[SourceScope, ...]) -> 
             "parking tickets",
             "parking citations",
             "parking enforcement",
+            "parking division",
+            "parking violations",
         }:
             parking.append(url)
     return list(dict.fromkeys(contest + parking))

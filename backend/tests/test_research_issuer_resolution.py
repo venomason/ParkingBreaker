@@ -404,14 +404,17 @@ def test_no_pages_skips_ai(harness: Harness) -> None:
 
 
 @pytest.mark.parametrize(("max_pages", "verified"), [(2, False), (3, True)])
+@pytest.mark.parametrize(
+    "directory_label", ["Parking Information", "Parking Violations", "Parking Division"]
+)
 def test_without_search_official_parking_navigation_can_find_issuer_evidence(
-    harness: Harness, max_pages: int, verified: bool
+    harness: Harness, max_pages: int, verified: bool, directory_label: str
 ) -> None:
     parking = ROOT + "parking"
     root_html = (
         '<a href="/permits">Parking permits</a>'
         '<a href="https://other.gov/contest">Contest parking ticket</a>'
-        '<a href="/parking">Parking Information</a>'
+        f'<a href="/parking">{directory_label}</a>'
     )
     parking_html = (
         '<a href="/pay">Pay a parking ticket</a>'
