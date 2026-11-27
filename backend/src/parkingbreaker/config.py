@@ -26,7 +26,7 @@ from parkingbreaker.ai_spend_store import WORKER_CAPS_CENTS
 from parkingbreaker.api.service import CaseServices
 from parkingbreaker.appeal.drafting import CustomerTextDrafter
 from parkingbreaker.blob_store import LocalBlobStore
-from parkingbreaker.case_service import CaseService, CaseServiceDeps, ResearchDeps
+from parkingbreaker.case_service import CaseServiceDeps, ResearchDeps
 from parkingbreaker.config_fakes import (
     CONTEST,
     ROOT,
@@ -36,6 +36,7 @@ from parkingbreaker.config_fakes import (
     FixtureLlm,
     SyntheticVisionLlm,
 )
+from parkingbreaker.customer_checkout import CustomerCheckout
 from parkingbreaker.dotgov_source import load_dotgov_snapshot
 from parkingbreaker.http_fetcher import HttpFetcher
 from parkingbreaker.journey_context import JourneyBuildIdentity
@@ -518,7 +519,7 @@ def build_services(
         del subject
         return CustomerTextDrafter()
 
-    return CaseService(
+    return CustomerCheckout(
         CaseServiceDeps(
             store,
             base_prehold,

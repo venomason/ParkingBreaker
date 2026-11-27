@@ -28,6 +28,7 @@ from parkingbreaker.beta_store import BETA_DISCLOSURE_SHA256
 from parkingbreaker.blob_store import FakeBlobStore
 from parkingbreaker.case_service import CaseService, CaseServiceDeps, ResearchDeps
 from parkingbreaker.case_state import CaseState, HardStop
+from parkingbreaker.customer_checkout import CustomerCheckout
 from parkingbreaker.json_types import JsonValue
 from parkingbreaker.llm import Usage
 from parkingbreaker.lob_fakes import FakeLobClient
@@ -282,8 +283,12 @@ def test_unfamiliar_issuer_fixtures_match_rehearsal_manifest() -> None:
         assert _sha256(SOURCE_DIR / f"{case_id}.txt") == entry["source_text_sha256"]
 
 
+@pytest.mark.parametrize(
+    "checkout", [CaseService, CustomerCheckout], ids=["existing-workflow", "new-checkout"]
+)
 async def test_cambridge_driver_plate_correction_and_unresolved_deadline_pause_through_api(
     tmp_path: Path,
+    checkout: type[CaseService],
 ) -> None:
     cam_png = (IMAGE_DIR / "cambridge.png").read_bytes()
     cam_html = (SOURCE_DIR / "cambridge.html").read_text(encoding="utf-8")
@@ -444,6 +449,7 @@ async def test_cambridge_driver_plate_correction_and_unresolved_deadline_pause_t
         issuer_assessor=issuer_assessor,
         extractor=extractor,
     )
+    case_service = checkout(case_service._deps)
     app = create_app(case_service)
 
     try:
@@ -564,6 +570,22 @@ async def test_cambridge_driver_plate_correction_and_unresolved_deadline_pause_t
             )
             assert submitted.status_code == 200, submitted.text
             case_id = submitted.json()["case_id"]
+            if checkout is CustomerCheckout:
+                assert submitted.json()["state"] == CaseState.STOPPED_NO_CHARGE.value
+                saved = store.get_research(case_id)
+                assert saved is not None
+                guard = (await api.get(f"/cases/{case_id}/pre-hold", headers=ALICE)).json()
+                assert guard["reason_key"] == "filing_evidence_unverified"
+                refused = await api.post(
+                    f"/cases/{case_id}/authorization",
+                    headers=ALICE,
+                    json={"terms_accepted": True, "payment_method_id": "pm_cam_synth"},
+                )
+                assert refused.status_code == 409
+                assert not payments.authorizations
+                assert not lob.calls
+                assert store.pending_authorization_attempt(case_id) is None
+                return
             assert submitted.json()["state"] == CaseState.INTAKE.value, submitted.text
 
             prehold_resp = await api.get(f"/cases/{case_id}/pre-hold", headers=ALICE)

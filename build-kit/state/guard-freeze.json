@@ -5,17 +5,24 @@
   "files": {
     "backend/src/parkingbreaker/research/support.py": "52d22b8a3255da714918ca7b4c6c2a6469f4d34b92cb101e92cd9cce54aa9135",
     "backend/src/parkingbreaker/research/findings.py": "9a1d84aa9a7eea69e21964a19ea61be2efdfcd43026e34728b415bb43d0169f1",
-    "backend/src/parkingbreaker/research/procedure.py": "f1c2b8132bf60d44b4bf863a9449dd96dadbdaecae27d40104aad22df98f000a",
+    "backend/src/parkingbreaker/research/procedure.py": "3b9d31ae0b3c90ff808e9020e5456b4be265778d21449cfb93c0c1602677b02e",
     "backend/src/parkingbreaker/research/route_requirements.py": "c5a1b3a026c1f585c989b773412103d747a746ed53652c63c2302f34b74bd279"
   },
   "owner_approved_exception": {
-    "approved_by": "Amir (owner), November 23 direction to fix the reported stale pin and T14 failures",
-    "approved_on": "2026-11-23",
-    "case_id": "cambridge-official-mail-dispute-formula",
-    "captured_url": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
-    "captured_page_sha256": "75cd79ab79dfbf0eb5ac18ba91b5e941be90e6d11ea3b4d8b4802d41e3b12046"
+    "approved_by": "Owner direction to reproduce and repair West Covina first-stage attribution on the captured official FAQ",
+    "approved_on": "2026-11-27",
+    "case_id": "west-covina-faq-stage-attribution",
+    "captured_url": "https://www.westcovina.gov/m/faq?cat=19",
+    "captured_page_sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e"
   },
   "exception_history": [
+    {
+      "approved_by": "Amir (owner), November 23 direction to fix the reported stale pin and T14 failures",
+      "approved_on": "2026-11-23",
+      "case_id": "cambridge-official-mail-dispute-formula",
+      "captured_url": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
+      "captured_page_sha256": "75cd79ab79dfbf0eb5ac18ba91b5e941be90e6d11ea3b4d8b4802d41e3b12046"
+    },
     {
       "approved_by": "Amir (owner), current chat PROCEED after saved Phase 3 patch review, 2026-11-08",
       "approved_on": "2026-11-08",
@@ -31,5 +38,5 @@
       "captured_page_sha256": "08fbc461e49a55375e6d6304c168e3bfbacec91f04045b611cd0ebd89f50a258"
     }
   ],
-  "current_exception_authority": "November 23 owner direction to reconcile the stale pin. The post-benchmark Cambridge captured-page comparison and negative controls are recorded in docs/verification/code-review-2026-11-22.json. This is source governance only."
+  "current_exception_authority": "November 27 direction to repair the demonstrated FAQ failure while retaining filing and payment safeguards. The archived capture and test_filing_faq.py reproduce the change."
 }

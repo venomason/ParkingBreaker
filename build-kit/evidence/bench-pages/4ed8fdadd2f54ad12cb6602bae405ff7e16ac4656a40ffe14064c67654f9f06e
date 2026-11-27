@@ -1,0 +1,3242 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<!-- Google Tag Manager for GA4 -->
+				<script>(function(w,d,s,l,i){w.GAMeasurementID='G-MMJV276GDM';w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+				'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','cpDataLayerGA4','GTM-K73C5PS');</script>
+				<!-- End Google Tag Manager for GA4 -->
+				<script type='text/javascript'>
+					var enableTelemetry = 'false'
+					var aiConfig = {
+					instrumentationKey: '1cde048e-3185-4906-aa46-c92a7312b60f'						
+					}
+					var appInsights = window.appInsights || function (a) { function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement('script'); b.src = a.url || 'https://js.monitor.azure.com/scripts/a/ai.0.js', d.getElementsByTagName('script')[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ['Event', 'Exception', 'Metric', 'PageView', 'Trace', 'Dependency']; f.length;)b('track' + f.pop()); if (b('setAuthenticatedUserContext'), b('clearAuthenticatedUserContext'), b('startTrackEvent'), b('stopTrackEvent'), b('startTrackPage'), b('stopTrackPage'), b('flush'), !a.disableExceptionTracking) { f = 'onerror', b('_' + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c['_' + f](a, b, d, e, h), i } } return c }(aiConfig);
+					window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length;
+					// Add telemetry initializer
+					appInsights.queue.push(function() {
+						appInsights.context.addTelemetryInitializer(function(envelope) {
+							var telemetryItem = envelope.data.baseData;
+							// To check the telemetry item’s type:
+							if (!false)
+							{
+								//If the telemetry is not enabled, we still want to capture Google map custom event, so only allow that
+								if (envelope.name.indexOf('.Event') == -1)
+									return false;
+							}
+						});
+					});						
+					appInsights.trackPageView();
+				</script>
+	<script>
+		function populateAntiForgery(token) {
+			var input = document.createElement("input");
+			input.name = "__RequestVerificationToken";
+			input.type = "hidden";
+			input.value = token;
+			var absPat = /^https?:\/\/|^\/\//i;
+			var forms = document.getElementsByTagName("form");
+			for (var i = 0; i < forms.length; i++) {
+				if (forms[i].method == "post" &&
+					!forms[i].querySelector('[name="__RequestVerificationToken"]') &&
+					!absPat.test(forms[i].getAttribute("action"))) {
+					forms[i].appendChild(input.cloneNode());
+				}
+			}
+		}
+
+		function getAntiForgeryToken(callback, error) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "/antiforgery");
+			xhr.addEventListener("load", function() {
+				try {
+					if (this.status !== 200) {
+						throw Error("Invalid status. Could not retrieve antiforgery token.");
+					}
+					var obj = JSON.parse(this.responseText);
+					callback(obj.token);
+				} catch (e) {
+					typeof error === "function" && error(e);
+				}
+			});
+			xhr.send();
+		}
+
+		getAntiForgeryToken(function(token) {
+			if (document.readyState === "complete"
+				|| document.readyState === "loaded" 
+				|| document.readyState === "interactive") {
+				populateAntiForgery(token);
+				return;
+			}
+			document.addEventListener("DOMContentLoaded", function() {
+				populateAntiForgery(token);
+			}, false);
+		}, console.error);
+	</script>
+			
+
+	<script type="text/javascript">
+		window.departmentHeader = {};
+		window.pageSectionTracker = {};
+		window.isResponsiveEnabled = true;
+		window.isRemoveSetHeights= true;
+		if (window.isRemoveSetHeights) {
+			document.documentElement.className += ' removeSetHeights';
+		}
+		window.mainMenuMediaQuery = 'screen and (max-width: 40em)';
+		window.isMobileBrowserIncludingTablets = false;
+		window.fixedResponsiveMenu = false;
+		window.fullWidthResponsiveMenu = true;
+		window.responsiveMenuHeight = '';
+		window.responsiveMenuFontSize = '';
+		window.isContentAdvisor = false;
+		(function () {
+			window.setSizeCookie = function () {
+				document.cookie = "dpi=" + window.devicePixelRatio + "; path=/";
+				document.cookie = "viewportWidth=" + window.innerWidth + "; path=/";
+				document.cookie = "viewportHeight=" + window.innerHeight + "; path=/";
+				if (screen && screen.width && screen.height) {
+					document.cookie = "screenWidth=" + screen.width + "; path=/";
+					document.cookie = "screenHeight=" + screen.height + "; path=/";
+				}
+				document.cookie = "responsiveGhost=1; path=/";
+			};
+
+			setSizeCookie();
+		}());
+	</script>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script async src="https://docaccess.com/docbox.js"></script>
+	
+	
+	
+	<meta name="theme-color" content="rgb(52, 105, 99)">
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+	
+
+	<script src="/Assets/Scripts/jQuery/jquery-3.7.1.min.js"></script>
+	<script src="/Assets/Scripts/jQuery/jquery-migrate-3.6.0.min.js" type="text/javascript"></script>
+	
+
+	<!--[if IE 6]><script language="JavaScript" type="text/javascript"> var isie6 = true; </script><![endif]-->
+	<!--[if IE 7]><script language="JavaScript" type="text/javascript"> var isie7 = true; </script><![endif]-->
+	<!--[if IE 8]><script language="JavaScript" type="text/javascript"> var isie8 = true; </script><![endif]-->
+	<!--[if IE 9]><script language="JavaScript" type="text/javascript"> var isie8 = true; </script><![endif]-->
+	<script type="text/javascript"><!--
+	var intCountryCode = 840;
+	var order = '';
+//--></script>
+	
+<link href="/-681783051.css" rel="stylesheet" type="text/css">	<link href="/-2140275272.css" rel="stylesheet" type="text/css">	<link href="/-1770949761.css" rel="stylesheet" type="text/css">
+
+	<link rel="stylesheet" type="text/css" href="/Assets/Styles/Print.css" media="print">
+	<script type="text/javascript">
+		window.Pages = window.Pages || {};
+		// FrontEnd RWD initialization
+		window.Pages.rwdReady = $.Deferred();
+		window.Pages.toolBarDeferred = $.Deferred();
+		window.Pages.rwdSetupComplete = $.Deferred();
+		window.Pages.megaMenuLoaded = $.Deferred();
+		window.Pages.angularToolbarComplete = $.Deferred();
+		window.Pages.frontEndToolbarComplete = $.Deferred();
+	</script>
+	<!--CPHeadContent-->
+	<script src="/739942322.js" type="text/javascript"></script>
+	
+	
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAQs - CivicPlus.CMS.FAQ</title>
+    <link rel="stylesheet" href="/static/FAQ/css/styles.css?v=xgyzQN0C30-KaOyfHTqYYriyDjd6D9Zk38DO7BNOpPs" />
+
+
+
+	<!--[if lte IE 8]><link rel="stylesheet" type="text/css" href="/App_Themes/ie8.css"><![endif]-->
+	<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/App_Themes/ie7.css"><![endif]-->
+	<!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="/App_Themes/ie6.css"><![endif]-->
+	<!--[if lt IE 9]><script type="text/javascript" src="/Scripts/html5.js"></script><![endif]-->
+
+	<script type="text/javascript">
+		setEditorVariables(false, 840);
+		function getPrintPreviewType() { return 0; } function printPreview() {pPreview(getPrintPreviewType()); }
+	</script>
+	<script src="/Assets/Scripts/AlpineJS/3.14.1/alpine.min.js" type="text/javascript" defer="defer"></script>
+</head>
+<body class="wide ">
+
+    <script>jQuery(document).click(function (event) {
+	var target = jQuery(event.target);
+	if (target.attr('src') && target.parents('.image').length && target.parents('.widget').length) {
+		var text = target.attr('title');
+		
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Image',
+				eventAction: 'Image - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.is('button') || target.hasClass('button') || target.parents().hasClass('button')) {
+		var text = "";
+		if (target.parents('.button')[0]) {
+			text = target.parents('.button').first().text();
+		} else if (target.text().length) {
+			text = target.text();
+		} else if (target.attr('title').length) {
+			text = target.attr('title');
+		}
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Button',
+				eventAction: 'Button - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.widgetCustomHtml').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Custom Html',
+				eventAction: 'Custom Html Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.editor').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Editor',
+				eventAction: 'Editor Link Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.GraphicLinks').length) {
+		var text = "";
+		var targetGraphicLink = target;
+		if (target.hasClass('widgetGraphicLinksLink')) {
+			targetGraphicLink = jQuery(target.children()[0]);
+		}
+		if (targetGraphicLink.hasClass('text')) {
+			text = targetGraphicLink.text();
+		} else if (targetGraphicLink.attr('src').length) {
+			if (targetGraphicLink.attr('alt').length) {
+				text = targetGraphicLink.attr('alt');
+			} else {
+				text = targetGraphicLink.attr('src');
+			}
+		} else {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Graphic Links',
+				eventAction: 'Graphic Link - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.InfoAdvanced').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Info Advanced',
+				eventAction: 'Info Advanced Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.list').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'List',
+				eventAction: 'List Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.megaMenuItem').length || target.parents('.topMenuItem').length) {
+		var megaMenuText = jQuery('.topMenuItem.mouseover').find('span').text();
+		var breadCrumbs = [];
+		jQuery('.breadCrumbs > li').each(function () {
+			 breadCrumbs.push(this.textContent);
+		});
+		var pageTitle = breadCrumbs.join('>');
+		var subTitleText = target.parents('.megaMenuItem').children('.widgetTitle').children().text();
+		var text = "";
+		if (pageTitle) {
+			text += pageTitle + " | ";
+		} else {
+			text += document.title + ' - ';
+		}
+		if (target.text() == "" && megaMenuText == "") {
+			text += "N/A";
+		} else if (target.text().length && megaMenuText.length) {
+			if (megaMenuText == target.text()) {
+				text += megaMenuText;
+			} else {
+				text += megaMenuText + " - " + subTitleText + " - " + target.text();
+			}
+		} else if (target.text() == "") {
+			text += megaMenuText;
+		} else {
+			text += target.text();
+		}
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Mega Menu',
+				eventAction: 'Mega Menu : ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.widgetNewsFlash').length && target.parents('.widgetItem').length) {
+		var text = jQuery(target.parents('.widgetItem')[0]).find('.widgetTitle').children().text();
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'News Flash',
+				eventAction: 'News Flash - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.hasClass('widgetQuickLinksLink') || target.find('.widgetQuickLinksLink').length) {
+		var text = target.text();
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Quick Links',
+				eventAction: 'Quick Links - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.attr('src') && target.parents('.cpSlideshow').length) {
+		var text = target.attr('title');
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Slideshow',
+				eventAction: 'Slideshow - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.widgetText').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Text',
+				eventAction: 'Text Link Clicked',
+				eventLabel: window.location.href
+			});
+	}
+});</script>
+	<div id="popoverModal" class="cp-PopOver cp-PopOver--modal cp-AdminWrap" style="position: fixed; display: none;">
+	<div class="cp-PopOver-header">
+		<h3 class="cp-PopOver-title"></h3>
+		<button class="cp-Btn cp-PopOver-close" onclick="closePopOverModal(event)">
+			<svg class="cp-Icon--close" alt="close" title="close">
+				<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#iconClose"></use>
+			</svg>
+		</button>
+	</div>
+	<div id="cpPopOverBody" class="cp-PopOver-body">
+		<form id="cpPopOverForm" name="cpPopOverForm" novalidate></form>
+	</div>
+	<div id="cpPopOverFooter" class="cp-PopOver-footer">
+		<div class="cp-BtnGroup" id="actionButtons">
+			<!-- Action buttons will be dynamically added here -->
+		</div>
+	</div>
+</div>
+    <div id="fb-root"></div>
+<div id=skipToContentLinks>
+<a href="#contentarea" target="_self" class="skipToContentLink">Skip to Main Content</a>
+</div>
+    <form id="frmReferenceFormForTelerikEditorDialogs"></form>
+
+        <input type="hidden" id="GoogleMapsKey" value="AIzaSyDWUuE-ifkbhxblF920N8MjpBdTg1Wt784">
+
+
+
+    <input type="hidden" id="cpcDomain" value="https://cp-civicplusuniversity2.civicplus.com">
+    <input type="hidden" id="hdnStructureID" value="2">
+    <input type="hidden" id="hdnContentCollectionID" value="9dd17759-87ea-4283-9b9c-cb1c70ebe70c">
+    <input type="hidden" id="hdnWorkingCopyID" value="00000000-0000-0000-0000-000000000000">
+    <input type="hidden" id="hdnThemeID" value="17">
+    <input type="hidden" id="pageIsFrontEnd" value="true">
+    <input type="hidden" id="pageModuleID" value="25">
+    <input type="hidden" id="pagePageID">
+
+        <input type="hidden" id="hdnModuleID" value="25">
+            <img id="imgLogoPrintPreview" src="/ImageRepository/Document?documentID=27" alt="West Covina, CA">
+<div id="stickyPlaceholder"></div>
+    <div id="outer-wrap" class="outer-wrap">
+        <div id="inner-wrap" class="inner-wrap">
+                <div id="divToolbars" class="cpToolbars newCP mui-fixed" style="">
+                    
+
+
+
+<!-- Begin Signed Out Bar -->
+<div class="cpToolbar user public">
+    <div class="inner selfClear">
+        <p class="dropdown"><a href="/MyAccount/ProfileCreate" class="myConnections" id="signedOutToolbarCreateProfileButton">Create a Website Account</a> <span class="welcomeMessage">- Manage notification subscriptions, save form progress and more. &nbsp;&nbsp;</span></p>
+        <ul class="nav secondary">
+	        <li><a href="/MyAccount" class="button" id="loggedOutToolbarSignInButton">Website Sign In</a></li>
+        </ul>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#signedOutToolbarCreateProfileButton').click(function (event) {
+            event.preventDefault();
+            window.location.href = '/MyAccount/ProfileCreate?from=url&url=/&dn=' + window.location.origin;
+        });
+
+			
+				$('#loggedOutToolbarSignInButton').click(function (event) {
+					event.preventDefault();
+					window.location.href = '/MyAccount/?from=url&url=' + encodeURIComponent(window.location.href.replace(window.location.origin, '')) + '&dn=' + window.location.host;
+				});
+			
+
+		if ('False' == 'True') {
+            $('#loggedOutToolbarSignInButton').hide();
+		}
+    })
+</script>
+<!-- End Signed Out Bar -->
+
+                </div>
+            <div id="bodyWrapper">
+                <div id="mainNavHolderMobile" class="mainNavHolderMobile"></div>
+                
+<div data-cprole="structuralContainer" id="bodyContainerTS">
+<!-- Header Container --><header data-cprole="structuralContainer" id="headerContainerTS" class="fixedTopTS">
+<div class="siteWrap3" id="flexHeaderTS"><div data-cprole="banner" id="bannerLogoTS" class="bannerLogoTS empty">
+
+
+
+
+				<a id="bannerLogoTS-58" style="			display: block; text-align: center;
+" class="bannerObject" href="/" target="_self"><img alt="West Covina California Home Page" class="bannerObject" height="494" src="/ImageRepository/Document?documentID=93" width="678"></a>
+</div><nav data-cprole="nav" id="mainNav" class="siteNav mainNav" role="navigation">
+<ol id="mainNavMenu" data-parent="1" class="rootNavMenu" role="menu"><!--
+--><li id="MainItem27" class="topMenuItem" role="none" data-pageid="27" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu27" id="mainNavGovernment" class="navMainItem mainNavItem mainNavItem1 " href="/27/Government" target="_self">   Government  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem31" class="topMenuItem" role="none" data-pageid="31" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu31" id="mainNavResidents" class="navMainItem mainNavItem mainNavItem2 " href="/31/Residents" target="_self">   Residents  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem35" class="topMenuItem" role="none" data-pageid="35" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu35" id="mainNavBusiness" class="navMainItem mainNavItem mainNavItem3 " href="/35/Business" target="_self">   Business  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem101" class="topMenuItem" role="none" data-pageid="101" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu101" id="mainNavOnlineServices" class="navMainItem mainNavItem mainNavItem4 " href="/101/Online-Services" target="_self">   Online Services  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem9" class="topMenuItem" role="none" data-pageid="9" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu9" id="mainNavHowDoI" class="navMainItem mainNavItem mainNavItem5 " href="/9/How-Do-I" target="_self">   How Do I...  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem159" class="topMenuItem" role="none" data-pageid="159" data-displaymegamenu="False"><!--
+			--><!--
+			--> <a role="menuitem" id="mainNavAskWC" class="navMainItem mainNavItem mainNavItem6" href="/159/AskWC" target="_self">   AskWC </a>			<!--
+			--><!--
+			--></li><!---->
+</ol>
+
+
+	<script type="text/javascript">
+		(function () {
+			function setupMenu() {
+				const menuID = 'mainNavMenu';
+				const menuType = MAIN_MENU;
+
+				//setup menu manager properties for main menu
+				if (!menuManager.mobileMainNav && true)
+					menuManager.adjustMainItemsWidth('#' + menuID);
+				menuManager.isMainMenuEditable = false;
+				menuManager.mainMenuMaxSubMenuLevels = 4;
+				menuManager.setMOMMode(2, menuType);
+
+				//Init main menu
+				const setupDraggable = menuManager.isMainMenuEditable;
+				const urlToGetHiddenMenus = '/Pages/MenuMain/HiddenMainSubMenus?pageID=1&moduleID=25&themeID=17&menuContainerID=mainNav';
+
+				menuManager.setupMenu(menuID, 'mainNav', menuType, setupDraggable, urlToGetHiddenMenus);
+				menuManager.mainMenuInit = true;
+				menuManager.mainMenuTextResizer = false;
+				if (1.00 > 0)
+					menuManager.mainMenuTextResizerRatio = 1.00;
+				if (window.isResponsiveEnabled)
+					menuManager.mainMenuReady.resolve();
+
+			}
+
+			if (document.readyState === "complete"
+				|| document.readyState === "loaded"
+				|| document.readyState === "interactive") {
+				setupMenu();
+				return;
+			}
+
+			document.addEventListener("DOMContentLoaded", setupMenu);
+		})();
+	</script>
+
+
+<aside data-cprole="megaMenu" id="megaMenu" class="megaMenu" style="display: none;"><input type="hidden" id="megaMenuPopupDirection" value="0"><input type="hidden" id="megaMenuWidthReference" value="0"><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu27" class="contentTop mainNavMegaMenu megaMenuContainer pageID_27 hidden" data-orientation="horizontal">	<div id="ccbefba7a2-965e-4e2d-b350-ce9f195e0a6c" data-containerid="befba7a2-965e-4e2d-b350-ce9f195e0a6c" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu31" class="contentTop mainNavMegaMenu megaMenuContainer pageID_31 hidden" data-orientation="horizontal">	<div id="cc5afaa535-ffdd-4298-8b30-73bcdd8cd7d8" data-containerid="5afaa535-ffdd-4298-8b30-73bcdd8cd7d8" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu35" class="contentTop mainNavMegaMenu megaMenuContainer pageID_35 hidden" data-orientation="horizontal">	<div id="ccc2e81bc0-0458-47ff-818b-df2cd32b97b0" data-containerid="c2e81bc0-0458-47ff-818b-df2cd32b97b0" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu101" class="contentTop mainNavMegaMenu megaMenuContainer pageID_101 hidden" data-orientation="horizontal">	<div id="cc4d9fdc2d-6009-4f02-b251-9bac537ad789" data-containerid="4d9fdc2d-6009-4f02-b251-9bac537ad789" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu9" class="contentTop mainNavMegaMenu megaMenuContainer pageID_9 hidden" data-orientation="horizontal">	<div id="cca7aa58b1-dcb9-4fe9-87b5-50a282c46a4d" data-containerid="a7aa58b1-dcb9-4fe9-87b5-50a282c46a4d" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside></aside></nav><div data-cprole="contentContainer" id="searchTS">	<div id="ccf18ecaf9-65ec-4ea1-9e47-9726a051921d" data-containerid="f18ecaf9-65ec-4ea1-9e47-9726a051921d" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col24 first last" style="" data-widgetcontainerid="f426d0b7-4093-4a0e-b7a2-7ed3c8c357eb">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col24 first last id96f95df6-4a51-45ed-9ce3-aa0fab3c2a61" style="" data-widgetcontainerid="96f95df6-4a51-45ed-9ce3-aa0fab3c2a61">	
+<div data-widget-id="4fea2c92-8abe-4ce0-8228-9ba3fc49bf58" data-widget-controller-path="/Layout/WidgetSearch">
+	
+	<script defer type="text/javascript" src="/Common/Controls/jquery-ui-1.14.2/jquery-ui.min.js"></script>
+	<script defer src="/Areas/Layout/Assets/Scripts/Search.js" type="text/javascript"></script>
+	<script defer type="text/javascript">
+
+		$(document).ready(function () {
+			try {
+				// Minimum characters required before performing a search/autocomplete
+				var minPrefixLength = 3;
+				var autoCompleteDebounceDelay = 500;
+				var searchFieldSelector = "#searchField" + '4fea2c92-8abe-4ce0-8228-9ba3fc49bf58';
+				var checkboxSelector = "#ysnSearchOnlyDept" + '4fea2c92-8abe-4ce0-8228-9ba3fc49bf58';
+				var buttonSelector = ".widgetSearchButton" + '4fea2c92-8abe-4ce0-8228-9ba3fc49bf58';
+				var autoCompleteCache = {};
+				var autoCompleteCacheKeys = [];
+				var autoCompleteCacheLimit = 25;
+				var currentAutoCompleteRequest = null;
+				var currentAutoCompleteRequestKey = null;
+				var autoCompleteDebounceTimer = null;
+				var autoCompleteDebounceKey = null;
+				var pendingAutoCompleteResponses = [];
+
+				function normalizeAutoCompleteTerm(term) {
+					return $.trim((term || "") + "").replace(/\s+/g, " ");
+				}
+
+				function shouldSearch(term) {
+					return normalizeAutoCompleteTerm(term).length >= minPrefixLength;
+				}
+
+				function getAutoCompleteUrl() {
+					return '/Search/AutoComplete' + ($(checkboxSelector).is(':checked') || false? '?departmentId=0' : '');
+				}
+
+				function getAutoCompleteCacheKey(requestUrl, term) {
+					return requestUrl + "|" + term.toLowerCase();
+				}
+
+				function cacheAutoCompleteResult(cacheKey, data) {
+					if (!Object.prototype.hasOwnProperty.call(autoCompleteCache, cacheKey)) {
+						autoCompleteCacheKeys.push(cacheKey);
+						if (autoCompleteCacheKeys.length > autoCompleteCacheLimit) {
+							delete autoCompleteCache[autoCompleteCacheKeys.shift()];
+						}
+					}
+					autoCompleteCache[cacheKey] = data;
+				}
+
+				function respondToPendingAutoComplete(data) {
+					var responses = pendingAutoCompleteResponses;
+					pendingAutoCompleteResponses = [];
+					for (var i = 0; i < responses.length; i++) {
+						responses[i](data);
+					}
+				}
+
+				function cancelPendingAutoComplete() {
+					clearTimeout(autoCompleteDebounceTimer);
+					autoCompleteDebounceKey = null;
+					if (currentAutoCompleteRequest != null) {
+						currentAutoCompleteRequest.abort();
+						currentAutoCompleteRequest = null;
+					}
+					currentAutoCompleteRequestKey = null;
+					respondToPendingAutoComplete([]);
+				}
+
+				function createWidgetAutoCompleteSource(options) {
+					return function (request, response) {
+						var term = normalizeAutoCompleteTerm(request.term);
+						if (!options.shouldSearch(term)) {
+							response([]);
+							return;
+						}
+
+						var requestUrl = options.url();
+						var cacheKey = getAutoCompleteCacheKey(requestUrl, term);
+						if (Object.prototype.hasOwnProperty.call(autoCompleteCache, cacheKey)) {
+							response(autoCompleteCache[cacheKey]);
+							if (options.success) {
+								options.success(autoCompleteCache[cacheKey]);
+							}
+							return;
+						}
+
+						if (currentAutoCompleteRequestKey === cacheKey || autoCompleteDebounceKey === cacheKey) {
+							pendingAutoCompleteResponses.push(response);
+							return;
+						}
+
+						cancelPendingAutoComplete();
+						autoCompleteDebounceKey = cacheKey;
+						pendingAutoCompleteResponses.push(response);
+						autoCompleteDebounceTimer = setTimeout(function () {
+							autoCompleteDebounceKey = null;
+							currentAutoCompleteRequestKey = cacheKey;
+							currentAutoCompleteRequest = $.ajax({
+								url: requestUrl,
+								dataType: "json",
+								timeout: options.timeout,
+								data: {
+									term: term,
+								},
+								success: function (data) {
+									if (currentAutoCompleteRequestKey === cacheKey) {
+										cacheAutoCompleteResult(cacheKey, data);
+										respondToPendingAutoComplete(data);
+										if (options.success) {
+											options.success(data);
+										}
+									}
+								},
+								error: function (xmlhttprequest, textstatus, message) {
+									if (textstatus === "abort") {
+										return;
+									}
+
+									if (options.error) {
+										options.error(xmlhttprequest, textstatus, message);
+									}
+
+									respondToPendingAutoComplete([]);
+								},
+								complete: function (xmlhttprequest) {
+									if (currentAutoCompleteRequest === xmlhttprequest) {
+										currentAutoCompleteRequest = null;
+										currentAutoCompleteRequestKey = null;
+									}
+								}
+							});
+						}, options.delay);
+					};
+				}
+
+				// click handler for search buttons
+				$(buttonSelector).click(function (e) {
+					e.preventDefault();
+					var $btn = $(this);
+					var $field = $btn.siblings(".widgetSearchBox");
+					var term = $field.val() + "";
+					if (!shouldSearch(term)) {
+						// do nothing until user types enough characters
+						$field.focus();
+						return;
+					}
+
+					if ($(checkboxSelector).is(':checked') || false)
+					{
+						doWidgetSearch($.trim(term), Number(0));
+					}
+					else {
+						doWidgetSearch($.trim(term), 0);
+					}
+				});
+
+				// enter key handler for the search field
+				$(searchFieldSelector).keypress(function (e) {
+					var code = e.which || e.keyCode;
+					if (code === 13) {
+						e.preventDefault();
+						var $this = $(this);
+						var term = $this.val() + "";
+						if (!shouldSearch(term)) {
+							// do nothing until user types enough characters
+							$this.focus();
+							return false;
+						}
+
+						if ($(checkboxSelector).is(':checked') || false) {
+							doWidgetSearch($.trim(term), Number(0));
+						} else {
+							doWidgetSearch($.trim(term), 0);
+						}
+						return false;
+					}
+					return true;
+				});
+
+				// autocomplete: set minLength and guard source
+				if (true) {
+					var $searchField = $(searchFieldSelector).autocomplete({
+						minLength: minPrefixLength,
+						source: createWidgetAutoCompleteSource({
+							delay: autoCompleteDebounceDelay,
+							timeout: 10000,
+							shouldSearch: shouldSearch,
+							url: getAutoCompleteUrl,
+							success: function () {
+								$('.autoCompleteError').remove();
+							},
+							error: function (xmlhttprequest, textstatus, message) {
+								if (textstatus === "timeout") {
+									if ($(searchFieldSelector).siblings('.autoCompleteError').length == 0)
+										$('<span class="autoCompleteError"><p class="alert error">Search autocomplete is currently not responding. Please try again later.</p></span>').insertAfter($(searchFieldSelector));
+								}
+							}
+						}),
+						html: true,
+						delay: 0,
+						select: function (event, ui) {
+							$(this).val(ui.item.value);
+							$(this).next().click();
+						}
+					});
+
+					$searchField.data("ui-autocomplete")._renderItem = function (ul, item) {
+						return $("<li class=\"itemList\"></li>")
+							.data("ui-autocomplete-item", item)
+							.append("<a>" + item.label + "</a>")
+							.appendTo(ul);
+					};
+				}
+
+				// keep searchBtnApplyQuery consistent with prefix rule
+				window.searchBtnApplyQuery = function() {
+					var $field = $(searchFieldSelector);
+					var term = $field.val() + "";
+					if (shouldSearch(term)) {
+						// update href for the icon/button (if present)
+						var btn = document.getElementById("btnSearchIcon");
+						if (btn) btn.href = "/Search?searchPhrase=" + encodeURIComponent($.trim(term));
+					} else {
+						var btn = document.getElementById("btnSearchIcon");
+						if (btn) btn.href = "#";
+					}
+				};
+			}
+			catch(e) {} //we're going to eat this error. Autocomplete won't work but we dont wan't to break anything else on the page.
+		});
+	</script>
+
+	<section id="widgetPreviewSearch" class="widget widgetSearch skin43 widgetOptionSet15" style="display: block;" aria-label="Search">
+				<!-- For the button right and inside -->
+		<div class="widgetBody buttonRightInside">
+			<input class="widgetSearchBox widgetSearchBox4fea2c92-8abe-4ce0-8228-9ba3fc49bf58" cp5ph="true" id="searchField4fea2c92-8abe-4ce0-8228-9ba3fc49bf58" name="searchField" onchange="searchBtnApplyQuery();" placeholder="Search..." type="text" value="">
+						<a href="/Search/Results" id="btnSearchIcon" class="widgetSearchButton widgetSearchButton4fea2c92-8abe-4ce0-8228-9ba3fc49bf58" role="button"><img alt="Search" class="imageHover" data-hover="/ImageRepository/Document?documentID=95" data-image="/ImageRepository/Document?documentID=94" src="/ImageRepository/Document?documentID=94"></a>
+
+			<label class="searchLabel" aria-hidden="true" for="searchField4fea2c92-8abe-4ce0-8228-9ba3fc49bf58">Search</label>
+		</div>
+
+	</section>
+
+
+<style scoped>
+	  
+		.widgetSearch ::-webkit-input-placeholder {
+		color: #fff;
+	  }
+		.widgetSearch :-moz-placeholder { /* Firefox 18- */
+	   color: #fff;
+	}
+		.widgetSearch ::-moz-placeholder {  /* Firefox 19+ */
+	   color: #fff;
+	}
+	.widgetSearch :-ms-input-placeholder {
+	   color: #fff;
+	}
+	
+
+	.widgetSearch .widgetBody .widgetSearchBox4fea2c92-8abe-4ce0-8228-9ba3fc49bf58
+	{
+		color: #fff;
+		font-family: Lato;
+height: 60px;
+border: 2px solid #56AEA5;
+padding: 0 80px 0 20px;
+border-radius: 5px;
+box-shadow: 0px 3px 10px #00000033;
+background: #346D67;
+	}
+	.widgetSearch .widgetBody .widgetSearchButton4fea2c92-8abe-4ce0-8228-9ba3fc49bf58
+	{
+		margin: 7px;
+width: 45px;
+
+	}
+	.widgetSearch .widgetSearch-onlyDept4fea2c92-8abe-4ce0-8228-9ba3fc49bf58
+	{
+		display: inline-block;
+		color: #333;
+		
+		
+		 padding-top: 10px;
+	}
+	#ysnSearchOnlyDept4fea2c92-8abe-4ce0-8228-9ba3fc49bf58
+	{
+		position: relative;
+		top: .125em;
+	}
+
+</style>
+
+<link rel="stylesheet" href="/Common/Controls/jquery-ui-1.14.2/jquery-ui.min.css">
+<link rel="stylesheet" href="/Common/Controls/jquery-ui-1.14.2/jquery-ui.theme.min.css">
+
+
+
+<script type="text/javascript">
+	//Updates search icons href to have the correct queryString
+	function searchBtnApplyQuery() {
+		document.getElementById("btnSearchIcon").href = "/Search?searchPhrase=" + document.getElementById("searchField4fea2c92-8abe-4ce0-8228-9ba3fc49bf58").value;
+	}
+</script>
+
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div></div>
+</header><!-- Banner --><div data-cprole="structuralContainer" id="bannerContainerTS" class="noOverflowTS">
+<div data-cprole="banner" id="banner1"><div data-cprole="structuralContainer" id="bannerSizingTS">
+<div data-cprole="structuralContainer" id="bannerSearchTS">
+<div class="siteWrap2"><div data-cprole="contentContainer" id="welcomeTS">	<div id="cc762b2605-233c-4e25-adae-967ccd4d33c4" data-containerid="762b2605-233c-4e25-adae-967ccd4d33c4" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</div></div>
+</div>
+</div>
+
+
+
+
+		<div id="bannerImagesJSON56" class="hidden"></div>
+		<div id="bannerSlideshowControls_banner1" class="bannerSlideshowControlsNew none " style="display:none">
+			<a id="arrowPrev_banner1" tabindex="0" class="arrowNew prev" aria-label="Banner Arrow Previous"><svg style=" " class=""><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#iconSlideshowArrowLeft"></use></svg></a>
+			<a id="arrowNext_banner1" tabindex="0" class="arrowNew next" aria-label="Banner Arrow Next"><svg style=" " class=""><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#iconSlideshowArrowRight"></use></svg></a>
+		</div>
+			<script type="text/javascript">
+				$(window).on("load", function () {
+					$.when(window.Pages.rwdSetupComplete)
+						.done(function () {
+							renderExternalBannerSlideshow('banner1',
+								{"BannerOptionID":56,"ThemeID":17,"SlotName":"banner1","Name":"Default","IsDefault":true,"BannerMode":2,"SlideShowSlideTiming":null,"SlideshowTransition":0,"SlideShowTransitionTiming":null,"ImageScale":true,"ImageAlignment":1,"ImageScroll":true,"MuteSound":true,"VideoType":0,"Status":40,"SlideshowControlsPosition":0,"SlideshowControlsAlignment":0,"SlideshowBannerControlsColorScheme":0,"DisplayVideoPauseButton":false,"VideoPauseButtonAlignment":1,"VideoPauseButtonControlsAlignment":0,"VideoPauseButtonStyle":"#FFFFFF","VideoPauseButtonBackgroundStyle":"#000000","VideoPauseButtonAlignmentClass":"alignRight viewport","DisplaySlideshowPauseButton":false,"SlideshowControlsColor":"#FFFFFF","SlideshowControlsBackgroundColor":"#000000","SlideshowPauseButtonClass":"isHidden","BannerImages":[{"BannerImageID":72,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=91","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":1,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""},{"BannerImageID":73,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=90","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":2,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""},{"BannerImageID":74,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=89","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":3,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""},{"BannerImageID":75,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=88","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":4,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""}],"BannerVideos":[],"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/"},
+								'/App_Themes/Simple/Images/',
+								'Rotating');
+						});
+				});
+			</script>
+
+</div>
+</div><!-- Content container --><div data-cprole="structuralContainer" id="mainContainerTS">
+<div class="siteWrap2"><div data-cprole="structuralContainer" id="mainWrapTS" class="mainWrap" role="main">
+<div data-cprole="structuralContainer" id="outerContentWrapTS" class="outerContentWrap">
+<div data-cprole="structuralContainer" id="contentWrapTS" class="contentWrap">
+<div data-cprole="breadCrumbs" id="breadCrumbs" class="breadCrumbContainer">		<ol class="semanticList breadCrumbs" id="breadcrumb-list">
+
+    <li><a class="breadCrumb" href="/">Home</a></li>
+    <li><a class="breadCrumb" href aria-current="page">FAQ</a></li>
+</ol>
+
+	   
+    
+</div><div data-cprole="mainContentContainer" id="moduleContent">
+    <div id="outer-wrapper" class="redesign-container">
+        
+
+
+    <div class="pageStyles faq-container content container p-md-4 p-3 grid">
+        <!-- Header -->
+        <header class="faq-header">
+            
+
+<div id="faq-header-search" class="row gy-2 gy-md-0 mb-3">
+    <div class="col-md-8 order-md-1">
+        <div class="input-group"><input class="form-control rounded-pill border search-input" name="searchTerms" placeholder="Search and discover questions"
+       value="" aria-label="Search Input" type="search" id="search-input" hx-get="/m/faq" 
+       hx-trigger="change" hx-target="#main-wrapper" hx-swap="outerHTML" 
+       hx-push-url="true" hx-include="[name=&#x27;cat&#x27;]" asp-for="SearchTerms">
+<span class="input-group-append position-absolute module-search end-0">
+    <button class="btn btn-outline-secondary btn-search rounded-pill border-0 shadow-none" type="button" aria-label="Search"
+            hx-get="/m/faq" hx-target="#main-wrapper" hx-swap="outerHTML"
+            hx-push-url="true" hx-include="[name=&#x27;cat&#x27;]">
+        <svg aria-hidden="true"xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+             class="bi bi-search" viewBox="0 0 16 16">
+            <path
+                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+    </button>
+</span></div>
+    </div>
+    <div class="col-md-4 order-md-2">
+        <select class="form-select" name="cat" hx-get="/m/faq" hx-target="#main-wrapper" hx-include="[name='searchTerms']" hx-trigger="change" hx-push-url="true" aria-label="Category Name" id="CategoryId">
+            <option value="" data-template="">All categories</option>
+                <option value="15"  data-template="">Home - FAQs</option>
+                <option value="17"  data-template="">Fire Department - Disaster Preparedness</option>
+                <option value="18"  data-template="">Fire Department - Fire Prevention Bureau: Hazardous Material</option>
+                <option value="19"  selected data-template="">Police Department</option>
+                <option value="20"  data-template="">Police Department - CCW License</option>
+                <option value="21"  data-template="">Public Works</option>
+                <option value="22"  data-template="">&#xA;Development Opportunity Site - Former BKK Landfill Site</option>
+        </select>
+    </div>
+</div>
+
+            <div class="align-middle header-links d-flex justify-content-end grid gap-sm-3 gap-2">
+            </div>
+        </header>
+        <!-- End of Header -->
+        <main role="main" id="main-wrapper">
+            <div class="row d-flex align-items-stretch">
+                <div class="col-sm-12 col-md-8">
+                    <h1 class="visually-hidden"><span class="headline">Frequently Asked Questions</span></h1>
+                    
+
+
+    <div id="faq-category-19" class="faq-category faq-category-19">
+        <style scoped>
+            .faq-category-19 {
+                --categoryColor: rgb(52, 105, 99);
+            }
+        </style>
+        <div id="faq-category-19-header" class="position-relative d-inline-flex align-items-center mb-3 edit-container">
+            <h2 class="m-0">Police Department</h2>
+            <span class="badge text-body rounded-pill ms-2">33</span>
+            <button type="button" class="btn btn-outline-secondary lh-1 p-1 ms-2 border-0 shadow-none expand-collapse-button"
+                    title="Collapse all questions"
+                    aria-label="Collapse all questions"
+                    data-bs-target="#question-78, #question-79, #question-80, #question-81, #question-82, #question-83, #question-84, #question-85, #question-86, #question-87, #question-88, #question-89, #question-90, #question-91, #question-92, #question-93, #question-94, #question-95, #question-96, #question-97, #question-98, #question-99, #question-100, #question-101, #question-102, #question-103, #question-104, #question-105, #question-106, #question-107, #question-108, #question-109, #question-110"
+                    data-category-id="19"
+                    data-action="collapse">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-contract" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" 
+                    d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707M15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707" />
+                </svg>
+            </button>
+        </div>
+
+
+        <ul class="nav nav-pills mb-2 ps-0" role="tablist">
+            <li class="nav-item faq-subcategory" role="presentation">
+                <button class="nav-link active primary" data-subcategory-id="0">All Content</button>
+            </li>
+
+        </ul>
+
+        <ul id="list-faq-category-19" aria-labelledby="faq-category-19-header"
+            class="faq-list-group list-group list-group-flush list-unstyled mb-0 ps-0">
+                
+
+
+<li id="question-78" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-78-answer" aria-expanded="true" aria-controls="question-78-answer">
+				What are the hours of operation of the West Covina Police Department?
+			</button>
+		</h3>
+		<div id="question-78-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The West Covina Police Department operates 24 hours a day, 7 days a week, and 365 days a year (366 for leap year!).</p><p>The WCPD public lobby is open from 7:30 am to 5:30 pm, Monday through Friday (Closed on city-observed holidays).</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-79" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-79-answer" aria-expanded="true" aria-controls="question-79-answer">
+				What is the address and phone number?
+			</button>
+		</h3>
+		<div id="question-79-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The location is:<br>1444 W Garvey Avenue<br>West Covina, CA 91790.</p><p>The non-emergency phone number is 626-939-8500.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-80" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-80-answer" aria-expanded="true" aria-controls="question-80-answer">
+				How can I get my impounded or stored vehicle returned to me?
+			</button>
+		</h3>
+		<div id="question-80-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Release forms for stored, impounded, or recovered stolen vehicles may be obtained from the Records Bureau at the Police Department from 7:30 am to 5:30 pm. Monday through Friday (Closed city-observed holidays). Proof of current ownership, current registration, and a valid driver&apos;s license are required.</p><p>Vehicles impounded pursuant to California Vehicle Code Section 14602.6 (suspended, revoked, or unlicensed drivers) may be held for 30 calendar days. Vehicle owners may contest the validity of a vehicle impound or request consideration for early release of a vehicle being held for 30 days by contacting the Traffic Division at 626-939-8555 during regular business hours (Monday through Thursday, 7 am to 4 pm).</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-81" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-81-answer" aria-expanded="true" aria-controls="question-81-answer">
+				How much is the fee for an impounded or stored vehicle?
+			</button>
+		</h3>
+		<div id="question-81-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The vehicle release fee is $206.40 payable in person at the West Covina Police Department. The fee is payable by credit card (Discover, MasterCard, or Visa) or by cash (exact amount required). No vehicle release fee is charged when the storage was due to the vehicle being a recovered stolen vehicle.</p><p>After paying the vehicle release fee at the West Covina Police Department, towing and storage fees are charged by the tow company. The City of West Covina currently utilizes the following towing company:&nbsp;<br>Royal Coaches Towing<br>14827 Ramona Blvd<br>Baldwin Park, CA 91706<br>Phone: 626-960-1824</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-82" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-82-answer" aria-expanded="true" aria-controls="question-82-answer">
+				How do I contact the court?
+			</button>
+		</h3>
+		<div id="question-82-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The Superior Court located at the West Covina Citrus Courthouse is a separate government entity. Please visit the&nbsp;<a href="http://www.lacourt.org/">Superior Court of California website</a> for more information.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-83" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-83-answer" aria-expanded="true" aria-controls="question-83-answer">
+				How can I report an issue in my neighborhood?
+			</button>
+		</h3>
+		<div id="question-83-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Emergency issues and crimes in progress should be reported by calling 911. Issues that are actively occurring but are not an emergency or crime in progress (e.g., loud music) can be reported using the non-emergency dispatch number 626-939-8500. Long-term or recurring issues can be forwarded to the appropriate service area lieutenant. You may call or <a href="/Directory.aspx?DID=17">email the service area lieutenant who handles your area of the City</a>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-84" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-84-answer" aria-expanded="true" aria-controls="question-84-answer">
+				Can I report information over the telephone without leaving my name?
+			</button>
+		</h3>
+		<div id="question-84-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Yes, the Police Department has a 24-hour Crime Hotline at 626-939-8688. The purpose of this Hotline is to allow community members to leave a message reporting crimes, suspicious activities, or neighborhood safety concerns, at any time, discreetly and confidentially. This information is reviewed and investigated by a detective, and callers can choose to remain anonymous or request to be contacted for follow-up.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-85" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-85-answer" aria-expanded="true" aria-controls="question-85-answer">
+				Can I report a tip via text message or online?
+			</button>
+		</h3>
+		<div id="question-85-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Yes, to send an anonymous tip via text message to the West Covina Police Department, text TIPWCPD and your tip to 847411 (TIP411). You can also <a href="https://home.tip411.com/">submit the tip online</a>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-86" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-86-answer" aria-expanded="true" aria-controls="question-86-answer">
+				How can I report graffiti?
+			</button>
+		</h3>
+		<div id="question-86-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If you witness someone actively marking graffiti, call 911 immediately, and you could be eligible for a $100 reward. If you spot graffiti anywhere in the City, please go to this website or call the graffiti hotline number at 626-939-8800 for removal.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-87" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-87-answer" aria-expanded="true" aria-controls="question-87-answer">
+				How do I get cash for reporting graffiti?
+			</button>
+		</h3>
+		<div id="question-87-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If you see someone in the process of marking graffiti, immediately call 911, report the information, and let the police handle it from there (you can choose to remain anonymous, but you will have to call back 1 hour later to follow up). If the graffiti vandals are arrested based on your call, you will be given a $100 cash reward, which you receive in person at the Police Department. Since this <a href="/305/Reward-Programs">graffiti rewards program</a> began in 2007, dozens of rewards have been paid for arrests resulting from resident calls.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-88" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-88-answer" aria-expanded="true" aria-controls="question-88-answer">
+				Can I receive information and alerts from West Covina PD online or using a mobile device?
+			</button>
+		</h3>
+		<div id="question-88-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Yes, you can follow West Covina PD using several social media options:</p><ul><li><a href="https://x.com/WestCovinaPD">Twitter</a></li><li><a href="https://www.facebook.com/WestCovinaPD/">Facebook</a></li><li><a href="https://www.instagram.com/WestCovinaPD/">Instagram</a></li><li><a href="https://local.nixle.com/west-covina-police-department/">Nixle</a></li></ul></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-89" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-89-answer" aria-expanded="true" aria-controls="question-89-answer">
+				How do I pay for a traffic citation or parking citation?
+			</button>
+		</h3>
+		<div id="question-89-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The West Covina Police Department does <strong>not</strong> accept traffic (moving) citation payments. All payments and hearing dates for traffic (moving) citations are handled by the Los Angeles Superior Court located at the West Covina Citrus Courthouse, which is a separate government entity. Please visit this website for more information.</p><ul><li>Payments for parking citations are accepted online or by telephone. Citations must be paid by their due date to avoid late penalties.</li><li><a href="https://www.pticket.com/scripts/Autobahn.exe/Execute?Application=pTicket&Program=REPORT-query_citation&parmAGENCY_STATE=CA&parmAGENCY_LOC=WC&DSI=0">Parking citation payments are accepted online</a>.</li><li>Parking citation payments are also accepted via telephone at 800-553-4412</li></ul><p>You can also mail your parking citation payments to:&nbsp;<br>City of West Covina<br>P.O. Box 2081, Tustin, CA 92781-2081</p><p>Please write the citation number on your check or money order. No extensions are given, and there are no partial payments for citations. Postmarks are accepted. Please do not mail cash.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-90" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-90-answer" aria-expanded="true" aria-controls="question-90-answer">
+				What if I lost my parking citation?
+			</button>
+		</h3>
+		<div id="question-90-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If you need to retrieve information about a citation, such as the citation number, address to send payment, information about how to request a review, or to check the status of a citation that has been paid or dismissed, you can reach the citation Parking Citation Service Center at 800-553-4412. The Parking Citation Service Center phone number is an automated system and should provide you with selections on their menu to assist your particular needs. If no option is available for your unique information, 0 may be dialed after the options are presented to connect you to an operator who can further assist you. Personnel at the desk of the West Covina Police Department do not have access to detailed information about parking citations.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-91" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-91-answer" aria-expanded="true" aria-controls="question-91-answer">
+				What if I paid the citation but the DMV shows that it is still pending and won&#x2019;t register my vehicle?
+			</button>
+		</h3>
+		<div id="question-91-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>There are several things that can cause this situation. The first is that the original citation payment was made after the maximum 21-day period and, therefore, increased due to additional penalties. The partial payment of the increased amount would have been received, but the citation would still be referred to DMV for collection because of the balance due. In this case, the total amount is still due to the DMV. It is advisable to pay the total fine amount to DMV so that the vehicle registration won&apos;t be delayed, causing additional fees. The original payment can then be refunded if proof of that payment can be provided. To receive a refund of this nature, contact the City of West Covina Finance Department at 626-939-8462. The second possibility for this to occur is that an error was made when posting the original payment, and it was not credited to the correct citation. If you have proof of payment for a citation that the DMV is showing due on the vehicle&apos;s registration, contact the City of West Covina Finance Department at 626-939-8462.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-92" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-92-answer" aria-expanded="true" aria-controls="question-92-answer">
+				How can I dispute a parking citation?
+			</button>
+		</h3>
+		<div id="question-92-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If you feel you have been issued a parking citation in error, or the violation should not have been issued because of a variance or some other extenuating circumstance, you can <a href="https://www.pticket.com/WC/contesting_info.html">request a review of the citation</a>.</p><p>Or, you can send your request via mail to: City of West Covina, Adjudication Services, P.O. Box 2081, Tustin, CA 92781-2081. The review request should include the name, address, and phone number of the person requesting the review, and a complete explanation, including any evidence available of why you feel the citation was issued in error. It is important to include all information helpful to your position because there will not be an opportunity to add information for the reviewers&apos; consideration after the fact.</p><p>Reviews must be requested in writing within 21 days of the violation, and the request must be sent to the processing company that maintains the citation records. Requests received that are postmarked outside the 21-day period will not be reviewed.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-93" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-93-answer" aria-expanded="true" aria-controls="question-93-answer">
+				What happens when the citation is reviewed?
+			</button>
+		</h3>
+		<div id="question-93-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>A review of the citation is made by a City of West Covina Police Department employee. Items considered during the review process included the information provided in the letter requesting the review, any notes or photographs that may have been taken by the issuing officer, computer records checks of DMV information, computer records of any parking variances granted by the City at the time of the violation, and any other evidence available. The results of the review will be provided as either dismissed or upheld. If the violation is upheld, a brief explanation will be provided.</p><p>It should be noted that the findings of first-level reviews are generally based on facts presented and do not show consideration to issues such as being late for appointments, being within sight of the illegally parked vehicle, or lack of other convenient parking.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-94" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-94-answer" aria-expanded="true" aria-controls="question-94-answer">
+				What if the citation is upheld and I still don&#x2019;t agree?
+			</button>
+		</h3>
+		<div id="question-94-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>There will be information in the letter explaining that a second-level hearing may be requested if you do not agree with the results of the review. You may request the second-level hearing by indicating either an in-person or a written hearing on the form and returning it to the Parking Enforcement Center (City of West Covina, Adjudication Services, P.O. Box 2081, Tustin, CA 92781-2081) within 15 days of the mailing of the notification letter. Requests received outside the 15-day period will not be honored.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-95" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-95-answer" aria-expanded="true" aria-controls="question-95-answer">
+				Why can&#x2019;t I get the results at the hearing?
+			</button>
+		</h3>
+		<div id="question-95-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The hearing examiner may need to conduct further research into the Vehicle Code, collect additional statements, or survey locations before ruling on some citations. For this reason, all results will be sent in writing.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-96" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-96-answer" aria-expanded="true" aria-controls="question-96-answer">
+				What if the hearing officer upholds the citation and I still don&#x2019;t agree?
+			</button>
+		</h3>
+		<div id="question-96-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>In this extreme case, you may file a civil case with the local court. You must file your case <strong>within 30 days</strong> of the examiner&apos;s verdict and pay all fees required by the court. If the court decides in your favor, any and all penalties, including court fees, will be refunded to you when the City receives a written judgment. If judgment is in favor of the City of West Covina, the action is ended, and all penalties are forfeited.</p><p>If you have any questions regarding filing a civil case, please contact the West Covina Superior Court at 626-813-3236.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-97" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-97-answer" aria-expanded="true" aria-controls="question-97-answer">
+				What if I can&#x2019;t or don&#x2019;t want to register a vehicle?
+			</button>
+		</h3>
+		<div id="question-97-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>All vehicles on public roadways or roadways subject to California Vehicle Code enforcement must be currently registered. If you have moved the vehicle to private property, filed for a non-operational permit, or are donating the vehicle to charity, the full fine amount can be paid, and there is no need to have the citation signed off.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-98" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-98-answer" aria-expanded="true" aria-controls="question-98-answer">
+				How can I obtain a copy of my traffic accident report?
+			</button>
+		</h3>
+		<div id="question-98-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If your accident occurred after September 1, 2009, you can obtain your report online at this website. You will need to know either the report date and last name, or the report number and last name. With a computer, printer, internet access, and a credit card, you can purchase the report for $5 immediately. The fee goes to an external company offering this service. Reports before September 1, 2009 are available in person at the police department. We recommend calling ahead at 626-939-8500 to make sure a copy is available for you.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-99" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-99-answer" aria-expanded="true" aria-controls="question-99-answer">
+				 How do I report a vehicle that is parked illegally or has been abandoned?
+			</button>
+		</h3>
+		<div id="question-99-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Call the Code Enforcement at 626-939-8426, and they will arrange for vehicle abatement service.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-100" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-100-answer" aria-expanded="true" aria-controls="question-100-answer">
+				What are the designated truck routes in the City of West Covina?
+			</button>
+		</h3>
+		<div id="question-100-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>View the City of West Covina&rsquo;s <a href="https://librarystage.municode.com/ca/west_covina/codes/code_of_ordinances?nodeId=MUCO_CH22TRRE_ARTIVOPVE_DIV5TRRO">designated truck routes</a>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-101" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-101-answer" aria-expanded="true" aria-controls="question-101-answer">
+				Are crime statistics for the City of West Covina published?
+			</button>
+		</h3>
+		<div id="question-101-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Yes, the Federal Bureau of Investigation collects and publishes crime statistics nationwide in its <a href="https://www.fbi.gov/how-we-can-help-you/more-fbi-services-and-information/ucr">Uniform Crime Report</a>. You can also view a table showing <a href="https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/home">crime statistics for all California cities</a> or <a href="/293/Crime-Stats">West Covina crime statistics</a>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-102" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-102-answer" aria-expanded="true" aria-controls="question-102-answer">
+				How much are copies of police reports?
+			</button>
+		</h3>
+		<div id="question-102-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>There is no charge for reports.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-103" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-103-answer" aria-expanded="true" aria-controls="question-103-answer">
+				Does the West Covina Police Department offer fingerprinting services?
+			</button>
+		</h3>
+		<div id="question-103-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The West Covina Police Department does not provide this service at this time. You may get further information on locations that provide the service on the <a href="https://oag.ca.gov/fingerprints/locations">California DOJ Office of the Attorney General&apos;s website</a>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-104" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-104-answer" aria-expanded="true" aria-controls="question-104-answer">
+				When does a child have to be in a child safety seat?
+			</button>
+		</h3>
+		<div id="question-104-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Please visit <a href="https://carseat.org/">SafetyBeltSafe U.S.A.</a> for more information.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-105" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-105-answer" aria-expanded="true" aria-controls="question-105-answer">
+				Who can I contact for release of my property?
+			</button>
+		</h3>
+		<div id="question-105-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Please contact the Property and Evidence Unit for an appointment at 626-939-8573. Normal office hours are Monday through Friday, 7 am to 4 pm; however, a voicemail can be left after hours.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-106" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-106-answer" aria-expanded="true" aria-controls="question-106-answer">
+				What is the process for registrants?
+			</button>
+		</h3>
+		<div id="question-106-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>All persons required to register with the West Covina Police Department pursuant to criminal conviction must contact the West Covina Police Department for an appointment at 626-939-8661.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-107" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-107-answer" aria-expanded="true" aria-controls="question-107-answer">
+				If I have a criminal record, how do I get a copy of my record?
+			</button>
+		</h3>
+		<div id="question-107-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The State of California Department of Justice has your criminal record information. You must provide them with your fingerprints and pay a fee. An information sheet is available at the police department.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-108" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-108-answer" aria-expanded="true" aria-controls="question-108-answer">
+				If I have a criminal record, how do I get a copy of my record?
+			</button>
+		</h3>
+		<div id="question-108-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The State of California Department of Justice has your criminal record information. You must provide them with your fingerprints and pay a fee. An information sheet is available at the police department.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-109" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-109-answer" aria-expanded="true" aria-controls="question-109-answer">
+				What are the fees / timeframes for subpoenas?
+			</button>
+		</h3>
+		<div id="question-109-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Subpoenas for records should be served to the City Clerk&apos;s Office at the West Covina City Hall. The exact amount due will be determined prior to the reproduction of documents. However, please attach a check (minimum amount $15) to the subpoena upon delivery. Subpoenas for police department personnel appearances should also be served at the City Clerk&apos;s Office with a check for the $275 fee for each day of appearance, per officer. Civil subpoenas require 15 days between the date of service and actual appearance, as required, to allow for adequate notification. Fees can be paid by cash (exact change only) or by credit card (Discover, MasterCard, or Visa).</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-110" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-110-answer" aria-expanded="true" aria-controls="question-110-answer">
+				How can I get a criminal clearance letter for the Immigration and Naturalization Service?
+			</button>
+		</h3>
+		<div id="question-110-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If you are currently a resident of the City of West Covina or have lived in the City, the West Covina Police Department will do a local criminal history search on you within our city jurisdiction only. If there is no criminal history on you within our jurisdiction, a letter will be made indicating to the INS that there is no adverse information found on you. There is an administrative fee of $10 for the letter, which must be paid by cash, check, or money order only. The letter can take up to ten days to receive.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Police Department</span>
+			</div>
+		</div>
+	</div>
+</li>
+        </ul>
+    </div>
+
+                </div>
+                <div class="col-md-4 d-none d-md-block">
+                    
+<nav id="TableOfContents" class="faq-toc rounded-5 border shadow-sm p-3 mt-sm-3 mt-md-0" aria-label="FAQ table of contents">
+    <ul class="list-unstyled ps-0">
+            <li class="faq-category list-group-item accordion px-0 mb-2 faq-category-19">
+                <style scoped>
+                    .faq-category-19 {
+                        --categoryColor: rgb(52, 105, 99);
+                    }
+                </style>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#topic-19-sidebar" aria-expanded="false"
+                                aria-controls="topic-19-sidebar">
+                            Police Department
+                            <span class="badge text-body rounded-pill ms-auto px-2">33</span>
+                        </button>
+                    </h3>
+                    <div id="topic-19-sidebar" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <ul class="faq-category-19 p-0">
+                                    <li class="faq-question">
+                                        <a href="#question-78">What are the hours of operation of the West Covina Police Department?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-79">What is the address and phone number?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-80">How can I get my impounded or stored vehicle returned to me?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-81">How much is the fee for an impounded or stored vehicle?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-82">How do I contact the court?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-83">How can I report an issue in my neighborhood?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-84">Can I report information over the telephone without leaving my name?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-85">Can I report a tip via text message or online?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-86">How can I report graffiti?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-87">How do I get cash for reporting graffiti?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-88">Can I receive information and alerts from West Covina PD online or using a mobile device?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-89">How do I pay for a traffic citation or parking citation?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-90">What if I lost my parking citation?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-91">What if I paid the citation but the DMV shows that it is still pending and won&#x2019;t register my vehicle?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-92">How can I dispute a parking citation?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-93">What happens when the citation is reviewed?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-94">What if the citation is upheld and I still don&#x2019;t agree?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-95">Why can&#x2019;t I get the results at the hearing?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-96">What if the hearing officer upholds the citation and I still don&#x2019;t agree?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-97">What if I can&#x2019;t or don&#x2019;t want to register a vehicle?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-98">How can I obtain a copy of my traffic accident report?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-99"> How do I report a vehicle that is parked illegally or has been abandoned?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-100">What are the designated truck routes in the City of West Covina?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-101">Are crime statistics for the City of West Covina published?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-102">How much are copies of police reports?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-103">Does the West Covina Police Department offer fingerprinting services?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-104">When does a child have to be in a child safety seat?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-105">Who can I contact for release of my property?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-106">What is the process for registrants?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-107">If I have a criminal record, how do I get a copy of my record?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-108">If I have a criminal record, how do I get a copy of my record?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-109">What are the fees / timeframes for subpoenas?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-110">How can I get a criminal clearance letter for the Immigration and Naturalization Service?</a>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+    </ul>
+</nav>
+
+                </div>
+            </div>
+        </main>
+        <script src="/static/FAQ/js/ExpandCollapse.js"></script>
+        <script src="/static/FAQ/js/TopicFilters.js"></script>
+    </div>
+
+    </div>
+    <script src="/static/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/FAQ/js/site.js?v=wFQTpMYPltUchiyPDikbo5YolaL3_kyoV2tlgXnV3PI"></script>
+    <script src="/static/FAQ/js/KAM.js?v=cYNUz5hMU5q2nR2y0vxt8QL23oqJlEEGzCkJw55TJ1I"></script>
+    <script src="/static/js/common.js?v=TAqahgSOdqWemo9E2C7jLNLT08kRCAvv7jZ4h3tw80Y"></script>
+    <script src="/static/js/loader.js?v=i215fmhn1ppNi3l5y5xz6tGyeuBsqLV8coS6Mfb4FrU"></script>
+    
+
+</div>
+</div>
+</div>
+</div></div>
+</div><!-- GBs --><div data-cprole="structuralContainer" id="gbsContainerTS">
+<div class="siteWrap2"><div data-cprole="contentContainer" id="gbsTS">	<div id="cc507edb2f-6457-4b9d-a8ca-5f751c9735cb" data-containerid="507edb2f-6457-4b9d-a8ca-5f751c9735cb" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile" data-contentcontainerbreakpoint="1">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col12 first" style="" data-widgetcontainerid="ff5ff636-4e50-463f-b932-01e0b5bee20a">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col12 first last idbdbedf28-afd9-47ba-b12d-1cde31e75962" style="" data-widgetcontainerid="bdbedf28-afd9-47ba-b12d-1cde31e75962">	
+<div data-widget-id="c98df6e3-1d27-43a3-97c3-bded23996de0" data-widget-controller-path="/GraphicLinks/Widget">
+
+
+
+
+<div id="graphicLinkWidgetc98df6e3-1d27-43a3-97c3-bded23996de0" class="widget widgetGraphicLinks skin45 widgetOptionSet4 wide" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' data-modulewidgettype="graphicLinks">
+	<div class="widgetHeader">
+		<div class="">
+				</div>
+	</div>
+	<div class="widgetBody cpGrid cpGrid3 ">
+		<nav class="widgetGraphicLinksNav" aria-labelledby="GraphicLinkHeaderText">
+				<div class="row   wide">
+					<!--
+--><div class="col col1 first "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/188/Agendas-Meetings" target="_self" class="fancyButton fancyButton46 ">
+		<span>
+			<span><span class="text">Agendas &amp; Minutes</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton46.fancyButton:link,.fancyButton46.fancyButton:visited, .fancyButton46div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 120px;
+transition: all .3s ease-in-out;}
+.fancyButton46.fancyButton:hover,.fancyButton46.fancyButton:focus,.fancyButton46.fancyButton:active,.fancyButton46.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton46.fancyButton:link > span,.fancyButton46.fancyButton:visited > span, .fancyButton46div.fancyButton > span{
+}
+.fancyButton46.fancyButton:hover > span,.fancyButton46.fancyButton:focus > span,.fancyButton46.fancyButton:active > span,.fancyButton46.fancyButton.hover > span{
+}
+.fancyButton46.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "Lato";
+	padding-top: 9em;
+	font-weight: 700;
+	text-decoration: none;
+	padding-top: 9em;
+	background-image: url('/ImageRepository/Document?documentID=98');
+	background-repeat: no-repeat;
+	background-position: center 2.8em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton46.fancyButton:hover .text,.fancyButton46.fancyButton:focus .text,.fancyButton46.fancyButton:active .text,.fancyButton46.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.8em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/227/Community-Development-Applications-Permi" target="_self" class="fancyButton fancyButton48 ">
+		<span>
+			<span><span class="text">Permits</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton48.fancyButton:link,.fancyButton48.fancyButton:visited, .fancyButton48div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=99');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 120px;
+transition: all .3s ease-in-out;}
+.fancyButton48.fancyButton:hover,.fancyButton48.fancyButton:focus,.fancyButton48.fancyButton:active,.fancyButton48.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton48.fancyButton:link > span,.fancyButton48.fancyButton:visited > span, .fancyButton48div.fancyButton > span{
+}
+.fancyButton48.fancyButton:hover > span,.fancyButton48.fancyButton:focus > span,.fancyButton48.fancyButton:active > span,.fancyButton48.fancyButton.hover > span{
+}
+.fancyButton48.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "Lato";
+	padding-top: 9em;
+	font-weight: 700;
+	text-decoration: none;
+	padding-top: 9em;
+	background-image: url('/ImageRepository/Document?documentID=106');
+	background-repeat: no-repeat;
+	background-position: center 2.8em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton48.fancyButton:hover .text,.fancyButton48.fancyButton:focus .text,.fancyButton48.fancyButton:active .text,.fancyButton48.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.8em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  last"><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://www.youtube.com/watch?v=QAOoc7wYPPo" target="_self" class="fancyButton fancyButton49 ">
+		<span>
+			<span><span class="text">Watch Live Meetings</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton49.fancyButton:link,.fancyButton49.fancyButton:visited, .fancyButton49div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=100');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 120px;
+transition: all .3s ease-in-out;}
+.fancyButton49.fancyButton:hover,.fancyButton49.fancyButton:focus,.fancyButton49.fancyButton:active,.fancyButton49.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton49.fancyButton:link > span,.fancyButton49.fancyButton:visited > span, .fancyButton49div.fancyButton > span{
+}
+.fancyButton49.fancyButton:hover > span,.fancyButton49.fancyButton:focus > span,.fancyButton49.fancyButton:active > span,.fancyButton49.fancyButton.hover > span{
+}
+.fancyButton49.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "Lato";
+	padding-top: 9em;
+	font-weight: 700;
+	text-decoration: none;
+	padding-top: 9em;
+	background-image: url('/ImageRepository/Document?documentID=108');
+	background-repeat: no-repeat;
+	background-position: center 2.8em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton49.fancyButton:hover .text,.fancyButton49.fancyButton:focus .text,.fancyButton49.fancyButton:active .text,.fancyButton49.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.8em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!--				-->
+				</div>
+			</nav>
+		</div>
+	<div class="widgetFooter">
+			</div>
+</div>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col12 last" style="" data-widgetcontainerid="a6d68683-8b82-4dfa-950f-f5fa7a572b52">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col12 first last id1179c79c-5328-4fc7-b905-9bba9a532ccd" style="" data-widgetcontainerid="1179c79c-5328-4fc7-b905-9bba9a532ccd">	
+<div data-widget-id="c8569270-7448-41f2-b1dc-d753826683ed" data-widget-controller-path="/GraphicLinks/Widget">
+
+
+
+
+<div id="graphicLinkWidgetc8569270-7448-41f2-b1dc-d753826683ed" class="widget widgetGraphicLinks skin45 widgetOptionSet4 wide" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' data-modulewidgettype="graphicLinks">
+	<div class="widgetHeader">
+		<div class="">
+				</div>
+	</div>
+	<div class="widgetBody cpGrid cpGrid3 ">
+		<nav class="widgetGraphicLinksNav" aria-labelledby="GraphicLinkHeaderText">
+				<div class="row   wide">
+					<!--
+--><div class="col col1 first "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/452/Go-West-Covina---Microtransit" target="_self" class="fancyButton fancyButton50 ">
+		<span>
+			<span><span class="text">Go West Covina</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton50.fancyButton:link,.fancyButton50.fancyButton:visited, .fancyButton50div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=101');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 120px;
+transition: all .3s ease-in-out;}
+.fancyButton50.fancyButton:hover,.fancyButton50.fancyButton:focus,.fancyButton50.fancyButton:active,.fancyButton50.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton50.fancyButton:link > span,.fancyButton50.fancyButton:visited > span, .fancyButton50div.fancyButton > span{
+}
+.fancyButton50.fancyButton:hover > span,.fancyButton50.fancyButton:focus > span,.fancyButton50.fancyButton:active > span,.fancyButton50.fancyButton.hover > span{
+}
+.fancyButton50.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "Lato";
+	padding-top: 9em;
+	font-weight: 700;
+	text-decoration: none;
+	padding-top: 9em;
+	background-image: url('/ImageRepository/Document?documentID=104');
+	background-repeat: no-repeat;
+	background-position: center 2.8em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton50.fancyButton:hover .text,.fancyButton50.fancyButton:focus .text,.fancyButton50.fancyButton:active .text,.fancyButton50.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.8em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/336/Report-an-Issue" target="_self" class="fancyButton fancyButton51 ">
+		<span>
+			<span><span class="text">Report an Issue</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton51.fancyButton:link,.fancyButton51.fancyButton:visited, .fancyButton51div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=102');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 120px;
+transition: all .3s ease-in-out;}
+.fancyButton51.fancyButton:hover,.fancyButton51.fancyButton:focus,.fancyButton51.fancyButton:active,.fancyButton51.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton51.fancyButton:link > span,.fancyButton51.fancyButton:visited > span, .fancyButton51div.fancyButton > span{
+}
+.fancyButton51.fancyButton:hover > span,.fancyButton51.fancyButton:focus > span,.fancyButton51.fancyButton:active > span,.fancyButton51.fancyButton.hover > span{
+}
+.fancyButton51.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "Lato";
+	padding-top: 9em;
+	font-weight: 700;
+	text-decoration: none;
+	padding-top: 9em;
+	background-image: url('/ImageRepository/Document?documentID=107');
+	background-repeat: no-repeat;
+	background-position: center 2.8em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton51.fancyButton:hover .text,.fancyButton51.fancyButton:focus .text,.fancyButton51.fancyButton:active .text,.fancyButton51.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.8em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  last"><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/list.aspx" target="_self" class="fancyButton fancyButton52 ">
+		<span>
+			<span><span class="text">Notify Me®</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton52.fancyButton:link,.fancyButton52.fancyButton:visited, .fancyButton52div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 120px;
+transition: all .3s ease-in-out;}
+.fancyButton52.fancyButton:hover,.fancyButton52.fancyButton:focus,.fancyButton52.fancyButton:active,.fancyButton52.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton52.fancyButton:link > span,.fancyButton52.fancyButton:visited > span, .fancyButton52div.fancyButton > span{
+}
+.fancyButton52.fancyButton:hover > span,.fancyButton52.fancyButton:focus > span,.fancyButton52.fancyButton:active > span,.fancyButton52.fancyButton.hover > span{
+}
+.fancyButton52.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "Lato";
+	padding-top: 9em;
+	font-weight: 700;
+	text-decoration: none;
+	padding-top: 9em;
+	background-image: url('/ImageRepository/Document?documentID=105');
+	background-repeat: no-repeat;
+	background-position: center 2.8em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton52.fancyButton:hover .text,.fancyButton52.fancyButton:focus .text,.fancyButton52.fancyButton:active .text,.fancyButton52.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.8em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!--				-->
+				</div>
+			</nav>
+		</div>
+	<div class="widgetFooter">
+			</div>
+</div>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div></div>
+</div><!-- Calendar/Carousel --><!-- <div data-cpRole="structuralContainer" id="homeContainer1">
+    <div class="siteWrap2">
+      <div data-cpRole="contentContainer" id="homeContent1a"></div>
+    </div>
+  </div> --><!-- Footer --><footer data-cprole="structuralContainer" id="footerContainerTS">
+<div class="siteWrap2"><div data-cprole="contentContainer" id="footerTS">	<div id="cc11dcd00f-8277-4920-9950-6d06ff54543f" data-containerid="11dcd00f-8277-4920-9950-6d06ff54543f" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile" data-contentcontainerbreakpoint="55">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col3 first" style="" data-widgetcontainerid="c7510034-f195-4536-9bc5-d00155e0cb86">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col3 first last id2bd2804d-77c0-4fc0-ad6c-e2b79765c38c" style="" data-widgetcontainerid="2bd2804d-77c0-4fc0-ad6c-e2b79765c38c">	
+    <div data-widget-id="82fb29e0-f7d3-43ef-99a7-7d25aec41b59" data-widget-controller-path="/InfoAdvanced/Widget">
+
+
+
+
+
+	<section id="divInfoAdv82fb29e0-f7d3-43ef-99a7-7d25aec41b59" class="widget widgetInfoAdvanced skin56 widgetOptionSet5 wide" data-modulewidgettype="infoAdv" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-label="Info Advanced">
+			<header class="widgetHeader" id="header82fb29e0-f7d3-43ef-99a7-7d25aec41b59">
+		<div class="">
+								</div>
+	</header>
+	<div class="widgetBody  cpGrid cpGrid1 ">
+		<div class="row  wide">
+					<div class="col col1 first last">
+						<ol class="pageStyles semanticList">
+
+<li class="InfoAdvanced widgetItem fr-view">
+	<p><a href="/"><img src="/ImageRepository/Document?documentId=114" class="fr-dib" alt="West Covina California Home Page"></a></p>
+</li>						</ol>
+					</div>
+		</div>
+	</div>
+	<div class="widgetFooter">
+
+	</div>
+
+	</section>
+
+
+
+<script type="text/javascript">
+	//Render slideshow if info advacned items contain one.
+	$(document).ready(function (e) {
+		$('#divInfoAdv82fb29e0-f7d3-43ef-99a7-7d25aec41b59 .InfoAdvanced.widgetItem').each(function () {
+			renderSlideshowIfApplicable($(this));		
+		});
+	});
+</script></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col2" style="" data-widgetcontainerid="69968cd7-0bea-47fc-b652-db41bacc1870">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col2 first last id26696067-9819-45c6-b6dd-a84a7c90aba5" style="" data-widgetcontainerid="26696067-9819-45c6-b6dd-a84a7c90aba5">	
+
+<div class="widget widgetSpacer" id="f6f32970-4c42-42b4-a97e-62d8e9a290cd"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col4" style="" data-widgetcontainerid="98c13367-a203-4706-a878-5ab9d34af5c6">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col4 first last id769d0cfb-ddaf-4fcf-8214-c33b21ebd43f" style="" data-widgetcontainerid="769d0cfb-ddaf-4fcf-8214-c33b21ebd43f">	
+    <div data-widget-id="3f725b7a-214b-41fa-a2ef-20652bd007f9" data-widget-controller-path="/InfoAdvanced/Widget">
+
+
+
+
+
+	<section id="divInfoAdv3f725b7a-214b-41fa-a2ef-20652bd007f9" class="widget widgetInfoAdvanced skin37 widgetOptionSet5 wide" data-modulewidgettype="infoAdv" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-labelledby="header3f725b7a-214b-41fa-a2ef-20652bd007f9">
+			<header class="widgetHeader" id="header3f725b7a-214b-41fa-a2ef-20652bd007f9">
+		<div class="">
+					<h3>Contact Us</h3>
+								</div>
+	</header>
+	<div class="widgetBody  cpGrid cpGrid1 ">
+		<div class="row  wide">
+					<div class="col col1 first last">
+						<ol class="pageStyles semanticList">
+
+<li class="InfoAdvanced widgetItem fr-view">
+	<p id="isPasted"><strong>City of West Covina</strong><br>1444 West Garvey Avenue South<br>West Covina, CA 91790<br>Phone: <a href="tel:%20626-939-8400">626-939-8400</a></p>
+</li>						</ol>
+					</div>
+		</div>
+	</div>
+	<div class="widgetFooter">
+
+	</div>
+
+	</section>
+
+
+
+<script type="text/javascript">
+	//Render slideshow if info advacned items contain one.
+	$(document).ready(function (e) {
+		$('#divInfoAdv3f725b7a-214b-41fa-a2ef-20652bd007f9 .InfoAdvanced.widgetItem').each(function () {
+			renderSlideshowIfApplicable($(this));		
+		});
+	});
+</script></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col2" style="" data-widgetcontainerid="591ee1e7-810d-478b-a846-b37125fdfb30">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col2 first last id01526eb4-ebb5-4ca2-a010-f456aff1b7eb" style="" data-widgetcontainerid="01526eb4-ebb5-4ca2-a010-f456aff1b7eb">	
+
+<div class="widget widgetSpacer" id="e8795e53-739e-4f33-9727-ac499ce2c070"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col3" style="" data-widgetcontainerid="2c061a98-0eb5-4b4e-8936-fbf7e2ad250c">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col3 first last id663cde17-c1f0-463c-8fa5-456d8faa81b5" style="" data-widgetcontainerid="663cde17-c1f0-463c-8fa5-456d8faa81b5">	
+<div data-widget-id="018d7406-3558-4e53-ba92-28f2294f020f" data-widget-controller-path="/GraphicLinks/Widget">
+
+
+
+
+<div id="graphicLinkWidget018d7406-3558-4e53-ba92-28f2294f020f" class="widget widgetGraphicLinks skin37 widgetOptionSet4 wide" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' data-modulewidgettype="graphicLinks">
+	<div class="widgetHeader">
+		<div class="">
+			<h3 id="GraphicLinkHeaderText" class="">Social Media</h3>
+				</div>
+	</div>
+	<div class="widgetBody cpGrid cpGrid1 ">
+		<nav class="widgetGraphicLinksNav" aria-labelledby="GraphicLinkHeaderText">
+					<ul class="semanticList">
+						<!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://www.youtube.com/channel/UCB6garANBTuHBkXFXBRw4RA" target="_self" class="fancyButton fancyButton54 ">
+		<span>
+			<span><span class="text">YouTube</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton54.fancyButton:link,.fancyButton54.fancyButton:visited, .fancyButton54div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=51');
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton54.fancyButton:hover,.fancyButton54.fancyButton:focus,.fancyButton54.fancyButton:active,.fancyButton54.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton54.fancyButton:link > span,.fancyButton54.fancyButton:visited > span, .fancyButton54div.fancyButton > span{
+}
+.fancyButton54.fancyButton:hover > span,.fancyButton54.fancyButton:focus > span,.fancyButton54.fancyButton:active > span,.fancyButton54.fancyButton.hover > span{
+}
+.fancyButton54.fancyButton .text{
+	color: rgb(255, 255, 255);
+	font-family: "Lato";
+	text-align: left;
+	padding-left: 2em;
+	font-style: normal;
+	text-decoration: none;
+	padding-left: 2em;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+.fancyButton54.fancyButton:hover .text,.fancyButton54.fancyButton:focus .text,.fancyButton54.fancyButton:active .text,.fancyButton54.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+</style>
+
+ </li><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://www.facebook.com/WestCovinaCity/" target="_self" class="fancyButton fancyButton53 ">
+		<span>
+			<span><span class="text">Facebook</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton53.fancyButton:link,.fancyButton53.fancyButton:visited, .fancyButton53div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=48');
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton53.fancyButton:hover,.fancyButton53.fancyButton:focus,.fancyButton53.fancyButton:active,.fancyButton53.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton53.fancyButton:link > span,.fancyButton53.fancyButton:visited > span, .fancyButton53div.fancyButton > span{
+}
+.fancyButton53.fancyButton:hover > span,.fancyButton53.fancyButton:focus > span,.fancyButton53.fancyButton:active > span,.fancyButton53.fancyButton.hover > span{
+}
+.fancyButton53.fancyButton .text{
+	color: rgb(255, 255, 255);
+	font-family: "Lato";
+	text-align: left;
+	padding-left: 2em;
+	font-style: normal;
+	text-decoration: none;
+	padding-left: 2em;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+.fancyButton53.fancyButton:hover .text,.fancyButton53.fancyButton:focus .text,.fancyButton53.fancyButton:active .text,.fancyButton53.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+</style>
+
+ </li><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://x.com/westcovinacity" target="_self" class="fancyButton fancyButton55 ">
+		<span>
+			<span><span class="text">X</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton55.fancyButton:link,.fancyButton55.fancyButton:visited, .fancyButton55div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=65');
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton55.fancyButton:hover,.fancyButton55.fancyButton:focus,.fancyButton55.fancyButton:active,.fancyButton55.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton55.fancyButton:link > span,.fancyButton55.fancyButton:visited > span, .fancyButton55div.fancyButton > span{
+}
+.fancyButton55.fancyButton:hover > span,.fancyButton55.fancyButton:focus > span,.fancyButton55.fancyButton:active > span,.fancyButton55.fancyButton.hover > span{
+}
+.fancyButton55.fancyButton .text{
+	color: rgb(255, 255, 255);
+	font-family: "Lato";
+	text-align: left;
+	padding-left: 2em;
+	font-style: normal;
+	text-decoration: none;
+	padding-left: 2em;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+.fancyButton55.fancyButton:hover .text,.fancyButton55.fancyButton:focus .text,.fancyButton55.fancyButton:active .text,.fancyButton55.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+</style>
+
+ </li><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://www.instagram.com/westcovinacity/" target="_self" class="fancyButton fancyButton56 ">
+		<span>
+			<span><span class="text">Instagram</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton56.fancyButton:link,.fancyButton56.fancyButton:visited, .fancyButton56div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=49');
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton56.fancyButton:hover,.fancyButton56.fancyButton:focus,.fancyButton56.fancyButton:active,.fancyButton56.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton56.fancyButton:link > span,.fancyButton56.fancyButton:visited > span, .fancyButton56div.fancyButton > span{
+}
+.fancyButton56.fancyButton:hover > span,.fancyButton56.fancyButton:focus > span,.fancyButton56.fancyButton:active > span,.fancyButton56.fancyButton.hover > span{
+}
+.fancyButton56.fancyButton .text{
+	color: rgb(255, 255, 255);
+	font-family: "Lato";
+	text-align: left;
+	padding-left: 2em;
+	font-style: normal;
+	text-decoration: none;
+	padding-left: 2em;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+.fancyButton56.fancyButton:hover .text,.fancyButton56.fancyButton:focus .text,.fancyButton56.fancyButton:active .text,.fancyButton56.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+</style>
+
+ </li><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://www.linkedin.com/company/city-of-west-covina" target="_self" class="fancyButton fancyButton57 ">
+		<span>
+			<span><span class="text">LinkedIn</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton57.fancyButton:link,.fancyButton57.fancyButton:visited, .fancyButton57div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=52');
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton57.fancyButton:hover,.fancyButton57.fancyButton:focus,.fancyButton57.fancyButton:active,.fancyButton57.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.fancyButton57.fancyButton:link > span,.fancyButton57.fancyButton:visited > span, .fancyButton57div.fancyButton > span{
+}
+.fancyButton57.fancyButton:hover > span,.fancyButton57.fancyButton:focus > span,.fancyButton57.fancyButton:active > span,.fancyButton57.fancyButton.hover > span{
+}
+.fancyButton57.fancyButton .text{
+	color: rgb(255, 255, 255);
+	font-family: "Lato";
+	text-align: left;
+	padding-left: 2em;
+	font-style: normal;
+	text-decoration: none;
+	padding-left: 2em;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+.fancyButton57.fancyButton:hover .text,.fancyButton57.fancyButton:focus .text,.fancyButton57.fancyButton:active .text,.fancyButton57.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: left top;
+
+
+}
+</style>
+
+ </li><!--
+					-->
+					</ul>
+			</nav>
+		</div>
+	<div class="widgetFooter">
+			</div>
+</div>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col2" style="" data-widgetcontainerid="98a9fed1-a7b0-40ea-a546-608fa35fab3b">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col2 first last id03e642ac-40fb-4229-ac34-ce7061d09d31" style="" data-widgetcontainerid="03e642ac-40fb-4229-ac34-ce7061d09d31">	
+
+<div class="widget widgetSpacer" id="b1f085ad-6e94-4f41-bd96-9647f4d80328"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col4" style="" data-widgetcontainerid="2679a34a-ce30-4713-b615-6ce324837cf3">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col4 first last ida8b46767-7559-4b90-8ca4-f1a6a5754370" style="" data-widgetcontainerid="a8b46767-7559-4b90-8ca4-f1a6a5754370">	
+	<div data-widget-id="bfd8a645-12cc-4a05-850f-7d278584619d" data-widget-controller-path="/QuickLinks/Widget">
+
+
+
+
+
+
+
+
+	<section id="widgetQuicklinkbfd8a645-12cc-4a05-850f-7d278584619d" class="widget widgetQuickLinks skin37 widgetOptionSet27 narrow" data-modulewidgettype="quickLinks" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-labelledby="quickLinksHeaderbfd8a645-12cc-4a05-850f-7d278584619d">
+			<header class="widgetHeader" id="quickLinksHeaderbfd8a645-12cc-4a05-850f-7d278584619d">
+		<div class="">
+					<h3><a style="" href="/QuickLinks.aspx?CID=15">Quick Links</a></h3>
+						</div>
+	</header>
+	<div class="widgetBody cpGrid cpGrid1 ">
+        <div class="row  narrow">
+				<div class="col col1 first last">
+					<ol class="semanticList">
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/BusinessDirectoryii.aspx" target="_self" aria-label="Business Directory - Helpful Links" rel="">Business Directory</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/Calendar.aspx" target="_self" aria-label="Calendar - Helpful Links" rel="">Calendar</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/FAQ.aspx" target="_self" aria-label="FAQs - Helpful Links" rel="">FAQs</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/CivicAlerts.aspx" target="_self" aria-label="News - Helpful Links" rel="">News</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/Facilities" target="_self" aria-label="Parks &amp; Facilities - Helpful Links" rel="">Parks & Facilities</a>
+        <div class="widgetMeta"></div>
+    </li>
+					</ol>
+				</div>
+		</div>
+        
+	</div>
+	<div class="widgetFooter">
+	</div>
+	<div class="addItemModal hidden">
+		<div class="url hidden">/QuickLinks.aspx</div>
+	</div>
+
+	</section>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col1" style="" data-widgetcontainerid="adcebd71-6f20-4a04-ab52-0495a196c11e">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col1 first last id3318a4e0-f305-45f7-a459-57c186f61a64" style="" data-widgetcontainerid="3318a4e0-f305-45f7-a459-57c186f61a64">	
+
+<div class="widget widgetSpacer" id="b9721fa4-5190-4fa1-9add-b87e4fa87c97"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col3 last" style="" data-widgetcontainerid="66804255-1813-4449-8c4d-23c63a1c1990">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col3 first last idbdf2e955-5733-4a80-85fc-69f5d774b8de" style="" data-widgetcontainerid="bdf2e955-5733-4a80-85fc-69f5d774b8de">	
+	<div data-widget-id="23ae68f7-6299-4934-aba0-de46b6c3b696" data-widget-controller-path="/QuickLinks/Widget">
+
+
+
+
+
+
+
+
+	<section id="widgetQuicklink23ae68f7-6299-4934-aba0-de46b6c3b696" class="widget widgetQuickLinks skin37 widgetOptionSet27 narrow" data-modulewidgettype="quickLinks" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-labelledby="quickLinksHeader23ae68f7-6299-4934-aba0-de46b6c3b696">
+			<header class="widgetHeader" id="quickLinksHeader23ae68f7-6299-4934-aba0-de46b6c3b696">
+		<div class="">
+					<h3><a style="" href="/QuickLinks.aspx?CID=16">Helpful Links</a></h3>
+						</div>
+	</header>
+	<div class="widgetBody cpGrid cpGrid1 ">
+        <div class="row  narrow">
+				<div class="col col1 first last">
+					<ol class="semanticList">
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/" target="_self" aria-label="Home - Site Links" rel="">Home</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/sitemap" target="_self" aria-label="Site Map - Site Links" rel="">Site Map</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/directory.aspx" target="_self" aria-label="Contact Us - Site Links" rel="">Contact Us</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/site/accessibility" target="_self" aria-label="Accessibility - Site Links" rel="">Accessibility</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/copyright" target="_self" aria-label="Copyright Notices - Site Links" rel="">Copyright Notices</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/site/privacy" target="_self" aria-label="Privacy Policy - Site Links" rel="">Privacy Policy</a>
+        <div class="widgetMeta"></div>
+    </li>
+					</ol>
+				</div>
+		</div>
+        
+	</div>
+	<div class="widgetFooter">
+	</div>
+	<div class="addItemModal hidden">
+		<div class="url hidden">/QuickLinks.aspx</div>
+	</div>
+
+	</section>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div><div data-cprole="contentContainer" id="poweredByTS">	<div id="ccf4cc4bf7-72c4-48a2-a8cc-3e4bcfbc7f66" data-containerid="f4cc4bf7-72c4-48a2-a8cc-3e4bcfbc7f66" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col24 first last" style="" data-widgetcontainerid="8d6e8be7-8cff-4a52-889b-f954df4d7944">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col24 first last ide26f24f8-7748-4d69-8fe4-8d0a5b06ae64" style="" data-widgetcontainerid="e26f24f8-7748-4d69-8fe4-8d0a5b06ae64">	
+ 
+	<div data-widget-id='5bd9ea1e-4bb9-4c14-bc3e-2884c50666cb' data-modulename="customHtml" id='widgetCustomHtml5bd9ea1e-4bb9-4c14-bc3e-2884c50666cb' class="widget widgetCustomHtml skin37 narrow">
+	<div class="widgetBody pageStyles" id="widgetBody5bd9ea1e-4bb9-4c14-bc3e-2884c50666cb">
+		<div id="customHtml5bd9ea1e-4bb9-4c14-bc3e-2884c50666cb"><div><!-- CP BAR -->
+  <style>
+    /* CP icon */
+    .cpBylineIconTS {
+        color: #fff;
+    }
+    /* CP Text */
+    .cpBylineTextTS,
+    .cpBylineTextTS a:link,
+    .cpBylineTextTS a:visited,
+    .cpBylineTextTS a:hover,
+    .cpBylineTextTS a:focus,
+    .cpBylineTextTS a:active {
+        color: #fff!important;
+    }
+
+    .cpBylineTextTS a:link,
+    .cpBylineTextTS a:visited,
+    .cpBylineTextTS a:hover,
+    .cpBylineTextTS a:focus,
+    .cpBylineTextTS a:active {
+        text-decoration: underline !important;
+    }
+
+    .cpBylineTS {
+        text-align: center;
+    }
+    .cpBylineIconTS {
+        fill: currentColor;
+        width: 39px;
+        height: 26px;
+        display: inline;
+        vertical-align: middle;
+    }
+  </style>
+    
+  <div class="widgetItem cpBylineTS">
+    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="cpBylineIconTS">
+      <path class="c" d="M73.4,23.2h-19v16.7h19c2.8,0,5,2.2,5,5c0,2.8-2.2,5-5,5h-19v28.4h5.5l11.3-11.7h2.2c11.9,0,21.6-9.7,21.6-21.6C95,33,85.3,23.2,73.4,23.2"></path>
+      <path class="p" d="M45.8,66.5H26.6C14.7,66.5,5,56.8,5,44.9C5,33,14.7,23.2,26.6,23.2h19.1v16.7H26.6c-2.8,0-5,2.2-5,5c0,2.8,2.2,5,5,5h19.1V66.5z"></path>
+    </svg>
+    <span class="cpBylineTextTS">Government Websites by <a href="https://connect.civicplus.com/referral">CivicPlus&reg;</a></span>
+  </div>
+</div></div>
+	</div>
+
+	</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div></div>
+</footer>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+
+<link href="/745732998.css" rel="stylesheet" type="text/css">
+
+<div id="SplashMessageWrapper" class="cp-Splash-wrapper">
+	<div role="dialog" aria-labelledby="cp-Splash-title" aria-describedby="editorContentDesc" aria-modal="true" tabindex="-1" id="SplashMessage" class="hidden cp-Splash cp-Splash--modal is-open">
+		<div class="cp-Splash-header">
+			<h2 class="cp-Splash-title" id="cp-Splash-title">Loading</h2>
+			<button class="cp-Splash-Btn cp-Splash-close" aria-label="Close this modal" title="Close this window">
+				<svg id="iconClose" viewbox="0 0 25 25">
+					<polygon style="fill:currentcolor" points="18.806,6.98 18.075,6.248 12.532,11.792 6.989,6.248 6.257,6.98 11.786,12.508 6.212,18.084 6.943,18.815 12.532,13.224 18.12,18.815 18.851,18.084 13.277,12.508"></polygon>
+				</svg>
+			</button>
+		</div>
+		<div class="cp-Splash-body">
+			<div class="cp-Splash-Prose editorContent fr-view" id="editorContentDesc">
+				<!-- Content from the Froala Editor will go here. -->
+				Loading
+			</div>
+		</div>
+		<div class="cp-Splash-footer">
+			<button class="cp-Splash-Btn cp-Splash-Btn--NoShow">Do Not Show Again</button>
+			<button class="cp-Splash-Btn cp-Splash-Btn--Close">Close</button>
+		</div>
+	</div>
+</div>
+
+<script src="/Assets/Scripts/APIClient.js"></script>
+<script src="/Assets/Mystique/Shared/Scripts/Moment/Moment.min.js"></script>
+<script src="/Assets/Scripts/SplashModal/SplashModalRender.js"></script>
+<script>
+
+		$(document).ready(function () {
+			var filter = {
+				targetId: '',
+				targetType: 0
+			}
+
+			new SplashModalRender().triggerRender(filter);
+		});
+</script>
+
+	
+
+    
+
+
+	
+
+
+
+
+
+
+    <script src="/-1442400649.js" type="text/javascript"></script>
+    <!-- Fixed Nav Adjustment -->
+<script>
+  function getValueTS(elem, attr) {
+    var val = elem.css(attr);
+    if (val === undefined) return undefined;
+    var num = parseInt(val, 10);
+    if (num === NaN) return undefined;
+    return num;
+  }
+
+  function clampTS(number, min, max) {
+    return Math.min(Math.max(number, min), max);
+  }
+
+  function isPageEditingTS() {
+    return (
+      $("#doneEditing").length > 0 || // In live edit
+      typeof DesignCenter !== "undefined" // In theme manager
+    );
+  }
+
+  var bgColorRegexTS = new RegExp("rgba\((\d+), (\d+), (\d+), (\d*\.?\d*)\)");
+  function isTransparentTS(elem) {
+    var bg = elem.css('background-color');
+    if (typeof bg !== "string") return false;
+    if (bg === "transparent") return true;
+    if (!bg.startsWith('rgba(')) return false;
+    var matchState = bg.match(bgColorRegexTS);
+    if (!matchState || matchState.length !== 5) return false;
+    var alpha = parseFloat(matchState[4], 10);
+    if (!(alpha >= 0 && alpha < 1)) return false;
+    return true;
+  }
+
+  function iterateLeftpads(cb) {
+    var containersTS = $("[class^='siteWrap'],[class*=' siteWrap']");
+    for (var i = 0; i < containersTS.length; i++) {
+      var containerTS = containersTS[i];
+      // Skip the body container and anything with data-skip-leftpad
+      if (
+        containerTS.id !== "bodyContainerTS" &&
+        containerTS.getAttribute('data-skip-leftpad') === null
+      ) {
+        cb(containerTS);
+      }
+    }
+  }
+
+  function iterateRightpads(cb) {
+    var containersTS = $("[class^='siteWrap'],[class*=' siteWrap']");
+    for (var i = 0; i < containersTS.length; i++) {
+      var containerTS = containersTS[i];
+      // Skip the body container and anything with data-skip-rightpad
+      if (
+        containerTS.id !== "bodyContainerTS" &&
+        containerTS.getAttribute('data-skip-rightpad') === null
+      ) {
+        cb(containerTS);
+      }
+    }
+  }
+
+  var anchor = $("#divToolbars");
+  var bodyContainerTS = $("#bodyContainerTS");
+
+  // Outer banner padding (push banner down)
+  var outerSizingTS = $("#bannerContainerTS");
+  // Inner banner padding (push banner content down) - Transparent header OR on attaching headers
+  var innerSizingTS = $("#bannerSizingTS");
+
+  var forceUnfixClassTS = "forceUnfixTS";
+
+  var fixedTopTS = $(".fixedTopTS");
+  var fixedBottomTS = $(".fixedBottomTS");
+  var fixedLeftTS = $(".fixedLeftTS");
+  var fixedRightTS = $(".fixedRightTS");
+
+  var initialTopTS;
+  var topAttachTS;
+  if (fixedTopTS && fixedTopTS.length === 1) {
+    initialTopTS = getValueTS(fixedTopTS, 'top');
+    var attachment = fixedTopTS.attr('data-attach');
+    if (attachment) topAttachTS = $("#" + attachment);
+    if (!topAttachTS || topAttachTS.length !== 1) topAttachTS = undefined;
+  }
+
+  function resizeAdjustmentTS() {
+    var editing = isPageEditingTS();
+
+    // Fixed top script
+    (function () {
+      if (!fixedTopTS || fixedTopTS.length !== 1 || initialTopTS === undefined) return;
+
+      if (editing) {
+        fixedTopTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedTopTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      var topPosition = fixedTopTS.css('position');
+      if (topPosition === 'fixed') {
+        if (topAttachTS) {
+          scrollAdjustmentTS();
+        } else {
+          var anchorHeight = anchor.outerHeight() - 1;
+          fixedTopTS.css('top', anchorHeight + initialTopTS);
+        }
+      } else {
+        fixedTopTS.css('top', initialTopTS);
+      }
+
+      if (topPosition === 'fixed' || topPosition === 'absolute') {
+        // Bump the banner content down
+        if (isTransparentTS(fixedTopTS)) {
+          innerSizingTS.css('padding-top', initialTopTS + fixedTopTS.outerHeight());
+          outerSizingTS.css('padding-top', '');
+
+          try {
+            window.Pages.onResizeHandlersExecute();
+          } catch (e) { }
+        } else {
+          outerSizingTS.css('padding-top', fixedTopTS.outerHeight() - 1);
+          innerSizingTS.css('padding-top', '');
+        }
+      } else {
+        innerSizingTS.css('padding-top', '');
+        outerSizingTS.css('padding-top', '');
+      }
+    })();
+
+    // Fixed bottom script
+    (function () {
+      if (!fixedBottomTS || fixedBottomTS.length === 0) return;
+
+      // If the widget has gone narrow, force unfix
+      if (editing || fixedBottomTS.outerHeight() > 200) {
+        fixedBottomTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedBottomTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      if (fixedBottomTS.css('position') === 'fixed') {
+        bodyContainerTS.css('padding-bottom', fixedBottomTS.outerHeight());
+      } else {
+        bodyContainerTS.css('padding-bottom', '');
+      }
+    })();
+
+    // Fixed left script
+    (function () {
+      if (!fixedLeftTS || fixedLeftTS.length === 0) return;
+
+      if (editing) {
+        fixedLeftTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedLeftTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      if (fixedLeftTS.css('position') === 'fixed') {
+        var anchorHeight = anchor.outerHeight() - 1;
+        fixedLeftTS.css('top', anchorHeight);
+        var leftBoundingTS = fixedLeftTS[0].getBoundingClientRect();
+        iterateLeftpads(function (containerTS) {
+          var containerBoundingTS = containerTS.getBoundingClientRect();
+          if (containerBoundingTS.left <= leftBoundingTS.right) {
+            $(containerTS).css('padding-left', leftBoundingTS.width + 16);
+          } else {
+            $(containerTS).css('padding-left', '');
+          }
+        });
+      } else {
+        fixedLeftTS.css('top', '');
+        iterateLeftpads(function (containerTS) {
+          $(containerTS).css('padding-left', '');
+        });
+      }
+    })();
+
+    // Fixed right script
+    (function () {
+      if (!fixedRightTS || fixedRightTS.length === 0) return;
+
+      if (editing) {
+        fixedRightTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedRightTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      if (fixedRightTS.css('position') === 'fixed') {
+        var anchorHeight = anchor.outerHeight() - 1;
+        fixedRightTS.css('top', anchorHeight);
+        var rightBoundingTS = fixedRightTS[0].getBoundingClientRect();
+        iterateRightpads(function (containerTS) {
+          var containerBoundingTS = containerTS.getBoundingClientRect();
+          if (containerBoundingTS.right >= rightBoundingTS.left) {
+            $(containerTS).css('padding-right', rightBoundingTS.width + 16);
+          }
+        });
+      } else {
+        fixedRightTS.css('top', '');
+        iterateRightpads(function (containerTS) {
+          $(containerTS).css('padding-right', '');
+        });
+      }
+    })();
+  }
+
+  function scrollAdjustmentTS() {
+    if (!fixedTopTS || fixedTopTS.length !== 1 || !topAttachTS || topAttachTS.length !== 1) return;
+    var topPosition = fixedTopTS.css('position');
+    if (topPosition === 'fixed' || topPosition === 'absolute') {
+      var anchorBounding = anchor[0].getBoundingClientRect();
+      var attachBounding = topAttachTS[0].getBoundingClientRect();
+      var scrollTop = $(window).scrollTop();
+
+      fixedTopTS.css('top', Math.max(anchorBounding.bottom - 1, attachBounding.bottom));
+    } else {
+      fixedTopTS.css('top', initialTopTS);
+    }
+  }
+
+  $(window).load(function () {
+    setTimeout(function () {
+      try {
+        resizeAdjustmentTS();
+      } catch (e) {
+        console.error(e);
+      }
+    }, 350);
+
+    $(window).scroll(function () {
+      try {
+        scrollAdjustmentTS();
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    var adjustTimeoutTS;
+    $(window).resize(function () {
+      clearTimeout(adjustTimeoutTS);
+      adjustTimeoutTS = setTimeout(function () {
+        try {
+          resizeAdjustmentTS();
+        } catch (e) {
+          console.error(e);
+        }
+      }, 350);
+    });
+
+    $.when(window.Pages.angularToolbarComplete).done(function () {
+      try {
+        resizeAdjustmentTS();
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  });
+</script>
+<!-- End Fixed Nav Adjustment -->
+
+<script type="text/javascript">!function(){var b=function(){window.__AudioEyeSiteHash = "d6237ad4856482fa2232d3807a5e698d"; var a=document.createElement("script");a.src="https://wsmcdn.audioeye.com/aem.js";a.type="text/javascript";a.setAttribute("async","");document.getElementsByTagName("body")[0].appendChild(a)};"complete"!==document.readyState?window.addEventListener?window.addEventListener("load",b):window.attachEvent&&window.attachEvent("onload",b):b()}();</script>
+
+
+
+<!----------Google Translate (Mobile Friendly)--------->
+<style>#google-translate-container {float: right;padding: 3px 5px 0px 0px;}.goog-te-combo,.goog-te-banner *,.goog-te-ftab *,.goog-te-menu *,.goog-te-menu2 *,.goog-te-balloon * {font-family: arial;font-size: 10pt;background-image: url("https://theme.zdassets.com/theme_assets/958586/bae8aa24db8d43595871692a9d259186f2db3fb4.png");background-position: 3px 4px;background-size: 22px;background-repeat: no-repeat;text-indent: 20px;background-color: #fff;color: #000 !important;}.goog-logo-link {display: none !important;}.goog-te-gadget {color: transparent !important;}.goog-te-gadget .goog-te-combo {margin: 2px 0 !important;border-radius: 15px !important;}.goog-te-combo{border: 1px solid !important;border-color: #bcc9d7 #96a3b1 #96a3b1 #bcc9d7 !important;border-radius: 0 !important;height:32px; !important;padding: 0 1px 0 .25rem !important;}
+#launcher-wrapper {bottom: 50px !important;}
+</style>
+<div id="google-translate-container">
+ <div id="google_translate_element" style="position: fixed; bottom: 0px; left: 70px; z-index: 5;"></div>
+</div>
+<script>
+function googleTranslateElementInit() {
+ var el = document.getElementById("google_translate_element");
+ if (el && el.innerHTML.trim() !== "") {
+     return;
+ }
+
+ new google.translate.TranslateElement({ pageLanguage: "en" }, "google_translate_element");
+ // begin accessibility compliance
+ $('img.goog-te-gadget-icon').attr('alt','Google Translate');
+ $('div#goog-gt-tt div.logo img').attr('alt','translate');
+ $('div#goog-gt-tt .original-text').css('text-align','left');
+ $('.goog-te-gadget-simple .goog-te-menu-value span').css('color','#000000');
+ $('.goog-te-combo').attr('aria-label','google translate languages');
+ $('svg.goog-te-spinner').attr('title','Google Translate Spinner');
+ $('.goog-te-gadget-simple .goog-te-menu-value span').css('color','#000000');
+}
+$(function() {
+ $.getScript("//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
+});
+</script>
+<!--------------End Google Translate----------------->
+
+<script src="https://cdn-residentagent.civicplus.com/loader.js"></script>
+<script>
+    window.ResidentAgentWidget.load({
+        agentId: '2b823c31-2473-441b-84b4-3ba3d4717855',
+        apiUrl: 'https://residentagent-api-production.azurewebsites.net'
+    });
+</script>
+
+
+    <script type="text/javascript">
+        $(function () {
+            document.cookie = "responsiveGhost=0; path=/";
+        });
+        $(window).on("load", function () {
+            $('body').addClass('doneLoading').removeClass('hideContent');
+
+            if ($('#404Content').length > 0)
+                $('div#bodyWrapper').css('padding', '0px');
+        });
+    </script>
+
+    <noscript>
+        <style>
+            body.hideContent {
+                opacity: 1 !important;
+            }
+        </style>
+    </noscript>
+
+        
+<div style="display: none;">
+	<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+
+		<symbol id="iconArrow--left" viewbox="0 0 25 25">
+			<title>Arrow Left</title>
+			<polygon style="fill:currentcolor" points="18.044,25 19.498,23.545 8.409,12.454 19.408,1.455 17.954,0 5.502,12.452"></polygon>
+		</symbol>
+
+		<symbol id="iconArrow--right" viewbox="0 0 25 25">
+			<title>Arrow Right</title>
+			<polygon style="fill:currentcolor" points="6.957,0 5.502,1.455 16.591,12.546 5.592,23.545 7.047,25 19.498,12.548"></polygon>
+		</symbol>
+
+	</svg>
+</div>
+    <script type="text/javascript">loadCSS('//fonts.googleapis.com/css?family=Lato:700,900,italic,regular|Oranienbaum:regular|');</script>
+    
+
+    <div class="hidden activeWidgetSkinComponentsOnPageJson">[]</div>
+        <div style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                <symbol id="iconSlideshowArrowLeft" viewbox="0 0 22.68 40">
+                    <title>Slideshow Left Arrow</title>
+                    <g>
+                        <path style="fill:currentcolor;" d="M20,40a2.67,2.67,0,0,1-1.9-.79L.79,21.9a2.68,2.68,0,0,1,0-3.79L18.1.79a2.68,2.68,0,1,1,3.79,3.79L6.47,20,21.89,35.42A2.68,2.68,0,0,1,20,40Z"></path>
+                    </g>
+                </symbol>
+                <symbol id="iconSlideshowArrowRight" viewbox="0 0 22.68 40">
+                    <title>Slideshow Right Arrow</title>
+                    <g>
+                        <path style="fill:currentcolor;" d="M2.68,0a2.67,2.67,0,0,1,1.9.79L21.89,18.1a2.68,2.68,0,0,1,0,3.79L4.58,39.21A2.68,2.68,0,0,1,.79,35.42L16.21,20,.79,4.58A2.68,2.68,0,0,1,2.68,0Z"></path>
+                    </g>
+                </symbol>
+            </svg>
+        </div>
+    
+	
+	
+
+    <div id="root-picker-outlet"></div>
+</body>
+</html>
+
+

@@ -21,7 +21,7 @@ from parkingbreaker.transaction_store import SqliteTransactionStore
 from test_beta_admission import NOW, campaign, candidate
 
 
-def reserve(store: SqliteTransactionStore) -> str:
+def reserve(store: SqliteTransactionStore, *, filing_verified: bool = True) -> str:
     iid = "case_1"
     pm = "pm_fixture"
     key = mutation_key("authorization", iid, "CERTIFIED:2999", pm)
@@ -40,6 +40,7 @@ def reserve(store: SqliteTransactionStore) -> str:
         pm,
         json.dumps(request, sort_keys=True, separators=(",", ":")),
         NOW,
+        filing_verified=filing_verified,
     )
     return key
 
@@ -55,6 +56,19 @@ def prepare(store: SqliteTransactionStore) -> None:
 class Forbidden:
     def __getattribute__(self, name: str) -> object:
         raise AssertionError("payment dependency touched: " + name)
+
+
+def test_filing_stop_applies_only_to_new_reservations(tmp_path: Path) -> None:
+    with SqliteTransactionStore(tmp_path / "db") as store:
+        prepare(store)
+        with pytest.raises(IntakeConflict, match="filing_evidence_unverified"):
+            reserve(store, filing_verified=False)
+        assert store.pending_authorization_attempt("case_1") is None
+        key = reserve(store)
+        assert reserve(store, filing_verified=False) == key
+        attempt = store.pending_authorization_attempt("case_1")
+        assert attempt is not None
+        assert attempt.idempotency_key == key
 
 
 @pytest.mark.parametrize("accepted", [False, True])

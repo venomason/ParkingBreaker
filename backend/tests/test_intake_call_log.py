@@ -106,8 +106,9 @@ async def test_real_fake_config_intake_logs_calls_per_subject_and_replay_is_idem
     workspace, payload, receipt = await submit(client, intake())
     case_id = receipt["case_id"]
     rows = service._store.ai_calls(case_id)
-    assert len(rows) >= 2  # issuer assessment plus linked-page assessment in the real fake resolver
-    assert all(row.worker is AiWorker.INTAKE_READING for row in rows)
+    assert sum(row.worker is AiWorker.INTAKE_READING for row in rows) >= 2
+    assert any(row.worker is AiWorker.RESEARCH for row in rows)
+    assert {row.worker for row in rows} == {AiWorker.INTAKE_READING, AiWorker.RESEARCH}
     assert all(row.model == "offline-fixture" and row.status is AiCallStatus.OK for row in rows)
     replay = await client.post(f"/workspaces/{workspace}/intake", headers=ALICE, json=payload)
     assert replay.status_code == 200

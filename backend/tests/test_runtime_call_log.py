@@ -21,6 +21,7 @@ from parkingbreaker.oplog.ai_journal import (
     AiWorker,
 )
 from test_config import ALICE, WORKER, held_case
+from test_intake_call_log import intake, submit
 
 
 class ObservedFixtureLlm(FixtureLlm):
@@ -41,7 +42,13 @@ class ObservedFixtureLlm(FixtureLlm):
         max_cost_cents: int | None = None,
     ) -> tuple[JsonValue, Usage]:
         properties = schema.get("properties", {})
-        kind = "draft" if isinstance(properties, dict) and "sentences" in properties else "research"
+        assert isinstance(properties, dict)
+        if "findings" in properties:
+            kind = "research"
+        elif "sentences" in properties:
+            kind = "draft"
+        else:
+            kind = "intake"
         self.observed.append((kind, max_cost_cents))
         if self.failure is not None and kind == "research":
             raise self.failure
@@ -111,23 +118,19 @@ async def test_runtime_research_and_drafting_log_one_row_per_provider_call(
     service, client, llm = fake_runtime
     case = await held_case(client)
     case_token = case_token_for(service, case)
-    before_calls = len(llm.observed)
-    before_rows = service._store.ai_calls(case_token)
+    observed = list(llm.observed)
+    rows = service._store.ai_calls(case)
     await research_and_draft(client, case)
-    delta = llm.observed[before_calls:]
-    rows = service._store.ai_calls(case_token)
-    appended = rows[len(before_rows) :]
-    assert len(appended) == len(delta)
-    # Customer-authored drafting makes no provider call, so every logged row is research.
-    assert [row.worker for row in appended] == [AiWorker.RESEARCH for kind, _ in delta]
-    assert all(row.model == "offline-fixture" and row.status is AiCallStatus.OK for row in appended)
-    assert all(
-        (row.input_tokens, row.output_tokens, row.cost_cents) == (13, 5, 2) for row in appended
-    )
-    assert [cap for _kind, cap in delta] == llm.ceilings[-len(delta) :]
-    assert all(isinstance(cap, int) and cap >= 0 for kind, cap in delta if kind == "research")
-    assert any(kind == "research" for kind, _ in delta)
-    assert all(kind == "research" for kind, _ in delta)
+    assert llm.observed == observed
+    assert len(rows) == len(observed)
+    assert [row.worker for row in rows] == [
+        AiWorker.INTAKE_READING if kind == "intake" else AiWorker.RESEARCH for kind, _ in observed
+    ]
+    assert all(row.model == "offline-fixture" and row.status is AiCallStatus.OK for row in rows)
+    assert all((row.input_tokens, row.output_tokens, row.cost_cents) == (13, 5, 2) for row in rows)
+    assert [cap for _, cap in observed] == llm.ceilings
+    assert all(isinstance(cap, int) and cap >= 0 for _, cap in observed)
+    assert {kind for kind, _ in observed} == {"intake", "research"}
 
     call_count = len(llm.observed)
     replay_research = await client.post(
@@ -138,7 +141,7 @@ async def test_runtime_research_and_drafting_log_one_row_per_provider_call(
     )
     assert replay_research.status_code == replay_draft.status_code == 200
     assert len(llm.observed) == call_count
-    assert service._store.ai_calls(case_token) == rows
+    assert service._store.ai_calls(case) == rows
 
     monkeypatch.setitem(ALICE, "Authorization", "Bearer fake-bob")
     other_case = await held_case(client)
@@ -165,12 +168,11 @@ async def test_runtime_research_and_drafting_log_one_row_per_provider_call(
         other_state = drafted.json()["state"]
     assert other_state == "AWAITING_ADOPTION"
     other_delta = llm.observed[other_before_calls:]
-    other_rows = service._store.ai_calls(other_token)
-    # Deterministic drafting spends nothing and logs nothing: no drafting provider call.
-    assert all(kind == "research" for kind, _ in other_delta)
-    assert all(row.worker is AiWorker.RESEARCH for row in other_rows)
+    other_rows = service._store.ai_calls(other_case)
+    assert not other_delta
+    assert other_rows
     assert all(row.status is AiCallStatus.OK for row in other_rows)
-    assert service._store.ai_calls(case_token) == rows
+    assert service._store.ai_calls(case) == rows
     assert other_token != case_token
 
 
@@ -179,14 +181,12 @@ async def test_research_failure_is_logged_with_unknown_usage(
     fake_runtime: tuple[CaseService, AsyncClient, ObservedFixtureLlm],
 ) -> None:
     service, client, llm = fake_runtime
-    case = await held_case(client)
-    case_token = case_token_for(service, case)
     llm.failure = LlmProviderError("synthetic provider failure with private detail")
-    result = await client.post(
-        f"/internal/cases/{case}/step", headers=WORKER, json={"step_id": "research"}
-    )
-    assert result.status_code == 200, result.text
-    failed = [row for row in service._store.ai_calls(case_token) if row.worker is AiWorker.RESEARCH]
+    _, _, receipt = await submit(client, intake())
+    case = receipt["case_id"]
+    assert receipt["state"] == "STOPPED_NO_CHARGE"
+    assert service._store.pending_authorization_attempt(case) is None
+    failed = [row for row in service._store.ai_calls(case) if row.worker is AiWorker.RESEARCH]
     assert len(failed) == 1
     assert failed[0].status is AiCallStatus.FALLBACK_AFTER_FAILURE
     assert (failed[0].input_tokens, failed[0].output_tokens, failed[0].cost_cents) == (

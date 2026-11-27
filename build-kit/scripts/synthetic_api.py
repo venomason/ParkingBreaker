@@ -130,13 +130,13 @@ def create_rehearsal_app():
         from parkingbreaker.api.app import create_app
     from parkingbreaker.address_disclosure import DISCLOSURE_SHA256
     from parkingbreaker.auth_config import build_customer_access, load_auth_settings
-    from parkingbreaker.case_service import CaseService
+    from parkingbreaker.customer_checkout import CustomerCheckout
     from parkingbreaker.research.findings import FactKey, Finding, FindingStatus, UnknownReason
     from parkingbreaker.research.sources import AuthorityClass, SourceRecord
     from parkingbreaker.research_records import answers_json, research_json
     from parkingbreaker.transaction_store import SqliteTransactionStore
 
-    class SyntheticCaseService(CaseService):
+    class SyntheticCaseService(CustomerCheckout):
         def _resolve(self, case_id, case_token, result, answers, revision):
             record = self._intake(case_id)
             citation = json.loads(record.intake_json)["ticket"]["citation_number"]

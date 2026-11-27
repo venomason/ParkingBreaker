@@ -742,6 +742,7 @@ class IntakeStoreMixin:
         now: datetime,
         *,
         allow_new_paid_authorization: bool = True,
+        filing_verified: bool = True,
         paid_cohort_cap: int | None = None,
     ) -> AuthorizationAttempt:
         """Durably reserve one immutable provider request before calling Stripe.
@@ -847,6 +848,8 @@ class IntakeStoreMixin:
             # The pending insert below reserves the place in this same write transaction.
             if paid_cohort_cap is not None and self.paid_cohort_full(intake_id, paid_cohort_cap):
                 raise IntakeConflict("paid_cohort_full")
+            if not filing_verified:
+                raise IntakeConflict("filing_evidence_unverified")
             # Only a fresh intent reaches this gate. Count terminal declines (which
             # include confirmed cancellations) by immutable server reservation time:
             # retry/reconciliation timestamps cannot move the window.

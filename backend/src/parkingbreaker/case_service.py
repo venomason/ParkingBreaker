@@ -54,7 +54,7 @@ from parkingbreaker.address_policy import (
     payment_addresses_in_text,
     remedy_for_responsibility,
 )
-from parkingbreaker.agencies import MailingAddress
+from parkingbreaker.agencies import MailingAddress, ResolvedAgency
 from parkingbreaker.api import schemas as s
 from parkingbreaker.api.service import ServiceConflict, SweepFailure, SweepResult, store_upload
 from parkingbreaker.appeal.adoption import FINAL_SCREEN_TEXT, Adoption, adopt, text_sha256
@@ -1412,6 +1412,10 @@ class CaseService:
         return offer.model_copy(update={"selected_tier": body.tier})
 
     # Built by later Lane C jobs (docs/specs/lane-c-core-jobs.md) ------------------------
+    def _filing_verified_for_reservation(self, case_id: str) -> bool:
+        """The durable customer service checks its saved prepayment filing evidence."""
+        return True
+
     def authorize(self, case_id: str, body: s.StartAuthorization) -> s.Authorization:
         """Authorize payment for a case."""
         if self._store.beta_entitlement(case_id) is not None:
@@ -1469,6 +1473,7 @@ class CaseService:
                 started_at,
                 allow_new_paid_authorization=self.service_phase is ServicePhase.PAID,
                 paid_cohort_cap=self._deps.paid_cohort_cap,
+                filing_verified=self._filing_verified_for_reservation(case_id),
             )
         except IntakeConflict as exc:
             current = self._store.get_intake(case_id)
@@ -2350,10 +2355,29 @@ class CaseService:
         )
         if deps is None:
             raise ServiceConflict("research_not_configured")
+        agency = decode_agency(record.agency_json)
+        try:
+            result, reused = self._collect_research(record, agency, deps, case.authorized_at)
+        except PROVIDER_ERRORS:
+            self._apply(
+                case.case_token, Stopped(StopReason.NOT_YET_VERIFIED, hard_stop=HardStop.S1)
+            )
+            self._log_research_call(case.case_token, deps.model_label, None, reused=False)
+            return
+        answers = intake_answers(s.SubmitIntake.model_validate_json(record.intake_json))
+        saved = self._store.save_research(
+            case_id, research_json(result), answers_json(answers), self._deps.clock(), None
+        )
+        self._log_research_call(case.case_token, deps.model_label, result, reused=reused)
+        self._record_tricks(agency.id, result, deps.tricks)
+        self._resolve(case_id, case.case_token, result, answers, saved.revision)
+
+    def _collect_research(
+        self, record: IntakeRecord, agency: ResolvedAgency, deps: ResearchDeps, started: datetime
+    ) -> tuple[ResearchResult, bool]:
         intake = s.SubmitIntake.model_validate_json(record.intake_json)
         ticket = intake.ticket
         now = self._deps.clock()
-        agency = decode_agency(record.agency_json)
         research_ticket = Ticket(
             f"{ticket.issued_city} {ticket.issued_state}",
             ticket.violation_code,
@@ -2363,7 +2387,9 @@ class CaseService:
         )
         candidates: list[ResearchResult] = []
         try:
-            recent = self._store.recent_research_json(now - RESEARCH_REUSE_WINDOW, case_id, 10)
+            recent = self._store.recent_research_json(
+                now - RESEARCH_REUSE_WINDOW, record.intake_id, 10
+            )
         except StorageCorruption:
             # A different case's cache cannot prevent this case's fresh research.
             recent = ()
@@ -2372,49 +2398,33 @@ class CaseService:
                 candidates.append(decode_research(raw))
             except ValueError:
                 continue
-        try:
-            reused = True
-            result = reuse_research(
-                candidates,
-                research_ticket,
-                agency,
-                deps.fetcher,
-                self._deps.clock,
-                now,
-                packet_plan=_intake_form_plan(intake),
-                remaining_time=remaining(case.authorized_at, now),
-            )
-            if result is None:
-                reused = False
-                result = run_research(
-                    research_ticket,
-                    agency,
-                    known_seeds(agency, deps.known_records),
-                    deps.fetcher,
-                    deps.extractor,
-                    self._deps.clock,
-                    searcher=deps.searcher,
-                    recovery=deps.recovery,
-                    wait=deps.wait,
-                    max_cost_cents=deps.budget_cents,
-                    stage=ticket.stage,
-                    remaining_time=remaining(case.authorized_at, self._deps.clock()),
-                    packet_plan=_intake_form_plan(intake),
-                )
-        except PROVIDER_ERRORS:
-            # Failed research is a verification stop, never "unsupported" (research tiers).
-            self._apply(
-                case.case_token, Stopped(StopReason.NOT_YET_VERIFIED, hard_stop=HardStop.S1)
-            )
-            self._log_research_call(case.case_token, deps.model_label, None, reused=False)
-            return
-        answers = intake_answers(intake)
-        saved = self._store.save_research(
-            case_id, research_json(result), answers_json(answers), self._deps.clock(), None
+        result = reuse_research(
+            candidates,
+            research_ticket,
+            agency,
+            deps.fetcher,
+            self._deps.clock,
+            now,
+            packet_plan=_intake_form_plan(intake),
+            remaining_time=remaining(started, now),
         )
-        self._log_research_call(case.case_token, deps.model_label, result, reused=reused)
-        self._record_tricks(agency.id, result, deps.tricks)
-        self._resolve(case_id, case.case_token, result, answers, saved.revision)
+        if result is not None:
+            return result, True
+        return run_research(
+            research_ticket,
+            agency,
+            known_seeds(agency, deps.known_records),
+            deps.fetcher,
+            deps.extractor,
+            self._deps.clock,
+            searcher=deps.searcher,
+            recovery=deps.recovery,
+            wait=deps.wait,
+            max_cost_cents=deps.budget_cents,
+            stage=ticket.stage,
+            remaining_time=remaining(started, self._deps.clock()),
+            packet_plan=_intake_form_plan(intake),
+        ), False
 
     def _record_tricks(
         self, place_key: str, result: ResearchResult, catalog: tuple[Trick, ...]

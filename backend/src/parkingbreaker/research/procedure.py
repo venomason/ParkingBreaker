@@ -63,6 +63,63 @@ class ProcedureSection:
     issuer_heading: str | None = None
 
 
+_FAQ_QUESTION = re.compile(r"(?m)^(?P<title>[^\n?]{1,240}\?)\n+(?:\[Tab/accordion content\]\n+)+")
+_PANEL_END = "[End tab/accordion content]."
+
+
+def _faq_stage(title: str, answer: str) -> str | None:
+    if "[Tab/accordion content]" in answer or "[Collapsed content]" in answer:
+        return None
+    first_question = re.fullmatch(
+        r"how (?:can|do) i (?:dispute|contest|appeal) (?:a|my|the) parking (?:citation|ticket)\?",
+        title,
+        re.I,
+    )
+    initial_request = re.search(
+        r"\b(?:can|may) request (?:a|an initial) review of (?:the|your) (?:citation|ticket)\b",
+        answer,
+        re.I,
+    )
+    if (
+        first_question
+        and initial_request
+        and not re.search(
+            r"\bhearing|\bupheld|\bdenied|\bdelinquen|\bsecond[- ]level", answer, re.I
+        )
+    ):
+        return "first-level review"
+    if (
+        re.search(r"\b(?:citation|ticket|review) (?:is|was) (?:upheld|denied)\b", title, re.I)
+        and re.search(r"\bsecond[- ]level hearing\b", answer, re.I)
+        and re.search(r"\bresults? of (?:the|your) (?:initial )?review\b", answer, re.I)
+        and not initial_request
+    ):
+        return "administrative hearing"
+    return None
+
+
+def _faq_sections(text: str) -> tuple[ProcedureSection, ...]:
+    """Scope a question to its own answer using the saved HTML extractor boundaries."""
+    sections: list[ProcedureSection] = []
+    cursor = 0
+    for question in _FAQ_QUESTION.finditer(text):
+        if question.start() < cursor:
+            continue
+        if question.start() > cursor:
+            sections.append(ProcedureSection(None, text[cursor : question.start()]))
+        cursor = question.end()
+        end = text.find(_PANEL_END, cursor)
+        if end == -1:
+            sections.append(ProcedureSection(None, question.group()))
+            continue
+        stage = _faq_stage(question["title"], text[cursor:end])
+        cursor = end + len(_PANEL_END)
+        sections.append(ProcedureSection(stage, text[question.start() : cursor]))
+    if sections and cursor < len(text):
+        sections.append(ProcedureSection(None, text[cursor:]))
+    return tuple(sections)
+
+
 def procedure_sections(text: str) -> tuple[ProcedureSection, ...]:
     """Recognise bounded standalone stage headings; prose never starts a section.
 
@@ -108,7 +165,7 @@ def procedure_sections(text: str) -> tuple[ProcedureSection, ...]:
             found = True
         current.append(line)
     if not found:
-        return (ProcedureSection(procedure_stage(text), text),)
+        return _faq_sections(text) or (ProcedureSection(procedure_stage(text), text),)
     if current:
         sections.append(ProcedureSection(stage, "".join(current), issuer_heading))
     return tuple(sections)
