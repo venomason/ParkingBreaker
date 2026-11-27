@@ -1,0 +1,332 @@
+{
+  "observed_through_utc": "2026-11-27T03:00:11.217996+00:00",
+  "business_date_pacific": "2026-11-26",
+  "signed_candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+  "decision": "Paid launch remains closed. Both deployed fictional cases stopped before authorization.",
+  "approved_scope": {
+    "research_limit_usd": 0.6,
+    "overall_rehearsal_limit_usd": 10,
+    "research_included_in_overall_limit": true,
+    "hostname": "parkingbreaker.com",
+    "temporary_exact_post_paths": [
+      "/__pb_rehearsal_1126/webhooks/stripe",
+      "/__pb_rehearsal_1126/webhooks/lob"
+    ],
+    "paid_customer_cap": 0,
+    "provider_mode": "test"
+  },
+  "customer_intake": {
+    "observed_utc": "2026-11-27T02:44:51.005594+00:00",
+    "method": "Two original confirmed customer workspaces submitted once through the normal signed application intake and pre-hold handlers inside the private test service.",
+    "results": {
+      "cambridge": {
+        "directory_match": "SINGLE",
+        "first_three_domains": [
+          "cambridgema.gov",
+          "cambridgeretirementma.gov"
+        ],
+        "confirmation_state": "current",
+        "submitted_state": "STOPPED_NO_CHARGE",
+        "prehold_result": "stop",
+        "reason": "stop.not_yet_verified.not_yet_verified.s2.no_pages",
+        "stop_family": "NOT_YET_VERIFIED",
+        "no_charge_on_stop": true,
+        "issuer": null
+      },
+      "riverside": {
+        "directory_match": "SINGLE",
+        "first_three_domains": [
+          "riversideca.gov",
+          "iren.gov",
+          "rcflood.gov"
+        ],
+        "confirmation_state": "current",
+        "submitted_state": "STOPPED_NO_CHARGE",
+        "prehold_result": "stop",
+        "reason": "stop.not_yet_verified.not_yet_verified.s2.quote_missing",
+        "stop_family": "NOT_YET_VERIFIED",
+        "no_charge_on_stop": true,
+        "issuer": null
+      }
+    },
+    "payment_and_mail_counts": {
+      "pb_intake_authorization_attempts": 0,
+      "pb_submission_operations": 0,
+      "pb_payment_operations": 0
+    },
+    "eligible_cases": 0,
+    "refused_before_hold": 2
+  },
+  "independent_procedure_research": {
+    "at": "2026-11-27T02:56:37.773832+00:00",
+    "supplemental_research": {
+      "cambridge": {
+        "search_error": "Brave search HTTP 422",
+        "brave_requests": 1,
+        "brave_estimated_or_reserved_cents": 1,
+        "brave_outcome": "provider_error",
+        "source_records": [
+          {
+            "url": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
+            "sha256": "f33dad3a26331693c2e658738100221df3c822f1c8384691324f5f3a7a38dfdd"
+          }
+        ],
+        "gemini_cost_cents": 1,
+        "budget_exhausted": false,
+        "gemini_tokens": [
+          3280,
+          1262
+        ],
+        "guarded_status": {
+          "MAIL_IN_ACCEPTED": "UNKNOWN",
+          "DEADLINE_DAYS": "UNKNOWN",
+          "DEADLINE_CLOCK_START": "UNKNOWN",
+          "DEADLINE_RULE": "UNKNOWN",
+          "MAILING_ADDRESS": "UNKNOWN",
+          "REQUIRED_ITEMS": "UNKNOWN"
+        }
+      },
+      "riverside": {
+        "search_error": "Brave search HTTP 422",
+        "brave_requests": 1,
+        "brave_estimated_or_reserved_cents": 1,
+        "brave_outcome": "provider_error",
+        "source_records": [
+          {
+            "url": "https://www.riversideca.gov/publicworks/parking/parking-faq",
+            "sha256": "6a985d6b797537ba2f2ca6978ce282d141ae9be02558e3b85279245e6087c355"
+          },
+          {
+            "url": "https://www.riversideca.gov/sites/default/files/pdf/2021%20Request%20for%20Administrative%20Review%20Form%20-%20Riverside.pdf",
+            "sha256": "37ba73ff9c3f9d87108b42caa7f49c31c35b7a7310a12dee9951a6391bb76849"
+          }
+        ],
+        "gemini_cost_cents": 1,
+        "budget_exhausted": false,
+        "gemini_tokens": [
+          5465,
+          998
+        ],
+        "guarded_status": {
+          "MAIL_IN_ACCEPTED": "UNKNOWN",
+          "DEADLINE_DAYS": "UNKNOWN",
+          "DEADLINE_CLOCK_START": "UNKNOWN",
+          "DEADLINE_RULE": "UNKNOWN",
+          "MAILING_ADDRESS": "UNKNOWN",
+          "REQUIRED_ITEMS": "UNKNOWN"
+        }
+      }
+    },
+    "max_model_cents_per_city": 10,
+    "max_search_cents_per_city": 1,
+    "changed_customer_case": false
+  },
+  "brave_provider_diagnostic": {
+    "http": 422,
+    "code": "SUBSCRIPTION_TOKEN_INVALID",
+    "reserve_cents": 1
+  },
+  "research_spend": {
+    "application_estimated_gemini_cents": 3,
+    "initial_deployed_gemini_calls": 1,
+    "additional_scoped_gemini_calls": 2,
+    "brave_per_request_allowance_cents": 1,
+    "initial_brave_requests_at_most": 2,
+    "method_for_initial_search_bound": "Both directory matches were SINGLE. The signed resolver issues at most one scoped candidate search per ticket on that branch. These two searches lack a per-request billing receipt.",
+    "supplemental_brave_requests": 2,
+    "diagnostic_brave_request": 1,
+    "gemini_estimate_plus_conservative_brave_allowance_cents": 8,
+    "maximum_model_reservations_plus_search_allowances_cents": 50,
+    "calculation": "One 25-cent intake Gemini reservation, two supplemental 10-cent Gemini ceilings, and at most five one-cent Brave requests. The separate four-cent earlier photo rehearsal is excluded here.",
+    "invoice_verified": false
+  },
+  "routing": {
+    "active": {
+      "at": "2026-11-27T02:53:26.292623+00:00",
+      "sha256": "5dcd89078b63be01079e7fc40cda999b7eea69163b0827912b985d09959366f6",
+      "paths": [
+        "/__pb_rehearsal_1126/webhooks/stripe",
+        "/__pb_rehearsal_1126/webhooks/lob"
+      ]
+    },
+    "validation": {
+      "at": "2026-11-27T02:50:30.237120+00:00",
+      "google_routing_tests": 11,
+      "run_app_url_disabled": true,
+      "ingress": "internal-and-cloud-load-balancing",
+      "existing_iam_and_firewalls_changed": false
+    },
+    "external_before": {
+      "GET parkingbreaker.com/": {
+        "http": 200
+      },
+      "GET parkingbreaker.com/api/health": {
+        "http": 200,
+        "mode": "fake",
+        "revision": "908ac8007120e12748112fc4752809b51691358a"
+      },
+      "GET parkingbreaker.com/__pb_rehearsal_1126/internal/dispatch": {
+        "http": 404
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/stripe/": {
+        "http": 308,
+        "location": "/__pb_rehearsal_1126/webhooks/stripe"
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/lob/other": {
+        "http": 404
+      },
+      "GET www.parkingbreaker.com/": {
+        "http": 200
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/stripe": {
+        "http": 404,
+        "invalid_signature": false
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/lob": {
+        "http": 404,
+        "invalid_signature": false
+      }
+    },
+    "external_during": {
+      "at": "2026-11-27T02:55:29.197462+00:00",
+      "http": {
+        "GET parkingbreaker.com/": {
+          "http": 200
+        },
+        "GET parkingbreaker.com/api/health": {
+          "http": 200,
+          "mode": "fake",
+          "revision": "908ac8007120e12748112fc4752809b51691358a"
+        },
+        "GET parkingbreaker.com/__pb_rehearsal_1126/internal/dispatch": {
+          "http": 404
+        },
+        "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/stripe/": {
+          "http": 308,
+          "location": "/__pb_rehearsal_1126/webhooks/stripe"
+        },
+        "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/lob/other": {
+          "http": 404
+        },
+        "GET www.parkingbreaker.com/": {
+          "http": 200
+        },
+        "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/stripe": {
+          "http": 400,
+          "invalid_signature": true
+        },
+        "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/lob": {
+          "http": 400,
+          "invalid_signature": true
+        }
+      },
+      "get_rejected": {
+        "stripe": 404,
+        "lob": 404
+      }
+    },
+    "successful_provider_posts": [
+      {
+        "at": "2026-11-27T02:55:30.377297Z",
+        "status": 200,
+        "path": "/__pb_rehearsal_1126/webhooks/stripe",
+        "sender_user_agent_class": "stripe"
+      },
+      {
+        "at": "2026-11-27T02:55:31.209617Z",
+        "status": 200,
+        "path": "/__pb_rehearsal_1126/webhooks/lob",
+        "sender_user_agent_class": "other"
+      },
+      {
+        "at": "2026-11-27T02:56:17.105985Z",
+        "status": 200,
+        "path": "/__pb_rehearsal_1126/webhooks/stripe",
+        "sender_user_agent_class": "stripe"
+      }
+    ],
+    "external_after": {
+      "GET parkingbreaker.com/": {
+        "http": 200
+      },
+      "GET parkingbreaker.com/api/health": {
+        "http": 200,
+        "mode": "fake",
+        "revision": "908ac8007120e12748112fc4752809b51691358a"
+      },
+      "GET parkingbreaker.com/__pb_rehearsal_1126/internal/dispatch": {
+        "http": 404
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/stripe/": {
+        "http": 308,
+        "location": "/__pb_rehearsal_1126/webhooks/stripe"
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/lob/other": {
+        "http": 404
+      },
+      "GET www.parkingbreaker.com/": {
+        "http": 200
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/stripe": {
+        "http": 404,
+        "invalid_signature": false
+      },
+      "POST parkingbreaker.com/__pb_rehearsal_1126/webhooks/lob": {
+        "http": 404,
+        "invalid_signature": false
+      }
+    }
+  },
+  "stripe": {
+    "real_provider_resends": 2,
+    "event_type": "payment_intent.succeeded",
+    "successful_https_responses": 2,
+    "one_durable_event_row_linked_to_seeded_original": true,
+    "at": "2026-11-27T02:56:50.628488+00:00",
+    "original_payment_intent_count": 1,
+    "original_payment_intent_status": "succeeded",
+    "original_charge_count": 1,
+    "original_captured_test_cents": 2999,
+    "fresh_test_lob_letter_verified": true,
+    "no_new_payment_created_for_callback_tests": true
+  },
+  "lob": {
+    "successful_https_responses": 1,
+    "at": "2026-11-27T02:56:16.211765+00:00",
+    "provider_readback_http": 200,
+    "event_id_and_test_letter_match_local_webhook_row": true,
+    "provider_event": "letter.created",
+    "case_bound": false,
+    "distinct_durable_event_rows": 1,
+    "event_id_sha256": [
+      "a391c670243095491b2e5b251b54f58f38aa2b120c38b95f21b18ada33b7ccb3"
+    ],
+    "scope": "One separately generated sandbox letter exercised genuinely signed provider delivery. The application retained its event in the unmatched backlog. No physical letter was sent."
+  },
+  "restoration": {
+    "at": "2026-11-27T02:58:27.319512+00:00",
+    "effective_url_map_matches_original": true,
+    "before_sha256": "fdbf961d72237f28156f606d548e318a6986b0a40edc683f498dc3ca3b93da70",
+    "after_sha256": "fdbf961d72237f28156f606d548e318a6986b0a40edc683f498dc3ca3b93da70",
+    "all_external_probe_outcomes_match_original": true,
+    "both_temporary_paths_post_http": 404,
+    "stripe_sandbox_destination_removed": true,
+    "lob_sandbox_destination_removed": true,
+    "temporary_lb_backend_removed": true,
+    "temporary_network_endpoint_group_removed": true,
+    "temporary_lb_only_relay_removed": true,
+    "private_gateway_restored": true,
+    "scope": "Effective URL map comparison omits API history fields, including the updated fingerprint.",
+    "verified_private_caddy_sha256": "3196d8385ec690751b728db6dc3b046fb63e0e19545d1b6aa9407ee763c59f32",
+    "private_gateway_bytes_equal_saved_original": true,
+    "deployed_paid_cap_after": 0,
+    "deployed_provider_mode_after": "test",
+    "deployed_allow_live_after": false,
+    "temporary_signing_files_removed": true
+  },
+  "open": [
+    "Brave returned SUBSCRIPTION_TOKEN_INVALID on the target. No verified first-stage mailing address and deadline for either case.",
+    "A completed customer checkout and both provider callbacks bound to that same customer order.",
+    "Live settlement, physical mail, and invoice totals."
+  ]
+}

@@ -1,0 +1,362 @@
+{
+  "observed_at": "2026-11-26T19:27:26.133934+00:00",
+  "scope": "Backend sandbox recovery on the isolated VM; a synthetic case used a seeded destination and packet approval. Stripe and Lob returned actual sandbox records.",
+  "fault_drill": {
+    "candidate": "0ac0115c794e2fdd345ec2734e52aafffcc94b49",
+    "vm": "pb-qual-backend-01",
+    "process_exit": 86,
+    "fault_location": "immediately after Lob returned an original test letter and before the application recorded the outcome",
+    "snapshot": {
+      "before_recovery": {
+        "letters": 1,
+        "original_charges": 1,
+        "captured_charges": 0,
+        "amount_received": 0,
+        "capturable": 2999,
+        "stripe_status": "requires_capture"
+      },
+      "app_call_intent_persisted": true,
+      "app_outcome_missing": true,
+      "records_and_artifacts_match": true,
+      "restored_in_quarantine": true
+    },
+    "restarted_original_authority": {
+      "letters": 1,
+      "original_charges": 1,
+      "captured_charges": 0,
+      "amount_received": 0,
+      "capturable": 2999,
+      "stripe_status": "requires_capture",
+      "same_prepared_identity": true,
+      "local_letter_recovered": true,
+      "cursor_sends": 2,
+      "cursor_owner_released": true,
+      "state": "SUBMITTING",
+      "next_due": "2026-11-26T18:54:00.565635+00:00"
+    },
+    "expiry_fallback_with_controlled_clock": {
+      "letters": 1,
+      "original_charges": 1,
+      "captured_charges": 1,
+      "amount_received": 2999,
+      "capturable": 0,
+      "stripe_status": "succeeded",
+      "controlled_application_clock": "2026-12-03T12:22:02+00:00",
+      "real_execution_time": "2026-11-26T18:53:25.158966+00:00"
+    },
+    "independent_readback_from_quarantined_snapshot": {
+      "restored_lookup_anchors_used": true,
+      "quarantine_preserved": true,
+      "original_lob_test_letters": 1,
+      "original_stripe_test_charges": 1,
+      "captures": 1,
+      "amount_captured_cents": 2999,
+      "snapshot_preceded_local_letter_id": true,
+      "approved_packet_hash_matched": true
+    },
+    "physical_postage_usd": 0,
+    "live_charges": 0,
+    "encrypted_off_host_copy": {
+      "verified_utc": "2026-11-26T19:04:22.368044+00:00",
+      "source_vm": "pb-qual-backend-01",
+      "source": "original pre-replay crash snapshot",
+      "source_snapshot_utc": "2026-11-26T18:52:27.242429+00:00",
+      "receiver": "independent operator workstation",
+      "transport": "IAP SSH, AES-256-GCM CMS envelope encrypted at the source",
+      "ciphertext_sha256": "95c1aecc560558a4a9bd49ee95e7bc531a0fa66d62bb6c4bad1e72bc6d6e1d30",
+      "source_and_receiver_manifest_sha256": "1eeeb6f49e8b090c874a865024705c47957c5a2ca28a56dc84a2430280f11731",
+      "records_matched": true,
+      "artifacts_matched": true,
+      "verified_tables": 91,
+      "verified_artifacts": 1,
+      "quarantine_preserved": true,
+      "original_anchors_exportable": true,
+      "seconds_from_local_decrypt_to_quarantined_restore": 0.03,
+      "limits": "Manual off-host copy of a seeded sandbox order. The restored store was opened only for verification. A scheduled backup, authority fencing, restored service and end-to-end recovery time remain open."
+    }
+  },
+  "stripe_environment_bug": {
+    "observed": "The old adapter classified a genuine Stripe sandbox PaymentIntent as verified but omitted its provider environment. Both test and live booleans were being stripped at the HTTP boundary.",
+    "impact": "The first-20 live-capture report needs Stripe environment evidence to count live captures. Historical operations with unavailable evidence remain unknown.",
+    "fixed_commit": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+    "tree": "a9beff3124505b59c6edcac8eb559a0a35870a93",
+    "signature": "verified",
+    "new_regression_cases": 3,
+    "tested_provider_readback": "The corrected image on the VM returned the original captured charge, amount 2999 cents and livemode false.",
+    "source_checks": {
+      "files_match_signed_commit": 461,
+      "compressed_sha256": "18ba7dddf7f258cde282dffc9132114160a352439ec673f0360db61d11c81221",
+      "source_generation": "1795719281827515"
+    },
+    "cloud_build_id": "ded85e06-f46e-4332-bfbf-078c67c56d79",
+    "cloud_build_status": "SUCCESS",
+    "image": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:4a97761f908830fba22068075f0e225d6d249f9e1985d095ec55d10ab79c6223",
+    "transport_probe": {
+      "service": "pb-qual-1126",
+      "revision": "pb-qual-1126-00001-6vx",
+      "url": "https://pb-qual-1126-wfzny6usha-uw.a.run.app",
+      "unauthenticated_health_http": 403,
+      "authenticated_health_http": 200,
+      "vm_backend_health": {
+        "status": "ok",
+        "mode": "preview",
+        "customer_authored_mode": false,
+        "customer_authored_mode_version": null,
+        "build_commit": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+        "policy_hashes": {}
+      },
+      "private_route_http": 404,
+      "callback_route_http": 404,
+      "network": "Direct VPC egress via 10.89.26.0/26 to hostname-validated private TLS gateway on 8443",
+      "expiry_utc": "2026-11-27 18:20:00 UTC",
+      "authenticated_preflight_post_status": {
+        "/api/webhooks/stripe": 404,
+        "/api/webhooks/lob": 404,
+        "/api/workspaces": 404,
+        "/api/internal/dispatch": 404
+      }
+    },
+    "transport_rollback": {
+      "observed_at": "2026-11-26T19:07:34.105506+00:00",
+      "scope": "authenticated Cloud Run to private VM health routing only",
+      "before": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+      "rollback": "0ac0115c794e2fdd345ec2734e52aafffcc94b49",
+      "restored": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+      "production_route_changed": false
+    }
+  },
+  "berkeley_reference_case": {
+    "source_url": "https://berkeleyca.gov/city-services/parking/contest-parking-ticket",
+    "source_sha256": "3521a434b0d09923522c51120f91b72430b25a66689207cd761a33fa6d1aba16",
+    "result": "The unchanged quote guard could not assign the first stage to this city’s numbered heading. First-review and later-hearing mailbox passages both remained unresolved. This was a recorded-page replay with scripted model claims. No city or customer was enrolled.",
+    "eligibility": "unverified"
+  },
+  "release": "NO-GO",
+  "remaining": [
+    "End-to-end ticket, real OCR and issuer discovery on the deployed customer site",
+    "Genuine provider-delivered signed callbacks on the same case",
+    "Fenced promotion and return to service from a reconciled restore; the read-back copy remained quarantined",
+    "Real iPhone and Android, email redemption, printed Certified proof, human alert acknowledgment",
+    "Funded reserves, live callbacks, owner cutover"
+  ],
+  "local_release_checks": {
+    "candidate": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+    "tree": "a9beff3124505b59c6edcac8eb559a0a35870a93",
+    "application_fingerprint": "00d3403b5d30174037e075c6fb21464172ce81818b06514d6719401107052c56",
+    "backend": {
+      "passed": 14308,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 1,
+      "warning": "Starlette TestClient uses a deprecated AnyIO alias",
+      "ruff_format_and_mypy_files": 526,
+      "log_sha256": "6714ac586a65791ecc66090565b244c9bcf697cbb0764eba99eceaea92b6e6a2"
+    },
+    "web_check": {
+      "passed": true,
+      "log_sha256": "bccfa2751cbd15303272784fcee4708034aa8dde2d325e808de2dfd9f7496a9c"
+    },
+    "synthetic_browser_checks": {
+      "paid": {
+        "passed": 165,
+        "rehearsal_sha256": "193659e4482a20758b5e3c04d6b563b0c02032d8d26149be12babd389b59d5b9",
+        "browser_check_sha256": "3ecf80d9e75b524080592a9c9050f9a0a2f2c1eabba9a1303c67a2b5b9afc2a8"
+      },
+      "paid-ocr": {
+        "passed": 17,
+        "rehearsal_sha256": "42bf983f1ae0f3b7be06c92267758fb2d31c759fd4e4012a7bcacc5caad1d838",
+        "browser_check_sha256": "065c2ebf579f84ffebe7a90070a0db3de944c403e2d19dfea3cb3045b00eddcc"
+      },
+      "mobile": {
+        "passed": 61,
+        "rehearsal_sha256": "17141aaa53f20bfbd71e9061b2642f5795fd52b0f04c13d69d039c6a59f186b4",
+        "browser_check_sha256": "590bb07015424c95f97ddae2334431def51c6e1be73dca73ee612aad107e469c"
+      }
+    },
+    "browser_total": 243,
+    "timed_first_class": {
+      "supported": "IN_TRANSIT, one simulated letter",
+      "payment_only": "STOPPED_NO_CHARGE, zero letters",
+      "payment_calls": 0,
+      "receipt_sha256": "a2b6f1e99b945009441fc1ae79af3527a5730f026c4304f2fddc10abce96d51a"
+    },
+    "offline_research_and_vision_self_tests": true,
+    "tooling_unit_tests_passed": 6
+  },
+  "operating_checks": {
+    "authorized_mailbox_connected": true,
+    "rehearsal_access_message_sent": false,
+    "phones_connected_via_usb_or_adb": 0,
+    "cloud_project_billing_enabled": true,
+    "bigquery_datasets_visible_in_project": 0,
+    "invoiced_cost_and_available_promo_balance": "unverified",
+    "previous_first_party_public_key_search": {
+      "first_party_config_files": 361,
+      "distinct_plausible_public_keys": 0,
+      "pair_verified": false
+    },
+    "public_checkout_provider_key_status": "No match from 361 first-party checkout configuration files or 18 files in named Git worktrees. The owner credential entry is still empty."
+  },
+  "stripe_callback_preflight": {
+    "fixed_backend_commit": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+    "environment": "Production application entrypoint in test provider mode, customer role, paid cohort cap zero, on the original seeded sandbox case store. Signing secret from the temporary Stripe sandbox endpoint. Checkout was inaccessible.",
+    "account_verified": "The sandbox secret retrieved the documented ParkingBreaker Stripe account ID and its ParkingBreaker business profile. The exact original PaymentIntent, one succeeded event and captured charge matched the VM recovery case.",
+    "original_stripe_event_sha256": "4325b9836d385ea629b58eaf73cf72a91e235b07230c5c314dda662299a1c40b",
+    "subscribed_events": [
+      "payment_intent.succeeded"
+    ],
+    "authenticated_cloud_run_post": "400 invalid_signature for an unsigned body at the signed backend",
+    "gate_failure": "Google IAM returned FAILED_PRECONDITION for allUsers as roles/run.invoker. Effective organization policy limits permitted IAM member domains. No change to that policy was attempted.",
+    "http_observations": [
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "http": 404,
+        "count": 1
+      },
+      {
+        "method": "GET",
+        "path": "/api/webhooks/stripe",
+        "http": 404,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/api/internal/dispatch",
+        "http": 404,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/api/webhooks/lob",
+        "http": 404,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/api/webhooks/stripe",
+        "http": 400,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/api/webhooks/stripe",
+        "http": 403,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspaces",
+        "http": 404,
+        "count": 1
+      }
+    ],
+    "genuine_stripe_delivery": false,
+    "genuine_lob_delivery": false,
+    "provider_event_rows_for_this_probe": 0,
+    "route_proposal": {
+      "validated": true,
+      "routing_test_cases": 11,
+      "live_url_map_changed": false,
+      "reference_backend_had_no_destinations": true,
+      "rendered_proposal_sha256": "62e828293f419c06a703f8512e90eba74ac979b8a33994cde4a414e243081918",
+      "scope": "Two exact test paths on the apex through the existing load balancer. The current public service uses load-balancer-only external ingress. Applying shared routing requires owner approval.",
+      "paths": [
+        "/__pb_rehearsal_1126/webhooks/stripe",
+        "/__pb_rehearsal_1126/webhooks/lob"
+      ]
+    },
+    "cleanup": {
+      "test_endpoint_absent": true,
+      "callback_cloud_service_absent": true,
+      "callback_container_absent": true,
+      "temporary_signing_material_removed": true,
+      "original_health_route_restored": true,
+      "unattached_route_validation_backend_deleted": true,
+      "production_url_map_matches_exported_baseline": true,
+      "public_apex_preview_state": {
+        "mode": "fake",
+        "build_commit": "908ac8007120e12748112fc4752809b51691358a",
+        "status": "ok"
+      },
+      "short_lived_callback_cleanup_timers_stopped_after_verification": true
+    },
+    "provider_readback_after_probes": {
+      "original_stripe_sandbox_charges": 1,
+      "captured_cents": 2999,
+      "original_lob_test_letters": 1,
+      "originals_matched": true
+    }
+  },
+  "separate_print_only_rehearsal": {
+    "scope": "Print-only sandbox sample on two existing synthetic ticket images. No customer checkout or physical mail.",
+    "commit": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+    "source_pdf_sha256": "b03aacfb25dcbbf59f41e372de4d279c08d18e0d9a6ebfe925aef1241ff5cb6f",
+    "source_pages": 3,
+    "front_and_back_source_sha256": [
+      "0b15fc04ab90a7c08447fd4152f1e3d57e9d2b8d2d232e39ba1e5ce279384173",
+      "0e6f36ecddeb443bdf930eaf0ac449f3648202567e593cd46179378ef17e8a2d"
+    ],
+    "provider_render_sha256": "216b0494d090ad9bbf7e6bbb71a2024fcae66af4a7dd53e8efb7873d98bfc145",
+    "sandbox_letters_for_print_sample": 1,
+    "original_recovery_order_reused": false,
+    "stripe_requests_for_print_sample": 0,
+    "postage_usd": 0,
+    "provider_status": "rendered",
+    "extra_service": "certified",
+    "provider_reported_pages": null,
+    "provider_to_zip": "94107",
+    "provider_pdf_pages": 5,
+    "all_pages_size_pt": [
+      612,
+      792
+    ],
+    "visually_reviewed_pages": 5,
+    "visible_sequence": [
+      "Certified Mail barcode and both sandbox addresses",
+      "reverse with provider production marks",
+      "proof letter",
+      "citation front",
+      "citation back"
+    ],
+    "citation_fields_verbatim_in_rendered_image_ocr": 11,
+    "citation_field_labels_checked": [
+      "citation_number",
+      "license_plate",
+      "license_plate_state",
+      "issuer_name",
+      "issue_date",
+      "notice_date",
+      "printed_deadline",
+      "violation_text",
+      "issued_city",
+      "issued_state",
+      "stage_text"
+    ],
+    "back_marker_readable": true,
+    "page_comparison": [
+      {
+        "original_page": 1,
+        "provider_page": 3,
+        "overlap_inside_original_ink_bounds_at_150dpi": 0.9674
+      },
+      {
+        "original_page": 2,
+        "provider_page": 4,
+        "overlap_inside_original_ink_bounds_at_150dpi": 0.9644
+      },
+      {
+        "original_page": 3,
+        "provider_page": 5,
+        "overlap_inside_original_ink_bounds_at_150dpi": 0.8942
+      }
+    ],
+    "remaining": "Physical paper, camera-captured ticket photos, postal acceptance and delivery require a funded live proof."
+  },
+  "subsequent_exact_callback_test": {
+    "receipt": "sandbox-callbacks-and-research-2026-11-26.json",
+    "original_stripe_event_delivered_twice_and_stored_once": true,
+    "separate_lob_test_letter_event_delivered": true,
+    "public_routes_restored": true
+  }
+}

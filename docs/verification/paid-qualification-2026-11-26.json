@@ -1,0 +1,90 @@
+{
+  "observed_at": "2026-11-26T18:47:57.061094+00:00",
+  "candidate": "0ac0115c794e2fdd345ec2734e52aafffcc94b49",
+  "tree": "70b460590f0af511c47ac19180af1aab01e70687",
+  "signed_commit_verified": true,
+  "scope": "ParkingBreaker 24-hour Google Cloud sandbox rehearsal, incremental budget USD 10. No paid cohort opened. Actual invoiced cost and credit application are unverified.",
+  "source": {
+    "files_verified_in_uploaded_generation": 461,
+    "archive_sha256": "b9eb1096bbd95ebe008da90261f93d6d31b72a1c40cab4fe8140254df0404a4d",
+    "compressed_bytes": 11608623,
+    "source_generation": "1795717875609393"
+  },
+  "backend": {
+    "build_id": "870e354c-07cc-47eb-9ffc-d63a60fa99fa",
+    "region": "us-west1",
+    "build_start": "2026-11-26T18:31:17.000874343Z",
+    "build_finish": "2026-11-26T18:33:18.410158Z",
+    "timeout": "600s",
+    "status": "SUCCESS",
+    "digest_reference": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:4e7473b57bda1ed75273697a7225b9934be069f4792760aea5cd3fa7c2bd34a5",
+    "target_vm": "pb-qual-backend-01",
+    "vm_verified_oci_revision": "0ac0115c794e2fdd345ec2734e52aafffcc94b49",
+    "isolated_transaction_store_integrity": "ok"
+  },
+  "private_target": {
+    "compose": "Docker Compose version 2.40.3+ds1-0ubuntu1~24.04.1",
+    "private_gateway_certificate": {
+      "expected_hostname_verified": true,
+      "unrelated_hostname_rejected": true,
+      "expires": "Nov 27 18:36:12 2026 GMT"
+    },
+    "standing_data_backup": {
+      "location": "separate directory on same regional disk",
+      "records_match": true,
+      "artifacts_match": true,
+      "integrity": "ok",
+      "quarantine_marker_present": true,
+      "normal_test_mode_api_startup_refused_restore": true,
+      "quarantined_database_digest_unchanged": true
+    }
+  },
+  "stripe_test": {
+    "existing_sandbox_secret_readback_http": 200,
+    "standing_web_bundle_publishable_key_http": 401,
+    "standing_vm_config_publishable_key_http": 401,
+    "matched_test_publishable_key_verified": false
+  },
+  "open": [
+    "Build the frontend with the matching Stripe sandbox publishable key.",
+    "Deploy the actual customer frontend and test-provider backend on this route, qualify public signed callbacks and restricted intake, then verify scheduled operations and rollback.",
+    "Run the two deployed cases and genuine sandbox callback with provider-response interruption and reconciliation.",
+    "Complete physical, support, financial and owner gates before live activation."
+  ],
+  "transport_probe": {
+    "service": "pb-qual-1126",
+    "revision": "pb-qual-1126-00001-6vx",
+    "url": "https://pb-qual-1126-wfzny6usha-uw.a.run.app",
+    "unauthenticated_health_http": 403,
+    "authenticated_health_http": 200,
+    "vm_backend_health": {
+      "status": "ok",
+      "mode": "preview",
+      "customer_authored_mode": false,
+      "customer_authored_mode_version": null,
+      "build_commit": "0ac0115c794e2fdd345ec2734e52aafffcc94b49",
+      "policy_hashes": {}
+    },
+    "private_route_http": 404,
+    "callback_route_http": 404,
+    "network": "Direct VPC egress via 10.89.26.0/26 to hostname-validated private TLS gateway on 8443",
+    "expiry_utc": "2026-11-27 18:20:00 UTC",
+    "authenticated_preflight_post_status": {
+      "/api/webhooks/stripe": 404,
+      "/api/webhooks/lob": 404,
+      "/api/workspaces": 404,
+      "/api/internal/dispatch": 404
+    }
+  },
+  "cleanup": {
+    "scheduled_utc": "2026-11-27 18:20:00 UTC",
+    "local_timer": "pb-qual-1126-expiry.timer",
+    "remote_health_stop_utc": "2026-11-27 18:19:00 UTC",
+    "outcome": "scheduled; actual disposal pending"
+  },
+  "vm_provider_connectivity": {
+    "mode": "test",
+    "stripe_sandbox_get": 200,
+    "lob_sandbox_get": 200
+  }
+}

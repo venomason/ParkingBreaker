@@ -1,0 +1,71 @@
+{
+  "as_of_utc": "2026-11-27T03:02:18.790404+00:00",
+  "scope": "US 50 states and DC; Puerto Rico logged separately. Place, county and subdivision geographies overlap. Municipal evidence reflects released receipts, benchmark and source registry reviewed, not a national census of issuing offices.",
+  "signed_backend": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+  "public_readback": {
+    "http": 200,
+    "mode": "fake",
+    "sha": "908ac8007120e12748112fc4752809b51691358a"
+  },
+  "public_readback_utc": "2026-11-26T20:33:26.403624+00:00",
+  "paid_cohort_cap_on_private_test_target": 0,
+  "reliably_served_paid_cities": 0,
+  "census_city_designation_25": 10239,
+  "city_percent": 0.0,
+  "reliably_served_paid_places": 0,
+  "places": 32071,
+  "place_percent": 0.0,
+  "cdps": 12557,
+  "balance_areas": 8,
+  "counties_and_equivalents": 3144,
+  "county_subdivisions": 35442,
+  "puerto_rico_places_logged_outside_denominator": 292,
+  "mutually_exclusive_place_counts": {
+    "State policy hold": 605,
+    "Source lead": 24,
+    "Component tested": 11,
+    "Bench or source evidence": 13,
+    "Documented route exclusion": 2,
+    "No matched evidence": 31416
+  },
+  "named_places_with_evidence": 54,
+  "data_sources": {
+    "places": {
+      "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2026_Gazetteer/2026_Gaz_place_national.zip",
+      "sha256": "af678e2d990827c89ee39b98c82de6e90b693c7361ff0e559ae3076670dd2863"
+    },
+    "counties": {
+      "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2026_Gazetteer/2026_Gaz_counties_national.zip",
+      "sha256": "6a99ca00efbc0be5112e225d4102704c51d5ce3b16e3afd6e4159460595fd12a"
+    },
+    "cousubs": {
+      "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2026_Gazetteer/2026_Gaz_cousubs_national.zip",
+      "sha256": "9d528b39b70a27075c863b1572f27eadaf24484d5435fac17fc3b4cdd36434c2"
+    }
+  },
+  "analysis_inputs": [
+    "backend/src/parkingbreaker/service_policy.py",
+    "backend/src/parkingbreaker/research/known_sources.py",
+    "backend/data/cities_2x",
+    "backend/data/unserviceable_jurisdictions.json",
+    "docs/bench/answer-key.jsonl",
+    "docs/bench/sf-answer-key.jsonl",
+    "docs/bench/deep-city-dossiers-2026-10-27.md",
+    "docs/verification/r01-candidate-2026-11-26.json",
+    "docs/verification/paid-recovery-2026-11-26.json",
+    "docs/verification/expanded-launch-checks-2026-11-18.json",
+    "docs/verification/code-review-2026-11-22.json",
+    "docs/verification/first-review-la-ny-2026-11-26.json",
+    "docs/verification/sandbox-callbacks-and-research-2026-11-26.json"
+  ],
+  "desktop_deliverables": {
+    "Nationwide readiness.md": "88cc78ba40b278100291caa8d496bdb14656f93219c779fbfbb5a97817bed44f",
+    "Jurisdiction register.xlsx": "d8b226795741dc08ebd3616928d885ada045ef0d133b0969f5198bcb4444c0da"
+  },
+  "checks": {
+    "every_exported_data_cell_compared_to_register": true,
+    "each_census_geoid_name_and_state_matched_to_raw_source": true,
+    "workbook_filters": 6,
+    "desktop_report_relative_links_resolve": true
+  }
+}

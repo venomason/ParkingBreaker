@@ -1,0 +1,153 @@
+{
+  "observed_utc": "2026-11-26T20:38:22.990837+00:00",
+  "sources": {
+    "la-city": {
+      "final_url": "https://ladot.lacity.gov/onlineservices",
+      "observed_utc": "2026-11-26T20:35:47.007935+00:00",
+      "sha256": "247a5806cfbe3deb1cc5934f7c63c92811e3abee81f7ae29af4199fc387b8ee4"
+    },
+    "la-form": {
+      "final_url": "https://ladotparking.org/wp-content/uploads/2018/04/Initial-Review-Request.pdf",
+      "observed_utc": "2026-11-26T20:35:47.008708+00:00",
+      "sha256": "ecb24ca9e23fc88a9c87f301568cb82eefa6f2d759e4e69df157741eae744568"
+    },
+    "la-contest": {
+      "final_url": "https://ladotparking.org/adjudication-division/contest-a-parking-citation/",
+      "observed_utc": "2026-11-26T20:35:47.009168+00:00",
+      "sha256": "14815562c5733d60d673af6e533eb46e094cd04d8ad22834791e5387a8c0b25f"
+    },
+    "la-pvb": {
+      "final_url": "https://prodpci.etimspayments.com/pbw/include/laopm/review2.html",
+      "observed_utc": "2026-11-26T20:35:47.010950+00:00",
+      "sha256": "07d67a934b8ba5b193c900506510bfa96a3cc080a72a3549ac76bdc8491b0976"
+    },
+    "nyc-mail": {
+      "final_url": "https://www.nyc.gov/site/finance/vehicles/dispute-mail.page",
+      "observed_utc": "2026-11-26T20:35:47.011419+00:00",
+      "sha256": "08b2ff98af6f7d8098310354a5c7c5feed93f6a01206179d583eb874e24dc52d"
+    },
+    "nyc-311": {
+      "final_url": "https://portal.311.nyc.gov/article/?kanumber=KA-02275",
+      "observed_utc": "2026-11-26T20:35:47.388426+00:00",
+      "sha256": "9ad96bb43edb8fe3a905a4dbf3d3be5cb4c4f5df3f4c023ab90d7a42d142e16b"
+    },
+    "nyc-copy": {
+      "final_url": "https://www.nyc.gov/site/finance/vehicles/services-get-a-copy-of-a-ticket.page",
+      "observed_utc": "2026-11-26T20:35:47.391783+00:00",
+      "sha256": "81d73f02736ac5cc3a001181b4c4a9e4c81794487cb11c665c98a3ed9c5f00dc"
+    },
+    "la-linked-form": {
+      "final_url": "https://prodpci.etimspayments.com/pbw/include/laopm/adminrevreq.pdf",
+      "observed_utc": "2026-11-26T20:36:45.950904+00:00",
+      "sha256": "5faf1a07f05dda6bf9b6794361453ea2ce016b58f5ae732b1e49fa8bc25718bc"
+    }
+  },
+  "mode": "Replay of retrieved bytes using the signed local application code, scripted extraction and the normal quote guard. Exact host scopes were supplied for testing. This does not prove provider-driven issuer or delegation verification. No payment, mail or billable AI calls.",
+  "los_angeles": {
+    "portal_links_tested_initial_review_form": true,
+    "first_review_web_box": "30247",
+    "linked_first_review_form_box": "30420",
+    "form_edition_visually_read": "07/2019",
+    "form_days_from_issue": 21,
+    "form_days_from_first_overdue_notice": 14,
+    "form_clock": "received",
+    "findings_on_combined_claims": {
+      "MAIL_IN_ACCEPTED": "UNKNOWN",
+      "DEADLINE_DAYS": "CONFIRMED",
+      "DEADLINE_CLOCK_START": "UNKNOWN",
+      "DEADLINE_RULE": "CONFIRMED",
+      "MAILING_ADDRESS": "UNKNOWN"
+    }
+  },
+  "new_york": {
+    "authority": "NYC Department of Finance",
+    "requires_ticket_return_with_back_marked": true,
+    "copy_substitution_established": false,
+    "30_day_311_window": "avoid late penalties if the dispute is unsuccessful",
+    "terminal_filing_deadline_proven": false
+  },
+  "guard_results": {
+    "la-contest": {
+      "MAIL_IN_ACCEPTED": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage",
+        "stage_identified": null
+      },
+      "MAILING_ADDRESS": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage",
+        "stage_identified": null
+      }
+    },
+    "la-linked-form": {
+      "MAIL_IN_ACCEPTED": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: value not in quote",
+        "stage_identified": "first-level review"
+      },
+      "DEADLINE_DAYS": {
+        "status": "CONFIRMED",
+        "reason": "",
+        "stage_identified": "first-level review"
+      },
+      "DEADLINE_CLOCK_START": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: value not in quote",
+        "stage_identified": "first-level review"
+      },
+      "DEADLINE_RULE": {
+        "status": "CONFIRMED",
+        "reason": "",
+        "stage_identified": "first-level review"
+      },
+      "MAILING_ADDRESS": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: value not in quote",
+        "stage_identified": "first-level review"
+      }
+    },
+    "nyc-mail": {
+      "MAIL_IN_ACCEPTED": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage",
+        "stage_identified": null
+      },
+      "MAILING_ADDRESS": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source does not establish procedure stage",
+        "stage_identified": null
+      },
+      "REQUIRED_ITEMS": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: channel-local wording is not a global requirement",
+        "stage_identified": null
+      }
+    },
+    "nyc-311": {
+      "DEADLINE_DAYS": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source procedure has another stage",
+        "stage_identified": "administrative hearing"
+      },
+      "DEADLINE_CLOCK_START": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source procedure has another stage",
+        "stage_identified": "administrative hearing"
+      },
+      "DEADLINE_RULE": {
+        "status": "UNKNOWN",
+        "reason": "quote guard: source procedure has another stage",
+        "stage_identified": "administrative hearing"
+      }
+    }
+  },
+  "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+  "application_source_matches_signed_tree": true,
+  "focused_tests": {
+    "suite": "backend/tests/test_unfamiliar_issuers_api.py",
+    "passed": 3,
+    "mode": "preview with synthetic provider adapters and archived official sources",
+    "cambridge": "A fake authorization was placed before official deadline research. The case could not proceed on the 21-day late-fee language. The hold was released, no capture and no letter.",
+    "georgia_tech": "The pre-hold refusal scenario created zero authorizations and letters."
+  }
+}

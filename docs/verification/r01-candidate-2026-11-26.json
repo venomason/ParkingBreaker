@@ -1,0 +1,633 @@
+{
+  "observed_utc": "2026-11-27T03:00:11.217996+00:00",
+  "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+  "tree": "aec43e528712b8cd1a6b21f609917d090a38f7e1",
+  "signature_verified": true,
+  "parent": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+  "paid_launch": "NO-GO",
+  "change": {
+    "reproduction": "Saved tier on printed deadline. On the following day the old API accepted a new authorization on a recent ticket and invoked the simulated payment provider.",
+    "candidate_behavior": "Starting a new authorization after the printed date returns 409 before any provider call or new attempt. A retry of a hold placed in time returns the original response.",
+    "regression_cases": "backend/tests/test_launch1_intake.py::test_ticket_printed_deadline_expires_before_first_hold",
+    "focused_checks_passed": 274
+  },
+  "local_release": {
+    "backend_passed": 14310,
+    "backend_seconds": 1353.56,
+    "ruff_and_mypy_files": 526,
+    "backend_log_sha256": "311c0ea4a7e20c02a3d316bae8e4fbfcaf8fe77ff9f4a07f7378a3dd37fdcea6",
+    "web_lint_types_build_passed": true,
+    "qualification_script_self_tests": 2,
+    "tooling_unit_tests": 6,
+    "application_fingerprint": "b426b58285be48e09d735315614305c2c7f087f80ae122a89522470e28361900",
+    "synthetic_browser_cases": {
+      "paid": {
+        "checks": 165,
+        "application_fingerprint": "b426b58285be48e09d735315614305c2c7f087f80ae122a89522470e28361900",
+        "receipt_sha256": "0bca793aafab56c0c6e20d7b7c0c6f632be97fda3f66a7dfcb52c9553d3916bb"
+      },
+      "paid-ocr": {
+        "checks": 17,
+        "application_fingerprint": "b426b58285be48e09d735315614305c2c7f087f80ae122a89522470e28361900",
+        "receipt_sha256": "c29cac0de01e5b8e55b47007dc6eeb5a0ca22feb2ef41aa342b2e23e09ac3bdc"
+      },
+      "mobile": {
+        "checks": 61,
+        "application_fingerprint": "b426b58285be48e09d735315614305c2c7f087f80ae122a89522470e28361900",
+        "receipt_sha256": "9014f2eb2e786aec02cbe1826129bd60ed2eef0a0d01cc4546842911f6a6d5f6"
+      }
+    },
+    "timed_first_class": {
+      "supported": "IN_TRANSIT",
+      "supported_simulated_letters": 1,
+      "payment_only": "STOPPED_NO_CHARGE",
+      "payment_only_simulated_letters": 0,
+      "receipt_sha256": "3a462a267657b6eff225d522a7934edd0ac755c244b81cb2d571993b2ead7cba"
+    }
+  },
+  "cloud_build": {
+    "project": "neuraldraft-parkingbreaker",
+    "region": "us-west1",
+    "build_id": "97d3a488-ecdc-423b-a1b5-43c0a37d79c7",
+    "start": "2026-11-26T19:39:21.008201061Z",
+    "finish": "2026-11-26T19:41:25.417490Z",
+    "backend_image": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:1c28d5a2e8f6c44fe86ba4a108ee1933f2143a80326dcb89e521b36de0bf97df",
+    "source_verification": {
+      "files_match_signed_commit": 461,
+      "compressed_sha256": "677a9602519015696db4db33fbf8f9a2c40093d2292848c0001d100a3b6e8fcf",
+      "source_generation": "1795721959449994"
+    }
+  },
+  "final_services": {
+    "checked_utc": "2026-11-26T20:33:26.403624+00:00",
+    "qualification": {
+      "pb-qual-1126": {
+        "health": {
+          "http": 200,
+          "mode": "preview",
+          "sha": "adcf8a689a045408d7b8ce65df41fd88a8d5221e"
+        },
+        "anonymous": {
+          "http": 403
+        },
+        "min_instances": 0,
+        "max_instances": 1,
+        "revision": "pb-qual-1126-00001-6vx"
+      },
+      "pb-qual-intake-1126": {
+        "health": {
+          "http": 200,
+          "mode": "test",
+          "sha": "adcf8a689a045408d7b8ce65df41fd88a8d5221e"
+        },
+        "anonymous": {
+          "http": 403
+        },
+        "min_instances": 0,
+        "max_instances": 1,
+        "revision": "pb-qual-intake-1126-00003-p95"
+      }
+    },
+    "public_site": {
+      "http": 200,
+      "mode": "fake",
+      "sha": "908ac8007120e12748112fc4752809b51691358a"
+    },
+    "scheduled_expiry": "2026-11-27 18:20:00 UTC",
+    "local_expiry_timer": "active"
+  },
+  "private_health_route": {
+    "service": "pb-qual-1126",
+    "revision": "pb-qual-1126-00001-6vx",
+    "url": "https://pb-qual-1126-wfzny6usha-uw.a.run.app",
+    "network": "Direct VPC egress via 10.89.26.0/26 to hostname-validated private TLS gateway on 8443",
+    "expiry_utc": "2026-11-27 18:20:00 UTC",
+    "observed_utc": "2026-11-26T19:42:21.592431+00:00",
+    "vm_backend_health": {
+      "status": "ok",
+      "mode": "preview",
+      "customer_authored_mode": false,
+      "customer_authored_mode_version": null,
+      "build_commit": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+      "policy_hashes": {}
+    },
+    "authenticated_health_http": 200,
+    "unauthenticated_health_http": 403,
+    "authenticated_preflight_post_status": {
+      "/api/webhooks/stripe": 404,
+      "/api/webhooks/lob": 404,
+      "/api/workspaces": 404,
+      "/api/internal/dispatch": 404
+    },
+    "rollback_to": "313b9634e6c23f10822734e910c7bc9dc9ad4ea1",
+    "restored_to": "adcf8a689a045408d7b8ce65df41fd88a8d5221e"
+  },
+  "private_customer_api": {
+    "verified_utc": "2026-11-26T19:52:38.441951+00:00",
+    "service": "pb-qual-intake-1126",
+    "revision": "pb-qual-intake-1126-00002-5hg",
+    "origin": "https://pb-qual-intake-1126-wfzny6usha-uw.a.run.app",
+    "backend_sha": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "provider_mode": "test",
+    "paid_cohort_cap": 0,
+    "anonymous_google_invocation_http": 403,
+    "service_phase": "paid",
+    "observed_price_arm_cents": 2499,
+    "authenticated_session_created": true,
+    "workspace_created_under_customer_session": true,
+    "workspace_and_original_session_survived_container_restart": true,
+    "workspace_creation_retry_reused_original": true,
+    "session_cookie_secure_httponly": true,
+    "missing_csrf_http": 403,
+    "logout_revoked_session_and_workspace_access": true,
+    "signed_provider_callback_routes": false,
+    "worker_routes_exposed": false,
+    "scope": "Private authenticated HTTPS through Cloud Run and the VM TLS gateway. Real customer access service and fresh persistent test database. No ticket, OCR, provider transaction or access email in this workspace."
+  },
+  "customer_ticket_drafts": {
+    "observed_utc": "2026-11-26T19:57:22.569351+00:00",
+    "service": "pb-qual-intake-1126",
+    "cloud_run_revision": "pb-qual-intake-1126-00003-p95",
+    "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "provider_mode": "test",
+    "payment_calls": 0,
+    "mail_calls": 0,
+    "ocr_calls": 0,
+    "scenarios": {
+      "cambridge": {
+        "source": "Fictional ticket, front and back, generated from the qualification fixture layout",
+        "front_source_sha256": "14dfd2b70f44645ee503a238bab07adcce9b7724372b821969a9ee325b457f05",
+        "back_source_sha256": "b3227c29806aaa2430e6031053e0fa06538eb1247fb105597461184b0951925b",
+        "normalized_upload_hashes_verified": true,
+        "draft_revision": 2,
+        "original_front_and_back_reopened": true,
+        "ticket_reading_enabled": true,
+        "ticket_reading_required": true,
+        "case_submitted": false,
+        "access_to_other_workspace_http": 404
+      },
+      "riverside": {
+        "source": "Fictional ticket, front and back, generated from the qualification fixture layout",
+        "front_source_sha256": "e562c64c8aaba7c6f400f7c055e8ee4f965eb04471813d8614fe2e321f18527b",
+        "back_source_sha256": "85a0cd10e391ff46f6fe840afd9ce4d66d2bae9dba2c252599836dd8a17cbd7a",
+        "normalized_upload_hashes_verified": true,
+        "draft_revision": 2,
+        "original_front_and_back_reopened": true,
+        "ticket_reading_enabled": true,
+        "ticket_reading_required": true,
+        "case_submitted": false,
+        "access_to_other_workspace_http": 404
+      }
+    },
+    "scope": "Two real customer sessions over the authenticated private HTTPS test API. Only photo upload, autosave, ownership isolation and reload were exercised. Official mailing eligibility and OCR remain pending."
+  },
+  "test_customer_provider_connectivity": {
+    "stripe_test_account_http": 200,
+    "stripe_account_verified": true,
+    "lob_test_letter_list_http": 200,
+    "lob_sandbox_readable": true,
+    "gemini_model_metadata_http": 200,
+    "configured_model_returned": true,
+    "configured_ocr_model": "gemini-3.5-flash-lite",
+    "gemini_inference_calls": 0,
+    "billing_tier_verified": false,
+    "paid_cohort_cap": 0,
+    "public_container_ports": 0,
+    "dedicated_outbound_network": true
+  },
+  "fixture_legibility": {
+    "scope": "Local Tesseract check of the exact uploaded front image files. The deployed mandatory Gemini reader was not called.",
+    "cases": {
+      "cambridge": {
+        "readable_fields": 8,
+        "checked_fields": 8,
+        "missing_fields": []
+      },
+      "riverside": {
+        "readable_fields": 8,
+        "checked_fields": 8,
+        "missing_fields": []
+      }
+    }
+  },
+  "gemini_billing": {
+    "free_tier_verified": false,
+    "welcome_credit_applicability": "Google excludes Gemini Developer API usage from Cloud welcome credits.",
+    "provider_source": "https://aistudio.google.com/docs/billing#cloud-credits",
+    "approval": "Up to USD 1 within the existing USD 10 limit for these four test operations.",
+    "reserved_cents": 100,
+    "application_estimated_usage_cents": 4,
+    "invoice_verified": false
+  },
+  "deployed_image_isolated_api": {
+    "scope": "signed runtime image; ASGI API; synthetic clock, issuer and payments; isolated temporary SQLite",
+    "cases": [
+      {
+        "existing_hold": false,
+        "provider_call_count_changed_after_expiry": false,
+        "responses": [
+          {
+            "route": "authorization",
+            "http": 409
+          },
+          {
+            "route": "pre-hold",
+            "http": 200,
+            "reason": "printed_deadline_passed"
+          }
+        ]
+      },
+      {
+        "existing_hold": true,
+        "provider_call_count_changed_after_expiry": false,
+        "responses": [
+          {
+            "route": "authorization",
+            "http": 200
+          },
+          {
+            "route": "authorization",
+            "http": 200
+          }
+        ]
+      }
+    ]
+  },
+  "prior_sandbox_order_provider_readback": {
+    "letters": 1,
+    "original_charges": 1,
+    "captured_charges": 1,
+    "amount_received": 2999
+  },
+  "scheduled_backup_of_settled_sandbox_order": {
+    "manifest_sha256": "f3ca5f114648908adbeec437397d7bcc407d01f48e723a202701a6719bfd6f9c",
+    "journal_events": {
+      "timer_armed": "2026-11-26T19:46:15.907092+00:00",
+      "job_started": "2026-11-26T19:46:19.983170+00:00",
+      "job_completed": "2026-11-26T19:46:25.718128+00:00",
+      "timer_stopped": "2026-11-26T19:46:25.719518+00:00"
+    },
+    "verified_utc": "2026-11-26T19:48:36.958543+00:00",
+    "source": "post-capture seeded Stripe and Lob sandbox order on the isolated VM",
+    "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "cloud_image": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:1c28d5a2e8f6c44fe86ba4a108ee1933f2143a80326dcb89e521b36de0bf97df",
+    "source_snapshot_utc": "2026-11-26T19:46:24.911930+00:00",
+    "sha256_encrypted": "b189c5d0daca520fe99ce9d033ba19d25056b9c0a40029eb1e738f39312f0e81",
+    "source_mount_read_only": true,
+    "source_job": "One-shot VM systemd timer running the candidate recovery CLI with networking disabled",
+    "transport": "Source-side AES-256-GCM CMS encryption, IAP SSH, independent operator workstation verified the source manifest",
+    "records_match": true,
+    "artifacts_match": true,
+    "record_tables": 91,
+    "artifacts": 1,
+    "restored_payment_anchors": 1,
+    "restored_letter_anchors": 1,
+    "stored_original_letter_reference": true,
+    "quarantine_preserved": true,
+    "local_decryption_to_quarantined_readback_seconds": 0.027,
+    "read_original_test_providers_from_restored_anchors": true,
+    "matched_test_intents": 1,
+    "matched_test_charges": 1,
+    "matched_test_letters": 1,
+    "matched_captured_cents": 2999,
+    "remaining": "Recurring private network replica and restored service resumption on the joined customer order"
+  },
+  "source_checks": {
+    "riverside": {
+      "tested_utc": "2026-11-26T19:43:52.380550+00:00",
+      "sources": {
+        "page": {
+          "url": "https://www.riversideca.gov/publicworks/parking/parking-faq",
+          "sha256": "a4b10a18f3ea7fdddd35b306faff3255473df30a516b5b17fbff36bb83894f9d"
+        },
+        "form": {
+          "url": "https://www.riversideca.gov/sites/default/files/pdf/2021%20Request%20for%20Administrative%20Review%20Form%20-%20Riverside.pdf",
+          "sha256": "37ba73ff9c3f9d87108b42caa7f49c31c35b7a7310a12dee9951a6391bb76849"
+        }
+      },
+      "mode": "actual same-issuer public sources, scripted extractor claims, synthetic initial-review ticket, ordinary byte parser and guard",
+      "distinct_published_mailing_addresses": true,
+      "faq_address": {
+        "recipient": "City of Riverside",
+        "attention": "Parking Services",
+        "line1": "3900 Main st.",
+        "line2": null,
+        "city": "Riverside",
+        "state": "CA",
+        "zip_code": "92501"
+      },
+      "linked_form_address": {
+        "recipient": "C/O City of RIVERSIDE",
+        "attention": null,
+        "line1": "P. O. Box 10479",
+        "line2": null,
+        "city": "Newport Beach",
+        "state": "CA",
+        "zip_code": "92658-0479"
+      },
+      "source_facts": {
+        "faq": {
+          "MAIL_IN_ACCEPTED": {
+            "status": "UNKNOWN",
+            "reason": "quote guard: value not in quote",
+            "source_stage": "first-level review"
+          },
+          "MAILING_ADDRESS": {
+            "status": "UNKNOWN",
+            "reason": "quote guard: address quote does not say the address is for contesting",
+            "source_stage": "first-level review"
+          }
+        },
+        "linked_form": {
+          "DEADLINE_DAYS": {
+            "status": "UNKNOWN",
+            "reason": "quote guard: source does not establish procedure stage",
+            "source_stage": null
+          },
+          "DEADLINE_CLOCK_START": {
+            "status": "UNKNOWN",
+            "reason": "quote guard: source does not establish procedure stage",
+            "source_stage": null
+          },
+          "DEADLINE_RULE": {
+            "status": "UNKNOWN",
+            "reason": "quote guard: source does not establish procedure stage",
+            "source_stage": null
+          },
+          "MAILING_ADDRESS": {
+            "status": "UNKNOWN",
+            "reason": "quote guard: source does not establish procedure stage",
+            "source_stage": null
+          }
+        }
+      },
+      "consolidated": {
+        "MAIL_IN_ACCEPTED": "UNKNOWN",
+        "DEADLINE_DAYS": "UNKNOWN",
+        "DEADLINE_CLOCK_START": "UNKNOWN",
+        "DEADLINE_RULE": "UNKNOWN",
+        "MAILING_ADDRESS": "UNKNOWN"
+      },
+      "end_to_end_checkout_exercised": false
+    },
+    "san_jacinto": {
+      "scope": "actual municipal page, synthetic ticket and scripted extractor claims, normal quote guard",
+      "url": "https://www.sanjacintoca.gov/city_departments/community-development/street-sweeping/make_a_payment",
+      "captured_at": "2026-11-26T19:36:32.967527+00:00",
+      "sha256": "2779f05eb800ef51c24b9a2cfc67e8f34ded4ec798e480e3c4b50b7289b041f0",
+      "address_when_claiming_appeal": {
+        "status": "UNKNOWN",
+        "notes": "quote guard: source does not establish procedure stage",
+        "located_stage": null
+      },
+      "address_when_claiming_payment_only_passage": {
+        "status": "UNKNOWN",
+        "notes": "quote guard: source does not establish procedure stage",
+        "located_stage": null
+      }
+    }
+  },
+  "open": {
+    "web_checkout": "The paired sandbox key and local signed-source frontend build passed. Deploy and verify the matching cloud customer frontend.",
+    "callback": "Both temporary sandbox callback routes delivered genuine events and were removed. The original seeded Stripe order and the separate Lob test letter had different identities. A joined customer order with both callbacks is still open.",
+    "target": "The private intake service serves the test-mode backend for pricing, sessions, workspaces, ticket-photo upload and draft autosave. A separate health-only service retains preview rollback coverage. The secure customer service has an isolated disk path, a dedicated outbound network with successful sandbox Stripe and Lob reads, no worker and a zero order cap. The frontend build points to its private TLS API base.",
+    "joined_order": "Both deployed confirmed test tickets stopped before a card hold. No positive eligible filing route or completed customer checkout. The configured Brave subscription token was rejected.",
+    "physical_and_owner": "Physical phones, posted Certified proof, alert acknowledgment, funding and signed cohort approval remain open.",
+    "billing": "Cloud authorization is capped at USD 10 for the isolated rehearsal. The invoice and promotional credit remaining were not verified. For a Lob Credits account use the posted usage drawdown and credit statement to establish the cost of the physical Certified packet. API HTTP 200 also occurs at a zero Lob Credits balance.",
+    "lob_billing_source": "https://help.lob.com/account-management/billing/lob-credits"
+  },
+  "deployed_customer_ocr": {
+    "at": "2026-11-26T20:16:19.850105+00:00",
+    "model": "gemini-3.5-flash-lite",
+    "method": "Deployed signed customer HTTP handlers inside the isolated private test container. Fictional original uploads, existing customer sessions and CSRF. No submission, payment, or mail request.",
+    "runs": 2,
+    "printed_fields_exact_per_ticket": 9,
+    "absent_dates_blank_per_ticket": 2,
+    "matched_fields_in_independent_review_per_ticket": 9,
+    "same_model_separate_calls": true,
+    "raw_receipt_sha256": "892af8c2cc1d0679c5ebe1b66c1219543d8b4e5c4c2c2d03346c8c5ae44c2dd5",
+    "reason_for_absent_violation_code": "The fictional customer draft explicitly recorded that the ticket printed no violation code.",
+    "spend_basis": "App-estimated and rounded to whole cents. The provider invoice was not inspected."
+  },
+  "deployed_customer_confirmation": {
+    "observed_utc": "2026-11-26T20:27:19.914377+00:00",
+    "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "scope": "Simulated driver in the two original fictional-ticket workspaces. The deployed normal customer handlers accepted explicit confirmation once for each matching review; no external order or submission.",
+    "result": {
+      "cambridge": {
+        "unacknowledged_confirmation_rejected": true,
+        "original_and_replayed_receipts_identical": true,
+        "generation": 1,
+        "reloaded_state": "current",
+        "discrepancies": "none",
+        "case_submitted": false
+      },
+      "riverside": {
+        "unacknowledged_confirmation_rejected": true,
+        "original_and_replayed_receipts_identical": true,
+        "generation": 1,
+        "reloaded_state": "current",
+        "discrepancies": "none",
+        "case_submitted": false
+      }
+    },
+    "gemini_operations_after": 4,
+    "new_estimated_ai_cost_cents": 0
+  },
+  "qualification_issuer_directory": {
+    "before": {
+      "at_utc": "2026-11-26T20:30:24.781324+00:00",
+      "file": "dotgov-2026-11-21.csv",
+      "sha256": "b9a0331f6cd26bcc5dbc8d0492e976324aac05fed382e8aeccb28f5d82984ec6",
+      "raw_rows": 1,
+      "header_fields": [
+        "Domain name",
+        "Domain type",
+        "Organization name",
+        "Suborganization name",
+        "City",
+        "State",
+        "Security contact email"
+      ],
+      "domain_examples": [
+        "sfmta.gov"
+      ],
+      "state_counts": {
+        "CA": 1
+      },
+      "target_domains": {
+        "cambridgema.gov": false,
+        "riversideca.gov": false
+      }
+    },
+    "directory_selection_before": {
+      "observed_utc": "2026-11-26T20:29:51.949852+00:00",
+      "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+      "scope": "Current government directory candidate selection on two confirmed fictional drafts. A directory match alone does not verify an appeal address or deadline.",
+      "submitted_to_test_api": false,
+      "scenarios": {
+        "cambridge": {
+          "directory_match": "NONE",
+          "first_three_domains": [],
+          "confirmation_state": "current"
+        },
+        "riverside": {
+          "directory_match": "NONE",
+          "first_three_domains": [],
+          "confirmation_state": "current"
+        }
+      },
+      "counts": {
+        "pb_intake_authorization_attempts": 0,
+        "pb_submission_operations": 0,
+        "pb_payment_operations": 0
+      },
+      "total_isolated_app_ai_ledger_count_reserved_and_settled_cents": [
+        4,
+        100,
+        4
+      ]
+    },
+    "after": {
+      "observed_utc": "2026-11-26T20:33:30.451529+00:00",
+      "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+      "scope": "Current government directory candidate selection on two confirmed fictional drafts. A directory match alone does not verify an appeal address or deadline.",
+      "submitted_to_test_api": false,
+      "scenarios": {
+        "cambridge": {
+          "directory_match": "SINGLE",
+          "first_three_domains": [
+            "cambridgema.gov",
+            "cambridgeretirementma.gov"
+          ],
+          "confirmation_state": "current",
+          "original_session_photos_and_confirmation_reopened_over_private_https": true
+        },
+        "riverside": {
+          "directory_match": "SINGLE",
+          "first_three_domains": [
+            "riversideca.gov",
+            "iren.gov",
+            "rcflood.gov"
+          ],
+          "confirmation_state": "current",
+          "original_session_photos_and_confirmation_reopened_over_private_https": true
+        }
+      },
+      "counts": {
+        "pb_intake_authorization_attempts": 0,
+        "pb_submission_operations": 0,
+        "pb_payment_operations": 0
+      },
+      "total_isolated_app_ai_ledger_count_reserved_and_settled_cents": [
+        4,
+        100,
+        4
+      ]
+    },
+    "records_in_installed_registry": 17151,
+    "registry_date": "2026-11-26",
+    "sha256": "a46c68589f391e2217026bc150add0c2f51cd4932ce1f734f0e9c085482c41f7",
+    "registry_authority": "https://get.gov/about/data/",
+    "pinned_public_file": "https://raw.githubusercontent.com/cisagov/dotgov-data/3504ef254b259cbcc5dabd87886e305e2ceae55c/current-full.csv",
+    "recovery": "The initial container replacement encountered transient Docker name retention during automatic removal. The replacement waited for removal, restarted the same signed image on its original private database, and passed both original customer session checks.",
+    "boundary": "Private test intake service only. Original standing directory file unchanged. No paid lookup or case submission in this step."
+  },
+  "confirmed_ticket_draft_recovery": {
+    "verified_utc": "2026-11-26T20:45:25.479330+00:00",
+    "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "scope": "Encrypted off-host recovery of current confirmed customer drafts using the signed backup CLI. The original private test authority stayed active; independent restoration stayed in quarantine.",
+    "systemd_trigger": "",
+    "source_manifest_sha256": "e4920d16638300433079c95e6959e65ac38995a88e3f621f4796238d9ca3912e",
+    "encrypted_bundle_sha256": "1afcd9e8f5ddc2d8e605d490b4c38fad2b88caf0997b15b7405f0e18c59e9c55",
+    "record_table_digests": 91,
+    "record_hashes_match": true,
+    "all_artifacts_match": true,
+    "exact_recovered_photo_count": 4,
+    "successful_operations": {
+      "extract": 2,
+      "review": 2
+    },
+    "confirmed_distinct_workspaces": 2,
+    "quarantine_preserved": true,
+    "sqlite_integrity": "ok",
+    "restored_payment_authorization_or_mail_operation_rows": 0,
+    "external_payment_or_mail_anchors": 0,
+    "gemini_ledger_operations": 4,
+    "measured_seconds_decrypt_through_semantic_verification": 0.169,
+    "production_RTO_measured": false
+  },
+  "customer_access_route": {
+    "at_utc": "2026-11-26T20:44:29.722533+00:00",
+    "scope": "GET of /access with no token or customer information; no access email sent.",
+    "routes": {
+      "private-without-IAM": {
+        "http": 403
+      },
+      "private-with-IAM": {
+        "http": 404
+      },
+      "public-preview": {
+        "http": 200,
+        "content_type": "text/html"
+      }
+    }
+  },
+  "issuer_directory_readback_by_role": {
+    "verified_utc": "2026-11-26T20:50:10.878947+00:00",
+    "roles": [
+      {
+        "container": "pb-qual-1126-intake",
+        "configured": true,
+        "readable": true,
+        "under_data": false,
+        "records": 17151,
+        "sha256": "a46c68589f391e2217026bc150add0c2f51cd4932ce1f734f0e9c085482c41f7"
+      },
+      {
+        "container": "pb-api",
+        "configured": true,
+        "readable": true,
+        "under_data": false,
+        "records": 1,
+        "sha256": "b9a0331f6cd26bcc5dbc8d0492e976324aac05fed382e8aeccb28f5d82984ec6"
+      },
+      {
+        "container": "pb-worker",
+        "configured": true,
+        "readable": true,
+        "under_data": false,
+        "records": 1,
+        "sha256": "b9a0331f6cd26bcc5dbc8d0492e976324aac05fed382e8aeccb28f5d82984ec6"
+      }
+    ]
+  },
+  "sandbox_frontend_key_and_local_build": {
+    "observed_utc": "2026-11-27T00:51:23.448456+00:00",
+    "candidate": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "provider_mode": "test",
+    "credential_source": "Existing publishable key copied from the signed-in Stripe sandbox dashboard",
+    "account_matched_project_record": true,
+    "same_existing_sandbox_payment_retrieved_with_secret_and_publishable_key": true,
+    "stripe_readback_http": 200,
+    "credential_file_mode": "0600",
+    "signed_build_recipe_preflight": "passed",
+    "local_frontend_production_build": "passed",
+    "matched_key_embedded_in_browser_bundle": true,
+    "rewrites_match_qualification_api_origin": true,
+    "loopback_access_page_http": 200,
+    "access_confirmation_page_rendered": true,
+    "cloud_frontend_built_by_this_check": false
+  },
+  "exact_sandbox_callbacks_and_ticket_research": {
+    "receipt": "sandbox-callbacks-and-research-2026-11-26.json",
+    "deployed_refusals_before_hold": 2,
+    "stripe_provider_deliveries": 2,
+    "stripe_original_event_rows": 1,
+    "lob_provider_deliveries": 1,
+    "lob_event_bound_to_separate_test_letter": true,
+    "same_customer_order_for_both_providers": false,
+    "original_url_map_restored": true,
+    "paid_capacity": 0
+  }
+}

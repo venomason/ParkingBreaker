@@ -1,0 +1,237 @@
+{
+  "recorded_utc": "2026-11-27T20:35:06.776765+00:00",
+  "release": "NO-GO",
+  "signed_candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+  "access": {
+    "target": "pb-qual-backend-01",
+    "authenticated_gcloud": true,
+    "compute_readback": "RUNNING in us-west1-a",
+    "iap_ssh_exit": 0,
+    "standing_http_local": {
+      "api": "127.0.0.1:8000/health",
+      "web": "127.0.0.1:3000/api/health",
+      "status": "ok",
+      "mode": "test",
+      "build_commit": null,
+      "public_origin": "https://qual.invalid",
+      "verified_zero_cap": false
+    },
+    "signed_private_rehearsal_19443": "unreachable",
+    "cloud_run_ready_services": [
+      "parkingbreaker-frontend-00013-rdw"
+    ],
+    "public_health": {
+      "status": "ok",
+      "mode": "fake",
+      "build_commit": "908ac8007120e12748112fc4752809b51691358a"
+    },
+    "approval": "Previous private Google window and its resources are closed. Scope of this check was read-only. No standing checkout, new deployment, payment, mail, traffic or spending authorized by the prior window."
+  },
+  "deployed_attempts_started": 0,
+  "sequential_local_results": [
+    {
+      "operator": "GPT-6.2 Sol Extra High",
+      "finished_utc": "2026-11-27T20:28:08.543358+00:00",
+      "result_sha256": "b187d046001ed4b54c879cd26eb9a48d0613724a535a68cbff5686a16d19172a",
+      "browser": {
+        "valid": true,
+        "tests": 17,
+        "results": 17
+      },
+      "backend": {
+        "tests": 130,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "separate_fictional_ticket": {
+        "id": "SYN-MTB-N271S",
+        "issued_on": "2026-11-26",
+        "stage": "first-level review",
+        "city": "Montebello",
+        "violation": "fictional expired meter",
+        "notice_date": null,
+        "printed_deadline": null,
+        "used_for_mailing": false
+      },
+      "conditional_timing": {
+        "deadline": "2026-12-17",
+        "mailing_date": "2026-12-01",
+        "arrival_date": "2026-12-10",
+        "latest_safe_send_date": "2026-12-15",
+        "reachable": true,
+        "send_date": "2026-11-27",
+        "next_day_after_latest_safe_is_rejected": true
+      },
+      "production_application_fingerprint": "cca43f34d331f9c21b80faf4bbb63217d7904bbeb0559dc769564ab3dbdebd28",
+      "workspace_scope": "Clean SQLite authority and fresh browser sessions. Repository’s fixture citation for the positive browser path.",
+      "operator_report_sha256": "65273f5628da8e38116a56e8f0a5ae66b57f18108182dd89b805f11cd995e839"
+    },
+    {
+      "operator": "gemini-4-neon-xhigh",
+      "started_utc": "2026-11-27T20:31:27.297231+00:00",
+      "finished_utc": "2026-11-27T20:33:22.492140+00:00",
+      "result_sha256": "ecf187e6d0b4fb8e8520c900c4e21e630cc97b78ff4938fd41781c0bd0147cac",
+      "model_report_sha256": "79a9b718d8dd61214207896495318f02ddb1a4d677b862cbaa9a5dffeca58b29",
+      "model_tool_invoked": true,
+      "browser": {
+        "valid": true,
+        "tests": 17,
+        "results": 17
+      },
+      "backend": {
+        "tests": 130,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "separate_fictional_ticket": {
+        "id": "SYN-MTB-N272G",
+        "issued_on": "2026-11-27",
+        "stage": "first-level review",
+        "city": "Montebello",
+        "violation": "fictional expired meter",
+        "notice_date": null,
+        "printed_deadline": null,
+        "used_for_mailing": false
+      },
+      "conditional_timing": {
+        "deadline": "2026-12-18",
+        "mailing_date": "2026-12-01",
+        "arrival_date": "2026-12-10",
+        "latest_safe_send_date": "2026-12-16",
+        "reachable": true,
+        "send_date": "2026-11-27",
+        "next_day_after_latest_safe_is_rejected": true
+      },
+      "harness_application_fingerprint_including_test_fixture": "2687f396b74419399d5116bc7771b648404f44d77af2710d58c3b1e3b0a095e6",
+      "workspace_scope": "Distinct synthetic browser citation identifier in web/tests/beta-ticket-vision.spec.ts. Application and guard source unchanged.",
+      "supervisor_annotated_report_sha256": "2379c95fbbcedb0e755a329bd9ad9dd23c0bb940a125c130dcb452b733a1b631"
+    }
+  ],
+  "official_source_checks": {
+    "montebello": {
+      "source": {
+        "observed_utc": "2026-11-27T20:24:39.299168+00:00",
+        "http_code": 200,
+        "url_effective": "https://www.montebelloca.gov/departments/planning_community_development/parking_enforcement/parking_appeal_form",
+        "content_type": "text/html; charset=utf-8",
+        "size_download": 133854,
+        "ssl_verify_result": 0,
+        "body_sha256": "c38a14aa2f476ff10cc6a9a2b469d5d9ace2af2bc05b736b4d8aceb6f555bc8e",
+        "application_source_sha256": "c38a14aa2f476ff10cc6a9a2b469d5d9ace2af2bc05b736b4d8aceb6f555bc8e",
+        "normalized_text_sha256": "ff640c0040cec982cc8e6eb96ae43b58c1a3e5207da754222a74c141b5e13e85"
+      },
+      "facts": {
+        "MAIL_IN_ACCEPTED": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "source_stage": null,
+          "value_supported_in_quote": false
+        },
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "source_stage": null,
+          "value_supported_in_quote": false
+        },
+        "DEADLINE_CLOCK_START": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "source_stage": null,
+          "value_supported_in_quote": false
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "source_stage": null,
+          "value_supported_in_quote": false
+        },
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "source_stage": null,
+          "value_supported_in_quote": false
+        },
+        "REQUIRED_ITEMS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "source_stage": null,
+          "value_supported_in_quote": true
+        }
+      },
+      "release_proceed": false,
+      "release_reasons": [
+        "MAIL_IN_ACCEPTED: unknown",
+        "DEADLINE_DAYS: unknown",
+        "DEADLINE_CLOCK_START: unknown",
+        "DEADLINE_RULE: unknown",
+        "MAILING_ADDRESS: unknown",
+        "REQUIRED_ITEMS: unknown",
+        "REQUIRED_DECLARATIONS: missing",
+        "CONTEST_ELIGIBILITY: missing",
+        "MANDATORY_FORMS: missing",
+        "SIGNATURE_REQUIREMENT: missing",
+        "PRIOR_STEP_REQUIREMENT: missing",
+        "TICKET_SPECIFIC_REQUIREMENTS: missing",
+        "DEADLINE_ABSOLUTE: missing"
+      ]
+    },
+    "west_covina": {
+      "source": {
+        "observed_utc": "2026-11-27T20:24:40.028765+00:00",
+        "http_code": 200,
+        "url_effective": "https://www.westcovina.gov/m/faq?cat=19",
+        "content_type": "text/html; charset=utf-8",
+        "size_download": 146793,
+        "ssl_verify_result": 0,
+        "body_sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e",
+        "application_source_sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e",
+        "normalized_text_sha256": "4105083f2a1690b92cb4ee43fd3f022de8368cafe8f144e331148e2324e7cf7b"
+      },
+      "first_level_address": {
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "source_stage": "administrative hearing",
+          "value_supported_in_quote": true
+        }
+      },
+      "later_stage_negative_control": {
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "source_stage": "administrative hearing",
+          "value_supported_in_quote": true
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "source_stage": "administrative hearing",
+          "value_supported_in_quote": false
+        }
+      }
+    }
+  },
+  "limits": [
+    "The customer browser and backend tests use signed application logic with test fixtures and no authentic payment, carrier or OCR-provider interaction. Separate local Tesseract reads are not deployed OCR.",
+    "Montebello for an ordinary original ticket has an explicit postmark branch. The signed quote guard did not approve the government source. The date and production checks were conditional simulations. They did not authorize a hold or mail.",
+    "West Covina first-level address and actual authority text are distinct from later hearing evidence. The exact signed guard treated the first-level address quote as a hearing. The later-stage negative case correctly remained unverified. The violation-date trigger independently requires support.",
+    "The previous seeded provider proof still applies only to its recorded case. No fresh sandbox Stripe or Lob operations, callback delivery, recovery or settlement were observed on the deployed target in this task.",
+    "Direct Gemini CLI used the configured account with available credits. One unconfigured MCP call was declined in headless mode. The same CLI was retried with exact two-tool permissions in a temporary isolated configuration. No provider credentials or Sol results were accessible to Gemini."
+  ],
+  "real_customer_charges": 0,
+  "physical_mail": 0,
+  "paid_traffic_usd": 0,
+  "live_paid_capacity": 0,
+  "new_cloud_window_opened": false,
+  "new_cloud_or_payment_mail_provider_spend_authorized": false,
+  "required_before_next_live_cloud_test": [
+    "Approve a new bounded private Google time window and maximum spend, with OCR, research and billable callback or infrastructure use in the same ceiling if authorized. Reconcile the remaining amount under the original $10 cap first.",
+    "Prove a supported first-stage route through the exact signed evidence pipeline, preserving payment-only, later-stage, contradictory and ambiguous deadline stops.",
+    "Pin matching immutable site and API on an authenticated private test origin, isolated data authority and expiry and rollback. Prove paired test keys, sandbox-only callback paths with provider signatures, and explicit test capacity for two sequential fictional orders. Keep production paid capacity zero.",
+    "Run Sol first and preserve the complete joined order and recovery receipt before Gemini starts on separate data. Tear down both test paths and verify restoration."
+  ],
+  "previous_seeded_and_private_google_receipt": "launch-qualification-2026-11-27.json",
+  "supervisor_verification": "Official instructions exist for the prescribed mailing evidence. The application did not authorize either tested source claim set. New approval is required for the deployment window, spending and test-only provider scope. Public-source checks and offline work are already authorized."
+}

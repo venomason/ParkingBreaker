@@ -6,6 +6,10 @@ See [current readiness](../BETA-READINESS.md) for source-specific results.
 Status: **NO-GO for live intake**. This is a preparation and acceptance packet,
 not permission to provision, deploy, use paid providers, send notifications or mail.
 
+## Checking the government domain directory on a qualification target
+
+Read the file mounted at `PB_DOTGOV_SNAPSHOT` inside the running customer backend. Record its source date, record count and SHA-256. Compare its bytes with the full CISA directory at the selected public revision. For each rehearsal ticket, record the issuer candidates before starting billable research. On November 26 a recent, valid one-row fixture prevented both test cities from matching. The full registry corrected candidate selection. Verify the running worker as well as the API. Both standing containers still read a one-row file after the isolated rehearsal was corrected. The private VM Compose file mounts the host data directory at `/data` in both roles. A date-stamped registry stored there must use its container-visible path in `PB_DOTGOV_SNAPSHOT`. Compare each role’s file hash with the pinned source before qualification. [CISA source](https://get.gov/about/data/) · [Deployment receipt](../verification/r01-candidate-2026-11-26.json).
+
 ## Paid launch direction (November 17)
 
 Paid launch uses the existing authorization, exact-packet approval, mailing and capture
@@ -570,6 +574,20 @@ the separately approved real image trials above do not qualify the complete cust
 flow or the newest prompt changes.
 
 ## Final release decision
+
+For the funded cap, use available Lob balance and the billed cost of the exact
+packet. Reserve one proof piece and the planned remails in Lob separately from
+cash for full customer refunds. The November 27 planning check puts a five-page
+black-and-white Certified piece at $8.42 under Lob's published Developer
+rate. With one proof and one remail per customer, two customers require an
+estimated $42.10 in Lob funds. Up to $62.32 in separate cash covers two
+$29.99 refunds and their estimated original domestic card fees. Five customers
+would require an estimated $92.62 in Lob funds and up to $155.80 in separate
+cash under the same assumptions. The observed sandbox proof had three
+approved pages and five rendered pages. Use the invoice to determine which
+pages were billed. [Planning check](../verification/launch-qualification-2026-11-27.json)
+· [Lob rate schedule](https://help.lob.com/print-and-mail/ready-to-get-started/pricing-details)
+· [Stripe rates](https://stripe.com/pricing?locale=en-US)
 
 Do not release until provider, target, printing, notification, human and physical-device
 receipts identify the exact candidate and pass. The paid-beta activation packet must

@@ -1,0 +1,164 @@
+{
+  "as_of_pacific": "2026-11-25",
+  "release_decision": "NO-GO for live paid intake",
+  "application_commit": "0ac0115c794e2fdd345ec2734e52aafffcc94b49",
+  "tree": "70b460590f0af511c47ac19180af1aab01e70687",
+  "application_fingerprint": "2669eba51b66c69019b1c3b6d20fa0278bdca8647886056b3a3bbf0d20685c67",
+  "candidate_signature_verified": true,
+  "local": {
+    "backend": {
+      "command": "make check with UV_OFFLINE=1 and a disk-backed short pytest basetemp",
+      "tested_tree": "32cf34b91ccb691ffa203494e2ab4b50c0f87bdc",
+      "backend_tree": "1001d638aca472861ed2847eed452b3ec7ee0fcd",
+      "final_commit_difference": "Only web/components/ExactPacketPages.tsx changed after this backend run.",
+      "passed": 14305,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "warnings": 1,
+      "warning": "Starlette test client dependency deprecation",
+      "junit_sha256": "9379257da46140eb355d67e9f475365ea5ab42ab2db10b51ab0d0ee7e7bf796b",
+      "ruff_and_mypy_files": 526
+    },
+    "web_build": "make web-check passed on the corrected UI",
+    "browser_campaigns": {
+      "paid": {
+        "passed": 165,
+        "skipped": 0,
+        "flaky": 0,
+        "failed": 0,
+        "rehearsal_sha256": "73c97b9bd683f3c0b83eb8bc6b36ffe168f9fa83b16e4bca4a3b52090112c416",
+        "check_sha256": "ebc7f8d9950fe8d31d4e8d8618565562d8d576d01efec79c5481ef26ce04b501",
+        "report_sha256": "8b64c21d141f6a6666b538af60452b353d3bda26ce3f0d399a123e76b6ff5fb0"
+      },
+      "paid_ocr": {
+        "passed": 17,
+        "skipped": 0,
+        "flaky": 0,
+        "failed": 0,
+        "rehearsal_sha256": "76667542108f757d645fe170385faee2aa30668002c6fb3cf4e09c2d8ba653f9",
+        "check_sha256": "010bd76fc62c376526623660fb086bf2c954baf0cf34812621675f54d41cc3be",
+        "report_sha256": "2bb75a243eedcb655c5186a2f6b3642daf3131181cc82163ee0a51348fcff2c5"
+      },
+      "mobile_ocr": {
+        "passed": 61,
+        "skipped": 0,
+        "flaky": 0,
+        "failed": 0,
+        "rehearsal_sha256": "6ca6a6380a0ca49771d5e2205faa10f8e305f8e2f74683b9b35334c358d5116f",
+        "check_sha256": "4814ccdae083a63ecbf037629f20e6871259863e50b576940a86ab5723e5a456",
+        "report_sha256": "00b58846767ab5233b53824754723aaecf4e91a0150ec498f31e8912f27d97f2"
+      }
+    },
+    "timed_first_class": {
+      "supported": {
+        "final_state": "IN_TRANSIT",
+        "fake_mailings": 1,
+        "payment_state": "NO_CHARGE"
+      },
+      "payment_only": {
+        "final_state": "STOPPED_NO_CHARGE",
+        "fake_mailings": 0,
+        "payment_state": "NO_CHARGE"
+      }
+    },
+    "other": [
+      "Both offline provider qualification self-tests passed",
+      "Six tools unit tests passed",
+      "Build-kit doctor passed",
+      "Private-topology validation, deploy and rollback dry-runs exited 0"
+    ],
+    "observed_failures": [
+      "Chrome refused a long temporary socket path. A short disk-backed path resolved the startup failure.",
+      "Paid OCR reached the exact PDF and timed out locating the next page by its accessible name. Decorative arrows are now hidden from assistive technology. The same test advanced to page two and completed."
+    ]
+  },
+  "public_preview_observation": {
+    "health": "ok",
+    "mode": "fake",
+    "reported_backend_commit": "908ac8007120e12748112fc4752809b51691358a",
+    "cloud_run_latest_ready_revision": "parkingbreaker-frontend-00013-rdw",
+    "qualification_target_promoted": false
+  },
+  "standing_target_observation": {
+    "vm_running": true,
+    "machine_type": "e2-medium",
+    "regional_data_disk_gb": 200,
+    "mount": "/srv/parkingbreaker",
+    "observed_containers": [
+      "web",
+      "worker",
+      "api"
+    ],
+    "api_and_web_published_to_loopback": true,
+    "app_provider_mode": "test",
+    "app_public_origin": "https://qual.invalid",
+    "scheduled_parkingbreaker_systemd_timer_listed": false,
+    "dedicated_public_qualification_endpoint_verified": false,
+    "local_image_id": null,
+    "new_registry_digests": null,
+    "ci": "No Cloud Build triggers listed in global or us-west1. Manual source checks passed."
+  },
+  "external_readback_of_previous_sandbox_case": {
+    "prior_case_source": "November 25 paid rehearsal, test providers with simulated ticket reading, issuer research, email and signed callback input",
+    "restored_before_capture_state": "AUTHORIZED",
+    "restore_preserved_quarantine": true,
+    "payment_current_status": "succeeded",
+    "test_cents_captured": 2999,
+    "original_charge_count": 1,
+    "charge_amount_and_original_hold_expiry_matched": true,
+    "matching_lob_test_letters": 1,
+    "approved_pdf_matched_dispatched_pdf": true,
+    "original_approval_and_envelope_hashes_matched": true,
+    "provider_proof": {
+      "lob_status": "rendered",
+      "extra_service": "certified",
+      "proof_sha256": "142a724da40b2a9fa7598021f5c5bb338f9f90e485938f70136d46986b0393e8",
+      "approved_sha256": "08401ab273d97e510e38acdd63b070063e41bfd9856a439c9eb29568fb0bd366",
+      "approved_pages": 3,
+      "rendered_pages": 5,
+      "page_size_points": [
+        612,
+        792
+      ],
+      "visual_inspection": "Certified address sheet, blank reverse, then the three approved pages in order. The evidence images are solid-color synthetic placeholders. Real ticket legibility and physical output remain open."
+    },
+    "provider_mutations_in_this_readback": 0,
+    "post_backup_change": "The external charge settled after the local snapshot. The local restore continues to require reconciliation before promotion.",
+    "scope_limit": "Original sandbox objects were read independently. The provider-response/local-write fault and fenced restoration on the final deployment remain open.",
+    "address_field_comparison": "Name, attention, street and unit, city, state, ZIP5 and country matched for sender and recipient after postal abbreviation and line normalization."
+  },
+  "provider_configuration": {
+    "live_stripe": {
+      "ownership_matches_profile": true,
+      "charges_enabled": true,
+      "payouts_enabled": true,
+      "card_payments_capability": "active",
+      "requirements_past_due_count": 0,
+      "business_window_inventory_complete": true,
+      "enabled_matching_public_stripe_endpoints_in_window": 0
+    },
+    "sandbox_ownership": "The local test credential retrieved the known original sandbox payment. Its account display profile did not independently identify ParkingBreaker.",
+    "email": {
+      "checked_utc": "2026-11-26T04:57:36.564671+00:00",
+      "project_secret_accessible": true,
+      "messages_sent": 0,
+      "domain_metadata_http": 401,
+      "provider_error_name": "restricted_api_key"
+    },
+    "email_interpretation": "The credential is restricted for the domain-list operation. Delivery and click-through require an actual rehearsal message."
+  },
+  "issuer_check": {
+    "source": "https://www.boston.gov/departments/parking-clerk/how-appeal-parking-ticket",
+    "archived_source_sha256": "b8c98d298a7f3d86db379501c000071a40268c6615a75d2b8b555622de3b3cf0",
+    "result": "Reproduced on the November 25 backend. The extractor saw both mail steps. The guard kept mail acceptance and the receiving address unknown because the filing stage was not established. This was a scripted extraction, not an eligibility or enrollment decision."
+  },
+  "remaining": [
+    "Pin and serve the candidate images on a durable, isolated, reachable test target. Verify gateway, timers, backups and rollback on that target.",
+    "Run real ticket reading and issuer research through one supported case plus a pre-hold refusal.",
+    "Bind a provider-delivered test webhook to the original order. Complete interruption and original-object recovery on the intended deployment.",
+    "Inspect a physical Certified proof and a genuinely readable evidence photo. Check actual access mail, physical devices and responder coverage.",
+    "Verify deposited funds, billed packet cost, reserves and the owner activation record before opening the paid cap."
+  ],
+  "provider_reference": "https://help.lob.com/print-and-mail/getting-data-and-results/using-webhooks"
+}

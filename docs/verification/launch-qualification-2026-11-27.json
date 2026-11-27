@@ -1,0 +1,1286 @@
+{
+  "date_pacific": "2026-11-27",
+  "recorded_utc": "2026-11-27T20:12:46.252639+00:00",
+  "live_paid_release": "NO-GO",
+  "paid_customer_capacity": 0,
+  "signed_candidate": {
+    "sha": "7db2a277766109582d595f23d0fbc3c36fb54308",
+    "tree": "22e1b97f53b6fc8b4cc11d142f6d9f18d08c92ff",
+    "changes": {
+      "a5e5ec7": "Normalize the default HTTPS Host and follow bounded first-party links from a single matching federal directory entry.",
+      "6320cf9": "Disclose pricing persistence, review telemetry, AI processing and access-link lifetime before upload.",
+      "765d301": "Follow two additional parking directory labels within existing bounds.",
+      "7db2a27": "Normalize readable project files in the image and run the production process as its default user before publication."
+    },
+    "application_fingerprint": "cca43f34d331f9c21b80faf4bbb63217d7904bbeb0559dc769564ab3dbdebd28",
+    "signed_git_archive": {
+      "signed_candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+      "git_tree": "22e1b97f53b6fc8b4cc11d142f6d9f18d08c92ff",
+      "files": 462,
+      "archive_bytes": 11579098,
+      "sha256": "6ee4a6f8ece3b6ee84a27fb2e3c387af5ddf0ce27c94ca207df84ea5d933cf7f",
+      "all_file_modes_verified_against_git": true,
+      "directory_modes_nonroot_traversable": true
+    }
+  },
+  "local_checks": {
+    "backend_passed": 14317,
+    "backend_elapsed_seconds": 1462.29,
+    "backend_warning_lines": [
+      "/home/ghostmonday/Desktop/ParkingBreaker-Codebase/backend/.venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead."
+    ],
+    "make_check": "passed",
+    "make_qualification_check": "passed, two offline self-tests",
+    "make_web_check": "passed",
+    "browser_checks": {
+      "paid_chromium": 166,
+      "paid_ocr_chromium": 17,
+      "free_mobile_ocr_four_browser_projects": 244
+    },
+    "browser_executions_across_campaigns": 427,
+    "physical_devices": false,
+    "timed_first_class_replay": [
+      "supported",
+      "payment_only"
+    ],
+    "evidence_sha256": {
+      "backend.log": "012d1e77fcb7d29dc6d1d0ff30142591718ced364bbf7357e6aae61cf6b3b9b7",
+      "qualification.log": "1f181a990cdbd46d33f1770b36fa4e4636b57514bdd3b70ecec74d53728e701c",
+      "web.log": "80dfe32035ae0651f7f05ff4ed987478b443423c2cc7b99b8f61613925c03086",
+      "paid/rehearsal.json": "db242cee61e9f502c77f72ed396e9078693a960c758dd567dff51bf2ca6d787a",
+      "ocr/rehearsal.json": "355bc6bb9dbe9ae6fa45d0ccd67fe425b9d0246dc4fea95467f66dfa43bcbd7e",
+      "matrix/matrix.json": "772ac032fc5aa6f27398f5dfe28c726f0f32cab02fa831452eb6353337a6f921",
+      "first-class/timed-first-class.json": "fe97796f1f477280d56b51a013d6be9c685851a3189423d6ef6e4ad6e3b25e99"
+    }
+  },
+  "official_source_readbacks": {
+    "cambridge-root": {
+      "final_url": "https://www.cambridgema.gov/",
+      "http": 200,
+      "bytes_sha256": "0085e84c90b08b6d7284bd60204d026d9cc8495e4c954ae54544a8d407de0117",
+      "checked_utc": "2026-11-27T17:33:43.210029+00:00"
+    },
+    "cambridge-mail": {
+      "final_url": "https://www.cambridgema.gov/iwantto/disputeaparkingticket",
+      "http": 200,
+      "bytes_sha256": "92d64b7752953ee1193d664485417e9a802014327b8d5474b9cceb109c4ea216",
+      "checked_utc": "2026-11-27T17:33:42.745191+00:00"
+    },
+    "sacramento-root": {
+      "final_url": "https://www.cityofsacramento.gov/",
+      "http": 200,
+      "bytes_sha256": "3b6c047ed259b27702b792e76321b35ecb277af0ed6bff11c42e888d9e0353b3",
+      "checked_utc": "2026-11-27T17:33:43.000129+00:00"
+    },
+    "sacramento-directory": {
+      "final_url": "https://www.cityofsacramento.gov/public-works/parking/citation-services",
+      "http": 200,
+      "bytes_sha256": "7e089ca3b23c9467fa51f2dbe758f3126d89470ee5513eb09029e25e3b645fa5",
+      "checked_utc": "2026-11-27T17:33:43.848790+00:00"
+    },
+    "sacramento-instructions": {
+      "final_url": "https://www.cityofsacramento.gov/public-works/parking/contact-parking-services/parking-enforcement",
+      "http": 200,
+      "bytes_sha256": "6ca795496c9a08dc5aa289439b902a99a456343174a83565c9371f8bca48662c",
+      "checked_utc": "2026-11-27T17:33:46.546075+00:00"
+    },
+    "sacramento-form": {
+      "final_url": "https://www.cityofsacramento.gov/content/dam/portal/pw/Parking/parking-enforcement/Citation-Contest-Form.pdf",
+      "http": 200,
+      "bytes_sha256": "2c84b5f93d63da385c407c662fb364c7aed7de935c9c502be4cb87f1daf3dbdc",
+      "checked_utc": "2026-11-27T17:33:43.849185+00:00"
+    },
+    "riverside": {
+      "final_url": "https://www.riversideca.gov/publicworks/parking/parking-faq",
+      "http": 200,
+      "bytes_sha256": "621d00291967419a169219bda176932cdd43a00cb1aa168be95ed09362d8fe95",
+      "checked_utc": "2026-11-27T17:33:44.226667+00:00"
+    }
+  },
+  "issuer_discovery": {
+    "Cambridge": {
+      "model_cost_cents": 0,
+      "fetched_pages": [
+        {
+          "url": "https://www.cambridgema.gov/",
+          "sha256": "788bbcd8e7fc3057e997db51420022de3972c45389963de3675c43679a8ca5b5",
+          "bytes_of_text": 7657,
+          "checked_utc": "2026-11-27T17:36:54.144141+00:00"
+        },
+        {
+          "url": "https://www.cambridgema.gov/iwantto/parkacarincambridge",
+          "sha256": "39f177b8ef838140a9395e085179cdbf4f932ce9846340c1d0b3657db07ed59e",
+          "bytes_of_text": 14718,
+          "checked_utc": "2026-11-27T17:36:54.960253+00:00"
+        },
+        {
+          "url": "https://www.cambridgema.gov/iwantto/payaparkingticket",
+          "sha256": "23b9a5fc45cb997f235d6fa398d31b267bebbab62d68f749453c83ead651c934",
+          "bytes_of_text": 6537,
+          "checked_utc": "2026-11-27T17:36:56.059534+00:00"
+        }
+      ],
+      "end_reason": "AI budget exhausted"
+    },
+    "Sacramento": {
+      "model_cost_cents": 0,
+      "fetched_pages": [
+        {
+          "url": "https://www.cityofsacramento.gov/",
+          "sha256": "3b6c047ed259b27702b792e76321b35ecb277af0ed6bff11c42e888d9e0353b3",
+          "bytes_of_text": 4936,
+          "checked_utc": "2026-11-27T17:36:53.917196+00:00"
+        },
+        {
+          "url": "https://www.cityofsacramento.gov/public-works/parking/contact-parking-services/parking-enforcement",
+          "sha256": "6ca795496c9a08dc5aa289439b902a99a456343174a83565c9371f8bca48662c",
+          "bytes_of_text": 8999,
+          "checked_utc": "2026-11-27T17:36:54.931630+00:00"
+        },
+        {
+          "url": "https://www.cityofsacramento.gov/public-works/parking/citation-services",
+          "sha256": "7e089ca3b23c9467fa51f2dbe758f3126d89470ee5513eb09029e25e3b645fa5",
+          "bytes_of_text": 3234,
+          "checked_utc": "2026-11-27T17:36:55.908447+00:00"
+        }
+      ],
+      "end_reason": "AI budget exhausted"
+    }
+  },
+  "issuer_proof_limits": {
+    "sacramento_current_evidence": {
+      "MAIL_IN_ACCEPTED": "UNKNOWN",
+      "DEADLINE_DAYS": "UNKNOWN",
+      "DEADLINE_CLOCK_START": "UNKNOWN",
+      "DEADLINE_RULE": "UNKNOWN",
+      "MAILING_ADDRESS": "UNKNOWN",
+      "REQUIRED_ITEMS": "UNKNOWN"
+    },
+    "consequence": "The city form and the free-form mailing instructions have different evidentiary limits. The payment-only address and a later-stage deadline did not authorize a first-stage filing. No city or customer has been enabled.",
+    "positive_deployed_customer_path": false,
+    "previous_two_fictional_tickets": "The prior private Cambridge and Riverside cases both stopped before a card hold."
+  },
+  "public_preview": {
+    "observed_utc": "2026-11-27T18:06:30.264Z",
+    "mode": "fake",
+    "revision": "908ac8007120e12748112fc4752809b51691358a",
+    "pages": {
+      "/privacy": {
+        "status": 200,
+        "pricing_cookie_named": false,
+        "two_cookie_statement": true,
+        "visible_cookie_control": false,
+        "cookies": [],
+        "storage_keys": {
+          "local": [],
+          "session": []
+        },
+        "requested_third_party_hosts": [],
+        "api_requests": []
+      },
+      "/": {
+        "status": 200,
+        "pricing_cookie_named": false,
+        "two_cookie_statement": false,
+        "visible_cookie_control": false,
+        "cookies": [
+          {
+            "name": "__Host-pb-price",
+            "http_only": true,
+            "secure": true,
+            "days": 400
+          }
+        ],
+        "storage_keys": {
+          "local": [],
+          "session": []
+        },
+        "requested_third_party_hosts": [],
+        "api_requests": [
+          {
+            "method": "GET",
+            "path": "/api/auth/appeal"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/session"
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/pricing"
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/appeal"
+          }
+        ]
+      }
+    }
+  },
+  "public_health_recheck": {
+    "recorded_utc": "2026-11-27T19:02:02.553301+00:00",
+    "observations": [
+      {
+        "ip_version": 4,
+        "http": 200,
+        "mode": "fake",
+        "sha": "908ac8007120e12748112fc4752809b51691358a"
+      },
+      {
+        "ip_version": 6,
+        "http": 200,
+        "mode": "fake",
+        "sha": "908ac8007120e12748112fc4752809b51691358a"
+      }
+    ],
+    "prior_probe_observation": "An initial curl and the first untargeted retry timed out. Both forced-IP probes and the following untargeted retry returned HTTP 200. Persistent outage not established."
+  },
+  "privacy": {
+    "signed_candidate": "Privacy policy and inline upload notice disclose AI and browser usage. Clean-browser checks record actual storage transitions.",
+    "optional_cookie_consent_control_implemented": false,
+    "service_approvals": "The paid mailing terms and exact-packet approval are distinct from optional measurement preferences.",
+    "retention_unresolved": "The notice says two years for ticket photos and extracted facts. The proposed backend retention rule is one calendar year and still requires a policy decision.",
+    "stripe_device_storage_on_final_checkout_verified": false,
+    "offline_preference_signal_check": {
+      "recorded_utc": "2026-11-27T18:49:00.822806+00:00",
+      "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+      "environment": "Offline application HTTP handlers and synthetic data. No payments, mail, production requests, or billing.",
+      "pricing": {
+        "browser_privacy_signal": "Sec-GPC: 1",
+        "fresh_pricing_http": 200,
+        "cookie_before_signin": {
+          "name": "__Host-pb-price",
+          "max_age_seconds": 34560000,
+          "http_only": true,
+          "secure": true
+        },
+        "visitor_assignments_before_signin": 1,
+        "started_appeal_http": 201,
+        "reissued_after_manual_cookie_clear": {
+          "name": "__Host-pb-price",
+          "max_age_seconds": 34560000,
+          "http_only": true,
+          "secure": true
+        },
+        "saved_offer_unchanged": true,
+        "cookie_names_after_closing_private_access": [
+          "__Host-pb-price"
+        ]
+      },
+      "review": {
+        "browser_privacy_signal": "Sec-GPC: 1",
+        "default_policy": "baseline",
+        "default_treatment_percentage": 0,
+        "returned_variant": "baseline",
+        "review_session_http": 200,
+        "review_observation_http": 200,
+        "review_measurements_persisted": 1
+      }
+    },
+    "offline_preference_signal_check_sha256": "b9e080d0b11e9625a07458fca234f2931a20db288d5ee01d7a774ba616df0cef"
+  },
+  "agy": {
+    "cli": "agy",
+    "version": "1.5.18",
+    "selected_model": "gemini-4-neon-high",
+    "result": "Direct Neon review identified two lost directory labels and correctly rejected a whitespace false positive. Both labels failed before the change and passed afterwards within the same two- and three-page regression.",
+    "reviewed_inputs": "Source code only, no provider or customer records.",
+    "response_sha256": "fc483c9e8fe5bd151b550e8f40d7b5b48ffe7303af320f2770b8329b413d62af"
+  },
+  "earlier_private_cloud_run": {
+    "sha": "adcf8a689a045408d7b8ce65df41fd88a8d5221e",
+    "frontend_cloud_build_id": "e4510efd-1c1c-44c4-8a83-7bc70572033a",
+    "image_digest": "sha256:174f74d494aaf27dda59300951e6b31f4c9e9ae8c01c0001abaffda31442373d",
+    "deployment": "Failed startup on revision pb-qual-intake-1126-00004-rcm. Next reported EACCES on /app/web/tsconfig.json. Input files had mode 0600 and directories 0700. All traffic remained on the previous ready private revision.",
+    "cleanup": {
+      "observed_utc": "2026-11-27T19:48:38.229353+00:00",
+      "old_cloud_resources_absent": {
+        "pb-qual-1126": true,
+        "pb-qual-intake-1126": true,
+        "scoped_allow_removed": true,
+        "scoped_guard_removed": true,
+        "scoped_subnet_removed": true,
+        "service_identity_removed": true
+      },
+      "owned_markers_remaining": [],
+      "old_timer_completed_successfully": true,
+      "public_https_status": {
+        "/api/health": 200,
+        "/__pb_rehearsal_1126/webhooks/stripe": 404,
+        "/__pb_rehearsal_1126/webhooks/lob": 404
+      },
+      "public_mode": "fake",
+      "public_sha": "908ac8007120e12748112fc4752809b51691358a"
+    }
+  },
+  "new_private_google_rehearsal": {
+    "window": {
+      "started_utc": "2026-11-27T19:48:45.995803+00:00",
+      "not_after_utc": "2026-11-27T21:18:45.995803+00:00"
+    },
+    "signed_source_and_immutable_images": {
+      "backend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:5be28c082084eca502a6074bb847898f3b31d39ee0db1774c4bcbfe9d08c0ebd",
+      "frontend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-frontend@sha256:72fddbfcf7aef343a9acd508c8da721b06dad2b2a6d40c9b0ffd0ce2ea9fd2fb"
+    },
+    "build_id": "d49250e3-138c-4c8b-84c3-ca0d75f931d5",
+    "build_status": "SUCCESS",
+    "image_build_steps": [
+      "SUCCESS",
+      "SUCCESS",
+      "SUCCESS",
+      "SUCCESS"
+    ],
+    "nonroot_website_and_static_asset_smoke": "The final Cloud Build step passed before publication with external networking disabled.",
+    "site": "Signed site and signed test API reached over Google IAP and pinned HTTPS on the dedicated qualification VM with persistent storage.",
+    "browser": {
+      "utc": "2026-11-27T19:59:35.294Z",
+      "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+      "transport": "Google IAP SSH to the qualification VM loopback HTTPS listener; pinned rehearsal certificate",
+      "pages": {
+        "privacy": {
+          "http": 200,
+          "heading": "Privacy Policy"
+        },
+        "home": {
+          "http": 200,
+          "heading": "Appeal your parking ticket in your own words."
+        },
+        "access": {
+          "http": 200,
+          "heading": "Let’s get you a fresh link"
+        }
+      },
+      "storage": {
+        "clean_privacy": [],
+        "home": [
+          {
+            "name": "__Host-pb-price",
+            "secure": true,
+            "http_only": true,
+            "days": 400
+          }
+        ],
+        "open": [
+          {
+            "name": "__Host-pb-csrf",
+            "secure": true,
+            "http_only": false,
+            "days": 30
+          },
+          {
+            "name": "__Host-pb-price",
+            "secure": true,
+            "http_only": true,
+            "days": 400
+          },
+          {
+            "name": "__Host-pb-session",
+            "secure": true,
+            "http_only": true,
+            "days": 30
+          }
+        ],
+        "closed": [
+          {
+            "name": "__Host-pb-price",
+            "secure": true,
+            "http_only": true,
+            "days": 400
+          }
+        ]
+      },
+      "http": {
+        "health": 200,
+        "closed_session": 401,
+        "workspace_missing_csrf": 403,
+        "workspace": 201,
+        "resumed_workspace": 200,
+        "resumed_after_route_rollback": 200,
+        "logout": 200,
+        "workspace_after_logout": 401
+      },
+      "third_party_hosts": [],
+      "errors": [],
+      "mode": "test",
+      "session_and_workspace_survived_restart": true,
+      "same_workspace_on_retry": true,
+      "workspace_survived_private_route_rollback": true,
+      "static_font_or_script": true,
+      "passed": true
+    },
+    "verified_runtime_controls": {
+      "PB_PROVIDER_MODE": "test",
+      "PB_ALLOW_LIVE": "0",
+      "PB_PAID_COHORT_CAP": "0",
+      "PB_BUILD_COMMIT": "7db2a277766109582d595f23d0fbc3c36fb54308",
+      "PB_API_ROLE": "customer",
+      "data_mount": true,
+      "frontend_user": "node",
+      "web_and_api_network_isolated": true,
+      "listen_address": "127.0.0.1"
+    },
+    "private_route_rollback": {
+      "private_listener_removed": true,
+      "backend_health_unreachable_via_removed_listener": true,
+      "same_gateway_and_api_restored": true,
+      "private_signed_health_recovered": true
+    },
+    "cleanup": {
+      "observed_utc": "2026-11-27T20:00:09.913120+00:00",
+      "vm_containers_absent_and_port_closed": true,
+      "build_terminal_state": "SUCCESS",
+      "backend_tag_absent": true,
+      "frontend_tag_absent": true,
+      "created_source_generation_absent": true
+    },
+    "public_recheck": {
+      "observed_utc": "2026-11-27T20:00:32.332732+00:00",
+      "public_status": {
+        "/api/health": 200,
+        "/__pb_rehearsal_1126/webhooks/stripe": 404,
+        "/__pb_rehearsal_1126/webhooks/lob": 404
+      },
+      "public_sha": "908ac8007120e12748112fc4752809b51691358a",
+      "public_mode": "fake"
+    },
+    "recovery_diagnostics": {
+      "gateway": "The first gateway exited with an executable capability error. The rehearsal added the same NET_BIND_SERVICE capability used by the earlier qualified gateway and retained the non-root user, read-only image, no-new-privileges, isolated network and loopback binding.",
+      "browser_harness": "The first logout probe raced with the page reload. The second probe awaited the logout response and navigation, then confirmed access was revoked.",
+      "rollback_scope": "Removed and restored the isolated private gateway, then reopened the same workspace. This did not exercise an old application image or a production rollback."
+    }
+  },
+  "budget": {
+    "owner_rehearsal_authorization": {
+      "owner_approval": "One more 90-minute private Google Cloud rehearsal after the first cleanup to rebuild and verify the corrected site, capped at $1 inside the existing $10 total.",
+      "approved_additional_ceiling_usd": 1,
+      "total_session_ceiling_usd": 10,
+      "provider_mode": "test",
+      "customer_cap": 0,
+      "ad_spend_usd": 0,
+      "public_ingress_changes": false,
+      "payment_or_mailing_provider_transactions": false,
+      "timing_decision": {
+        "recorded_utc": "2026-11-27T19:43:37.552126+00:00",
+        "start_condition": "Verify complete teardown of the prior Google rehearsal before opening the new window.",
+        "rehearsal_supervision": "User accepted responsibility for supervising this rehearsal. Amir retains final paid-launch decision.",
+        "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+        "scope": "One private 90-minute Google rehearsal. Max $1 within the existing $10. Verify matching website and API, rollback and teardown. Provider test mode and paid capacity zero."
+      }
+    },
+    "joined_sandbox_authorization": {
+      "recorded_utc": "2026-11-27T19:45:35.823381+00:00",
+      "supervision_confirmed": "Amir authorized genuine Stripe test mode and Lob test mode requests and callbacks needed for a joined sandbox order and restart proof.",
+      "sequence": "After verifying the 90-minute private Google site rehearsal and its teardown.",
+      "customer_capacity": 0,
+      "live_charges": 0,
+      "physical_mail": 0,
+      "paid_traffic": 0,
+      "additional_spending_approved": false,
+      "preserve_existing_spending_caps": true,
+      "paid_activation_authority": "Amir retains the final decision.",
+      "private_google_window_minutes": 90,
+      "private_google_ceiling_usd_within_original_10": 1
+    },
+    "owner_reported_available_on_first_usd": 450,
+    "prior_cloud_usage": {
+      "observed_utc": "2026-11-27T18:09:16.285121+00:00",
+      "first_rehearsal_build_seconds": {
+        "backend-build.json": 121.41,
+        "313b963/backend-build.json": 115.4,
+        "adcf8a6/backend-build.json": 124.41,
+        "adcf8a6/frontend-build.json": 258.75
+      },
+      "original_build_compute_estimate_usd_at_list_before_credits": 0.062,
+      "run_seconds_by_private_service": {
+        "pb-qual-1126": {
+          "http": 200,
+          "time_series": 1,
+          "complete_page": true,
+          "observed_billable_instance_seconds": 13.6,
+          "time_span_utc": [
+            "2026-11-26T18:20:00Z",
+            "2026-11-27T18:09:16Z"
+          ]
+        },
+        "pb-qual-intake-1126": {
+          "http": 200,
+          "time_series": 4,
+          "complete_page": true,
+          "observed_billable_instance_seconds": 30.278,
+          "time_span_utc": [
+            "2026-11-26T18:20:00Z",
+            "2026-11-27T18:09:16Z"
+          ]
+        }
+      },
+      "provider_invoice_verified": false,
+      "second_rehearsal": {
+        "cloud_build_jobs_planned": 1,
+        "single_default_pool_build_timeout_seconds": 900,
+        "build_compute_ceiling_usd_before_credits": 0.09,
+        "new_vms": 0,
+        "new_disks": 0,
+        "new_load_balancers": 0,
+        "repository_vulnerability_scanning": "disabled, confirmed on this repository",
+        "additional_owner_limit_usd": 1,
+        "owner_total_limit_usd": 10
+      }
+    },
+    "second_build_compute_estimate_usd_before_credits": 0.0388,
+    "source": "https://cloud.google.com/build/pricing",
+    "invoiced_google_cost_usd": null,
+    "cloud_credit_application_verified": false,
+    "lob_balance_or_spend_verified_this_run": false,
+    "cohort_planning_sensitivity": {
+      "recorded_utc": "2026-11-27T19:00:39.828253+00:00",
+      "disposition": "Planning sensitivity only. Certified billing, deposited Lob credit, current card-rate agreement and actual cash refund reserve are unverified. Owner-approved cap and dates are pending. Current paid capacity is zero.",
+      "owner_reported": {
+        "uncommitted_cash_expected_on_first_cents": 45000,
+        "reported_lob_credit_cents": 5000,
+        "cash_and_credit_independent_verified": false
+      },
+      "mail_scenario": {
+        "plan": "Lob Developer public rate schedule effective 2026-11-01",
+        "black_and_white_first_class_base_dollars": "1.066",
+        "per_additional_pdf_page_dollars": "0.101",
+        "certified_addon_dollars": "6.950",
+        "over_six_sheets_addon_dollars": "2.495",
+        "modelled_one_proof_and_one_remail_per_case": true,
+        "print": "US letter B&W single-sided and Certified without Electronic Return Receipt. These are the application defaults.",
+        "source_vs_rendered_pages": "The sandbox proof has 3 approved PDF pages and 5 rendered provider pages. The public price schedule counts extra PDF pages. The provider invoice is needed to establish whether the extra rendered pages are billable.",
+        "rates_reference": "https://help.lob.com/print-and-mail/ready-to-get-started/pricing-details",
+        "estimated_piece_cents_by_chargeable_page_count": {
+          "3": 822,
+          "5": 842,
+          "6": 853,
+          "7": 1112
+        }
+      },
+      "card_scenario": {
+        "standard_domestic_price_assumption": "2.9 percent plus 30 cents, rounded up in reserve model.",
+        "fees_recovered_on_refund_assumption": false,
+        "rates_reference": "https://stripe.com/pricing?locale=en-US",
+        "fees_cents_by_price_cents": {
+          "1999": 88,
+          "2499": 103,
+          "2999": 117
+        },
+        "max_gross_refund_per_case_cents": 2999
+      },
+      "funding_sensitivity": {
+        "3": {
+          "modelled_piece_cents": 822,
+          "provisional_max_orders_from_reported_lob_credit_for_one_proof_and_one_remail_each": 2,
+          "illustrative_cohorts": {
+            "1": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 1,
+              "remail_piece_reserve": 1,
+              "estimated_lob_requirement_cents": 2466,
+              "max_gross_refund_cash_reserve_cents": 2999,
+              "original_card_fee_cash_reserve_cents": 117,
+              "combined_without_using_reported_lob_credit_cents": 5582,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 39418,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 0
+            },
+            "2": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 2,
+              "remail_piece_reserve": 2,
+              "estimated_lob_requirement_cents": 4110,
+              "max_gross_refund_cash_reserve_cents": 5998,
+              "original_card_fee_cash_reserve_cents": 234,
+              "combined_without_using_reported_lob_credit_cents": 10342,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 34658,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 0
+            },
+            "5": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 5,
+              "remail_piece_reserve": 5,
+              "estimated_lob_requirement_cents": 9042,
+              "max_gross_refund_cash_reserve_cents": 14995,
+              "original_card_fee_cash_reserve_cents": 585,
+              "combined_without_using_reported_lob_credit_cents": 24622,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 20378,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 4042
+            }
+          }
+        },
+        "5": {
+          "modelled_piece_cents": 842,
+          "provisional_max_orders_from_reported_lob_credit_for_one_proof_and_one_remail_each": 2,
+          "illustrative_cohorts": {
+            "1": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 1,
+              "remail_piece_reserve": 1,
+              "estimated_lob_requirement_cents": 2526,
+              "max_gross_refund_cash_reserve_cents": 2999,
+              "original_card_fee_cash_reserve_cents": 117,
+              "combined_without_using_reported_lob_credit_cents": 5642,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 39358,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 0
+            },
+            "2": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 2,
+              "remail_piece_reserve": 2,
+              "estimated_lob_requirement_cents": 4210,
+              "max_gross_refund_cash_reserve_cents": 5998,
+              "original_card_fee_cash_reserve_cents": 234,
+              "combined_without_using_reported_lob_credit_cents": 10442,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 34558,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 0
+            },
+            "5": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 5,
+              "remail_piece_reserve": 5,
+              "estimated_lob_requirement_cents": 9262,
+              "max_gross_refund_cash_reserve_cents": 14995,
+              "original_card_fee_cash_reserve_cents": 585,
+              "combined_without_using_reported_lob_credit_cents": 24842,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 20158,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 4262
+            }
+          }
+        },
+        "7": {
+          "modelled_piece_cents": 1112,
+          "provisional_max_orders_from_reported_lob_credit_for_one_proof_and_one_remail_each": 1,
+          "illustrative_cohorts": {
+            "1": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 1,
+              "remail_piece_reserve": 1,
+              "estimated_lob_requirement_cents": 3336,
+              "max_gross_refund_cash_reserve_cents": 2999,
+              "original_card_fee_cash_reserve_cents": 117,
+              "combined_without_using_reported_lob_credit_cents": 6452,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 38548,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 0
+            },
+            "2": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 2,
+              "remail_piece_reserve": 2,
+              "estimated_lob_requirement_cents": 5560,
+              "max_gross_refund_cash_reserve_cents": 5998,
+              "original_card_fee_cash_reserve_cents": 234,
+              "combined_without_using_reported_lob_credit_cents": 11792,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 33208,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 560
+            },
+            "5": {
+              "proof_quantity": 1,
+              "original_packet_quantity": 5,
+              "remail_piece_reserve": 5,
+              "estimated_lob_requirement_cents": 12232,
+              "max_gross_refund_cash_reserve_cents": 14995,
+              "original_card_fee_cash_reserve_cents": 585,
+              "combined_without_using_reported_lob_credit_cents": 27812,
+              "headroom_out_of_owner_reported_future_450_before_other_costs_cents": 17188,
+              "lob_shortfall_if_reported_separate_credit_is_verified_cents": 7232
+            }
+          }
+        }
+      },
+      "excluded": "Provider taxes and plan changes, non-domestic and other fee exceptions, support, acquisition, platform costs, OCR/search and existing obligations. Treat the separate reported provider balance as zero funded authority until deposited balance is observed. No statement, credit purchase, mailing, payment or activation was performed.",
+      "dashboard_readback": "No Lob connector is exposed and the browser access host returned unavailable. No authenticated balance read was performed."
+    },
+    "cohort_planning_sensitivity_sha256": "ec680774d8895e7af93d0d687b6970f8780b6debcd85ced4c481314879bc3a43",
+    "second_window_gemini_brave_calls": 0,
+    "second_window_stripe_charges": 0,
+    "second_window_lob_letters": 0
+  },
+  "boston_filing_replay": {
+    "observed_utc": "2026-11-27T18:55:30.096354+00:00",
+    "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+    "method": "Normal production fetch, HTML text extraction and quote guard. Scripted extraction claims came from exact captured passages. Synthetic first-stage ticket. No provider calls or customer data.",
+    "sources": {
+      "appeal": {
+        "url": "https://www.boston.gov/departments/parking-clerk/how-appeal-parking-ticket",
+        "final_url": "https://www.boston.gov/departments/parking-clerk/how-appeal-parking-ticket",
+        "status": 200,
+        "source_sha256": "96942b40725d6f2b8541ff6a1a50f0666a8ae88430c0fee2ecc5f0c96d92adb8",
+        "checked_utc": "2026-11-27T18:54:32.869319+00:00",
+        "content_type": "text/html",
+        "bytes": 84634
+      },
+      "faq": {
+        "url": "https://www.boston.gov/departments/parking-clerk/parking-ticket-faqs",
+        "final_url": "https://www.boston.gov/departments/parking-clerk/parking-ticket-faqs",
+        "status": 200,
+        "source_sha256": "5d067e52381fb24286346bb4c06521cadb6a23b69f9de02b2367bc4b210b8425",
+        "checked_utc": "2026-11-27T18:54:33.749570+00:00",
+        "content_type": "text/html",
+        "bytes": 87420
+      },
+      "payment": {
+        "url": "https://www.boston.gov/departments/parking-clerk/how-pay-parking-ticket",
+        "final_url": "https://www.boston.gov/departments/parking-clerk/how-pay-parking-ticket",
+        "status": 200,
+        "source_sha256": "0ecbda3c09506d340a2041879d0b9b85e02b37ee4b8e913d4b839709ca5f9308",
+        "checked_utc": "2026-11-27T18:54:34.988833+00:00",
+        "content_type": "text/html",
+        "bytes": 76594
+      }
+    },
+    "official_page_reading": {
+      "first_stage_mail_route": "The appeal page gives a letter route, its required particulars and the full destination.",
+      "same_box_requires_procedure_evidence": "The payment page directs checks or money orders to the same box. A matching box does not establish filing eligibility.",
+      "deadline": "The 21-day FAQ wording explains overdue status and says overdue tickets may still be appealed. The FAQ mentions postmark for payment. The 10-day instruction is after denial. The captured pages do not establish a receipt or postmark deadline for this first-stage letter."
+    },
+    "scoped_checks": {
+      "appeal_letter": {
+        "MAIL_IN_ACCEPTED": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": null,
+          "quote_sha256": "a1e992c507b13aa753cb248e8fd3d9a7016687bf2b5a334ca2662d736e797be7"
+        },
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": "address quote does not say the address is for contesting",
+          "quote_sha256": "47d2b989f85413f16ae370da6c5efe5f100d01f23c3c7a5de303e040960fa67b"
+        },
+        "REQUIRED_ITEMS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": true,
+          "address_purpose_problem": null,
+          "quote_sha256": "1d95ceca63cd5c1fca0da68dce40adc1653f3527514790b388c21d14da4f044a"
+        }
+      },
+      "late_fee_explanation": {
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": null,
+          "quote_sha256": "69439ad087655776e178bae2d3532434610d9f09acf3bf345f36fc5eeb2c6a20"
+        },
+        "DEADLINE_CLOCK_START": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": null,
+          "quote_sha256": "69439ad087655776e178bae2d3532434610d9f09acf3bf345f36fc5eeb2c6a20"
+        }
+      },
+      "control_shared_payment_box_as_appeal_destination": {
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": "address quote does not say the address is for contesting",
+          "quote_sha256": "a15af8bd8189b0dd130a10c3dc1d88ff86149241da86104cd4503cf86fbd6d71"
+        }
+      },
+      "control_payment_postmark_as_appeal_deadline": {
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": null,
+          "quote_sha256": "5624cd4be20ee12a926661059973f0bd2cf32f333d42754d2869f946a836fa57"
+        }
+      },
+      "control_post_denial_ten_day_rule_as_initial_deadline": {
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source does not establish procedure stage",
+          "detected_source_stage": null,
+          "value_checker_supports_scoped_quote": false,
+          "address_purpose_problem": null,
+          "quote_sha256": "b416b9801fd14b862ffe0999a6e16abdc64bdec788760fb1cd4ad5bde94bd6f1"
+        }
+      }
+    },
+    "release": {
+      "proceed": false,
+      "blocking_reasons": [
+        "MAIL_IN_ACCEPTED: unknown",
+        "DEADLINE_DAYS: unknown",
+        "DEADLINE_CLOCK_START: unknown",
+        "DEADLINE_RULE: missing",
+        "MAILING_ADDRESS: unknown",
+        "REQUIRED_ITEMS: unknown",
+        "REQUIRED_DECLARATIONS: missing",
+        "CONTEST_ELIGIBILITY: missing",
+        "MANDATORY_FORMS: missing",
+        "SIGNATURE_REQUIREMENT: missing",
+        "PRIOR_STEP_REQUIREMENT: missing",
+        "TICKET_SPECIFIC_REQUIREMENTS: missing",
+        "DEADLINE_ABSOLUTE: missing"
+      ]
+    },
+    "hearing_regulation": {
+      "official_artifact_final_url": "https://www.boston.gov/sites/default/files/file/2025/03/City%20of%20Boston%20Traffic%20Rules%20and%20Regulations_03.01.2025.pdf",
+      "http": 200,
+      "sha256": "740f8e1bb30618f2873f87024f993f6750a8baffcd1fa36427147cf1ee699200",
+      "bytes": 1401344,
+      "section": "Article IV-B, sections 1-2, printed p. 41",
+      "separate_procedure": "Administrative hearing request",
+      "mailing_address": "City of Boston, P.O. Box 1626, Boston, MA 02105",
+      "timing": "Article IV-B cites a 21-day issuance provision in the enabling law, and states a 45-day first-mail-notice rule with postmark as the receipt date for a hearing request. The hearing route uses a different address from the initial correspondence route.",
+      "fixture_relevance": "No evidence tying the initial letter route to the hearing-request mailbox or clock. These regulations were independently read. The signed quote-guard replay used the three HTML sources."
+    },
+    "alternative_issuer_screen": {
+      "municipal_url": "https://www.montebelloca.gov/departments/planning_community_development/parking_enforcement/parking_appeal_form",
+      "official_linked_form": {
+        "official_artifact_final_url": "https://cdnsm5-hosted2.civiclive.com/UserFiles/Servers/Server_58672/File/Departments/Planning%20&%20Comm.%20Dev/Code%20Enforcement%20Division/Adjudication%20Form%20(Parking%20Appeal)%20Blank.pdf",
+        "http": 200,
+        "sha256": "3850c3b7565fe010174820645457c62a0d8048cf01dbc5dd1e43d14277e30e1a",
+        "bytes": 220839
+      },
+      "findings": "The municipal page offers a written contest by mail if the online system cannot be used. It gives a first-stage postmark rule and lists the citation or reminder among required enclosures. The linked two-page form has a petitioner signature field and restricts submissions to registered owners. Whether separate signed petition material, a photocopy of the citation, and a generated letter are all accepted together remains unverified.",
+      "eligibility": "Not selected as a positive rehearsal fixture."
+    },
+    "focused_api_and_discovery_tests_passed": 50
+  },
+  "boston_filing_replay_sha256": "570c0be7c5eaf2516c91ea02b8cfb4a20d0e987132c0dcc4ba6018c2a0088e5f",
+  "west_covina_filing_replay": {
+    "recorded_utc": "2026-11-27T18:58:40.612354+00:00",
+    "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+    "source": {
+      "url": "https://www.westcovina.gov/m/faq?cat=19",
+      "final_url": "https://www.westcovina.gov/m/faq?cat=19",
+      "status": 200,
+      "source_sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e",
+      "checked_utc": "2026-11-27T18:58:05.584979+00:00",
+      "content_type": "text/html",
+      "bytes": 146793
+    },
+    "official_reading": {
+      "mail_route": "The municipality offers a mailed letter for first-level review and identifies the adjudication recipient and mailing address.",
+      "required_items": "The instructions identify name, address, telephone and a complete explanation with available evidence. The replay involves synthetic facts only.",
+      "date_limit": "The city says 21 days from the violation and rejects review requests postmarked after that period. The quoted passage does not equate the violation date with the date of issuance.",
+      "controls": "The page also shows payment and a second-level hearing at the same PO box. Payment evidence and the second-level receipt deadline are outside the first-level dispute passage."
+    },
+    "procedure_sections": [
+      {
+        "stage": "administrative hearing",
+        "end_of_text_offset": 19706
+      }
+    ],
+    "scripted_assertions": {
+      "first_level_filing": {
+        "MAIL_IN_ACCEPTED": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": false,
+          "quote_sha256": "f72a7f81a692b7f11115a08c12baf8a2392762deef3cae63719e68f22340c8b1"
+        },
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": true,
+          "quote_sha256": "92d3aac4c44213752b5dce042778062543205e616562d8e8531351f2813bec3c"
+        },
+        "DEADLINE_CLOCK_START": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": false,
+          "quote_sha256": "92d3aac4c44213752b5dce042778062543205e616562d8e8531351f2813bec3c"
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": false,
+          "quote_sha256": "fa38cbd2c4ba76361f040d545df9e96db741740ba3c5aac759a59215d07cab0c"
+        },
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": true,
+          "quote_sha256": "f72a7f81a692b7f11115a08c12baf8a2392762deef3cae63719e68f22340c8b1"
+        },
+        "REQUIRED_ITEMS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": true,
+          "quote_sha256": "25c0f72dfc19ddbdda3489e172328c5a6ceb36a46f476f116098b74e3155bdfc"
+        }
+      },
+      "control_payment_postmark": {
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": false,
+          "quote_sha256": "59eaf63ef94b3dcac6a8e481c12a958f7801951066df16fc4485668dfb07e55c"
+        }
+      },
+      "control_payment_box": {
+        "MAILING_ADDRESS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": false,
+          "quote_sha256": "59eaf63ef94b3dcac6a8e481c12a958f7801951066df16fc4485668dfb07e55c"
+        }
+      },
+      "control_later_clock": {
+        "DEADLINE_DAYS": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": true,
+          "quote_sha256": "0c418e5b47a595802c47fbf725f215c8bf092e0696b96c8b231b1a57e771c88c"
+        },
+        "DEADLINE_RULE": {
+          "status": "UNKNOWN",
+          "reason": "quote guard: source procedure has another stage",
+          "section_stage": "administrative hearing",
+          "value_supported_by_individual_quote_check": false,
+          "quote_sha256": "0c418e5b47a595802c47fbf725f215c8bf092e0696b96c8b231b1a57e771c88c"
+        }
+      }
+    },
+    "release_decision": {
+      "proceed": false,
+      "reasons": [
+        "MAIL_IN_ACCEPTED: unknown",
+        "DEADLINE_DAYS: unknown",
+        "DEADLINE_CLOCK_START: unknown",
+        "DEADLINE_RULE: unknown",
+        "MAILING_ADDRESS: unknown",
+        "REQUIRED_ITEMS: unknown",
+        "REQUIRED_DECLARATIONS: missing",
+        "CONTEST_ELIGIBILITY: missing",
+        "MANDATORY_FORMS: missing",
+        "SIGNATURE_REQUIREMENT: missing",
+        "PRIOR_STEP_REQUIREMENT: missing",
+        "TICKET_SPECIFIC_REQUIREMENTS: missing",
+        "DEADLINE_ABSOLUTE: missing"
+      ]
+    },
+    "method": "Production HTTPS and pinned captured HTML replay. Scripted extraction proposals. Existing quote, value and release guards. No city enabled, model billing, provider transaction or mail."
+  },
+  "west_covina_filing_replay_sha256": "b0747a2189433b2ecdda372f1514bd5f086a64305d742016a91b9cace0c73e1f",
+  "access_email_preflight": {
+    "recorded_utc": "2026-11-27T18:52:46.489484+00:00",
+    "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+    "dns_verified": [
+      {
+        "authority": "ns27.domaincontrol.com",
+        "dkim_txt_present": true,
+        "return_path_cname": "send.forge.rmta.net.",
+        "dmarc_quarantine": true,
+        "dmarc_relaxed_spf_dkim": true
+      },
+      {
+        "authority": "ns28.domaincontrol.com",
+        "dkim_txt_present": true,
+        "return_path_cname": "send.forge.rmta.net.",
+        "dmarc_quarantine": true,
+        "dmarc_relaxed_spf_dkim": true
+      }
+    ],
+    "resent_or_sent_email": false,
+    "provider_sender_authorization_verified": false,
+    "inbox_delivery_verified": false,
+    "local_tunnel_preflight": {
+      "fixed_private_origin": "https://pb-qual-1127.parkingbreaker.test",
+      "old_nonstandard_port_rejected_by_signed_auth_configuration": true,
+      "new_origin_accepted_by_signed_auth_configuration": true,
+      "path": "Verified Chrome and curl with pinned private TLS over a loopback listener. The browser origin uses standard HTTPS while the test transport uses a high local port.",
+      "browser_same_origin_auth_pricing_http": 200,
+      "mismatched_origin_http": 403,
+      "provider_or_google_mutations": false
+    },
+    "focused_backend_access_and_email_tests_passed": 89
+  },
+  "access_email_preflight_sha256": "eed094814ffa99309bc7526e49656762cd47d2fee29850b6725cde2660bac9e5",
+  "remaining": {
+    "qualified_paid_customer_orders": 0,
+    "owner_inbox_access_email": "No message from rehearsal sender was found in the designated inbox for the in-scope period. The private qualification origin requires IAP. No sign-in email was sent during this window.",
+    "alert": "The November 18 Pacific alert and recovery notifications were observed in the designated inbox. Google records the incident as CLOSED. No human acknowledgement was verified.",
+    "physical_iphone_android_print": "Unverified on physical devices and printed packet.",
+    "order": "Run a supported ticket on the intended standing target through real OCR, verified official address and deadline, customer approval, capture and case-linked callbacks. Repeat interruption and measure safe return to service from restore.",
+    "owner_cutover": "Verified postage and refund reserves, staffed support, approved cohort cap, dates and stop rules, and live cutover remain open."
+  },
+  "joined_sandbox_rehearsal": {
+    "candidate": "7db2a277766109582d595f23d0fbc3c36fb54308",
+    "result": "passed_seeded_order",
+    "performed_after_private_google_teardown": true,
+    "start_utc": "2026-11-27T20:11:18.462168+00:00",
+    "runtime": "Local signed-candidate worker and callback routes with a seeded order, synthetic PDF and installed test credentials. Separate from the removed Google website and API.",
+    "callback_transport": "Free Cloudflare Quick Tunnel, loopback target. Two exact POST paths with provider-issued signature checks and matching test object identities. No parkingbreaker.com route changes.",
+    "callback_transport_reference": "https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/",
+    "lob_event_limits_reference": "https://help.lob.com/print-and-mail/getting-data-and-results/using-webhooks",
+    "no_transaction_route_preflight": "Initial relay start timed out before either test account changed. Retry awaited the actual local response header.",
+    "earlier_orders": [
+      {
+        "callback_issue": "Relay required a mode field missing in the authenticated Lob test event readback. The original signed delivery was never retained.",
+        "provider_state_after_restart": {
+          "letters": 1,
+          "original_charges": 1,
+          "captured_charges": 0,
+          "amount_received": 0,
+          "capturable": 2999,
+          "stripe_status": "requires_capture",
+          "same_prepared_identity": true,
+          "local_letter_recovered": true,
+          "cursor_sends": 2,
+          "cursor_owner_released": true,
+          "state": "SUBMITTING",
+          "next_due": "2026-11-27T20:03:39.400697+00:00"
+        },
+        "release": {
+          "mode": "test",
+          "cancelled": true,
+          "real_charge": false,
+          "capture_cents": 0,
+          "capturable_cents": 0,
+          "readback_verified": true,
+          "initial_cleanup_request_reused_subscription_idempotency_key": true
+        },
+        "teardown": {
+          "subscriptions": {
+            "observed_utc": "2026-11-27T20:04:59.513804+00:00",
+            "sandbox_subscriptions_absent": {
+              "stripe": true,
+              "lob": true
+            }
+          },
+          "relay": {
+            "closed_utc": "2026-11-27T20:05:00.046668+00:00",
+            "owned_relay_process_stopped": true,
+            "local_listener_closed": true
+          }
+        }
+      },
+      {
+        "callback_issue": "Relay required matching submission metadata which the delivered callback did not establish. The response count included one HTTP 200 and no retained envelope.",
+        "provider_state_after_restart": {
+          "letters": 1,
+          "original_charges": 1,
+          "captured_charges": 0,
+          "amount_received": 0,
+          "capturable": 2999,
+          "stripe_status": "requires_capture",
+          "same_prepared_identity": true,
+          "local_letter_recovered": true,
+          "cursor_sends": 2,
+          "cursor_owner_released": true,
+          "state": "SUBMITTING",
+          "next_due": "2026-11-27T20:08:47.468694+00:00"
+        },
+        "release": {
+          "mode": "test",
+          "cancelled": true,
+          "real_charge": false,
+          "readback_verified": true,
+          "capture_cents": 0,
+          "capturable_cents": 0
+        },
+        "teardown": {
+          "subscriptions": {
+            "observed_utc": "2026-11-27T20:10:51.349595+00:00",
+            "sandbox_subscriptions_absent": {
+              "stripe": true,
+              "lob": true
+            }
+          },
+          "relay": {
+            "closed_utc": "2026-11-27T20:10:51.594524+00:00",
+            "owned_relay_process_stopped": true,
+            "local_listener_closed": true
+          }
+        }
+      }
+    ],
+    "interrupted_after_lob_accepted_before_local_outcome": {
+      "before_recovery": {
+        "letters": 1,
+        "original_charges": 1,
+        "captured_charges": 0,
+        "amount_received": 0,
+        "capturable": 2999,
+        "stripe_status": "requires_capture"
+      },
+      "app_call_intent_persisted": true,
+      "app_outcome_missing": true,
+      "records_and_artifacts_match": true,
+      "restored_in_quarantine": true
+    },
+    "original_provider_objects_after_restart": {
+      "letters": 1,
+      "original_charges": 1,
+      "captured_charges": 0,
+      "amount_received": 0,
+      "capturable": 2999,
+      "stripe_status": "requires_capture",
+      "same_prepared_identity": true,
+      "local_letter_recovered": true,
+      "cursor_sends": 2,
+      "cursor_owner_released": true,
+      "state": "SUBMITTING",
+      "next_due": "2026-11-27T20:13:02.571776+00:00"
+    },
+    "provider_callbacks": {
+      "lob": {
+        "delivery": {
+          "provider": "lob",
+          "event_type": "letter.created",
+          "test_only": true,
+          "signature_verified_at_receipt": true,
+          "received_utc": "2026-11-27T20:11:30.959179+00:00",
+          "matches_original_test_letter_id": true,
+          "submission_metadata_present": true,
+          "submission_token_matches": false,
+          "event_mode_present": true
+        },
+        "application": {
+          "provider": "lob",
+          "genuine_signed_payload_accepted_http": 200,
+          "tampered_body_rejected_http": 400,
+          "duplicate_http": 200,
+          "durable_rows": 1,
+          "same_seeded_case": true,
+          "event_identity_sha256": "cfe93ef7ba20dba45dcc0a01eb9713d8f48ee0fee90232d334acf01261c287bc"
+        }
+      },
+      "stripe": {
+        "delivery": {
+          "provider": "stripe",
+          "event_type": "payment_intent.succeeded",
+          "test_only": true,
+          "signature_verified_at_receipt": true,
+          "received_utc": "2026-11-27T20:12:06.630496+00:00"
+        },
+        "application": {
+          "provider": "stripe",
+          "genuine_signed_payload_accepted_http": 200,
+          "tampered_body_rejected_http": 400,
+          "duplicate_http": 200,
+          "durable_rows": 1,
+          "same_seeded_case": true,
+          "event_identity_sha256": "8c331bf9cd8245fa7933cd3319f542ce225357d2f9c05e6bd65413f6bb6ec2e9"
+        }
+      }
+    },
+    "sandbox_capture_at_simulated_application_time": {
+      "letters": 1,
+      "original_charges": 1,
+      "captured_charges": 1,
+      "amount_received": 2999,
+      "capturable": 0,
+      "stripe_status": "succeeded",
+      "controlled_application_clock": "2026-12-04T13:42:28+00:00",
+      "real_execution_time": "2026-11-27T20:12:07.111275+00:00"
+    },
+    "joined_case_readback": {
+      "readback": {
+        "letters": 1,
+        "original_charges": 1,
+        "captured_charges": 1,
+        "amount_received": 2999,
+        "capturable": 0,
+        "stripe_status": "succeeded"
+      },
+      "durable_webhook_rows": {
+        "lob": 1,
+        "stripe": 1
+      },
+      "packet_sha256": "31970d7b21f664cb76e6325a2c04aa1d55e77b9c5797f57239795f4197dbaf83",
+      "approval_exists": true
+    },
+    "independent_quarantined_restore_lookup": {
+      "restored_lookup_anchors_used": true,
+      "quarantine_preserved": true,
+      "original_lob_test_letters": 1,
+      "original_stripe_test_charges": 1,
+      "captures": 1,
+      "amount_captured_cents": 2999,
+      "snapshot_preceded_local_letter_id": true,
+      "approved_packet_hash_matched": true
+    },
+    "provider_digital_proof": {
+      "checked_utc": "2026-11-27T20:12:46.230590+00:00",
+      "provider_document": {
+        "available": true,
+        "pdf_sha256": "b9df66676648e3b3c30e8c92431938dea2412d6e4a9d81d8e394fe41a25225ac",
+        "bytes": 59602
+      },
+      "pages": 5,
+      "approved_packet_pages": 3,
+      "approved_page_text_matches_in_order": true,
+      "us_letter_geometry": true,
+      "visual_review_all_5_pages_completed": true,
+      "certified_cover_had_expected_synthetic_addressees_and_barcode": true,
+      "page_2_has_only_production_marks": true,
+      "physical_print_or_postal_scan_verified": false
+    },
+    "failure": null,
+    "final_uncaptured_hold_release": null,
+    "teardown": {
+      "subscriptions": {
+        "observed_utc": "2026-11-27T20:12:12.594643+00:00",
+        "sandbox_subscriptions_absent": {
+          "stripe": true,
+          "lob": true
+        }
+      },
+      "relay": {
+        "closed_utc": "2026-11-27T20:12:13.136092+00:00",
+        "owned_relay_process_stopped": true,
+        "local_listener_closed": true
+      }
+    },
+    "public_preview_post_teardown": {
+      "observed_utc": "2026-11-27T20:12:31.468598+00:00",
+      "public_status": {
+        "/api/health": 200,
+        "/__pb_rehearsal_1126/webhooks/stripe": 404,
+        "/__pb_rehearsal_1126/webhooks/lob": 404
+      },
+      "public_sha": "908ac8007120e12748112fc4752809b51691358a",
+      "public_mode": "fake"
+    },
+    "real_customer_charges": 0,
+    "physical_letters_sent": 0,
+    "paid_traffic_spend_usd": 0,
+    "added_billed_services_for_sandbox": 0,
+    "qualification_limits": [
+      "Seeded case used fixture destination and pre-approved synthetic PDF.",
+      "Google browser exercise and genuine provider join were separate.",
+      "Near-expiry application clock, no USPS postal scan.",
+      "Restored copy stayed fenced and quarantined."
+    ],
+    "sanitized_artifact_sha256": {
+      "snapshot": "5ac796d3c8485ed86547fff781e7b3b60db5f217d413ce98a0a36da6f51ea115",
+      "replay": "2e750abfafa7709ffd5d04e27eb7ae4cd0b54349ead021f235db93158ab007e6",
+      "fallback": "188da394d5cd07b945e542e4c3e65b4d6d2b7c87da329a3616f548b312791d28",
+      "joined-readback": "62f6eeac843602f7dfca4f5e2bf7e91b94c9445bc4b0b8a8a70c95ee1c8042e4",
+      "external-reconciliation": "50232b9185016c8cd9530438988fb1c151bfcc92be96b05208ab6bb1362b4eda",
+      "lob-delivery": "7d2a0801e2ec81b57d0e4ac49190b985783a6be1dfef3588bbee3fbff2793723",
+      "stripe-delivery": "0ad395a55d856aa38a7a24543ef4a4bb12a070c58247f816b514095ae6786355",
+      "lob-application": "033df12f0d59a5873cffeb024a591fd603b8a463b2b43aef531a21013336210b",
+      "stripe-application": "e7c0cb153236bde65d09e50e94752e3128b7bfabf326ce59b5d7f56d0ca15f7f",
+      "provider-preview": "159df8f640eba706afc086d88798c0b49a3637c870f9d962c4dbfe9404be6178",
+      "digital-print-inspection": "704fcbbc20748a77a7127c71b6d835811db9973e7363ee014448673c99af36d1",
+      "endpoint-teardown": "ae4ea44e1cbbdd62f4f3ba1ab4c27563e6bbd55c9e980ad4d6836f6e3cf40d89",
+      "relay-teardown": "0963e2707089a7176afa1acd06eba9f0c9d5849d01671b5a398d797802553d61"
+    }
+  }
+}
