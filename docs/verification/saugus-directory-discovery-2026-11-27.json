@@ -1,0 +1,550 @@
+{
+  "application_commit": "8940d1be429fac39e111d8e1451912dd5d43b4c4",
+  "application_tree": "7e00cd40bb605ef5c4f82494a88438fa5cd0c599",
+  "local_customer_api": {
+    "started": "2026-11-28T05:31:43.705912+00:00",
+    "environment": "local customer API, recorded model proposals, fresh official HTTPS sources, no search provider, no supplied page URLs",
+    "sources": {
+      "issuer": [
+        [
+          "https://www.saugus-ma.gov/",
+          "2f4612713c503ae17f0ee2855053de6549449e8d926e9af27965d178a6e93606"
+        ],
+        [
+          "https://www.saugus-ma.gov/m/faq?cat=21",
+          "45bf4e583c0aee08849df5dbc403f21908dea570d1b40ea88f81befab8adfe05"
+        ],
+        [
+          "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId=",
+          "aa33522df2ed4d5ee26e399f097178d538368c416d6814a5a717f013aa15c70c"
+        ]
+      ],
+      "research": [
+        [
+          "https://www.saugus-ma.gov/m/faq?cat=21",
+          "fc384f15f89fff181bdd71ce9bea391be7ab60eafbefbbc022b367cdbf41e04e"
+        ],
+        [
+          "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId=",
+          "aa33522df2ed4d5ee26e399f097178d538368c416d6814a5a717f013aa15c70c"
+        ]
+      ]
+    },
+    "financial_calls": 0,
+    "revision": "8940d1be429fac39e111d8e1451912dd5d43b4c4",
+    "https_reads": [
+      {
+        "stage": "issuer",
+        "url": "https://saugus-ma.gov/",
+        "http": 301
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/",
+        "http": 200
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/27/Departments",
+        "http": 200
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/186/Treasurer-Collector",
+        "http": 200
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/Faq.aspx?TID=21",
+        "http": 302
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/m/faq?cat=21",
+        "http": 200
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497",
+        "http": 301
+      },
+      {
+        "stage": "issuer",
+        "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId=",
+        "http": 200
+      },
+      {
+        "stage": "procedure",
+        "url": "https://www.saugus-ma.gov/m/faq?cat=21",
+        "http": 200
+      },
+      {
+        "stage": "procedure",
+        "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497",
+        "http": 301
+      },
+      {
+        "stage": "procedure",
+        "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId=",
+        "http": 200
+      }
+    ],
+    "intake_state": "NEEDS_CUSTOMER",
+    "question": "VEHICLE_RELATIONSHIP",
+    "decision": {
+      "kind": "offer",
+      "issuer": {
+        "issuer_id": "MA:saugus-ma.gov",
+        "issuer_name": "Town of Saugus",
+        "deciding_body": "Parking Hearings Officer",
+        "state": "MA",
+        "stage": "first-level review",
+        "service_basis": "MA",
+        "delegated_tenant": null
+      },
+      "tiers": [
+        {
+          "tier": "CERTIFIED",
+          "amount_cents": 1999,
+          "currency": "usd",
+          "description": "Certified mail with tracking; no promised arrival date."
+        }
+      ],
+      "selected_tier": null
+    },
+    "finished": "2026-11-28T05:32:04.042141+00:00"
+  },
+  "inputs": {
+    "issuer": "Town of Saugus",
+    "city": "Saugus",
+    "state": "MA",
+    "stage": "first-level review",
+    "supplied_source_urls": [],
+    "issuer_registry": "2026-11-26 CISA .gov snapshot",
+    "model_inputs": "Deterministic historical claim proposals with the current source quote and hash. No production Gemini call or live OCR during this local checkout. The synthetic API fixture used a test image and stored test intake facts."
+  },
+  "manual_browser": {
+    "started_utc": "2026-11-28T05:14:06Z",
+    "form_opened_utc": "2026-11-28T05:19:07Z",
+    "navigation": [
+      "Departments",
+      "Treasurer / Collector",
+      "View All FAQs",
+      "Parking Ticket - What are your appeal options? (PICK ONLY ONE)",
+      "see document link"
+    ],
+    "form_final_url": "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId="
+  },
+  "review_controls": {
+    "utc": "2026-11-28T05:29:41.001909+00:00",
+    "mode": "synthetic municipal form responses on research re-fetch, fake payment",
+    "cases": [
+      {
+        "control": "missing",
+        "decision": "stop",
+        "reason": "filing_evidence_unverified",
+        "authorization_http": 409,
+        "holds": 0,
+        "refetched_form": true,
+        "offscope_transport_calls": [],
+        "unread_artifact": [
+          "https://www.saugus-ma.gov/DocumentCenter/View/1497"
+        ]
+      },
+      {
+        "control": "offsite",
+        "decision": "stop",
+        "reason": "filing_evidence_unverified",
+        "authorization_http": 409,
+        "holds": 0,
+        "refetched_form": true,
+        "offscope_transport_calls": [],
+        "unread_artifact": [
+          "https://www.saugus-ma.gov/DocumentCenter/View/1497"
+        ]
+      },
+      {
+        "control": "insecure",
+        "decision": "stop",
+        "reason": "filing_evidence_unverified",
+        "authorization_http": 409,
+        "holds": 0,
+        "refetched_form": true,
+        "offscope_transport_calls": [],
+        "unread_artifact": [
+          "https://www.saugus-ma.gov/DocumentCenter/View/1497"
+        ]
+      }
+    ]
+  },
+  "backend_checks": {
+    "revision": "8940d1be429fac39e111d8e1451912dd5d43b4c4",
+    "passed": true,
+    "tests_passed": 14340,
+    "expected_tests": 14340,
+    "shards": [
+      {
+        "shard": 0,
+        "exit": 0,
+        "passed": 1696,
+        "summary": "1696 passed, 1 warning in 317.72s (0:05:17)"
+      },
+      {
+        "shard": 1,
+        "exit": 0,
+        "passed": 1239,
+        "summary": "1239 passed in 267.91s (0:04:27)"
+      },
+      {
+        "shard": 2,
+        "exit": 0,
+        "passed": 1243,
+        "summary": "1243 passed in 253.37s (0:04:13)"
+      },
+      {
+        "shard": 3,
+        "exit": 0,
+        "passed": 1434,
+        "summary": "1434 passed in 430.17s (0:07:10)"
+      },
+      {
+        "shard": 4,
+        "exit": 0,
+        "passed": 2538,
+        "summary": "2538 passed, 1 warning in 335.38s (0:05:35)"
+      },
+      {
+        "shard": 5,
+        "exit": 0,
+        "passed": 6190,
+        "summary": "6190 passed in 264.83s (0:04:24)"
+      }
+    ],
+    "elapsed_seconds": 431.4
+  },
+  "offline_qualification": {
+    "routing": true,
+    "vision": true,
+    "guard_doctor_workspace_ready": true
+  },
+  "next_evidence": "Resolve the unknown ticket-reading outcome using provider diagnostics where available. Qualify a single signed deployed order from both photos through confirmed Gemini results and an evidence-backed filing decision. A separate, zero-model source discovery and a local offer do not complete that order.",
+  "local_guarded_findings": {
+    "MAIL_IN_ACCEPTED": {
+      "status": "CONFIRMED",
+      "value": true,
+      "source_sha256s": [
+        "fc384f15f89fff181bdd71ce9bea391be7ab60eafbefbbc022b367cdbf41e04e"
+      ]
+    },
+    "DEADLINE_DAYS": {
+      "status": "CONFIRMED",
+      "value": 21,
+      "source_sha256s": [
+        "fc384f15f89fff181bdd71ce9bea391be7ab60eafbefbbc022b367cdbf41e04e"
+      ]
+    },
+    "DEADLINE_CLOCK_START": {
+      "status": "CONFIRMED",
+      "value": "ISSUE_DATE",
+      "source_sha256s": [
+        "fc384f15f89fff181bdd71ce9bea391be7ab60eafbefbbc022b367cdbf41e04e"
+      ]
+    },
+    "DEADLINE_RULE": {
+      "status": "CONFIRMED",
+      "value": "RECEIPT",
+      "source_sha256s": [
+        "fc384f15f89fff181bdd71ce9bea391be7ab60eafbefbbc022b367cdbf41e04e"
+      ]
+    },
+    "MAILING_ADDRESS": {
+      "status": "CONFIRMED",
+      "value": {
+        "attention": "Parking Hearings Officer",
+        "city": "Saugus",
+        "line1": "298 Central Street",
+        "line2": "Suite 5",
+        "recipient": "Town of Saugus",
+        "state": "MA",
+        "zip_code": "01906"
+      },
+      "source_sha256s": [
+        "fc384f15f89fff181bdd71ce9bea391be7ab60eafbefbbc022b367cdbf41e04e"
+      ]
+    }
+  },
+  "independent_review": {
+    "client": "Antigravity native agy CLI",
+    "model": "gemini-4-carbon-medium",
+    "completed_scope": "Review of the discovery design, signed-record contract and local validation claims",
+    "accepted_findings": [
+      "A local result using recorded model proposals does not establish a deployed Gemini decision.",
+      "Exercise the complete checkout when a previously readable form disappears or redirects beyond the verified HTTPS source scope."
+    ],
+    "verified_follow_up": "Three customer-API regressions returned filing_evidence_unverified and HTTP 409 on authorization with zero holds.",
+    "full_diff_review": "A separate full-diff call timed out without a verdict.",
+    "selector_review": {
+      "model": "gemini-4-carbon-medium",
+      "scope": "Exact unique-destination selection branch plus applied regression results",
+      "finding": "Distinct URL variants can reduce discovery coverage. Query strings may distinguish offices, so ambiguous links continue to stop.",
+      "tested": [
+        {
+          "case": "identical destinations",
+          "lead": "https://town.gov/office"
+        },
+        {
+          "case": "distinct trailing slash",
+          "lead": null
+        },
+        {
+          "case": "different query",
+          "lead": null
+        }
+      ]
+    }
+  },
+  "prior_deployed_decision": {
+    "commit": "261215c2df2115a3db516c59a80dc54ebf56c1b1",
+    "kind": "stop",
+    "reason": "NO_PAGES",
+    "receipt": "saugus-google-rehearsal-2026-11-27.json"
+  },
+  "private_google_rehearsal": {
+    "scope": "One fictional customer workspace over private IAP and TLS. Test-mode customer API with real Gemini configured. The public website remained a simulated preview.",
+    "origin": "https://pb-qual-1127.parkingbreaker.test",
+    "project": "neuraldraft-parkingbreaker",
+    "region": "us-west1",
+    "window": {
+      "started_utc": "2026-11-28T05:38:50.652713+00:00",
+      "new_work_until_utc": "2026-11-28T06:43:50.652713+00:00",
+      "not_after_utc": "2026-11-28T07:08:50.652713+00:00",
+      "incremental_max_usd": 1,
+      "total_max_usd": 10,
+      "customer_capacity": "one fictional test order"
+    },
+    "application_commit": "8940d1be429fac39e111d8e1451912dd5d43b4c4",
+    "build": {
+      "id": "3cc2fbb4-1d9f-4201-a0b5-5a9bdef20139",
+      "start_utc": "2026-11-28T05:39:07.663990163Z",
+      "finish_utc": "2026-11-28T05:46:03.629302Z",
+      "seconds": 415.965,
+      "image_digests": {
+        "backend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:c0f902a5a3d1f91c4dd2f8c646ba3adee3f828b320196309329bb07712f6c89c",
+        "frontend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-frontend@sha256:62df6984eb0f2650c0411740dbfb6389362be659964fe33c5e89f0961e548d3e"
+      }
+    },
+    "browser_events": [
+      {
+        "utc": "2026-11-28T05:47:48.194Z",
+        "event": "observed-health",
+        "mode": "test",
+        "build_commit": "8940d1be429fac39e111d8e1451912dd5d43b4c4"
+      },
+      {
+        "utc": "2026-11-28T05:47:48.244Z",
+        "event": "verified-test-build"
+      },
+      {
+        "utc": "2026-11-28T05:47:53.465Z",
+        "event": "incomplete",
+        "last_step": "verified-test-build",
+        "error_type": "AssertionError"
+      }
+    ],
+    "photo_sha256": {
+      "front": "b2ebba83fdc26d8a211b81c954dabc048d62244debd3eafb8c07842050700e2b",
+      "back": "5cccbd0bc84e61f55cdd9bacd3dbc090dc8e34319f49323e50bd8b45c6ec89a6"
+    },
+    "exact_photo_binding": {
+      "images": [
+        {
+          "sha256": "b2ebba83fdc26d8a211b81c954dabc048d62244debd3eafb8c07842050700e2b",
+          "bytes": 38856
+        },
+        {
+          "sha256": "5cccbd0bc84e61f55cdd9bacd3dbc090dc8e34319f49323e50bd8b45c6ec89a6",
+          "bytes": 20254
+        }
+      ],
+      "photo_fields": [
+        "photo_refs"
+      ],
+      "workspace_count": 1,
+      "fixture_matches": {
+        "front": true,
+        "back": true
+      },
+      "claimed_ocr_binding_sha256": "cfda5ace0817d03cbd56ceeccc280979eec0ddacf72bd12bc66df92b65b110e5",
+      "exact_front_and_back_bound_to_claim": true,
+      "front_only_bound_to_claim": false
+    },
+    "terminal_observation": {
+      "step": "ticket-reading",
+      "http": 409,
+      "method": "POST",
+      "observed_utc": "2026-11-28T05:47:53.465Z",
+      "response_body_captured": false,
+      "source_mapped_application_error": "ticket_reading_provider_unavailable",
+      "source": "backend/src/parkingbreaker/ticket_intake_service.py:TicketIntakeCoordinator.request_reading",
+      "provider_http_status": null,
+      "provider_root_cause": null,
+      "filing_decision": null
+    },
+    "configured_ocr_model": "gemini-3.5-flash-lite",
+    "ocr_observation": {
+      "primary_status": "provider_error",
+      "primary_duration_ms": 2019,
+      "coordinator_duration_ms": 2020,
+      "escalation_status": "not_applicable",
+      "shown_suggestion_count": 0,
+      "manual_entry_field_count": 11,
+      "reason_counts_json": "{}",
+      "recorded_at": "2026-11-28T05:47:53.438229+00:00"
+    },
+    "durable_attempt": {
+      "operation": "extract",
+      "status": "unknown",
+      "claimed_at": "2026-11-28T05:47:51.410438+00:00",
+      "completed_at": "2026-11-28T05:47:53.436677+00:00",
+      "stored_response": 0,
+      "recorded_usage": 0
+    },
+    "ai_ledger": [
+      {
+        "worker": "INTAKE_READING",
+        "calls": 1,
+        "reserved_cents": 25,
+        "estimated_settled_cents": null,
+        "budget_used_cents": 25
+      }
+    ],
+    "row_counts": {
+      "pb_workspaces": 1,
+      "pb_ticket_intake_operations": 1,
+      "pb_ticket_intake_confirmations": 0,
+      "pb_intake_records": 0,
+      "pb_intake_authorization_attempts": 0,
+      "pb_intake_drafts": 0,
+      "pb_payment_operations": 0,
+      "pb_mail_attempts": 0,
+      "pb_case_history": 0,
+      "pb_intake_research": 0
+    },
+    "sqlite_integrity": "ok",
+    "cloud_monitoring_query": {
+      "from_utc": "2026-11-28T05:44:00Z",
+      "until_utc": "2026-11-28T05:57:16Z",
+      "scope": "Project-wide API request metrics without per-order attribution.",
+      "points": [],
+      "http": 200
+    },
+    "cloud_audit_query": {
+      "checked_utc": "2026-11-28T05:55:09.081914+00:00",
+      "scope": "Gemini service audit records in the deployment project from 05:47:45 to 05:48:00 UTC",
+      "query_succeeded": true,
+      "records": []
+    },
+    "separate_deployed_source_discovery": {
+      "utc": "2026-11-28T05:53:08.300849+00:00",
+      "revision": "8940d1be429fac39e111d8e1451912dd5d43b4c4",
+      "scope": "Separate component check inside the deployed API. Issuer and city only, known-city registry, no search and zero model budget.",
+      "fetch": [
+        {
+          "url": "https://saugus-ma.gov/",
+          "error": "not on the allowlist: http://www.saugus-ma.gov"
+        },
+        {
+          "url": "https://www.saugus-ma.gov/",
+          "error": null
+        },
+        {
+          "url": "https://www.saugus-ma.gov/27/Departments",
+          "error": null
+        },
+        {
+          "url": "https://www.saugus-ma.gov/186/Treasurer-Collector",
+          "error": null
+        },
+        {
+          "url": "https://www.saugus-ma.gov/Faq.aspx?TID=21",
+          "error": null
+        },
+        {
+          "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497",
+          "error": null
+        }
+      ],
+      "saved": [
+        {
+          "url": "https://www.saugus-ma.gov/",
+          "sha256": "1c0007cee25cc413e8d74745fce1d30f02f1a0e5597085761f399c49d786db88"
+        },
+        {
+          "url": "https://www.saugus-ma.gov/m/faq?cat=21",
+          "sha256": "cc3513e5f67b8990efb17f3eb105ee99b128cea51fa4d97464ca17841acb9ad6"
+        },
+        {
+          "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId=",
+          "sha256": "aa33522df2ed4d5ee26e399f097178d538368c416d6814a5a717f013aa15c70c"
+        }
+      ],
+      "final_code": "BUDGET_EXHAUSTED",
+      "model_calls": 0,
+      "search_calls": 0
+    },
+    "cost": {
+      "incremental_ceiling_usd": 1,
+      "overall_ceiling_usd": 10,
+      "prior_conservative_allocation_usd": 6.88,
+      "ocr_reserved_usd": 0.25,
+      "ocr_settled_estimate_usd": null,
+      "build_compute_estimate_usd_at_prior_rate": 0.0416,
+      "invoiced_total_usd": null
+    },
+    "cleanup": {
+      "observed_utc": "2026-11-28T05:53:36.435630+00:00",
+      "vm_containers_absent_and_port_closed": true,
+      "isolated_guest_directory_removed": true,
+      "build_terminal_state": "SUCCESS",
+      "backend_tag_absent": true,
+      "frontend_tag_absent": true,
+      "created_source_generation_absent": true,
+      "local_expiry_timer_inactive": true,
+      "local_tunnel_port_closed": true,
+      "disposable_browser_profile_removed": true,
+      "verified_utc": "2026-11-28T05:54:42.148490+00:00"
+    },
+    "standing_baseline_before_and_after_matched": true,
+    "public_after": {
+      "observed_utc": "2026-11-28T05:54:24.526869+00:00",
+      "public_status": {
+        "/api/health": 200,
+        "/__pb_rehearsal_1126/webhooks/stripe": 404,
+        "/__pb_rehearsal_1126/webhooks/lob": 404
+      },
+      "public_sha": "908ac8007120e12748112fc4752809b51691358a",
+      "public_mode": "fake"
+    }
+  },
+  "browser_recorder_offline_verification": {
+    "checked_utc": "2026-11-28T05:56:50.106Z",
+    "scope": "Local HTTPS fixture, real Chrome, simulated responses; validates the reusable browser recorder.",
+    "results": [
+      {
+        "fixture": "known",
+        "outcome": "incomplete",
+        "passed": true
+      },
+      {
+        "fixture": "unlisted",
+        "outcome": "incomplete",
+        "passed": true
+      },
+      {
+        "fixture": "offer",
+        "outcome": "filing-decision",
+        "passed": true
+      }
+    ]
+  }
+}

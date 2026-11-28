@@ -7,16 +7,41 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('../../web/node_modules/playwright');
 const hash = value => createHash('sha256').update(value).digest('hex');
-async function checkedResponse(page, suffix, action) {
+const publicFailureCodes = new Set([
+    'workspace_changed_reload_required', 'ticket_photo_required', 'ticket_photo_not_found',
+    'ticket_photo_not_supported', 'ticket_photo_reading_limit', 'ticket_reading_budget_exhausted',
+    'ticket_reading_provider_unavailable', 'ticket_review_budget_exhausted',
+    'ticket_review_provider_unavailable', 'filing_evidence_unverified',
+]);
+class QualificationResponseError extends Error {
+    constructor(endpoint, status, bytes) {
+        super(`${endpoint} returned HTTP ${status}`);
+        this.name = 'QualificationResponseError';
+        let detail;
+        if (bytes) {
+            try { detail = JSON.parse(bytes.toString('utf8')).detail; }
+            catch { /* A proxy can return a non-JSON response. */ }
+        }
+        const code = typeof detail === 'string' ? detail : detail?.code;
+        this.receipt = {
+            endpoint, http: status, code: publicFailureCodes.has(code) ? code : null,
+            response_sha256: bytes ? hash(bytes) : null,
+        };
+    }
+}
+async function checkedResponse(page, suffix, action, timeout = 120000) {
     const origin = new URL(page.url()).origin;
     const [response] = await Promise.all([
         page.waitForResponse(r => {
             const url = new URL(r.url());
             return url.origin === origin && url.pathname.endsWith(suffix) && r.request().method() === 'POST';
-        }, { timeout: 120000 }),
+        }, { timeout }),
         action(),
     ]);
-    assert.equal(response.status(), 200, suffix);
+    if (response.status() !== 200) {
+        const bytes = await response.body().catch(() => null);
+        throw new QualificationResponseError(suffix, response.status(), bytes);
+    }
     return response.json();
 }
 async function run() {
@@ -65,7 +90,13 @@ async function run() {
         await page.getByRole('button', { name: 'Add ticket photo →' }).click();
         for (const side of ['front', 'back']) {
             await page.getByRole('button', { name: 'Choose ' + side + ' photo' }).setInputFiles(path.join(fixtureDir, side + '.png'));
+            const field = side === 'front' ? 'ticket_photo_ref' : 'ticket_back_photo_ref';
+            await page.waitForFunction(async key => {
+                const response = await fetch('/api/auth/appeal');
+                return response.ok && Boolean((await response.json()).intake_form?.[key]);
+            }, field, { polling: 250, timeout: 30000 });
         }
+        record('both-uploads-saved');
         const extract = await checkedResponse(page, '/ticket-reading', () => page.locator('#visionReadBtn').click());
         record('extraction', { status: extract.status, model: extract.primary_model, synthetic: extract.synthetic, fields_sha256: hash(JSON.stringify(extract.fields)) });
         assert(extract.status === 'success' && extract.synthetic === false);
@@ -101,23 +132,55 @@ async function run() {
         for (const [field, value] of Object.entries(contact))
             await page.locator('#' + field).fill(value);
         await page.locator('#liveRentalPaid').selectOption('not-rental');
+        const researchTimeout = 600000;
         const decisionResponse = page.waitForResponse(r => {
             const url = new URL(r.url());
             return url.origin === origin && url.pathname.endsWith('/pre-hold') && r.request().method() === 'GET';
-        }, { timeout: 120000 });
-        const [intake, response] = await Promise.all([
-            checkedResponse(page, '/intake', () => page.locator('#liveSubmit').click()), decisionResponse,
+        }, { timeout: researchTimeout });
+        const [intake, firstResponse] = await Promise.all([
+            checkedResponse(page, '/intake', () => page.locator('#liveSubmit').click(), researchTimeout),
+            decisionResponse,
         ]);
-        assert.equal(response.status(), 200);
-        const bytes = await response.body();
-        const decision = JSON.parse(bytes.toString());
-        assert.equal(decision.case_id, intake.case_id);
-        const status = await page.evaluate(async (id) => (await fetch('/api/cases/' + encodeURIComponent(id) + '/status')).json(), intake.case_id);
-        record('filing-decision', { http: response.status(), case_id_sha256: hash(intake.case_id), response_sha256: hash(bytes), state: status.state, decision: { ...decision, case_id: '[redacted]' } });
-        return decision.kind;
+        const casePath = origin + '/api/cases/' + encodeURIComponent(intake.case_id);
+        const caseHash = hash(intake.case_id);
+        async function browserRead(resource) {
+            return page.evaluate(async url => {
+                const response = await fetch(url);
+                return { http: response.status, text: await response.text() };
+            }, casePath + resource);
+        }
+        async function observe(http, bytes) {
+            if (http !== 200) throw new QualificationResponseError('/pre-hold', http, bytes);
+            const decision = JSON.parse(bytes.toString());
+            assert.equal(decision.case_id, intake.case_id);
+            const read = await browserRead('/status');
+            if (read.http !== 200) throw new QualificationResponseError('/status', read.http, Buffer.from(read.text));
+            const status = JSON.parse(read.text);
+            assert.equal(status.case_id, intake.case_id);
+            const payload = JSON.parse(JSON.stringify(decision, (key, value) =>
+                key === 'case_id' || key === 'evidence_ref' ? '[redacted]' : value));
+            record(status.state === 'NEEDS_CUSTOMER' ? 'filing-question' : 'filing-decision', {
+                http, case_id_sha256: caseHash, response_sha256: hash(bytes),
+                state: status.state, question: status.question?.question_id ?? null, decision: payload,
+            });
+            return { status, decision };
+        }
+        let observed = await observe(firstResponse.status(), await firstResponse.body());
+        if (observed.status.state === 'NEEDS_CUSTOMER' && observed.status.question?.question_id === 'VEHICLE_RELATIONSHIP') {
+            const answer = await checkedResponse(page, '/answers', () =>
+                page.getByRole('button', { name: 'Registered owner', exact: true }).click());
+            assert.equal(answer.case_id, intake.case_id);
+            record('fixture-ownership-confirmed', { case_id_sha256: caseHash });
+            const saved = await browserRead('/pre-hold');
+            observed = await observe(saved.http, Buffer.from(saved.text, 'utf8'));
+        }
+        return observed.status.state === 'NEEDS_CUSTOMER' ? 'customer-question' : observed.decision.kind;
     }
     catch (error) {
-        record('incomplete', { last_step: receipt.events.at(-1)?.event ?? 'startup', error_type: error.name });
+        record('incomplete', {
+            last_step: receipt.events.at(-1)?.event ?? 'startup', error_type: error.name,
+            ...(error instanceof QualificationResponseError ? { response: error.receipt } : {}),
+        });
         throw error;
     }
     finally {
