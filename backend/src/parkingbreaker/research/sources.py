@@ -547,6 +547,7 @@ class FetchFailure:
     url: str
     reason: str
     retryable: bool = False
+    blocked_first_redirect: str | None = None
 
 
 Clock = Callable[[], datetime]
@@ -579,7 +580,11 @@ def fetch_source(
     current = url
     for _hop in range(MAX_REDIRECTS + 1):
         if not is_allowed(current, scopes):
-            return FetchFailure(url, f"not on the allowlist: {current}")
+            return FetchFailure(
+                url,
+                f"not on the allowlist: {current}",
+                blocked_first_redirect=current if _hop == 1 else None,
+            )
         try:
             response = fetcher.get(current)
         except FetchError as exc:

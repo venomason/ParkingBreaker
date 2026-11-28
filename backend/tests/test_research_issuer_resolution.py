@@ -435,6 +435,39 @@ def test_without_search_official_parking_navigation_can_find_issuer_evidence(
     assert (result.agency is not None) is verified
 
 
+@pytest.mark.parametrize("trailing_slash", ["", "/"])
+def test_directory_root_can_find_its_https_www_site_after_http_redirect(
+    harness: Harness, trailing_slash: str
+) -> None:
+    secure_root = "https://www.sfmta.gov/"
+    contest = secure_root + "contest"
+    harness.searcher = None
+    harness.fetcher = FakeFetcher(
+        {
+            ROOT: redirect_response(ROOT, "http://www.sfmta.gov" + trailing_slash),
+            secure_root: html_response(
+                secure_root, '<a href="/contest">Contest a parking ticket</a>'
+            ),
+            contest: html_response(contest, HTML),
+        }
+    )
+    result = harness.run()
+    assert harness.fetcher.calls == [ROOT, secure_root, contest]
+    assert [page.final_url for page in result.pages] == [secure_root, contest]
+    assert result.agency is not None
+
+
+@pytest.mark.parametrize("location", ["http://other.gov/", "http://www.sfmta.gov/payments"])
+def test_other_http_redirects_do_not_nominate_a_new_directory_root(
+    harness: Harness, location: str
+) -> None:
+    harness.searcher = None
+    harness.fetcher = FakeFetcher({ROOT: redirect_response(ROOT, location)})
+    result = harness.run()
+    assert harness.fetcher.calls == [ROOT]
+    assert result.code is VetoCode.NO_PAGES
+
+
 def test_off_domain_search_hits_and_redirects_never_fetched(harness: Harness) -> None:
     hostile = "https://sfmta.gov.evil.org/contest"
     harness.searcher = FakeSearcher(lambda _: (SearchHit(hostile), SearchHit(CONTEST)))

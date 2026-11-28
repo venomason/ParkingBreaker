@@ -266,7 +266,8 @@ def resolve_ticket_issuer(
                 False,
             ),
         )
-        urls = [f"https://{candidate.domains[0]}/"]
+        directory_root = f"https://{candidate.domains[0]}/"
+        urls = [directory_root]
         # A record may nominate a page on this candidate's already verified host.
         # Neither a legacy record nor a redirect authenticates another domain.
         for lead in chain((hit.url for hit in hits), candidate_urls):
@@ -291,6 +292,14 @@ def resolve_ticket_issuer(
                     error=fetched.reason if isinstance(fetched, FetchFailure) else None,
                 )
             )
+            if isinstance(fetched, FetchFailure) and url == directory_root:
+                # Some directory roots advertise their own www site over HTTP.
+                # Build the new HTTPS lead from the directory name.
+                www_host = f"www.{candidate.domains[0]}"
+                if fetched.blocked_first_redirect in (f"http://{www_host}", f"http://{www_host}/"):
+                    secure_root = f"https://{www_host}/"
+                    if secure_root not in urls:
+                        urls.append(secure_root)
             if isinstance(fetched, SourceRecord):
                 if any(page.final_url == fetched.final_url for page in pages):
                     continue
