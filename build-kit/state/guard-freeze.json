@@ -3,19 +3,26 @@
   "phase": "pre_benchmark_freeze",
   "frozen_at_commit": "2490fb59db52dadd6fb72ec7eb2e88dfe392c915",
   "files": {
-    "backend/src/parkingbreaker/research/support.py": "52d22b8a3255da714918ca7b4c6c2a6469f4d34b92cb101e92cd9cce54aa9135",
-    "backend/src/parkingbreaker/research/findings.py": "9a1d84aa9a7eea69e21964a19ea61be2efdfcd43026e34728b415bb43d0169f1",
-    "backend/src/parkingbreaker/research/procedure.py": "3b9d31ae0b3c90ff808e9020e5456b4be265778d21449cfb93c0c1602677b02e",
+    "backend/src/parkingbreaker/research/support.py": "09555187bd2bd6808935284e8e0c25e7d8ab5060f8ecafcb1c232fcc62db8115",
+    "backend/src/parkingbreaker/research/findings.py": "7858de81208fab04efd9eb66762f444fc459e38fd68c4c76ba019bc3c2c71b24",
+    "backend/src/parkingbreaker/research/procedure.py": "b8b9ce8995ace8ee07d456470135253c7a135b996412c9cce421972d3550b7ba",
     "backend/src/parkingbreaker/research/route_requirements.py": "c5a1b3a026c1f585c989b773412103d747a746ed53652c63c2302f34b74bd279"
   },
   "owner_approved_exception": {
-    "approved_by": "Owner direction to reproduce and repair West Covina first-stage attribution on the captured official FAQ",
+    "approved_by": "Amir (owner), November 27 direction to repair Saugus first-stage multi-topic FAQ + linked official form attribution and complete launch readiness",
     "approved_on": "2026-11-27",
-    "case_id": "west-covina-faq-stage-attribution",
-    "captured_url": "https://www.westcovina.gov/m/faq?cat=19",
-    "captured_page_sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e"
+    "case_id": "saugus-faq-and-form-first-stage-attribution",
+    "captured_url": "https://www.saugus-ma.gov/m/faq?cat=21",
+    "captured_page_sha256": "c514380fb9ded25e85a2849c6a4b020176be9759dfee887139b1c64f78488279"
   },
   "exception_history": [
+    {
+      "approved_by": "Owner direction to reproduce and repair West Covina first-stage attribution on the captured official FAQ",
+      "approved_on": "2026-11-27",
+      "case_id": "west-covina-faq-stage-attribution",
+      "captured_url": "https://www.westcovina.gov/m/faq?cat=19",
+      "captured_page_sha256": "4ed8fdadd2f54ad12cb6602bae405ff7e16ac4656a40ffe14064c67654f9f06e"
+    },
     {
       "approved_by": "Amir (owner), November 23 direction to fix the reported stale pin and T14 failures",
       "approved_on": "2026-11-23",
@@ -38,5 +45,5 @@
       "captured_page_sha256": "08fbc461e49a55375e6d6304c168e3bfbacec91f04045b611cd0ebd89f50a258"
     }
   ],
-  "current_exception_authority": "November 27 direction to repair the demonstrated FAQ failure while retaining filing and payment safeguards. The archived capture and test_filing_faq.py reproduce the change."
+  "current_exception_authority": "November 27 owner direction to repair the demonstrated Saugus multi-topic FAQ and linked official PDF form failure while retaining all negative controls, stage isolation, and payment safeguards."
 }

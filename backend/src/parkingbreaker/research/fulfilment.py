@@ -608,6 +608,42 @@ def _physical_item(item: str) -> bool:
     ) and not bool(re.search(r"\bcopy of (?:the |an? |your )?original\b", item, re.I))
 
 
+_NON_OWNER_PERMISSION_RULE = re.compile(
+    r"\bif no,\s*then you must provide documentation\s*(?:\(letter\)\s*)?"
+    r"from (?:the )?vehicle owner giving you permission to "
+    r"(?:appeal|contest|dispute)\b",
+    re.I,
+)
+_CITATION_COPY_ITEMS = frozenset(
+    {
+        "citation copy",
+        "copy of citation",
+        "copy of the citation",
+        "copy of your citation",
+        "ticket copy",
+        "copy of ticket",
+        "copy of the ticket",
+        "copy of your ticket",
+    }
+)
+_CONDITIONAL_PLACARD_ITEM = re.compile(
+    r"copy of (?:your |the |an? )?(?:hp|hvp|handicap\w*|disabled|accessible) placard"
+    r"\s*\((?:if|when) applicable\)[.]?",
+    re.I,
+)
+_PLACARD_VIOLATION = re.compile(
+    r"\b(?:hp|hvp|handicap\w*|disabled|accessible|placard)\b",
+    re.I,
+)
+
+
+def _ticket_is_placard_violation(ticket: Ticket | None) -> bool:
+    if ticket is None or not ticket.violation_code.strip():
+        return True
+    violation_text = f"{ticket.violation_code} {ticket.violation_description or ''}"
+    return bool(_PLACARD_VIOLATION.search(violation_text))
+
+
 def standing_question_applies(quote: str) -> bool:
     return bool(
         re.search(
@@ -615,6 +651,7 @@ def standing_question_applies(quote: str) -> bool:
             quote,
             re.I,
         )
+        or _NON_OWNER_PERMISSION_RULE.search(" ".join(quote.split()))
     )
 
 
@@ -674,7 +711,8 @@ def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
     )
     if not re.search(
         r"\b(?:must|required|shall|only|eligible)\b"
-        r"|^(?:include|complete|enclose|attach|submit|provide|sign|return)\b",
+        r"|^(?:include|complete|enclose|attach|submit|provide|sign|return)\b"
+        r"|\bmail (?:your |an? |the )?(?:appeal|contest|dispute)(?: letter| request)? with\b",
         scoped_quote,
         re.I,
     ) or re.search(
@@ -699,6 +737,8 @@ def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
     if _identifier_requirement_kind(key, item, scoped_quote) is not None:
         return True
     if key is FactKey.CONTEST_ELIGIBILITY:
+        if _NON_OWNER_PERMISSION_RULE.search(" ".join(quote.split())):
+            return True
         return standing_question_applies(quote) and not re.search(
             r"\b(?:proof|document|registration|copy)\b",
             quote,
@@ -739,8 +779,10 @@ def requirement_interpretable(key: FactKey, item: str, quote: str) -> bool:
         return True
     if key is FactKey.MANDATORY_FORMS or "form" in item.casefold():
         return bool(_document_name(item))
+    if key is FactKey.REQUIRED_ITEMS and _CONDITIONAL_PLACARD_ITEM.fullmatch(_inventory_item(item)):
+        return True
     return key is FactKey.REQUIRED_ITEMS and (
-        item.casefold() in {"citation number", "citation copy", "copy of citation"}
+        item.casefold() in {"citation number", *_CITATION_COPY_ITEMS}
         or bool(re.fullmatch(r"copy of (?:the )?[\w -]+", item, re.I))
     )
 
@@ -945,6 +987,11 @@ def packet_fulfillment_pending(
         return plan is not None and requirement_fulfilled(
             key, item, quote, plan, sources=sources, ticket=ticket
         )
+    if key in {
+        FactKey.REQUIRED_ITEMS,
+        FactKey.TICKET_SPECIFIC_REQUIREMENTS,
+    } and _CONDITIONAL_PLACARD_ITEM.fullmatch(_inventory_item(item)):
+        return not _ticket_is_placard_violation(ticket)
     return requirement_interpretable(key, item, quote)
 
 
@@ -990,6 +1037,8 @@ def requirement_fulfilled(
             ticket=ticket,
         )
     if key is FactKey.CONTEST_ELIGIBILITY:
+        if _NON_OWNER_PERMISSION_RULE.search(" ".join(quote.split())):
+            return vehicle_relationship == "REGISTERED_OWNER"
         # A relationship answer proves standing only; a separate proof requirement is
         # not satisfied by the answer and is never treated as an enclosure.
         return (
@@ -1005,6 +1054,11 @@ def requirement_fulfilled(
                 re.I,
             )
         )
+    if key is FactKey.REQUIRED_ITEMS and _CONDITIONAL_PLACARD_ITEM.fullmatch(_inventory_item(item)):
+        if not _ticket_is_placard_violation(ticket):
+            return True
+        if plan.frozen_pdf is None:
+            return False
     if plan.frozen_pdf is None:
         if ticket is not None and (
             key is FactKey.MANDATORY_FORMS
@@ -1033,7 +1087,7 @@ def requirement_fulfilled(
             if item.casefold() == "citation number":
                 expected = _expected_citation_reference(plan)
                 return expected is not None and _citation_reference_present(text, expected)
-            if item.casefold() in {"citation copy", "copy of citation"}:
+            if item.casefold() in _CITATION_COPY_ITEMS:
                 return any(
                     (page.extract_text() or "").startswith("Copy of citation") and page.images
                     for page in reader.pages

@@ -39,6 +39,7 @@ from parkingbreaker.research.procedure import (
     procedure_stage,
     quote_jurisdiction_matches,
     quote_procedure_section,
+    quote_procedure_sections,
     quote_procedure_stage,
     requirement_sentences,
     same_stage,
@@ -213,7 +214,7 @@ def apply_quote_guard(
                 if f.key not in SILENCE_KEYS or f.value != []
                 else "missing complete-procedure assessment"
                 if a is None or page is None
-                else assessment_problem(a, page)
+                else assessment_problem(a, page, sources)
             )
             if (
                 problem is None
@@ -245,6 +246,10 @@ def apply_quote_guard(
                 if is_code_publisher(other.final_url) and other.jurisdiction != a.jurisdiction:
                     continue
                 for section in procedure_sections(other.text):
+                    if "[Tab/accordion content]" in section.text and not re.search(
+                        r"\b(?:parking|citations?|tickets?)\b", section.text, re.I
+                    ):
+                        continue
                     for quote in requirement_sentences(f.key, section.text):
                         other_stage = section.stage
                         if other_stage is not None and not same_stage(other_stage, a.stage):
@@ -357,9 +362,9 @@ def apply_quote_guard(
                 continue
             if f.scope_quote is not None and not any(
                 verify_quote(f.scope_quote, by_sha[sha].text)
-                and (fact_section := quote_procedure_section(by_sha[sha].text, f.verbatim_quote))
+                and (scope_section := quote_procedure_section(by_sha[sha].text, f.scope_quote))
                 is not None
-                and quote_procedure_section(by_sha[sha].text, f.scope_quote) == fact_section
+                and scope_section in quote_procedure_sections(by_sha[sha].text, f.verbatim_quote)
                 for sha in verified
             ):
                 guarded.append(_downgrade(f, "quote guard: scope quote not in fact's section"))
@@ -367,9 +372,11 @@ def apply_quote_guard(
         supported = value_supported_by_quote(f.key, f.value, f.verbatim_quote)
         if f.key is FactKey.DEADLINE_CLOCK_START:
             supported = all(
-                (clock_section := quote_procedure_section(by_sha[sha].text, f.verbatim_quote))
-                is not None
-                and clock_quote_supported_by_source(f.value, f.verbatim_quote, clock_section.text)
+                bool(clock_sections := quote_procedure_sections(by_sha[sha].text, f.verbatim_quote))
+                and all(
+                    clock_quote_supported_by_source(f.value, f.verbatim_quote, clock_section.text)
+                    for clock_section in clock_sections
+                )
                 for sha in verified
             )
         if not supported:

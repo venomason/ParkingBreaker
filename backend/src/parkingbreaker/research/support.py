@@ -126,7 +126,7 @@ _DEADLINE_CUE_AFTER = re.compile(
 _ISSUE_TRIGGER = re.compile(
     r"\b(?:of|from|after|following|starting|beginning on)\s+(?:the\s+)?"
     r"(?:(?:parking|citation|ticket)\s+)?issue(?:\s+date)?\b"
-    r"|\b(?:of|from|after|following)\s+(?:the\s+)?citation date\b"
+    r"|\b(?:of|from|after|following)\s+(?:the\s+)?(?:citation|ticket) date\b"
     r"|\b(?:citation|ticket)\s+(?:was|is)\s+issued\b",
     re.IGNORECASE,
 )
@@ -625,7 +625,7 @@ def value_supported_by_quote(key: FactKey, value: JsonValue, quote: str) -> bool
         case FactKey.MAIL_IN_ACCEPTED:
             # A mention of a mailing address or mailed payments is not a contest route.
             # Unsupported wording stays UNKNOWN; never infer permission from the registry.
-            if value is not True or _NEGATION.search(quote):
+            if value is not True or _NEGATION.search(quote) or _OTHER_PURPOSE.search(quote):
                 return False
             return bool(
                 re.fullmatch(
@@ -633,6 +633,8 @@ def value_supported_by_quote(key: FactKey, value: JsonValue, quote: str) -> bool
                     r"(?:received|postmarked)[^.!?;]*[.]?"
                     r"|you (?:may|can)(?: also)? (?:(?:submit|send|file|request) "
                     rf"(?:your |an? |the )?)?{_CONTEST}\b[^.!?;]*\bby mail[.]?"
+                    rf"|you (?:may|can)(?: also)? mail (?:your |an? |the )?{_CONTEST}"
+                    r"(?: letter| request| form)?\b[^.!?;]*[.]?"
                     r"|to (?:submit|send|file|request) (?:your |an? |the )?"
                     rf"{_CONTEST} by mail\b[^.!?;]*[.:]?"
                     rf"|to submit (?:your |an? |the ){_CONTEST} via mail, you must include:"
@@ -718,7 +720,9 @@ def value_supported_by_quote(key: FactKey, value: JsonValue, quote: str) -> bool
                     and bool(
                         re.search(
                             r"\b(?:must|required|only|shall|eligible)\b"
-                            r"|^(?:include|complete|enclose|attach|submit|provide|sign|return)\b",
+                            r"|^(?:include|complete|enclose|attach|submit|provide|sign|return)\b"
+                            r"|\bmail (?:your |an? |the )?(?:appeal|contest|dispute)"
+                            r"(?: letter| request)? with\b",
                             lowered,
                         )
                     )

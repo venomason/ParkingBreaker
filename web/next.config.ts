@@ -4,6 +4,8 @@ import type { NextConfig } from "next";
 // nothing secret is exposed: worker steps go through the server-only dev-worker route.
 // Next writes these rewrites at build time. Remote deployments must supply their
 // reachable PB_API_ORIGIN during `next build`; a runtime-only value cannot retarget them.
+// Upgrade candidate: terminate `/api/*` directly in Caddy at runtime so one immutable
+// Next.js build artifact can serve any rehearsal or production API origin without rebuilds.
 const apiOrigin = process.env.PB_API_ORIGIN || "http://127.0.0.1:8000";
 
 const mode = process.env.PB_PROVIDER_MODE;

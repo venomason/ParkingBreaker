@@ -220,6 +220,9 @@ class ResearchResult:
             and same_stage(stage, self.manifest.stage)
             and _violation_key(ticket.violation_code) == _violation_key(self.ticket.violation_code)
             and ticket.violation_description == self.ticket.violation_description
+            # Upgrade candidate: when DEADLINE_ABSOLUTE.applicable is False and re-fetched .gov
+            # SHA-256s match, scope reuse by (issuer, stage, violation_code) without requiring
+            # identical issue_date, while resolving each driver's deadline from their own ticket.
             and ticket.issue_date == self.ticket.issue_date
             and timedelta(0) <= now - self.started_at < RESEARCH_REUSE_WINDOW
             and not unread_linked_artifacts(self.sources)

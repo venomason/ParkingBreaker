@@ -1,0 +1,3034 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<!-- Google Tag Manager for GA4 -->
+				<script>(function(w,d,s,l,i){w.GAMeasurementID='G-5C9XZ8FKW1';w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+				'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','cpDataLayerGA4','GTM-K73C5PS');</script>
+				<!-- End Google Tag Manager for GA4 -->
+				<script type='text/javascript'>
+					var enableTelemetry = 'false'
+					var aiConfig = {
+					instrumentationKey: '1cde048e-3185-4906-aa46-c92a7312b60f'						
+					}
+					var appInsights = window.appInsights || function (a) { function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement('script'); b.src = a.url || 'https://js.monitor.azure.com/scripts/a/ai.0.js', d.getElementsByTagName('script')[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ['Event', 'Exception', 'Metric', 'PageView', 'Trace', 'Dependency']; f.length;)b('track' + f.pop()); if (b('setAuthenticatedUserContext'), b('clearAuthenticatedUserContext'), b('startTrackEvent'), b('stopTrackEvent'), b('startTrackPage'), b('stopTrackPage'), b('flush'), !a.disableExceptionTracking) { f = 'onerror', b('_' + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c['_' + f](a, b, d, e, h), i } } return c }(aiConfig);
+					window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length;
+					// Add telemetry initializer
+					appInsights.queue.push(function() {
+						appInsights.context.addTelemetryInitializer(function(envelope) {
+							var telemetryItem = envelope.data.baseData;
+							// To check the telemetry item’s type:
+							if (!false)
+							{
+								//If the telemetry is not enabled, we still want to capture Google map custom event, so only allow that
+								if (envelope.name.indexOf('.Event') == -1)
+									return false;
+							}
+						});
+					});						
+					appInsights.trackPageView();
+				</script>
+	<script>
+		function populateAntiForgery(token) {
+			var input = document.createElement("input");
+			input.name = "__RequestVerificationToken";
+			input.type = "hidden";
+			input.value = token;
+			var absPat = /^https?:\/\/|^\/\//i;
+			var forms = document.getElementsByTagName("form");
+			for (var i = 0; i < forms.length; i++) {
+				if (forms[i].method == "post" &&
+					!forms[i].querySelector('[name="__RequestVerificationToken"]') &&
+					!absPat.test(forms[i].getAttribute("action"))) {
+					forms[i].appendChild(input.cloneNode());
+				}
+			}
+		}
+
+		function getAntiForgeryToken(callback, error) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "/antiforgery");
+			xhr.addEventListener("load", function() {
+				try {
+					if (this.status !== 200) {
+						throw Error("Invalid status. Could not retrieve antiforgery token.");
+					}
+					var obj = JSON.parse(this.responseText);
+					callback(obj.token);
+				} catch (e) {
+					typeof error === "function" && error(e);
+				}
+			});
+			xhr.send();
+		}
+
+		getAntiForgeryToken(function(token) {
+			if (document.readyState === "complete"
+				|| document.readyState === "loaded" 
+				|| document.readyState === "interactive") {
+				populateAntiForgery(token);
+				return;
+			}
+			document.addEventListener("DOMContentLoaded", function() {
+				populateAntiForgery(token);
+			}, false);
+		}, console.error);
+	</script>
+			
+
+	<script type="text/javascript">
+		window.departmentHeader = {};
+		window.pageSectionTracker = {};
+		window.isResponsiveEnabled = true;
+		window.isRemoveSetHeights= true;
+		if (window.isRemoveSetHeights) {
+			document.documentElement.className += ' removeSetHeights';
+		}
+		window.mainMenuMediaQuery = 'screen and (max-width: 40em)';
+		window.isMobileBrowserIncludingTablets = false;
+		window.fixedResponsiveMenu = false;
+		window.fullWidthResponsiveMenu = true;
+		window.responsiveMenuHeight = '';
+		window.responsiveMenuFontSize = '';
+		window.isContentAdvisor = false;
+		(function () {
+			window.setSizeCookie = function () {
+				document.cookie = "dpi=" + window.devicePixelRatio + "; path=/";
+				document.cookie = "viewportWidth=" + window.innerWidth + "; path=/";
+				document.cookie = "viewportHeight=" + window.innerHeight + "; path=/";
+				if (screen && screen.width && screen.height) {
+					document.cookie = "screenWidth=" + screen.width + "; path=/";
+					document.cookie = "screenHeight=" + screen.height + "; path=/";
+				}
+				document.cookie = "responsiveGhost=1; path=/";
+			};
+
+			setSizeCookie();
+		}());
+	</script>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script async src="https://docaccess.com/docbox.js"></script>
+	
+	
+	
+	<meta name="theme-color" content="rgb(131, 0, 20)">
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+	
+
+	<script src="/Assets/Scripts/jQuery/jquery-3.7.1.min.js"></script>
+	<script src="/Assets/Scripts/jQuery/jquery-migrate-3.6.0.min.js" type="text/javascript"></script>
+	
+
+	<!--[if IE 6]><script language="JavaScript" type="text/javascript"> var isie6 = true; </script><![endif]-->
+	<!--[if IE 7]><script language="JavaScript" type="text/javascript"> var isie7 = true; </script><![endif]-->
+	<!--[if IE 8]><script language="JavaScript" type="text/javascript"> var isie8 = true; </script><![endif]-->
+	<!--[if IE 9]><script language="JavaScript" type="text/javascript"> var isie8 = true; </script><![endif]-->
+	<script type="text/javascript"><!--
+	var intCountryCode = 840;
+	var order = '';
+//--></script>
+	
+<link href="/-681783051.css" rel="stylesheet" type="text/css">	<link href="/-2140275272.css" rel="stylesheet" type="text/css">	<link href="/-1241289205.css" rel="stylesheet" type="text/css">
+
+	<link rel="stylesheet" type="text/css" href="/Assets/Styles/Print.css" media="print">
+	<script type="text/javascript">
+		window.Pages = window.Pages || {};
+		// FrontEnd RWD initialization
+		window.Pages.rwdReady = $.Deferred();
+		window.Pages.toolBarDeferred = $.Deferred();
+		window.Pages.rwdSetupComplete = $.Deferred();
+		window.Pages.megaMenuLoaded = $.Deferred();
+		window.Pages.angularToolbarComplete = $.Deferred();
+		window.Pages.frontEndToolbarComplete = $.Deferred();
+	</script>
+	<!--CPHeadContent-->
+	<script src="/739942322.js" type="text/javascript"></script>
+	
+	
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAQs - CivicPlus.CMS.FAQ</title>
+    <link rel="stylesheet" href="/static/FAQ/css/styles.css?v=xgyzQN0C30-KaOyfHTqYYriyDjd6D9Zk38DO7BNOpPs" />
+
+
+
+	<!--[if lte IE 8]><link rel="stylesheet" type="text/css" href="/App_Themes/ie8.css"><![endif]-->
+	<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/App_Themes/ie7.css"><![endif]-->
+	<!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="/App_Themes/ie6.css"><![endif]-->
+	<!--[if lt IE 9]><script type="text/javascript" src="/Scripts/html5.js"></script><![endif]-->
+
+	<script type="text/javascript">
+		setEditorVariables(false, 840);
+		function getPrintPreviewType() { return 0; } function printPreview() {pPreview(getPrintPreviewType()); }
+	</script>
+	<script src="/Assets/Scripts/AlpineJS/3.14.1/alpine.min.js" type="text/javascript" defer="defer"></script>
+</head>
+<body class="wide ">
+
+    <script>jQuery(document).click(function (event) {
+	var target = jQuery(event.target);
+	if (target.attr('src') && target.parents('.image').length && target.parents('.widget').length) {
+		var text = target.attr('title');
+		
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Image',
+				eventAction: 'Image - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.is('button') || target.hasClass('button') || target.parents().hasClass('button')) {
+		var text = "";
+		if (target.parents('.button')[0]) {
+			text = target.parents('.button').first().text();
+		} else if (target.text().length) {
+			text = target.text();
+		} else if (target.attr('title').length) {
+			text = target.attr('title');
+		}
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Button',
+				eventAction: 'Button - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.widgetCustomHtml').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Custom Html',
+				eventAction: 'Custom Html Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.editor').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Editor',
+				eventAction: 'Editor Link Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.GraphicLinks').length) {
+		var text = "";
+		var targetGraphicLink = target;
+		if (target.hasClass('widgetGraphicLinksLink')) {
+			targetGraphicLink = jQuery(target.children()[0]);
+		}
+		if (targetGraphicLink.hasClass('text')) {
+			text = targetGraphicLink.text();
+		} else if (targetGraphicLink.attr('src').length) {
+			if (targetGraphicLink.attr('alt').length) {
+				text = targetGraphicLink.attr('alt');
+			} else {
+				text = targetGraphicLink.attr('src');
+			}
+		} else {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Graphic Links',
+				eventAction: 'Graphic Link - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.InfoAdvanced').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Info Advanced',
+				eventAction: 'Info Advanced Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.list').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'List',
+				eventAction: 'List Clicked',
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.megaMenuItem').length || target.parents('.topMenuItem').length) {
+		var megaMenuText = jQuery('.topMenuItem.mouseover').find('span').text();
+		var breadCrumbs = [];
+		jQuery('.breadCrumbs > li').each(function () {
+			 breadCrumbs.push(this.textContent);
+		});
+		var pageTitle = breadCrumbs.join('>');
+		var subTitleText = target.parents('.megaMenuItem').children('.widgetTitle').children().text();
+		var text = "";
+		if (pageTitle) {
+			text += pageTitle + " | ";
+		} else {
+			text += document.title + ' - ';
+		}
+		if (target.text() == "" && megaMenuText == "") {
+			text += "N/A";
+		} else if (target.text().length && megaMenuText.length) {
+			if (megaMenuText == target.text()) {
+				text += megaMenuText;
+			} else {
+				text += megaMenuText + " - " + subTitleText + " - " + target.text();
+			}
+		} else if (target.text() == "") {
+			text += megaMenuText;
+		} else {
+			text += target.text();
+		}
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Mega Menu',
+				eventAction: 'Mega Menu : ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.widgetNewsFlash').length && target.parents('.widgetItem').length) {
+		var text = jQuery(target.parents('.widgetItem')[0]).find('.widgetTitle').children().text();
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'News Flash',
+				eventAction: 'News Flash - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.hasClass('widgetQuickLinksLink') || target.find('.widgetQuickLinksLink').length) {
+		var text = target.text();
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Quick Links',
+				eventAction: 'Quick Links - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.attr('src') && target.parents('.cpSlideshow').length) {
+		var text = target.attr('title');
+		if (!text.length) {
+			text = "N/A";
+		}
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Slideshow',
+				eventAction: 'Slideshow - ' + text,
+				eventLabel: window.location.href
+			});
+	}
+	if (target.parents('.widgetText').length) {
+		ga('send',
+			{
+				hitType: 'event',
+				eventCategory: 'Text',
+				eventAction: 'Text Link Clicked',
+				eventLabel: window.location.href
+			});
+	}
+});</script>
+	<div id="popoverModal" class="cp-PopOver cp-PopOver--modal cp-AdminWrap" style="position: fixed; display: none;">
+	<div class="cp-PopOver-header">
+		<h3 class="cp-PopOver-title"></h3>
+		<button class="cp-Btn cp-PopOver-close" onclick="closePopOverModal(event)">
+			<svg class="cp-Icon--close" alt="close" title="close">
+				<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#iconClose"></use>
+			</svg>
+		</button>
+	</div>
+	<div id="cpPopOverBody" class="cp-PopOver-body">
+		<form id="cpPopOverForm" name="cpPopOverForm" novalidate></form>
+	</div>
+	<div id="cpPopOverFooter" class="cp-PopOver-footer">
+		<div class="cp-BtnGroup" id="actionButtons">
+			<!-- Action buttons will be dynamically added here -->
+		</div>
+	</div>
+</div>
+    <div id="fb-root"></div>
+<div id=skipToContentLinks>
+<a href="#contentarea" target="_self" class="skipToContentLink">Skip to Main Content</a>
+</div>
+    <form id="frmReferenceFormForTelerikEditorDialogs"></form>
+
+        <input type="hidden" id="GoogleMapsKey" value="AIzaSyDWUuE-ifkbhxblF920N8MjpBdTg1Wt784">
+
+
+
+    <input type="hidden" id="cpcDomain" value="https://cp-civicplusuniversity2.civicplus.com">
+    <input type="hidden" id="hdnStructureID" value="2">
+    <input type="hidden" id="hdnContentCollectionID" value="9dd17759-87ea-4283-9b9c-cb1c70ebe70c">
+    <input type="hidden" id="hdnWorkingCopyID" value="00000000-0000-0000-0000-000000000000">
+    <input type="hidden" id="hdnThemeID" value="17">
+    <input type="hidden" id="pageIsFrontEnd" value="true">
+    <input type="hidden" id="pageModuleID" value="25">
+    <input type="hidden" id="pagePageID">
+
+        <input type="hidden" id="hdnModuleID" value="25">
+            <img id="imgLogoPrintPreview" src="/ImageRepository/Document?documentID=27" alt="Saugus, MA">
+<div id="stickyPlaceholder"></div>
+    <div id="outer-wrap" class="outer-wrap">
+        <div id="inner-wrap" class="inner-wrap">
+                <div id="divToolbars" class="cpToolbars newCP mui-fixed" style="">
+                    
+
+
+
+<!-- Begin Signed Out Bar -->
+<div class="cpToolbar user public">
+    <div class="inner selfClear">
+        <p class="dropdown"><a href="/MyAccount/ProfileCreate" class="myConnections" id="signedOutToolbarCreateProfileButton">Create a Website Account</a> <span class="welcomeMessage">- Manage notification subscriptions, save form progress and more. &nbsp;&nbsp;</span></p>
+        <ul class="nav secondary">
+	        <li><a href="/MyAccount" class="button" id="loggedOutToolbarSignInButton">Website Sign In</a></li>
+        </ul>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#signedOutToolbarCreateProfileButton').click(function (event) {
+            event.preventDefault();
+            window.location.href = '/MyAccount/ProfileCreate?from=url&url=/&dn=' + window.location.origin;
+        });
+
+			
+				$('#loggedOutToolbarSignInButton').click(function (event) {
+					event.preventDefault();
+					window.location.href = '/MyAccount/?from=url&url=' + encodeURIComponent(window.location.href.replace(window.location.origin, '')) + '&dn=' + window.location.host;
+				});
+			
+
+		if ('False' == 'True') {
+            $('#loggedOutToolbarSignInButton').hide();
+		}
+    })
+</script>
+<!-- End Signed Out Bar -->
+
+                </div>
+            <div id="bodyWrapper">
+                <div id="mainNavHolderMobile" class="mainNavHolderMobile"></div>
+                
+<div data-cprole="structuralContainer" id="bodyContainerTS">
+<!-- Header Container --><header data-cprole="structuralContainer" id="headerContainerTS" class="fixedTopTS">
+<div class="siteWrap3" id="flexHeaderTS"><div data-cprole="banner" id="bannerLogoTS" class="bannerLogoTS empty">
+
+
+
+
+				<a id="bannerLogoTS-58" style="			display: block; text-align: center;
+" class="bannerObject" href="/" target="_self"><img alt="Saugus Massachusetts Home Page" class="bannerObject" height="332" src="/ImageRepository/Document?documentID=93" width="1104"></a>
+</div><nav data-cprole="nav" id="mainNav" class="siteNav mainNav" role="navigation">
+<ol id="mainNavMenu" data-parent="1" class="rootNavMenu" role="menu"><!--
+--><li id="MainItem27" class="topMenuItem" role="none" data-pageid="27" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu27" id="mainNavDepartments" class="navMainItem mainNavItem mainNavItem1 " href="/27/Departments" target="_self">   Departments  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem163" class="topMenuItem" role="none" data-pageid="163" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu163" id="mainNavBoardsCommittees" class="navMainItem mainNavItem mainNavItem2 " href="/163/Boards-Committees" target="_self">   Boards &amp; Committees  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem31" class="topMenuItem" role="none" data-pageid="31" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu31" id="mainNavCommunity" class="navMainItem mainNavItem mainNavItem3 " href="/31/Community" target="_self">   Community  </a>			<!--
+			--><!--
+			--></li><!----><li id="MainItem9" class="topMenuItem" role="none" data-pageid="9" data-displaymegamenu="True"><!--
+			--><!--
+			--> <a role="menuitem" aria-haspopup=true aria-expanded='false' aria-controls="mainNavMegaMenu9" id="mainNavHowDoI" class="navMainItem mainNavItem mainNavItem4 " href="/9/How-Do-I" target="_self">   How Do I...  </a>			<!--
+			--><!--
+			--></li><!---->
+</ol>
+
+
+	<script type="text/javascript">
+		(function () {
+			function setupMenu() {
+				const menuID = 'mainNavMenu';
+				const menuType = MAIN_MENU;
+
+				//setup menu manager properties for main menu
+				if (!menuManager.mobileMainNav && true)
+					menuManager.adjustMainItemsWidth('#' + menuID);
+				menuManager.isMainMenuEditable = false;
+				menuManager.mainMenuMaxSubMenuLevels = 4;
+				menuManager.setMOMMode(2, menuType);
+
+				//Init main menu
+				const setupDraggable = menuManager.isMainMenuEditable;
+				const urlToGetHiddenMenus = '/Pages/MenuMain/HiddenMainSubMenus?pageID=1&moduleID=25&themeID=17&menuContainerID=mainNav';
+
+				menuManager.setupMenu(menuID, 'mainNav', menuType, setupDraggable, urlToGetHiddenMenus);
+				menuManager.mainMenuInit = true;
+				menuManager.mainMenuTextResizer = false;
+				if (1.00 > 0)
+					menuManager.mainMenuTextResizerRatio = 1.00;
+				if (window.isResponsiveEnabled)
+					menuManager.mainMenuReady.resolve();
+
+			}
+
+			if (document.readyState === "complete"
+				|| document.readyState === "loaded"
+				|| document.readyState === "interactive") {
+				setupMenu();
+				return;
+			}
+
+			document.addEventListener("DOMContentLoaded", setupMenu);
+		})();
+	</script>
+
+
+<aside data-cprole="megaMenu" id="megaMenu" class="megaMenu" style="display: none;"><input type="hidden" id="megaMenuPopupDirection" value="0"><input type="hidden" id="megaMenuWidthReference" value="0"><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu27" class="contentTop mainNavMegaMenu megaMenuContainer pageID_27 hidden" data-orientation="horizontal">	<div id="cc50a8e5a4-5010-4cca-bb50-e487cb1699df" data-containerid="50a8e5a4-5010-4cca-bb50-e487cb1699df" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu163" class="contentTop mainNavMegaMenu megaMenuContainer pageID_163 hidden" data-orientation="horizontal">	<div id="cc1fd1217b-342c-4bec-8cd2-0cdb7a36bcf6" data-containerid="1fd1217b-342c-4bec-8cd2-0cdb7a36bcf6" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu31" class="contentTop mainNavMegaMenu megaMenuContainer pageID_31 hidden" data-orientation="horizontal">	<div id="cc03908865-76d2-4356-ab0b-5eebe31ed4c6" data-containerid="03908865-76d2-4356-ab0b-5eebe31ed4c6" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside><aside role="menu" data-cprole="contentContainer" id="mainNavMegaMenu9" class="contentTop mainNavMegaMenu megaMenuContainer pageID_9 hidden" data-orientation="horizontal">	<div id="cc08e5b51c-71e6-4fa8-94f0-af798da23c3a" data-containerid="08e5b51c-71e6-4fa8-94f0-af798da23c3a" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</aside></aside></nav><div data-cprole="contentContainer" id="searchTS">	<div id="cc15839c42-a33b-4995-ab42-c7c5770ebc54" data-containerid="15839c42-a33b-4995-ab42-c7c5770ebc54" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col24 first last" style="" data-widgetcontainerid="e117fbe0-2a16-49e3-8719-0659c4a5fe53">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col24 first last id77ed2e3c-3a87-4d47-b611-5cbb23f114ad" style="" data-widgetcontainerid="77ed2e3c-3a87-4d47-b611-5cbb23f114ad">	
+<div data-widget-id="4e3c86a9-b2a8-4fdd-bc96-8c1590b27898" data-widget-controller-path="/Layout/WidgetSearch">
+	
+	<script defer type="text/javascript" src="/Common/Controls/jquery-ui-1.14.2/jquery-ui.min.js"></script>
+	<script defer src="/Areas/Layout/Assets/Scripts/Search.js" type="text/javascript"></script>
+	<script defer type="text/javascript">
+
+		$(document).ready(function () {
+			try {
+				// Minimum characters required before performing a search/autocomplete
+				var minPrefixLength = 3;
+				var autoCompleteDebounceDelay = 500;
+				var searchFieldSelector = "#searchField" + '4e3c86a9-b2a8-4fdd-bc96-8c1590b27898';
+				var checkboxSelector = "#ysnSearchOnlyDept" + '4e3c86a9-b2a8-4fdd-bc96-8c1590b27898';
+				var buttonSelector = ".widgetSearchButton" + '4e3c86a9-b2a8-4fdd-bc96-8c1590b27898';
+				var autoCompleteCache = {};
+				var autoCompleteCacheKeys = [];
+				var autoCompleteCacheLimit = 25;
+				var currentAutoCompleteRequest = null;
+				var currentAutoCompleteRequestKey = null;
+				var autoCompleteDebounceTimer = null;
+				var autoCompleteDebounceKey = null;
+				var pendingAutoCompleteResponses = [];
+
+				function normalizeAutoCompleteTerm(term) {
+					return $.trim((term || "") + "").replace(/\s+/g, " ");
+				}
+
+				function shouldSearch(term) {
+					return normalizeAutoCompleteTerm(term).length >= minPrefixLength;
+				}
+
+				function getAutoCompleteUrl() {
+					return '/Search/AutoComplete' + ($(checkboxSelector).is(':checked') || false? '?departmentId=0' : '');
+				}
+
+				function getAutoCompleteCacheKey(requestUrl, term) {
+					return requestUrl + "|" + term.toLowerCase();
+				}
+
+				function cacheAutoCompleteResult(cacheKey, data) {
+					if (!Object.prototype.hasOwnProperty.call(autoCompleteCache, cacheKey)) {
+						autoCompleteCacheKeys.push(cacheKey);
+						if (autoCompleteCacheKeys.length > autoCompleteCacheLimit) {
+							delete autoCompleteCache[autoCompleteCacheKeys.shift()];
+						}
+					}
+					autoCompleteCache[cacheKey] = data;
+				}
+
+				function respondToPendingAutoComplete(data) {
+					var responses = pendingAutoCompleteResponses;
+					pendingAutoCompleteResponses = [];
+					for (var i = 0; i < responses.length; i++) {
+						responses[i](data);
+					}
+				}
+
+				function cancelPendingAutoComplete() {
+					clearTimeout(autoCompleteDebounceTimer);
+					autoCompleteDebounceKey = null;
+					if (currentAutoCompleteRequest != null) {
+						currentAutoCompleteRequest.abort();
+						currentAutoCompleteRequest = null;
+					}
+					currentAutoCompleteRequestKey = null;
+					respondToPendingAutoComplete([]);
+				}
+
+				function createWidgetAutoCompleteSource(options) {
+					return function (request, response) {
+						var term = normalizeAutoCompleteTerm(request.term);
+						if (!options.shouldSearch(term)) {
+							response([]);
+							return;
+						}
+
+						var requestUrl = options.url();
+						var cacheKey = getAutoCompleteCacheKey(requestUrl, term);
+						if (Object.prototype.hasOwnProperty.call(autoCompleteCache, cacheKey)) {
+							response(autoCompleteCache[cacheKey]);
+							if (options.success) {
+								options.success(autoCompleteCache[cacheKey]);
+							}
+							return;
+						}
+
+						if (currentAutoCompleteRequestKey === cacheKey || autoCompleteDebounceKey === cacheKey) {
+							pendingAutoCompleteResponses.push(response);
+							return;
+						}
+
+						cancelPendingAutoComplete();
+						autoCompleteDebounceKey = cacheKey;
+						pendingAutoCompleteResponses.push(response);
+						autoCompleteDebounceTimer = setTimeout(function () {
+							autoCompleteDebounceKey = null;
+							currentAutoCompleteRequestKey = cacheKey;
+							currentAutoCompleteRequest = $.ajax({
+								url: requestUrl,
+								dataType: "json",
+								timeout: options.timeout,
+								data: {
+									term: term,
+								},
+								success: function (data) {
+									if (currentAutoCompleteRequestKey === cacheKey) {
+										cacheAutoCompleteResult(cacheKey, data);
+										respondToPendingAutoComplete(data);
+										if (options.success) {
+											options.success(data);
+										}
+									}
+								},
+								error: function (xmlhttprequest, textstatus, message) {
+									if (textstatus === "abort") {
+										return;
+									}
+
+									if (options.error) {
+										options.error(xmlhttprequest, textstatus, message);
+									}
+
+									respondToPendingAutoComplete([]);
+								},
+								complete: function (xmlhttprequest) {
+									if (currentAutoCompleteRequest === xmlhttprequest) {
+										currentAutoCompleteRequest = null;
+										currentAutoCompleteRequestKey = null;
+									}
+								}
+							});
+						}, options.delay);
+					};
+				}
+
+				// click handler for search buttons
+				$(buttonSelector).click(function (e) {
+					e.preventDefault();
+					var $btn = $(this);
+					var $field = $btn.siblings(".widgetSearchBox");
+					var term = $field.val() + "";
+					if (!shouldSearch(term)) {
+						// do nothing until user types enough characters
+						$field.focus();
+						return;
+					}
+
+					if ($(checkboxSelector).is(':checked') || false)
+					{
+						doWidgetSearch($.trim(term), Number(0));
+					}
+					else {
+						doWidgetSearch($.trim(term), 0);
+					}
+				});
+
+				// enter key handler for the search field
+				$(searchFieldSelector).keypress(function (e) {
+					var code = e.which || e.keyCode;
+					if (code === 13) {
+						e.preventDefault();
+						var $this = $(this);
+						var term = $this.val() + "";
+						if (!shouldSearch(term)) {
+							// do nothing until user types enough characters
+							$this.focus();
+							return false;
+						}
+
+						if ($(checkboxSelector).is(':checked') || false) {
+							doWidgetSearch($.trim(term), Number(0));
+						} else {
+							doWidgetSearch($.trim(term), 0);
+						}
+						return false;
+					}
+					return true;
+				});
+
+				// autocomplete: set minLength and guard source
+				if (true) {
+					var $searchField = $(searchFieldSelector).autocomplete({
+						minLength: minPrefixLength,
+						source: createWidgetAutoCompleteSource({
+							delay: autoCompleteDebounceDelay,
+							timeout: 10000,
+							shouldSearch: shouldSearch,
+							url: getAutoCompleteUrl,
+							success: function () {
+								$('.autoCompleteError').remove();
+							},
+							error: function (xmlhttprequest, textstatus, message) {
+								if (textstatus === "timeout") {
+									if ($(searchFieldSelector).siblings('.autoCompleteError').length == 0)
+										$('<span class="autoCompleteError"><p class="alert error">Search autocomplete is currently not responding. Please try again later.</p></span>').insertAfter($(searchFieldSelector));
+								}
+							}
+						}),
+						html: true,
+						delay: 0,
+						select: function (event, ui) {
+							$(this).val(ui.item.value);
+							$(this).next().click();
+						}
+					});
+
+					$searchField.data("ui-autocomplete")._renderItem = function (ul, item) {
+						return $("<li class=\"itemList\"></li>")
+							.data("ui-autocomplete-item", item)
+							.append("<a>" + item.label + "</a>")
+							.appendTo(ul);
+					};
+				}
+
+				// keep searchBtnApplyQuery consistent with prefix rule
+				window.searchBtnApplyQuery = function() {
+					var $field = $(searchFieldSelector);
+					var term = $field.val() + "";
+					if (shouldSearch(term)) {
+						// update href for the icon/button (if present)
+						var btn = document.getElementById("btnSearchIcon");
+						if (btn) btn.href = "/Search?searchPhrase=" + encodeURIComponent($.trim(term));
+					} else {
+						var btn = document.getElementById("btnSearchIcon");
+						if (btn) btn.href = "#";
+					}
+				};
+			}
+			catch(e) {} //we're going to eat this error. Autocomplete won't work but we dont wan't to break anything else on the page.
+		});
+	</script>
+
+	<section id="widgetPreviewSearch" class="widget widgetSearch skin43 widgetOptionSet15" style="display: block;" aria-label="Search">
+				<!-- For the button right and inside -->
+		<div class="widgetBody buttonRightInside">
+			<input class="widgetSearchBox widgetSearchBox4e3c86a9-b2a8-4fdd-bc96-8c1590b27898" cp5ph="true" id="searchField4e3c86a9-b2a8-4fdd-bc96-8c1590b27898" name="searchField" onchange="searchBtnApplyQuery();" placeholder="Search..." type="text" value="">
+						<a href="/Search/Results" id="btnSearchIcon" class="widgetSearchButton widgetSearchButton4e3c86a9-b2a8-4fdd-bc96-8c1590b27898" role="button"><img alt="Search" class="imageHover" data-hover="/ImageRepository/Document?documentID=94" data-image="/ImageRepository/Document?documentID=95" src="/ImageRepository/Document?documentID=95"></a>
+
+			<label class="searchLabel" aria-hidden="true" for="searchField4e3c86a9-b2a8-4fdd-bc96-8c1590b27898">Search</label>
+		</div>
+
+	</section>
+
+
+<style scoped>
+	  
+		.widgetSearch ::-webkit-input-placeholder {
+		color: #fff;
+	  }
+		.widgetSearch :-moz-placeholder { /* Firefox 18- */
+	   color: #fff;
+	}
+		.widgetSearch ::-moz-placeholder {  /* Firefox 19+ */
+	   color: #fff;
+	}
+	.widgetSearch :-ms-input-placeholder {
+	   color: #fff;
+	}
+	
+
+	.widgetSearch .widgetBody .widgetSearchBox4e3c86a9-b2a8-4fdd-bc96-8c1590b27898
+	{
+		color: #fff;
+		font-family: DM Sans;
+height: 55px;
+border: 2px solid white;
+padding: 0 80px 0 20px;
+border-radius: 5px;
+box-shadow: 0px 3px 10px #00000033;
+background: #CC0020;
+	}
+	.widgetSearch .widgetBody .widgetSearchButton4e3c86a9-b2a8-4fdd-bc96-8c1590b27898
+	{
+		margin: 7px;
+width: 40px;
+	}
+	.widgetSearch .widgetSearch-onlyDept4e3c86a9-b2a8-4fdd-bc96-8c1590b27898
+	{
+		display: inline-block;
+		color: #333;
+		
+		
+		 padding-top: 10px;
+	}
+	#ysnSearchOnlyDept4e3c86a9-b2a8-4fdd-bc96-8c1590b27898
+	{
+		position: relative;
+		top: .125em;
+	}
+
+</style>
+
+<link rel="stylesheet" href="/Common/Controls/jquery-ui-1.14.2/jquery-ui.min.css">
+<link rel="stylesheet" href="/Common/Controls/jquery-ui-1.14.2/jquery-ui.theme.min.css">
+
+
+
+<script type="text/javascript">
+	//Updates search icons href to have the correct queryString
+	function searchBtnApplyQuery() {
+		document.getElementById("btnSearchIcon").href = "/Search?searchPhrase=" + document.getElementById("searchField4e3c86a9-b2a8-4fdd-bc96-8c1590b27898").value;
+	}
+</script>
+
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div></div>
+</header><!-- Banner --><div data-cprole="structuralContainer" id="bannerContainerTS" class="noOverflowTS">
+<div data-cprole="banner" id="banner1"><div data-cprole="structuralContainer" id="bannerSizingTS">
+<div data-cprole="structuralContainer" id="bannerSearchTS">
+<div class="siteWrap2"><div data-cprole="contentContainer" id="welcomeTS">	<div id="cc23ef93dd-ab67-44fc-b528-0eda0243f186" data-containerid="23ef93dd-ab67-44fc-b528-0eda0243f186" class="pageContent cpGrid cpGrid24 showInMobile">
+				                
+
+
+
+	</div>
+</div></div>
+</div>
+</div>
+
+
+
+
+		<div id="bannerImagesJSON56" class="hidden"></div>
+		<div id="bannerSlideshowControls_banner1" class="bannerSlideshowControlsNew none " style="display:none">
+			<a id="arrowPrev_banner1" tabindex="0" class="arrowNew prev" aria-label="Banner Arrow Previous"><svg style=" " class=""><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#iconSlideshowArrowLeft"></use></svg></a>
+			<a id="arrowNext_banner1" tabindex="0" class="arrowNew next" aria-label="Banner Arrow Next"><svg style=" " class=""><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#iconSlideshowArrowRight"></use></svg></a>
+		</div>
+			<script type="text/javascript">
+				$(window).on("load", function () {
+					$.when(window.Pages.rwdSetupComplete)
+						.done(function () {
+							renderExternalBannerSlideshow('banner1',
+								{"BannerOptionID":56,"ThemeID":17,"SlotName":"banner1","Name":"Default","IsDefault":true,"BannerMode":2,"SlideShowSlideTiming":null,"SlideshowTransition":0,"SlideShowTransitionTiming":null,"ImageScale":true,"ImageAlignment":1,"ImageScroll":true,"MuteSound":true,"VideoType":0,"Status":40,"SlideshowControlsPosition":0,"SlideshowControlsAlignment":0,"SlideshowBannerControlsColorScheme":0,"DisplayVideoPauseButton":false,"VideoPauseButtonAlignment":1,"VideoPauseButtonControlsAlignment":0,"VideoPauseButtonStyle":"#FFFFFF","VideoPauseButtonBackgroundStyle":"#000000","VideoPauseButtonAlignmentClass":"alignRight viewport","DisplaySlideshowPauseButton":false,"SlideshowControlsColor":"#FFFFFF","SlideshowControlsBackgroundColor":"#000000","SlideshowPauseButtonClass":"isHidden","BannerImages":[{"BannerImageID":70,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=92","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":1,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""},{"BannerImageID":71,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=90","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":2,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""},{"BannerImageID":72,"BannerOptionID":56,"FileName":"/ImageRepository/Document?documentID=89","Height":700,"Width":2200,"StartingOn":null,"StoppingOn":null,"IsLink":false,"LinkAddress":null,"Sequence":3,"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/","AltText":""}],"BannerVideos":[],"RecordStatus":0,"ModifiedBy":0,"ModifiedOn":"\/Date(-62135575200000)\/"},
+								'/App_Themes/Simple/Images/',
+								'Rotating');
+						});
+				});
+			</script>
+
+</div>
+</div><!-- Content container --><div data-cprole="structuralContainer" id="mainContainerTS">
+<div class="siteWrap2"><div data-cprole="structuralContainer" id="mainWrapTS" class="mainWrap" role="main">
+<div data-cprole="structuralContainer" id="outerContentWrapTS" class="outerContentWrap">
+<div data-cprole="structuralContainer" id="contentWrapTS" class="contentWrap">
+<div data-cprole="breadCrumbs" id="breadCrumbs" class="breadCrumbContainer">		<ol class="semanticList breadCrumbs" id="breadcrumb-list">
+
+    <li><a class="breadCrumb" href="/">Home</a></li>
+    <li><a class="breadCrumb" href aria-current="page">FAQ</a></li>
+</ol>
+
+	   
+    
+</div><div data-cprole="mainContentContainer" id="moduleContent">
+    <div id="outer-wrapper" class="redesign-container">
+        
+
+
+    <div class="pageStyles faq-container content container p-md-4 p-3 grid">
+        <!-- Header -->
+        <header class="faq-header">
+            
+
+<div id="faq-header-search" class="row gy-2 gy-md-0 mb-3">
+    <div class="col-md-8 order-md-1">
+        <div class="input-group"><input class="form-control rounded-pill border search-input" name="searchTerms" placeholder="Search and discover questions"
+       value="" aria-label="Search Input" type="search" id="search-input" hx-get="/m/faq" 
+       hx-trigger="change" hx-target="#main-wrapper" hx-swap="outerHTML" 
+       hx-push-url="true" hx-include="[name=&#x27;cat&#x27;]" asp-for="SearchTerms">
+<span class="input-group-append position-absolute module-search end-0">
+    <button class="btn btn-outline-secondary btn-search rounded-pill border-0 shadow-none" type="button" aria-label="Search"
+            hx-get="/m/faq" hx-target="#main-wrapper" hx-swap="outerHTML"
+            hx-push-url="true" hx-include="[name=&#x27;cat&#x27;]">
+        <svg aria-hidden="true"xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+             class="bi bi-search" viewBox="0 0 16 16">
+            <path
+                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+    </button>
+</span></div>
+    </div>
+    <div class="col-md-4 order-md-2">
+        <select class="form-select" name="cat" hx-get="/m/faq" hx-target="#main-wrapper" hx-include="[name='searchTerms']" hx-trigger="change" hx-push-url="true" aria-label="Category Name" id="CategoryId">
+            <option value="" data-template="">All categories</option>
+                <option value="17"  data-template="">Town Clerk</option>
+                <option value="18"  data-template="">Assessors Office</option>
+                <option value="19"  data-template="">Cemetery Department</option>
+                <option value="20"  data-template="">High School Project Building Committee</option>
+                <option value="21"  selected data-template="">Treasurer / Collector</option>
+        </select>
+    </div>
+</div>
+
+            <div class="align-middle header-links d-flex justify-content-end grid gap-sm-3 gap-2">
+            </div>
+        </header>
+        <!-- End of Header -->
+        <main role="main" id="main-wrapper">
+            <div class="row d-flex align-items-stretch">
+                <div class="col-sm-12 col-md-8">
+                    <h1 class="visually-hidden"><span class="headline">Frequently Asked Questions</span></h1>
+                    
+
+
+    <div id="faq-category-21" class="faq-category faq-category-21">
+        <style scoped>
+            .faq-category-21 {
+                --categoryColor: rgb(131, 0, 20);
+            }
+        </style>
+        <div id="faq-category-21-header" class="position-relative d-inline-flex align-items-center mb-3 edit-container">
+            <h2 class="m-0">Treasurer / Collector</h2>
+            <span class="badge text-body rounded-pill ms-2">32</span>
+            <button type="button" class="btn btn-outline-secondary lh-1 p-1 ms-2 border-0 shadow-none expand-collapse-button"
+                    title="Collapse all questions"
+                    aria-label="Collapse all questions"
+                    data-bs-target="#question-103, #question-104, #question-137, #question-136, #question-105, #question-106, #question-138, #question-140, #question-139, #question-107, #question-108, #question-109, #question-110, #question-111, #question-112, #question-113, #question-114, #question-141, #question-115, #question-117, #question-116, #question-118, #question-119, #question-120, #question-121, #question-142, #question-122, #question-143, #question-123, #question-124, #question-125, #question-126"
+                    data-category-id="21"
+                    data-action="collapse">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-contract" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" 
+                    d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707M15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707" />
+                </svg>
+            </button>
+        </div>
+
+
+        <ul class="nav nav-pills mb-2 ps-0" role="tablist">
+            <li class="nav-item faq-subcategory" role="presentation">
+                <button class="nav-link active primary" data-subcategory-id="0">All Content</button>
+            </li>
+
+        </ul>
+
+        <ul id="list-faq-category-21" aria-labelledby="faq-category-21-header"
+            class="faq-list-group list-group list-group-flush list-unstyled mb-0 ps-0">
+                
+
+
+<li id="question-103" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-103-answer" aria-expanded="true" aria-controls="question-103-answer">
+				What is the Real Estate Tax, Personal Property Tax &amp; Water-Sewer billing schedule?
+			</button>
+		</h3>
+		<div id="question-103-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><h2 class="subhead1">Real Estate and Personal Property Tax</h2><p><strong>Bill Date</strong></p><ul><li>January 1st</li><li>April 1st</li><li>July 1st</li><li>October 1st</li></ul><h2 class="subhead1">Quarterly Invoices</h2><h3 class="subhead2">Due Date</h3><p>30 Days after bill date - if falls on a weekend - next business day</p><h3 class="subhead2">Water / Sewer Bills</h3><p><strong>Meters are read in:</strong></p><ul><li>February</li><li>August</li></ul><h3 class="subhead2">Semi-Annual Invoices</h3><p><strong>Approximate Bill date</strong></p><ul><li>By last week in May</li><li>By last week in October</li></ul><h3 class="subhead2">Quarterly Invoices</h3><p><strong>Due Date</strong></p><p><span style="color: rgb(68, 68, 68); font-family: arial, helvetica, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(235, 235, 235); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;" data-pasted="true">30 Days after bill date - if falls on a weekend - next business day</span></p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-104" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-104-answer" aria-expanded="true" aria-controls="question-104-answer">
+				How can I pay my Real Estate, Personal Property, Excise, and Water/Sewer tax bills?
+			</button>
+		</h3>
+		<div id="question-104-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>All taxes can be paid by cash, personal check, or money order by mail or in person at the Town Hall.</p><p>In addition, you can pay your Real Estate Taxes online by credit card or ACH payment from your checking account. You can click on &quot;Online Payments&quot; left side of this page, to be taken to our online payment processing site with Unipay with Unibank.</p><p>If you are unable to make payment during regular business hours, a <strong>white</strong> payment / collection box is available in front of Town Hall for <strong>check</strong> or <strong>money order&nbsp;</strong>payments <strong>only</strong><strong>.</strong></p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-137" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-137-answer" aria-expanded="true" aria-controls="question-137-answer">
+				Need last calendar year&#x27;s tax payment amounts for your federal tax filing?
+			</button>
+		</h3>
+		<div id="question-137-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p data-pasted="true"><strong>Need copies of Excise, Property Tax, or Water/Sewer AMOUNTS to use to file your State and/or Federal tax return? &nbsp;&nbsp;</strong>We prefer to provide you the amounts in writing, so we can provide you a summary of tax payments that you require for Tax purposes. &nbsp;You can email us at <a href="/cdn-cgi/l/email-protection#c9bdbbaca8babcbbacbb89baa8bcaebcbae4a4a8e7aea6bf"><span class="__cf_email__" data-cfemail="f98d8b9c988a8c8b9c8bb98a988c9e8c8ad49498d79e968f">[email&#160;protected]</span></a> or contact the Treasurer/Collector&apos;s Office at 781-231-4135. &nbsp;Please allow up to 24 hours for your reports to be emailed back to you.</p><p><strong>No printer at home?&nbsp;</strong> We can provide you a copy by mail and we will send out to you via USPS to the property address on file, or to another address you specify.</p><p><strong>Property Tax Amounts&nbsp;</strong>- you will need to provide your property address, your parcel ID, or your account #</p><p><strong>Water/Sewer Utility Amounts -&nbsp;</strong>you will need to provide your property address, your parcel ID, or your account #</p><p><strong>Excise Tax -</strong> IS NOT PUBLIC RECORD - to request these documents you must provide the MA Driver&apos;s License # that the vehicle(s) are registered under, or the plate#(s) for EACH VEHICLE you need. If the vehicle is a leased vehicle - you can contact your leasing company for the amount you paid, or supply the plate# (only) for us to look up for you.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-136" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-136-answer" aria-expanded="true" aria-controls="question-136-answer">
+				WHAT IS A TAX LIEN - Tax Taking and why must it be advertised?
+			</button>
+		</h3>
+		<div id="question-136-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>People who own real property have to pay property taxes. The government uses the money that these taxes generate to pay for schools, public services, libraries, roads, parks, and the like. Typically, the tax amount is based on a property's assessed value. If you have a mortgage on your home, the loan servicer might collect money from you as part of the monthly mortgage payment to later pay the property taxes. The servicer pays the taxes on the homeowner's behalf through an escrow account. But if the taxes aren't collected and paid through this kind of account, the homeowner must pay them directly.</p><p>When homeowners don't pay their property taxes, the overdue amount becomes a lien on the property. A lien is a claim against your property to ensure you'll pay the debt; it effectively makes the property act as collateral for the debt. All states have laws that allow the local government to sell a home through a tax sale process to collect delinquent taxes. Accordingly, homeowners in Massachusetts who fail to make timely payments of property taxes could lose their home after a tax taking. &nbsp;In most cases, you'll get some time after the taking to get current on the overdue amounts before losing ownership of the property.</p><p>Why must it be advertised in the paper? &nbsp; It is a requirement of MA State Law - Tax Takings in Massachusetts - Before a taking, the collector must give you at least a 14-day advance notice by serving it on you or publishing it and post the notice in two or more public places. (<a href="https://malegislature.gov/Laws/GeneralLaws/PartI/TitleIX/Chapter60/Section53">Mass. Gen. Laws ch. 60, § 53</a>). The city or town then gets title to the property, subject to your right of redemption. (<a href="https://malegislature.gov/Laws/GeneralLaws/PartI/TitleIX/Chapter60/Section64">Mass. Gen. Laws ch. 60, § 64</a>).</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-105" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-105-answer" aria-expanded="true" aria-controls="question-105-answer">
+				What do I do if I have received a Parking Ticket? You can either PAY the parking ticket or APPEAL the parking ticket.
+			</button>
+		</h3>
+		<div id="question-105-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p><strong>2 options</strong> for parking ticket appeals as shown in the following</p><ol><li><strong>In Writing - Mail Payments and Appeals to:</strong> <strong>&nbsp;Town of Saugus - 298 Central Street, Suite 5, Saugus, MA 01906</strong><strong>&nbsp;-&nbsp;</strong>You can make a hand written appeal. The ticket will be placed on hold until the next review/hearing date - and you will be notified by mail and/or email with the Hearing Officer&apos;s resolution. Your appeal must be received within 21 days of the ticket date. You can mail your appeal letter with a copy of your ticket - and a copy of your HP placard (if applicable) to Town of Saugus, Parking Hearings Officer, 298 Central Street, Suite 5, Saugus, MA 01906. Forms are available at the Treasurer&apos;s office or <a href="/DocumentCenter/View/1497" target="_blank" rel="noopener">see document link -</a> if you wish to fill out a written appeal immediately.</li><li><strong>Online - Online Payments and Appeals Can Be Done at:</strong><strong>&nbsp;</strong>You can <a href="https://saugusma.rmcpay.com/">make an online appeal</a> - using the web address on the ticket <strong><a href="https://saugusma.rmcpay.com/"></a>-&nbsp;</strong> click &quot;Appeal&quot;. You can upload pictures and/or a detailed letter to go with your appeal. The ticket will be placed on hold until the next review / hearing date - and you will be notified by email with the Hearing Officer&apos;s resolution. <strong>Note -&nbsp;</strong>If you make an appeal online - you will also receive a <strong>mailed</strong> response.<strong>&nbsp;</strong></li></ol><p>If you enter the appeal online, and then send in writing - the appeal received <strong>first</strong> will be taken. It will not be reviewed again.</p><p>If you are not satisfied with your appeal result, you must request a Judicial Court Review at the Essex Superior Court to further appeal. A filing fee will apply to submit a Judicial Court Review. You will have to call the courthouse to inquire as to the cost. Once the Town of Saugus Hearings Officer has made his decision, he will not review again.</p><p><br></p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-106" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-106-answer" aria-expanded="true" aria-controls="question-106-answer">
+				How is the amount of my Motor Vehicle &amp; Trailer Excise Tax determined?
+			</button>
+		</h3>
+		<div id="question-106-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>To Contact the Mass.gov Customer Service - Excise Division - please call 857-368-8180</p><p>For a guide from the Secretary of the Commonwealth of Massachusetts in regards to penalty and interest calculations; abatements; excise calculations; etc - go to the <a href="https://www.mass.gov/guides/motor-vehicle-excise#-calculating-the-excise-">Mass.gov webpage</a>.</p><p>To Contact the Mass.gov Customer Service, Excise Division - please call 857-368-8180</p><p>The amount of the Motor Vehicle and Trailer Excise Tax on any particular vehicle or trailer is calculated by multiplying the discounted value<strong>**&nbsp;</strong>of the vehicle by the Excise Tax Rate of $25 per $1,000 of value. The $25 Excise Tax Rate applies to all communities in the Commonwealth of Massachusetts.</p><p>It is important to note that, under Massachusetts General Law, the minimum Excise Tax is $5.</p><p>The discounted value of your vehicle is determined by multiplying the Manufacturer&apos;s Suggested Retail Price (MSRP) of your vehicle, when it was originally sold by the manufacturer, by the applicable discount rate as shown as follows.</p><ul><li>In the year preceding the model year of vehicle 50%</li><li>In the model year of vehicle 90%</li><li>One year after model year of vehicle 60%</li><li>Two years after model year of vehicle 40%</li><li>Three years after model year of vehicle 25%</li><li>Four or more years after model year of vehicle 10%</li></ul></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-138" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-138-answer" aria-expanded="true" aria-controls="question-138-answer">
+				Need an invoice copy? Invoice images will be available online with our payment site.
+			</button>
+		</h3>
+		<div id="question-138-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p data-pasted="true"><strong>Please note &ndash; The Town of Saugus has made copies of your quarterly real and personal property tax bills available through Unipay - our online payment portal. &nbsp;You do not have to pay your taxes online in order to obtain a copy of your bill.&nbsp;</strong></p><p>Please contact the Assessor&apos;s office (781-231-4130) and have the mailing addresses updated or if you are not the property owner who receives directly in the mail, contact the property owners to obtain. &nbsp;If you are a 3rd party payment processor - you need to wait to obtain invoices via mail, or directly from your customers, or follow the instructions below for the self-serve option.</p><p>Real Estate, Personal Property, and Water/Sewer invoice images will be available online on our payment site on billed date - Unipay with Unibank. &nbsp;</p><p>UNIPAY Website Link: &nbsp;<a href="https://unipaygold.unibank.com/CustomerInfo.aspx">https://unipaygold.unibank.com/CustomerInfo.aspx</a> - Type &ldquo;Town of Saugus&rdquo; where indicated in the center of the page. &nbsp;There is a &ldquo;View Bills&rdquo; button at the bottom of the screen once you enter a valid account number.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-140" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-140-answer" aria-expanded="true" aria-controls="question-140-answer">
+				When will I receive my next Water and Sewer Utility bill?
+			</button>
+		</h3>
+		<div id="question-140-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p data-pasted="true">Your next water/sewer invoice should mail before the dates shown below. &nbsp;</p><p>If you have any questions call 781-231-4139 and 781-231-4135 or email <a href="/cdn-cgi/l/email-protection#a3cec6d7c6d1d7c6c0cbe3d0c2d6c4d6d08ecec28dc4ccd5"><span class="__cf_email__" data-cfemail="c2afa7b6a7b0b6a7a1aa82b1a3b7a5b7b1efafa3eca5adb4">[email&#160;protected]</span></a> or <a href="/cdn-cgi/l/email-protection#5a2e283f3b292f283f281a293b2f3d2f2977373b743d352c"><span class="__cf_email__" data-cfemail="d2a6a0b7b3a1a7a0b7a092a1b3a7b5a7a1ffbfb3fcb5bda4">[email&#160;protected]</span></a></p><table style="width: 100%; margin: auto; border-width: 1px; border-style: solid; height: 155px;"><colgroup><col style="width: 33.3333%;"><col style="width: 33.3333%;"><col style="width: 33.3333%;"></colgroup><tbody><tr><td><strong style='box-sizing: border-box; margin: 0px; padding: 0px; border: 0px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-weight: bold; font-stretch: inherit; line-height: inherit; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; font-size: 14px; vertical-align: baseline; color: rgb(68, 68, 68); letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;' data-pasted="true">Water/Sewer - Utility Bills</strong><br></td><td><strong>Semi-Annual Invoices</strong><strong>​</strong><br></td><td><strong>Quarterly Invoices</strong><br></td></tr><tr style="height: 33px;"><td><strong style='box-sizing: border-box; margin: 0px; padding: 0px; border: 0px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-variant-alternates: inherit; font-variant-position: inherit; font-variant-emoji: inherit; font-weight: bold; font-stretch: inherit; line-height: inherit; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; font-size: 14px; vertical-align: baseline; color: rgb(68, 68, 68); letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(235, 235, 235); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;' data-pasted="true">Bill Period</strong><br></td><td>&nbsp;<strong>Bill Date</strong><br></td><td><strong>Due Date</strong><br></td></tr><tr style="height: 56px;"><td>August &nbsp;- February</td><td>Usually in May<br></td><td>30 Days after bill date - if falls on a weekend - next business day<br></td></tr><tr><td>February - August</td><td>Usually October<br></td><td>30 Days after bill date - if falls on a weekend - next business day<br></td></tr></tbody></table><p>&nbsp;</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-139" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-139-answer" aria-expanded="true" aria-controls="question-139-answer">
+				Parking Ticket - What are your appeal options? (PICK ONLY ONE)
+			</button>
+		</h3>
+		<div id="question-139-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p data-pasted="true">The Treasurer&apos;s Office takes payments for parking tickets and/or can assist you with your appeal options. No one in the Treasurer&apos;s Office can reduce or negate your ticket, we can only guide you towards an appeal option.</p><h2 class="subhead1"><strong>TWO OPTIONS FOR PARKING TICKET APPEALS AS SHOWN BELOW</strong></h2><p><strong>IN WRITING - MAIL PAYMENTS &amp; APPEALS TO: &nbsp;Town of Saugus - 298 Central Street, Suite 5, Saugus, MA &nbsp;01906 -&nbsp;</strong>You can make a handwritten appeal. &nbsp;The ticket will be placed on hold until the next review/hearing date &ndash; and you will be notified by mail and/or email with the Hearing Officer&rsquo;s resolution. &nbsp;Your appeal must be received within 21 days of the ticket date. &nbsp;You can mail your appeal letter with a copy of your ticket &ndash; and a copy of your HP placard (if applicable) to Town of Saugus, Parking Hearings Officer, 298 Central Street, Suite 5, Saugus, MA &nbsp;01906. &nbsp;Forms are available at the Treasurer&rsquo;s Office or <a href="/DocumentCenter/View/1497" target="_blank" rel="noopener">see document link</a> - if you wish to fill out a written appeal immediately.</p><p><strong>ONLINE - ONLINE PAYMENTS &amp; APPEALS CAN BE DONE AT:</strong> You can <a href="https://saugusma.rmcpay.com/">make an online appeal&nbsp;</a>&ndash; using the web address on the ticket -<a data-fr-linked="true" href="https://saugusma.rmcpay.com/"></a> click &quot;Appeal&quot;. &nbsp;You can upload pictures and/or a detailed letter to go with your appeal. &nbsp;The ticket will be placed on hold until the next review/hearing date &ndash; and you will be notified by email with the Hearing Officer&rsquo;s resolution. *NOTE - If you make an appeal online - you will also receive a MAILED response. &nbsp;</p><p>If you enter the appeal online, and then send in writing - the appeal received FIRST will be taken. &nbsp;It will not be reviewed again.</p><p>If you are not satisfied with your appeal result, you must request a Judicial Court Review at the Essex Superior Court to further appeal. &nbsp;A filing fee will apply to submit a Judicial Court Review. &nbsp;You will have to call the courthouse to inquire as to the cost. &nbsp;Once the Town of Saugus Hearings Officer has made his decision, he will not review again.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-107" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-107-answer" aria-expanded="true" aria-controls="question-107-answer">
+				I am selling my property, how do I obtain a final Water and Sewer Bill?
+			</button>
+		</h3>
+		<div id="question-107-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Contact the Utility Billing Department of the Collector / Treasurer&apos;s Office at 781-231-4139 <strong>two weeks prior</strong> to the closing to have the final water reading scheduled.&nbsp;</p><p>Final water readings are prepared on Thursdays. &nbsp;</p><p>Final water reading invoices will be prepared after the reading is obtained from your UltraSonic SMART meter. &nbsp;If the new UltraSonic SMART meter has not been installed when scheduling the final water reading, you will be required to do so before the final reading can be completed. &nbsp;The Utility Billing Manager will coordinate an appointment with the installation company (Mass Installation Inc.) and a representative of the seller to have the UltraSonic SMART meter installed. &nbsp;Once installed, the final reading will be prepared and emailed to the seller&apos;s representative at the email provided to receive the final reading. &nbsp;The final reading invoice can be paid at the Town Hall Collector/Treasurer&apos;s Office or mailed to the same, or submitted to your attorney for payment to be distributed from the closing.</p><p>The mailing address is: &nbsp;Collector/Treasurer&apos;s Office, 298 Central Street, Suite 5, Saugus, MA&nbsp; 01906.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-108" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-108-answer" aria-expanded="true" aria-controls="question-108-answer">
+				I bought the property this year, why is the former owner still appearing on the Real Estate Tax bill?
+			</button>
+		</h3>
+		<div id="question-108-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Property taxes are billed with the information as of January 1st preceding the beginning of the current Fiscal Year. If you purchased the property any time after January 1st, you are not listed as the assessed owner until the next fiscal year. This rule is mandated by Massachusetts General Law. The town's Fiscal year runs from July 1st to June 30th each year. If the Assessors Office is notified that there is a new owner, as a courtesy the Assessors can add your name in "Care Of".</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-109" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-109-answer" aria-expanded="true" aria-controls="question-109-answer">
+				What types of Special Assessments can be added to my Real Estate Tax bill?
+			</button>
+		</h3>
+		<div id="question-109-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>There are three Special Assessments that are currently being billed to property owners on their Real Estate tax bill. Apportioned Sewer Assessment, Apportioned Septic Assessment, and Unpaid and Overdue Water and Sewer charges. The Apportioned Sewer Assessment is a 10-year fee paid for the installation of sewer pipeline in front of your property, the Apportioned Septic Assessment is also a 10-year fee for loans granted to improve septic systems that have failed Title V, and Unpaid and Overdue Water and Sewer charges are the charges billed to property owners for Water and Sewer service on a bi-annual basis. In order to avoid these Special Assessments be sure pay these charges as they are originally billed.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-110" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-110-answer" aria-expanded="true" aria-controls="question-110-answer">
+				When does interest accrue on unpaid bills?
+			</button>
+		</h3>
+		<div id="question-110-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If you are unable to pay your tax bill, Massachusetts General Law mandates that interest at 14% be added to the amount due from the due date to the date of payment. A tax bill is considered &quot;paid&quot; upon receipt by the Treasurer / Collector not the post mark on the envelope.</p><p>The Fiscal Years taxes must be paid in full by the May 1st due date to avoid any further action to collect. Other collection fees can apply.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-111" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-111-answer" aria-expanded="true" aria-controls="question-111-answer">
+				What if I can&#x2019;t pay my Real Estate Tax bill?
+			</button>
+		</h3>
+		<div id="question-111-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>First check with the Town of Saugus Assessor's Office to see if you qualify for a tax exemption or tax deferral. If you still owe taxes, please contact the Town Collector as soon as possible. Although we cannot eliminate the tax, we can listen to your situation and offer possible solutions.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-112" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-112-answer" aria-expanded="true" aria-controls="question-112-answer">
+				What is a municipal lien certificate and how much does it cost?
+			</button>
+		</h3>
+		<div id="question-112-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>A Municipal Lien Certificate is a certificate prepared by the Town of Saugus which lists any and all taxes and charges which may be due on a parcel. If you wish to request a Municipal Lien Certificate you need to do so in writing by providing us with the address and any other identifying information such as Owner and Map Block and Lot. Please be sure to include a self-addressed stamped envelope and the appropriate fee as shown here. Once we receive the request, a certificate will be prepared within ten business days.</p><ul><li>$50 Residential Single Family to Three Family</li><li>$100 Residential of Four Family or more</li><li>$50 Farms, forest land and all other real property</li><li>$150 Commercial, industrial, or public utility structure</li></ul></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-113" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-113-answer" aria-expanded="true" aria-controls="question-113-answer">
+				How can I pay my bills?
+			</button>
+		</h3>
+		<div id="question-113-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>All taxes can be paid by cash, personal check, or money order by mail or in person at the Town Hall. Online payments are accepted thru this website - click on Online Payments and you will be linked to the Unipay online payment portal with Unibank.</p><p>If you are unable to make payment during regular business hours, a white payment box is available in front of Town Hall. <strong>Do not</strong> make payments in cash - use this for checks <strong>only</strong>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-114" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-114-answer" aria-expanded="true" aria-controls="question-114-answer">
+				When does interest accrue on unpaid bills?
+			</button>
+		</h3>
+		<div id="question-114-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Excise tax is due and payable 30 days from the date of issue. If you are unable to pay your tax bill, Massachusetts General Law mandates that interest at 12% be added to the amount due from the due date to the date of payment. A tax bill is considered &quot;paid&quot; upon receipt by the Treasurer / Collector, not the post mark on the envelope. Other collection fees can be added.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-141" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-141-answer" aria-expanded="true" aria-controls="question-141-answer">
+				FAQs - Motor Vehicle Excise Tax
+			</button>
+		</h3>
+		<div id="question-141-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p data-pasted="true">For a guide from the Secretary of the Commonwealth of Massachusetts with regards to penalty and interest calculations; abatements; excise calculations; etc see the <a href="https://www.mass.gov/guides/motor-vehicle-excise">Commonwealth of Massachusetts Motor Vehicle Excise page</a>.</p><p>To contact the <a data-fr-linked="true" href="//Mass.gov">Mass.gov</a> Customer Service, Excise Division - please call 1-857-368-8180. &nbsp;</p><p><strong>What valuation is used for motor vehicle excise bills? </strong>&nbsp;The excise is based on the value of the motor vehicle as determined by the Commissioner of Revenue upon certain percentages of the manufacturer&apos;s list price in the year of manufacture. The excise valuation is not based on the actual purchase price or &quot;book value&quot; of the vehicle. The percentages set forth in the statutory depreciation schedule that are applied to manufacturer&apos;s list price are as follows:</p><p>In the year preceding the designated year of manufacture 50%</p><p>In the year of manufacture 90%</p><p>In the second year 60%</p><p>In the third year 40%</p><p>In the fourth year 25%</p><p>In the fifth and succeeding years 10%</p><p><strong>What is the rate of excise and where is it assessed? &nbsp;</strong>An excise in the amount of $25 per thousand is assessed upon the value of the vehicle as determined in accordance with the depreciation schedule. Prior to 1981 the rate was $66 per thousand. With the passage of Proposition 2 1/2 the rate was set at $25 per thousand. The excise is levied for a full calendar year and is assessed by the community where the motor vehicle is customarily garaged. In those instances where vehicles are registered in the Commonwealth but garaged outside of Massachusetts, the Commissioner of Revenue assesses the excise which is paid into the State treasury. M.G.L. Ch. 60A Sec. 1 provides that the owner of any motor vehicle registered for less than a full calendar year will be obligated to pay an excise based on the entire month when the vehicle was registered, as well as the remaining months of the year. For example, a vehicle registered on April 9th will be assessed an excise for the months of April through December.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-115" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-115-answer" aria-expanded="true" aria-controls="question-115-answer">
+				What happens if I do not pay my Motor Vehicle Excise Tax?
+			</button>
+		</h3>
+		<div id="question-115-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If your Motor Vehicle Excise Tax bill is not satisfied, either through making payment or receiving an abatement, you will receive a "Demand" notice which includes interest at the rate of 12% per annum and $5 demand fee which is due within fourteen days from the date of issue. If this tax remains unsatisfied the bill will be referred to the town's Deputy Tax Collector for further collection activity which includes being issued and served with a "Warrant to Collect" and your Excise Tax being "Marked" at the Massachusetts Registry of Motor Vehicles for non-renewal of your Driver's License and Vehicle or Trailer registration.</p><p>It should be noted that several other states have mutual agreements with the Commonwealth of Massachusetts to detain or impound "Marked" vehicles found in other states where there is an outstanding Excise Tax.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-117" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-117-answer" aria-expanded="true" aria-controls="question-117-answer">
+				What do I do if I receive a Motor Vehicle Excise Tax bill from Saugus, but I am no longer living in the Town of Saugus?
+			</button>
+		</h3>
+		<div id="question-117-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Under certain circumstances you may still be required to pay the Excise Tax to the Town of Saugus. If you do not live in the Town of Saugus when you receive the bill, but you did live in the Town of Saugus either on January 1st of the tax year, or when you registered the vehicle or trailer, you should still pay the Excise Tax to the Town of Saugus. You should then contact the Massachusetts Registry of Motor Vehicles to <strong>change</strong> both your mailing address and the city or town in which your vehicle is <strong>principally garaged</strong> (known as the garage code). Both of these items need to be changed with the Mass. RMV in order for you to receive your next Excise Tax bill from your new community rather than the Town of Saugus. There is a link to the Massachusetts Registry of Motor Vehicles on the first page of the Collector / Treasurers Office.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-116" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-116-answer" aria-expanded="true" aria-controls="question-116-answer">
+				How do I pay overdue Motor Vehicle Excise Taxes that have been marked at the Registry of Motor Vehicles for non-renewal?
+			</button>
+		</h3>
+		<div id="question-116-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Please contact our Deputy Collector, PKS Associates at 781-944-8504. You must make payment directly to their office. Once they receive payment from you, they will contact the Registry of Motor Vehicles to release your account so that you can renew your license and / or registration.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-118" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-118-answer" aria-expanded="true" aria-controls="question-118-answer">
+				I received a Motor Vehicle Excise Tax bill on a car I no longer own. Where do I go for an adjustment?
+			</button>
+		</h3>
+		<div id="question-118-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Please contact the Town of Saugus Assessor's Office for abatement information.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-119" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-119-answer" aria-expanded="true" aria-controls="question-119-answer">
+				What do I do if I feel my Motor Vehicle Excise amount is incorrect?
+			</button>
+		</h3>
+		<div id="question-119-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>You may file for an abatement of your tax with the Board of Assessors. If you contact the Board of Assessors at 781-231-4130, the Assessors&apos; Staff will be able to assist you with any questions you may have relative to completing the appropriate forms to file for an abatement.</p><p>Please remember that filing for an abatement of your tax does not stay any collection activity. You should pay your Excise Tax as you were billed and if you are granted an abatement from the Assessors, you will receive a credit to your tax bill and, if applicable, a refund.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-120" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-120-answer" aria-expanded="true" aria-controls="question-120-answer">
+				How often should I expect to receive a Motor Vehicle Excise Tax bill from the Town?
+			</button>
+		</h3>
+		<div id="question-120-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>You should expect to receive one Excise Tax bill relative to each calendar year during which the vehicle is registered. If the vehicle was not registered for an entire year, then the Excise Tax will be pro-rated according to the number of months during which the vehicle was registered - from the date of registration. It should be noted that under Massachusetts General Law, proration of the Excise Tax is only allowed on a per month basis.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-121" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-121-answer" aria-expanded="true" aria-controls="question-121-answer">
+				When does interest accrue on unpaid bills?
+			</button>
+		</h3>
+		<div id="question-121-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Water and Sewer charges are due and payable 30 days from the date of issue. Interest at the rate of 14% per annum begins to accrue from the due date to the date of payment. A Water and Sewer bill is considered &quot;paid&quot; upon receipt by the Treasurer/Collector, not the post mark on the envelope. Late fees of $5 for unpaid water and $5 for unpaid sewer fees are also added once the &quot;Demand&quot; notice is sent.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-142" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-142-answer" aria-expanded="true" aria-controls="question-142-answer">
+				Questions on your Water and Sewer Utility bill?
+			</button>
+		</h3>
+		<div id="question-142-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Problem with your invoice? &nbsp;Or questions about your invoice? &nbsp;</p><p>Please call the Treasurer/Collector&apos;s Office, Utility Billing at 781-231-4139 and 781-231-4135 or email <a data-fr-linked="true" href="/cdn-cgi/l/email-protection#6c010918091e18090f042c1f0d190b191f41010d420b031a" data-pasted="true"><span class="__cf_email__" data-cfemail="325f574657404657515a724153475547411f5f531c555d44">[email&#160;protected]</span></a> or<a href="/cdn-cgi/l/email-protection#5b2f293e3a282e293e291b283a2e3c2e2876363a753c342d">&nbsp;<span class="__cf_email__" data-cfemail="2e5a5c4b4f5d5b5c4b5c6e5d4f5b495b5d03434f00494158">[email&#160;protected]</span></a>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-122" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-122-answer" aria-expanded="true" aria-controls="question-122-answer">
+				What happens if I do not pay my Water and Sewer bill?
+			</button>
+		</h3>
+		<div id="question-122-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>In addition to the assessment of a late charge, Water and Sewer bills that are issued in the prior Fiscal Year and remain outstanding when the first actual tax bill is issued January 1st will be added to the Real Estate Tax on the property. These amounts will then be collected in the same manner as Real Estate Taxes which includes the assessment of interest and the possibility of a lien being recorded against the property.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-143" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-143-answer" aria-expanded="true" aria-controls="question-143-answer">
+				Is Your Water Bill Higher than Normal?
+			</button>
+		</h3>
+		<div id="question-143-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Is your water bill higher than normal? You could have a leak!</p><ul><li>The meter doesn&apos;t run unless water runs through it</li><li>If a meter is starting to fail, it will slow down, not speed up</li><li>Water issues flowing through your meter are your responsibility. &nbsp;Please contact your plumber to give you house a check up</li><li>Outside sprinkler systems can have sprinkler heads that crack during winter months and can cause excessive water usage, and remember - that green lawn during this summer&apos;s drought will cause a great increase in your invoice.</li><li>Less frequently used toilets can develop leaks in the tank and cause the toilet to run/refill when not in use. &nbsp;You will have to replace the kit inside the tank.</li><li>Visit the MWRA Conservation page for more tips: &nbsp;<a data-fr-linked="true" href="http://www.mwra.com/comsupport/waterconservationmain.htm">http://www.mwra.com/comsupport/waterconservationmain.htm</a></li><li>Do you have a bathroom or toilet you don&apos;t use as much? &nbsp;You could have developed a leak. Water saver/testing products are available free of charge at the Treasurer&apos;s Office.</li><li>Check for water flow through your meter - Stop running all faucets and appliances that use water, and then go to your basement, locate your meter, flip the top cover and watch the small white triangle in the middle. &nbsp;If water is not being used, the triangle will not move. &nbsp;If it is moving, the water is being called for somewhere in your residence. &nbsp;You will need to call your plumber to help you locate the leak.</li><li>Check your current usage, by reading the meter in your basement (flip top of meter up and record all of the digits shown), then call 781.231.4139 with the reading. &nbsp;The Water Billing Department can counsel you, on how much you have used since the last reading done in August.</li></ul></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-123" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-123-answer" aria-expanded="true" aria-controls="question-123-answer">
+				What is the Water Discount Program and do I qualify?
+			</button>
+		</h3>
+		<div id="question-123-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>The Water Discount Program is a 10% discount offered once a year to residents of the Town of Saugus who meet the following conditions:</p><ul><li>The applicant must receive a real estate tax exemption from the Board of Assessors.</li><li>The applicant must be the owner of record of the property for which the discount is requested and his/her name must appear on the water and sewer bill for that property.</li><li>The consumption of water, by the applicant, shall not exceed 3,000 cu ft for the two prior consecutive water bills issued.</li><li>The discount shall only apply to owner occupied single-family homes.</li><li>This discount will be applied on water and sewer bills issued in the spring of each year.</li></ul><p>An application for the 10% water discount must be submitted each year during the period of January 1st to March 31st. The amount of the discount is figured on 10% of the minimum water charge in effect at the time of the application.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-124" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-124-answer" aria-expanded="true" aria-controls="question-124-answer">
+				I received a Parking Violation, how can I pay it?
+			</button>
+		</h3>
+		<div id="question-124-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>Parking Violations can be paid by cash, personal check, or money order by mail or in person at the Town Hall. If the parking ticket has been &quot;Marked&quot; at the Registry of Motor Vehicles for non-renewal on your license or registration, you must make payment in the form of cash or money order. Personal checks will not be accepted.<br><br>If you are unable to make payment during regular business hours, a yellow payment box is available in front of Town Hall. <strong>Do not</strong> make payments in cash - use this for checks <strong>only</strong>.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-125" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-125-answer" aria-expanded="true" aria-controls="question-125-answer">
+				What happens if I do not pay the Parking Violation within 21 days of issue?
+			</button>
+		</h3>
+		<div id="question-125-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><p>If a parking ticket is not paid within 21 days of issue you will be subject to additional fines and penalties and possible &quot;Mark&quot; at the Registry of Motor Vehicles for non-renewal of your license and/or registration.</p></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+                
+
+
+<li id="question-126" class="list-group-item accordion px-0 pt-3 faq-question-item edit-container"
+	data-subcategory-id="">
+	<div class="position-relative accordion-item shadow-sm">
+		<h3 class="accordion-header faq-question-header">
+			<button class="accordion-button gap-3 z-0" type="button" data-bs-toggle="collapse"
+				data-bs-target="#question-126-answer" aria-expanded="true" aria-controls="question-126-answer">
+				How much are the Parking Violations in the Town of Saugus?
+			</button>
+		</h3>
+		<div id="question-126-answer" class="accordion-collapse collapse show">
+			<div class="accordion-body">
+				<div class="accordion-text redesign-text fr-view"><h2 class="subhead1">Effective December 13, 2005 Parking Violations are as follows:</h2><table border="1" cellspacing="1" cellpadding="1" style="float: left;" class="fr-alternate-rows"><thead><tr><th>Violation</th><th>Fee</th></tr></thead><tbody><tr><td>Meter Violation</td><td>$25</td></tr><tr><td>Within 10 Feet of Hydrant</td><td>$100</td></tr><tr><td>Feeding Meter</td><td>$25</td></tr><tr><td>Blocking Free Flow of Traffic</td><td>$25</td></tr><tr><td>Overtime Parking</td><td>$25</td></tr><tr><td>Double Parking</td><td>$25</td></tr><tr><td>Not Parking Within Marked space</td><td>$25</td></tr><tr><td>Not Parking Within Fire/Breakdown Lane</td><td>$50</td></tr><tr><td>Over 12 Inches from Curb</td><td>$25</td></tr><tr><td>Impeding Street Cleaning or Snow Removal</td><td>$100</td></tr><tr><td>Wrong Direction Parking</td><td>$25</td></tr><tr><td>Resident/Permit Parking Only</td><td>$25</td></tr><tr><td>Parking Over 48 Hrs.</td><td>$25</td></tr><tr><td>Snow Emergency</td><td>$100</td></tr><tr><td>Restricted Area</td><td>$25</td></tr><tr><td>Crosswalk</td><td>$50</td></tr><tr><td>Driveway / Private Way Blocking</td><td>$25</td></tr><tr><td>Sidewalk</td><td>$50</td></tr><tr><td>Impeding Handicap Van/Ramp</td><td>$300</td></tr><tr><td>Within 20 Feet of an Intersection</td><td>$25</td></tr><tr><td>HP / DV Parking</td><td>$300</td></tr><tr><td>Bus Stop</td><td>$25</td></tr><tr><td>Parking Taxi Stand</td><td>$25</td></tr></tbody></table></div>
+				<span class="badge text-body category-pill rounded-pill mw-100 text-truncate">Treasurer / Collector</span>
+			</div>
+		</div>
+	</div>
+</li>
+        </ul>
+    </div>
+
+                </div>
+                <div class="col-md-4 d-none d-md-block">
+                    
+<nav id="TableOfContents" class="faq-toc rounded-5 border shadow-sm p-3 mt-sm-3 mt-md-0" aria-label="FAQ table of contents">
+    <ul class="list-unstyled ps-0">
+            <li class="faq-category list-group-item accordion px-0 mb-2 faq-category-21">
+                <style scoped>
+                    .faq-category-21 {
+                        --categoryColor: rgb(131, 0, 20);
+                    }
+                </style>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#topic-21-sidebar" aria-expanded="false"
+                                aria-controls="topic-21-sidebar">
+                            Treasurer / Collector
+                            <span class="badge text-body rounded-pill ms-auto px-2">32</span>
+                        </button>
+                    </h3>
+                    <div id="topic-21-sidebar" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <ul class="faq-category-21 p-0">
+                                    <li class="faq-question">
+                                        <a href="#question-103">What is the Real Estate Tax, Personal Property Tax &amp; Water-Sewer billing schedule?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-104">How can I pay my Real Estate, Personal Property, Excise, and Water/Sewer tax bills?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-137">Need last calendar year&#x27;s tax payment amounts for your federal tax filing?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-136">WHAT IS A TAX LIEN - Tax Taking and why must it be advertised?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-105">What do I do if I have received a Parking Ticket? You can either PAY the parking ticket or APPEAL the parking ticket.</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-106">How is the amount of my Motor Vehicle &amp; Trailer Excise Tax determined?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-138">Need an invoice copy? Invoice images will be available online with our payment site.</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-140">When will I receive my next Water and Sewer Utility bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-139">Parking Ticket - What are your appeal options? (PICK ONLY ONE)</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-107">I am selling my property, how do I obtain a final Water and Sewer Bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-108">I bought the property this year, why is the former owner still appearing on the Real Estate Tax bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-109">What types of Special Assessments can be added to my Real Estate Tax bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-110">When does interest accrue on unpaid bills?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-111">What if I can&#x2019;t pay my Real Estate Tax bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-112">What is a municipal lien certificate and how much does it cost?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-113">How can I pay my bills?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-114">When does interest accrue on unpaid bills?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-141">FAQs - Motor Vehicle Excise Tax</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-115">What happens if I do not pay my Motor Vehicle Excise Tax?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-117">What do I do if I receive a Motor Vehicle Excise Tax bill from Saugus, but I am no longer living in the Town of Saugus?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-116">How do I pay overdue Motor Vehicle Excise Taxes that have been marked at the Registry of Motor Vehicles for non-renewal?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-118">I received a Motor Vehicle Excise Tax bill on a car I no longer own. Where do I go for an adjustment?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-119">What do I do if I feel my Motor Vehicle Excise amount is incorrect?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-120">How often should I expect to receive a Motor Vehicle Excise Tax bill from the Town?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-121">When does interest accrue on unpaid bills?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-142">Questions on your Water and Sewer Utility bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-122">What happens if I do not pay my Water and Sewer bill?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-143">Is Your Water Bill Higher than Normal?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-123">What is the Water Discount Program and do I qualify?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-124">I received a Parking Violation, how can I pay it?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-125">What happens if I do not pay the Parking Violation within 21 days of issue?</a>
+                                    </li>
+                                    <li class="faq-question">
+                                        <a href="#question-126">How much are the Parking Violations in the Town of Saugus?</a>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+    </ul>
+</nav>
+
+                </div>
+            </div>
+        </main>
+        <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="/static/FAQ/js/ExpandCollapse.js"></script>
+        <script src="/static/FAQ/js/TopicFilters.js"></script>
+    </div>
+
+    </div>
+    <script src="/static/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/FAQ/js/site.js?v=wFQTpMYPltUchiyPDikbo5YolaL3_kyoV2tlgXnV3PI"></script>
+    <script src="/static/FAQ/js/KAM.js?v=cYNUz5hMU5q2nR2y0vxt8QL23oqJlEEGzCkJw55TJ1I"></script>
+    <script src="/static/js/common.js?v=TAqahgSOdqWemo9E2C7jLNLT08kRCAvv7jZ4h3tw80Y"></script>
+    <script src="/static/js/loader.js?v=i215fmhn1ppNi3l5y5xz6tGyeuBsqLV8coS6Mfb4FrU"></script>
+    
+
+</div>
+</div>
+</div>
+</div></div>
+</div><!-- GBs --><div data-cprole="structuralContainer" id="gbsContainerTS">
+<div class="siteWrap2"><div data-cprole="contentContainer" id="gbsTS">	<div id="ccfdf585a5-fb94-4881-970c-bdcd14a7a042" data-containerid="fdf585a5-fb94-4881-970c-bdcd14a7a042" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col12 first" style="" data-widgetcontainerid="54b3d1b5-169a-4ce9-a4ab-3cf1cfaaf978">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col12 first last id913fcf29-6504-47e3-a491-41c63e80d1fc" style="" data-widgetcontainerid="913fcf29-6504-47e3-a491-41c63e80d1fc">	
+<div data-widget-id="412e3072-d0ea-4e63-86a2-2a8af785ae2a" data-widget-controller-path="/GraphicLinks/Widget">
+
+
+
+
+<div id="graphicLinkWidget412e3072-d0ea-4e63-86a2-2a8af785ae2a" class="widget widgetGraphicLinks skin45 widgetOptionSet4 wide" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' data-modulewidgettype="graphicLinks">
+	<div class="widgetHeader">
+		<div class="">
+				</div>
+	</div>
+	<div class="widgetBody cpGrid cpGrid3 ">
+		<nav class="widgetGraphicLinksNav" aria-labelledby="GraphicLinkHeaderText">
+				<div class="row   wide">
+					<!--
+--><div class="col col1 first "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/List.aspx" target="_self" class="fancyButton fancyButton46 ">
+		<span>
+			<span><span class="text">Notify Me®</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton46.fancyButton:link,.fancyButton46.fancyButton:visited, .fancyButton46div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 110px;
+transition: all .3s ease-in-out;}
+.fancyButton46.fancyButton:hover,.fancyButton46.fancyButton:focus,.fancyButton46.fancyButton:active,.fancyButton46.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton46.fancyButton:link > span,.fancyButton46.fancyButton:visited > span, .fancyButton46div.fancyButton > span{
+}
+.fancyButton46.fancyButton:hover > span,.fancyButton46.fancyButton:focus > span,.fancyButton46.fancyButton:active > span,.fancyButton46.fancyButton.hover > span{
+}
+.fancyButton46.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "DM Sans";
+	padding-top: 8.5em;
+	font-weight: 600;
+	text-decoration: none;
+	padding-top: 8.5em;
+	background-image: url('/ImageRepository/Document?documentID=101');
+	background-repeat: no-repeat;
+	background-position: center 2.65em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton46.fancyButton:hover .text,.fancyButton46.fancyButton:focus .text,.fancyButton46.fancyButton:active .text,.fancyButton46.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.65em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://www.saugus-ma.gov/405/Bill-Pay" target="_self" class="fancyButton fancyButton48 ">
+		<span>
+			<span><span class="text">Online Payments</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton48.fancyButton:link,.fancyButton48.fancyButton:visited, .fancyButton48div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 110px;
+transition: all .3s ease-in-out;}
+.fancyButton48.fancyButton:hover,.fancyButton48.fancyButton:focus,.fancyButton48.fancyButton:active,.fancyButton48.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton48.fancyButton:link > span,.fancyButton48.fancyButton:visited > span, .fancyButton48div.fancyButton > span{
+}
+.fancyButton48.fancyButton:hover > span,.fancyButton48.fancyButton:focus > span,.fancyButton48.fancyButton:active > span,.fancyButton48.fancyButton.hover > span{
+}
+.fancyButton48.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "DM Sans";
+	padding-top: 8.5em;
+	font-weight: 600;
+	text-decoration: none;
+	padding-top: 8.5em;
+	background-image: url('/ImageRepository/Document?documentID=102');
+	background-repeat: no-repeat;
+	background-position: center 2.65em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton48.fancyButton:hover .text,.fancyButton48.fancyButton:focus .text,.fancyButton48.fancyButton:active .text,.fancyButton48.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.65em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  last"><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/agendacenter" target="_self" class="fancyButton fancyButton49 ">
+		<span>
+			<span><span class="text">Minutes &amp; Agendas</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton49.fancyButton:link,.fancyButton49.fancyButton:visited, .fancyButton49div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 110px;
+transition: all .3s ease-in-out;}
+.fancyButton49.fancyButton:hover,.fancyButton49.fancyButton:focus,.fancyButton49.fancyButton:active,.fancyButton49.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton49.fancyButton:link > span,.fancyButton49.fancyButton:visited > span, .fancyButton49div.fancyButton > span{
+}
+.fancyButton49.fancyButton:hover > span,.fancyButton49.fancyButton:focus > span,.fancyButton49.fancyButton:active > span,.fancyButton49.fancyButton.hover > span{
+}
+.fancyButton49.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "DM Sans";
+	padding-top: 8.5em;
+	font-weight: 600;
+	text-decoration: none;
+	padding-top: 8.5em;
+	background-image: url('/ImageRepository/Document?documentID=97');
+	background-repeat: no-repeat;
+	background-position: center 2.65em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton49.fancyButton:hover .text,.fancyButton49.fancyButton:focus .text,.fancyButton49.fancyButton:active .text,.fancyButton49.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.65em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!--				-->
+				</div>
+			</nav>
+		</div>
+	<div class="widgetFooter">
+			</div>
+</div>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col12 last" style="" data-widgetcontainerid="8b418023-168b-46f7-a5cf-21de13842503">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col12 first last id1c7dbe85-e324-4a5d-9661-0ca3d8da458d" style="" data-widgetcontainerid="1c7dbe85-e324-4a5d-9661-0ca3d8da458d">	
+<div data-widget-id="10dc2337-5ca8-498f-a690-819a7c3381ea" data-widget-controller-path="/GraphicLinks/Widget">
+
+
+
+
+<div id="graphicLinkWidget10dc2337-5ca8-498f-a690-819a7c3381ea" class="widget widgetGraphicLinks skin45 widgetOptionSet4 wide" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' data-modulewidgettype="graphicLinks">
+	<div class="widgetHeader">
+		<div class="">
+				</div>
+	</div>
+	<div class="widgetBody cpGrid cpGrid3 ">
+		<nav class="widgetGraphicLinksNav" aria-labelledby="GraphicLinkHeaderText">
+				<div class="row   wide">
+					<!--
+--><div class="col col1 first "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="https://axisgis.com/saugusma/" target="_self" class="fancyButton fancyButton50 ">
+		<span>
+			<span><span class="text">GIS Mapping</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton50.fancyButton:link,.fancyButton50.fancyButton:visited, .fancyButton50div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 110px;
+transition: all .3s ease-in-out;}
+.fancyButton50.fancyButton:hover,.fancyButton50.fancyButton:focus,.fancyButton50.fancyButton:active,.fancyButton50.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton50.fancyButton:link > span,.fancyButton50.fancyButton:visited > span, .fancyButton50div.fancyButton > span{
+}
+.fancyButton50.fancyButton:hover > span,.fancyButton50.fancyButton:focus > span,.fancyButton50.fancyButton:active > span,.fancyButton50.fancyButton.hover > span{
+}
+.fancyButton50.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "DM Sans";
+	padding-top: 8.5em;
+	font-weight: 600;
+	text-decoration: none;
+	padding-top: 8.5em;
+	background-image: url('/ImageRepository/Document?documentID=100');
+	background-repeat: no-repeat;
+	background-position: center 2.65em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton50.fancyButton:hover .text,.fancyButton50.fancyButton:focus .text,.fancyButton50.fancyButton:active .text,.fancyButton50.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.65em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/224/Forms-Documents" target="_self" class="fancyButton fancyButton51 ">
+		<span>
+			<span><span class="text">Forms &amp; Applications</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton51.fancyButton:link,.fancyButton51.fancyButton:visited, .fancyButton51div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 110px;
+transition: all .3s ease-in-out;}
+.fancyButton51.fancyButton:hover,.fancyButton51.fancyButton:focus,.fancyButton51.fancyButton:active,.fancyButton51.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton51.fancyButton:link > span,.fancyButton51.fancyButton:visited > span, .fancyButton51div.fancyButton > span{
+}
+.fancyButton51.fancyButton:hover > span,.fancyButton51.fancyButton:focus > span,.fancyButton51.fancyButton:active > span,.fancyButton51.fancyButton.hover > span{
+}
+.fancyButton51.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "DM Sans";
+	padding-top: 8.5em;
+	font-weight: 600;
+	text-decoration: none;
+	padding-top: 8.5em;
+	background-image: url('/ImageRepository/Document?documentID=99');
+	background-repeat: no-repeat;
+	background-position: center 2.65em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton51.fancyButton:hover .text,.fancyButton51.fancyButton:focus .text,.fancyButton51.fancyButton:active .text,.fancyButton51.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.65em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!----><div class="col col1  last"><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks">
+
+<div>
+	<a href="/directory.aspx" target="_self" class="fancyButton fancyButton52 ">
+		<span>
+			<span><span class="text">Contact Us</span></span>
+		</span>
+	</a>
+</div>
+		<style scoped="scoped">.fancyButton52.fancyButton:link,.fancyButton52.fancyButton:visited, .fancyButton52div.fancyButton{
+	background-image: url('/ImageRepository/Document?documentID=103');
+	background-repeat: no-repeat;
+	background-position: center 1em ;
+background-size: 110px;
+transition: all .3s ease-in-out;}
+.fancyButton52.fancyButton:hover,.fancyButton52.fancyButton:focus,.fancyButton52.fancyButton:active,.fancyButton52.fancyButton.hover{
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.fancyButton52.fancyButton:link > span,.fancyButton52.fancyButton:visited > span, .fancyButton52div.fancyButton > span{
+}
+.fancyButton52.fancyButton:hover > span,.fancyButton52.fancyButton:focus > span,.fancyButton52.fancyButton:active > span,.fancyButton52.fancyButton.hover > span{
+}
+.fancyButton52.fancyButton .text{
+	color: rgb(0, 0, 0);
+	font-family: "DM Sans";
+	padding-top: 8.5em;
+	font-weight: 600;
+	text-decoration: none;
+	padding-top: 8.5em;
+	background-image: url('/ImageRepository/Document?documentID=98');
+	background-repeat: no-repeat;
+	background-position: center 2.65em ;
+background-size: 60px;
+transition: all .3s ease-in-out;
+}
+.fancyButton52.fancyButton:hover .text,.fancyButton52.fancyButton:focus .text,.fancyButton52.fancyButton:active .text,.fancyButton52.fancyButton.hover .text{
+	text-decoration: underline;
+	background-repeat: no-repeat;
+	background-position: center 1.65em ;
+
+
+}
+</style>
+
+ </li><!--
+--></ul></div><!--				-->
+				</div>
+			</nav>
+		</div>
+	<div class="widgetFooter">
+			</div>
+</div>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div></div>
+</div><!-- Calendar/Carousel --><!-- <div data-cpRole="structuralContainer" id="homeContainer1">
+    <div class="siteWrap2">
+      <div data-cpRole="contentContainer" id="homeContent1a"></div>
+    </div>
+  </div> --><!-- Footer --><footer data-cprole="structuralContainer" id="footerContainerTS">
+<div class="siteWrap2"><div data-cprole="contentContainer" id="footerTS">	<div id="ccba233562-24e1-4961-a43b-11299c246828" data-containerid="ba233562-24e1-4961-a43b-11299c246828" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile" data-contentcontainerbreakpoint="55">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col5 first" style="" data-widgetcontainerid="8f87adf6-171f-4c7e-bc0c-c9e9ff8ecd04">				
+	<div class="row nest first wide">
+	
+	<div class="inner col col5 first last id00d3b26d-6702-4f06-af33-1b5e497945b5" style="" data-widgetcontainerid="00d3b26d-6702-4f06-af33-1b5e497945b5">	
+    <div data-widget-id="858b6edc-52ea-4686-88ea-41126d2be813" data-widget-controller-path="/InfoAdvanced/Widget">
+
+
+
+
+
+	<section id="divInfoAdv858b6edc-52ea-4686-88ea-41126d2be813" class="widget widgetInfoAdvanced skin56 widgetOptionSet5 wide" data-modulewidgettype="infoAdv" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-label="Info Advanced">
+			<header class="widgetHeader" id="header858b6edc-52ea-4686-88ea-41126d2be813">
+		<div class="">
+								</div>
+	</header>
+	<div class="widgetBody  cpGrid cpGrid1 ">
+		<div class="row  wide">
+					<div class="col col1 first last">
+						<ol class="pageStyles semanticList">
+
+<li class="InfoAdvanced widgetItem fr-view">
+	<p><a href="/"><img src="/ImageRepository/Document?documentId=106" class="fr-dib" alt="Saugus Massachusetts Home Page"></a></p>
+</li>						</ol>
+					</div>
+		</div>
+	</div>
+	<div class="widgetFooter">
+
+	</div>
+
+	</section>
+
+
+
+<script type="text/javascript">
+	//Render slideshow if info advacned items contain one.
+	$(document).ready(function (e) {
+		$('#divInfoAdv858b6edc-52ea-4686-88ea-41126d2be813 .InfoAdvanced.widgetItem').each(function () {
+			renderSlideshowIfApplicable($(this));		
+		});
+	});
+</script></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+	<div class="row nest last wide">
+	
+	<div class="inner col col5 first last id9f4e884f-5346-4971-8c27-1c5223e05101" style="" data-widgetcontainerid="9f4e884f-5346-4971-8c27-1c5223e05101">	
+<div data-widget-id="be60272e-6b73-4024-a10c-da756257d897" data-widget-controller-path="/GraphicLinks/Widget">
+
+
+
+
+<div id="graphicLinkWidgetbe60272e-6b73-4024-a10c-da756257d897" class="widget widgetGraphicLinks skin55 widgetOptionSet4 wide" data-elementqueryclasses='{"wide-narrow":"min-width:1em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' data-modulewidgettype="graphicLinks">
+	<div class="widgetHeader">
+		<div class="">
+				</div>
+	</div>
+	<div class="widgetBody cpGrid cpGrid2 ">
+		<nav class="widgetGraphicLinksNav" aria-labelledby="GraphicLinkHeaderText">
+				<div class="row   wide">
+					<!--
+--><div class="col col1 first "><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks"><a class="widgetDesc widgetGraphicLinksLink" href="/twitter" target="_self">
+
+<img src="/ImageRepository/Document?documentID=65" class="graphicButtonLink" alt="X" onmouseover="this.src='/ImageRepository/Document?documentID=65'" onmouseout="this.src='/ImageRepository/Document?documentID=65'" onfocus="this.src='/ImageRepository/Document?documentID=65'" onblur="this.src='/ImageRepository/Document?documentID=65'"> 
+</a></li><!--
+--></ul></div><!----><div class="col col1  last"><ul class="semanticList"><!--
+	    --><li class="widgetItem GraphicLinks"><a class="widgetDesc widgetGraphicLinksLink" href="/instagram" target="_self">
+
+<img src="/ImageRepository/Document?documentID=49" class="graphicButtonLink" alt="Instagram" onmouseover="this.src='/ImageRepository/Document?documentID=49'" onmouseout="this.src='/ImageRepository/Document?documentID=49'" onfocus="this.src='/ImageRepository/Document?documentID=49'" onblur="this.src='/ImageRepository/Document?documentID=49'"> 
+</a></li><!--
+--></ul></div><!--				-->
+				</div>
+			</nav>
+		</div>
+	<div class="widgetFooter">
+			</div>
+</div>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col1" style="" data-widgetcontainerid="0b967ff4-6a1e-4641-a686-3d09d93d3cc8">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col1 first last id3c1598ec-e2fe-49ac-989a-d94075b974be" style="" data-widgetcontainerid="3c1598ec-e2fe-49ac-989a-d94075b974be">	
+
+<div class="widget widgetSpacer" id="2bfc69c9-8e60-41a8-a211-e9f0b3a0d27b"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col3" style="" data-widgetcontainerid="d7ed259d-1a4b-4f47-88a6-cb9ffeeee5c5">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col3 first last id2d66a81d-52ec-492c-bdb2-49a2dee8e25d" style="" data-widgetcontainerid="2d66a81d-52ec-492c-bdb2-49a2dee8e25d">	
+    <div data-widget-id="cda8f1a0-30bd-4eaf-bea6-abccd7ac478d" data-widget-controller-path="/InfoAdvanced/Widget">
+
+
+
+
+
+	<section id="divInfoAdvcda8f1a0-30bd-4eaf-bea6-abccd7ac478d" class="widget widgetInfoAdvanced skin37 widgetOptionSet5 wide" data-modulewidgettype="infoAdv" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-labelledby="headercda8f1a0-30bd-4eaf-bea6-abccd7ac478d">
+			<header class="widgetHeader" id="headercda8f1a0-30bd-4eaf-bea6-abccd7ac478d">
+		<div class="">
+					<h3>Contact Us</h3>
+								</div>
+	</header>
+	<div class="widgetBody  cpGrid cpGrid1 ">
+		<div class="row  wide">
+					<div class="col col1 first last">
+						<ol class="pageStyles semanticList">
+
+<li class="InfoAdvanced widgetItem fr-view">
+	<p data-pasted="true"><strong>Town of Saugus</strong><br>298 Central Street<br>Saugus, MA 01906<br>Phone: <a href="tel:%20781-231-4101">781-231-4101</a><br>Fax: 781-231-4109<br><a href="/cdn-cgi/l/email-protection#71544341121c1e031402121918310210041604025c1c105f161e07">Contact Us</a></p>
+</li>						</ol>
+					</div>
+		</div>
+	</div>
+	<div class="widgetFooter">
+
+	</div>
+
+	</section>
+
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+	//Render slideshow if info advacned items contain one.
+	$(document).ready(function (e) {
+		$('#divInfoAdvcda8f1a0-30bd-4eaf-bea6-abccd7ac478d .InfoAdvanced.widgetItem').each(function () {
+			renderSlideshowIfApplicable($(this));		
+		});
+	});
+</script></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col1" style="" data-widgetcontainerid="c42b4fc8-c041-48fe-8a3d-c215ea94440d">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col1 first last idcf3386a6-b1f2-400f-ab11-a3459eea9583" style="" data-widgetcontainerid="cf3386a6-b1f2-400f-ab11-a3459eea9583">	
+
+<div class="widget widgetSpacer" id="7c9ee352-ed5d-4d87-9d26-a9d621b1e5db"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col5" style="" data-widgetcontainerid="e08d56a5-b3c9-4470-a9cd-60e12259dda3">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col5 first last id9f3784b5-194a-482e-a67f-48d2fc30d162" style="" data-widgetcontainerid="9f3784b5-194a-482e-a67f-48d2fc30d162">	
+    <div data-widget-id="f415472d-9f2e-4852-94e8-18e796d8a9f7" data-widget-controller-path="/InfoAdvanced/Widget">
+
+
+
+
+
+	<section id="divInfoAdvf415472d-9f2e-4852-94e8-18e796d8a9f7" class="widget widgetInfoAdvanced skin37 widgetOptionSet5 wide" data-modulewidgettype="infoAdv" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-label="Info Advanced">
+			<header class="widgetHeader" id="headerf415472d-9f2e-4852-94e8-18e796d8a9f7">
+		<div class="">
+								</div>
+	</header>
+	<div class="widgetBody  cpGrid cpGrid1 ">
+		<div class="row  wide">
+					<div class="col col1 first last">
+						<ol class="pageStyles semanticList">
+
+<li class="InfoAdvanced widgetItem fr-view">
+	<p data-pasted="true"><strong>Town Hall Hours of Operation:</strong><br>Mon: 8:30 am to 7:00 pm<br>Tues - Thurs: 8:15 am to 5:00 pm<br>Fri: 8:15 am to 12:30 pm</p><p><strong>Summer Hours (June 1st - August 31st):</strong><br>Mon: 8:30 am to 7:00 pm<br>Tues - Thurs: 8:15 am to 4:00 pm<br>Fri: 8:15 am to 12:30 pm</p>
+</li>						</ol>
+					</div>
+		</div>
+	</div>
+	<div class="widgetFooter">
+
+	</div>
+
+	</section>
+
+
+
+<script type="text/javascript">
+	//Render slideshow if info advacned items contain one.
+	$(document).ready(function (e) {
+		$('#divInfoAdvf415472d-9f2e-4852-94e8-18e796d8a9f7 .InfoAdvanced.widgetItem').each(function () {
+			renderSlideshowIfApplicable($(this));		
+		});
+	});
+</script></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col1" style="" data-widgetcontainerid="5f9b4985-3b4a-459b-8cfe-30f3b83144de">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col1 first last idbb618a06-af58-42a8-bb78-492393343149" style="" data-widgetcontainerid="bb618a06-af58-42a8-bb78-492393343149">	
+
+<div class="widget widgetSpacer" id="fa75cb57-bd45-4abb-9a86-fad3ab83a1ff"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col4" style="" data-widgetcontainerid="45a9395c-9b43-43ed-9e07-8bb0bb97f900">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col4 first last id726d5f19-375d-4975-9d68-7acb217d17b4" style="" data-widgetcontainerid="726d5f19-375d-4975-9d68-7acb217d17b4">	
+	<div data-widget-id="fcf2b957-4edd-4ccd-add3-be33a844187e" data-widget-controller-path="/QuickLinks/Widget">
+
+
+
+
+
+
+
+
+	<section id="widgetQuicklinkfcf2b957-4edd-4ccd-add3-be33a844187e" class="widget widgetQuickLinks skin37 widgetOptionSet27 narrow" data-modulewidgettype="quickLinks" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-labelledby="quickLinksHeaderfcf2b957-4edd-4ccd-add3-be33a844187e">
+			<header class="widgetHeader" id="quickLinksHeaderfcf2b957-4edd-4ccd-add3-be33a844187e">
+		<div class="">
+					<h3><a style="" href="/QuickLinks.aspx?CID=15">Popular Pages</a></h3>
+						</div>
+	</header>
+	<div class="widgetBody cpGrid cpGrid1 ">
+        <div class="row  narrow">
+				<div class="col col1 first last">
+					<ol class="semanticList">
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/329/Town-Employment" target="_self" aria-label="Employment Opportunities - Home - Popular Links" rel="">Employment Opportunities</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/352/SeeClickFix" target="_self" aria-label="SeeClickFix - Home - Popular Links" rel="">SeeClickFix</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/183/Solid-Waste-Recycling-Department" target="_self" aria-label="Trash &amp; Recycling - Home - Popular Links" rel="">Trash & Recycling</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/FormCenter/General-Forms-4/Send-Us-Comments-76" target="_self" aria-label="Send Us Comments - Home - Popular Links" rel="">Send Us Comments</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="https://townofsauguswebportal.portal.finalsiteconnect.com/" target="_self" aria-label="Emergency Alerts - Home - Popular Links" rel="">Emergency Alerts</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/234/Make-a-Public-Records-Request" target="_self" aria-label="Public Records Requests - Home - Popular Links" rel="">Public Records Requests</a>
+        <div class="widgetMeta"></div>
+    </li>
+					</ol>
+				</div>
+		</div>
+        
+	</div>
+	<div class="widgetFooter">
+	</div>
+	<div class="addItemModal hidden">
+		<div class="url hidden">/QuickLinks.aspx</div>
+	</div>
+
+	</section>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col1" style="" data-widgetcontainerid="e5885a96-743b-48fa-b3b2-ad69e4f18e62">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col1 first last id4067914c-e9c7-4020-9b33-48c03fc3f75b" style="" data-widgetcontainerid="4067914c-e9c7-4020-9b33-48c03fc3f75b">	
+
+<div class="widget widgetSpacer" id="baf6dbaa-56e4-41ed-96c1-dce15d321068"></div>
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!----><div class="outer col col3 last" style="" data-widgetcontainerid="4502a715-ccca-4d8b-b069-99695694b19c">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col3 first last id68873abe-a2cf-4f96-9ee1-6f2f9ba50e09" style="" data-widgetcontainerid="68873abe-a2cf-4f96-9ee1-6f2f9ba50e09">	
+	<div data-widget-id="f2cc954e-0b75-435c-9240-836c646e2069" data-widget-controller-path="/QuickLinks/Widget">
+
+
+
+
+
+
+
+
+	<section id="widgetQuicklinkf2cc954e-0b75-435c-9240-836c646e2069" class="widget widgetQuickLinks skin37 widgetOptionSet27 narrow" data-modulewidgettype="quickLinks" data-elementqueryclasses='{"wide-narrow":"min-width:25em"}' data-elementquerymatch='matchMultiColumn' data-elementqueryunmatch='unmatchMultiColumn' aria-labelledby="quickLinksHeaderf2cc954e-0b75-435c-9240-836c646e2069">
+			<header class="widgetHeader" id="quickLinksHeaderf2cc954e-0b75-435c-9240-836c646e2069">
+		<div class="">
+					<h3><a style="" href="/QuickLinks.aspx?CID=16">Site Links</a></h3>
+						</div>
+	</header>
+	<div class="widgetBody cpGrid cpGrid1 ">
+        <div class="row  narrow">
+				<div class="col col1 first last">
+					<ol class="semanticList">
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/" target="_self" aria-label="Home - Site Links" rel="">Home</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/sitemap" target="_self" aria-label="Site Map - Site Links" rel="">Site Map</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/directory.aspx" target="_self" aria-label="Contact Us - Site Links" rel="">Contact Us</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/site/accessibility" target="_self" aria-label="Accessibility - Site Links" rel="">Accessibility</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/copyright" target="_self" aria-label="Copyright Notices - Site Links" rel="">Copyright Notices</a>
+        <div class="widgetMeta"></div>
+    </li>
+
+
+
+
+    <li style="position:relative" class="widgetItem QuickLinks">
+        <a class="widgetDesc widgetQuickLinksLink" href="/site/privacy" target="_self" aria-label="Privacy Policy - Site Links" rel="">Privacy Policy</a>
+        <div class="widgetMeta"></div>
+    </li>
+					</ol>
+				</div>
+		</div>
+        
+	</div>
+	<div class="widgetFooter">
+	</div>
+	<div class="addItemModal hidden">
+		<div class="url hidden">/QuickLinks.aspx</div>
+	</div>
+
+	</section>
+</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div><div data-cprole="contentContainer" id="poweredByTS">	<div id="cc20b10e92-03e9-4f0b-8c09-7ede4a8df4f9" data-containerid="20b10e92-03e9-4f0b-8c09-7ede4a8df4f9" class="pageContent cpGrid cpGrid24 isLockedContainer showInMobile">
+				                
+
+		<div class="row outer wide"><!--
+--><div class="outer col col24 first last" style="" data-widgetcontainerid="71e5806b-ab7c-43d4-be5c-14ef66a9983b">				
+	<div class="row nest first last wide">
+	
+	<div class="inner col col24 first last idbce45d02-b415-4327-9f11-9f0389495844" style="" data-widgetcontainerid="bce45d02-b415-4327-9f11-9f0389495844">	
+ 
+	<div data-widget-id='82cdb15c-49d8-45aa-93be-2cfdabaa92da' data-modulename="customHtml" id='widgetCustomHtml82cdb15c-49d8-45aa-93be-2cfdabaa92da' class="widget widgetCustomHtml skin37 narrow">
+	<div class="widgetBody pageStyles" id="widgetBody82cdb15c-49d8-45aa-93be-2cfdabaa92da">
+		<div id="customHtml82cdb15c-49d8-45aa-93be-2cfdabaa92da"><div><style>
+    /* CP icon */
+    .cpBylineIconTS {
+        color: #fff;
+    }
+    /* CP Text */
+    .cpBylineTextTS,
+    .cpBylineTextTS a:link,
+    .cpBylineTextTS a:visited,
+    .cpBylineTextTS a:hover,
+    .cpBylineTextTS a:focus,
+    .cpBylineTextTS a:active {
+        color: #fff!important;
+    }
+
+    .cpBylineTextTS a:link,
+    .cpBylineTextTS a:visited,
+    .cpBylineTextTS a:hover,
+    .cpBylineTextTS a:focus,
+    .cpBylineTextTS a:active {
+        text-decoration: underline !important;
+    }
+
+    .cpBylineTS {
+        text-align: center;
+    }
+    .cpBylineIconTS {
+        fill: currentColor;
+        width: 39px;
+        height: 26px;
+        display: inline;
+        vertical-align: middle;
+    }
+  </style>
+    
+  <div class="widgetItem cpBylineTS">
+    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 100 100" class="cpBylineIconTS">
+      <path class="c" d="M73.4,23.2h-19v16.7h19c2.8,0,5,2.2,5,5c0,2.8-2.2,5-5,5h-19v28.4h5.5l11.3-11.7h2.2c11.9,0,21.6-9.7,21.6-21.6C95,33,85.3,23.2,73.4,23.2"></path>
+      <path class="p" d="M45.8,66.5H26.6C14.7,66.5,5,56.8,5,44.9C5,33,14.7,23.2,26.6,23.2h19.1v16.7H26.6c-2.8,0-5,2.2-5,5c0,2.8,2.2,5,5,5h19.1V66.5z"></path>
+    </svg>
+    <span class="cpBylineTextTS">Government Websites by <a href="https://connect.civicplus.com/referral">CivicPlus&reg;</a></span>
+  </div></div></div>
+	</div>
+
+	</div>
+
+	</div> <!-- inner column -->
+
+	</div> <!-- inner row -->
+
+			</div><!-- outer column --><!--		--></div> <!-- outer row -->
+
+
+	</div>
+</div></div>
+</footer>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+
+<link href="/745732998.css" rel="stylesheet" type="text/css">
+
+<div id="SplashMessageWrapper" class="cp-Splash-wrapper">
+	<div role="dialog" aria-labelledby="cp-Splash-title" aria-describedby="editorContentDesc" aria-modal="true" tabindex="-1" id="SplashMessage" class="hidden cp-Splash cp-Splash--modal is-open">
+		<div class="cp-Splash-header">
+			<h2 class="cp-Splash-title" id="cp-Splash-title">Loading</h2>
+			<button class="cp-Splash-Btn cp-Splash-close" aria-label="Close this modal" title="Close this window">
+				<svg id="iconClose" viewbox="0 0 25 25">
+					<polygon style="fill:currentcolor" points="18.806,6.98 18.075,6.248 12.532,11.792 6.989,6.248 6.257,6.98 11.786,12.508 6.212,18.084 6.943,18.815 12.532,13.224 18.12,18.815 18.851,18.084 13.277,12.508"></polygon>
+				</svg>
+			</button>
+		</div>
+		<div class="cp-Splash-body">
+			<div class="cp-Splash-Prose editorContent fr-view" id="editorContentDesc">
+				<!-- Content from the Froala Editor will go here. -->
+				Loading
+			</div>
+		</div>
+		<div class="cp-Splash-footer">
+			<button class="cp-Splash-Btn cp-Splash-Btn--NoShow">Do Not Show Again</button>
+			<button class="cp-Splash-Btn cp-Splash-Btn--Close">Close</button>
+		</div>
+	</div>
+</div>
+
+<script src="/Assets/Scripts/APIClient.js"></script>
+<script src="/Assets/Mystique/Shared/Scripts/Moment/Moment.min.js"></script>
+<script src="/Assets/Scripts/SplashModal/SplashModalRender.js"></script>
+<script>
+
+		$(document).ready(function () {
+			var filter = {
+				targetId: '',
+				targetType: 0
+			}
+
+			new SplashModalRender().triggerRender(filter);
+		});
+</script>
+
+	
+
+    
+
+
+	
+
+
+
+
+
+
+    <script src="/-1442400649.js" type="text/javascript"></script>
+    <!-- Fixed Nav Adjustment -->
+<script>
+  function getValueTS(elem, attr) {
+    var val = elem.css(attr);
+    if (val === undefined) return undefined;
+    var num = parseInt(val, 10);
+    if (num === NaN) return undefined;
+    return num;
+  }
+
+  function clampTS(number, min, max) {
+    return Math.min(Math.max(number, min), max);
+  }
+
+  function isPageEditingTS() {
+    return (
+      $("#doneEditing").length > 0 || // In live edit
+      typeof DesignCenter !== "undefined" // In theme manager
+    );
+  }
+
+  var bgColorRegexTS = new RegExp("rgba\((\d+), (\d+), (\d+), (\d*\.?\d*)\)");
+  function isTransparentTS(elem) {
+    var bg = elem.css('background-color');
+    if (typeof bg !== "string") return false;
+    if (bg === "transparent") return true;
+    if (!bg.startsWith('rgba(')) return false;
+    var matchState = bg.match(bgColorRegexTS);
+    if (!matchState || matchState.length !== 5) return false;
+    var alpha = parseFloat(matchState[4], 10);
+    if (!(alpha >= 0 && alpha < 1)) return false;
+    return true;
+  }
+
+  function iterateLeftpads(cb) {
+    var containersTS = $("[class^='siteWrap'],[class*=' siteWrap']");
+    for (var i = 0; i < containersTS.length; i++) {
+      var containerTS = containersTS[i];
+      // Skip the body container and anything with data-skip-leftpad
+      if (
+        containerTS.id !== "bodyContainerTS" &&
+        containerTS.getAttribute('data-skip-leftpad') === null
+      ) {
+        cb(containerTS);
+      }
+    }
+  }
+
+  function iterateRightpads(cb) {
+    var containersTS = $("[class^='siteWrap'],[class*=' siteWrap']");
+    for (var i = 0; i < containersTS.length; i++) {
+      var containerTS = containersTS[i];
+      // Skip the body container and anything with data-skip-rightpad
+      if (
+        containerTS.id !== "bodyContainerTS" &&
+        containerTS.getAttribute('data-skip-rightpad') === null
+      ) {
+        cb(containerTS);
+      }
+    }
+  }
+
+  var anchor = $("#divToolbars");
+  var bodyContainerTS = $("#bodyContainerTS");
+
+  // Outer banner padding (push banner down)
+  var outerSizingTS = $("#bannerContainerTS");
+  // Inner banner padding (push banner content down) - Transparent header OR on attaching headers
+  var innerSizingTS = $("#bannerSizingTS");
+
+  var forceUnfixClassTS = "forceUnfixTS";
+
+  var fixedTopTS = $(".fixedTopTS");
+  var fixedBottomTS = $(".fixedBottomTS");
+  var fixedLeftTS = $(".fixedLeftTS");
+  var fixedRightTS = $(".fixedRightTS");
+
+  var initialTopTS;
+  var topAttachTS;
+  if (fixedTopTS && fixedTopTS.length === 1) {
+    initialTopTS = getValueTS(fixedTopTS, 'top');
+    var attachment = fixedTopTS.attr('data-attach');
+    if (attachment) topAttachTS = $("#" + attachment);
+    if (!topAttachTS || topAttachTS.length !== 1) topAttachTS = undefined;
+  }
+
+  function resizeAdjustmentTS() {
+    var editing = isPageEditingTS();
+
+    // Fixed top script
+    (function () {
+      if (!fixedTopTS || fixedTopTS.length !== 1 || initialTopTS === undefined) return;
+
+      if (editing) {
+        fixedTopTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedTopTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      var topPosition = fixedTopTS.css('position');
+      if (topPosition === 'fixed') {
+        if (topAttachTS) {
+          scrollAdjustmentTS();
+        } else {
+          var anchorHeight = anchor.outerHeight() - 1;
+          fixedTopTS.css('top', anchorHeight + initialTopTS);
+        }
+      } else {
+        fixedTopTS.css('top', initialTopTS);
+      }
+
+      if (topPosition === 'fixed' || topPosition === 'absolute') {
+        // Bump the banner content down
+        if (isTransparentTS(fixedTopTS)) {
+          innerSizingTS.css('padding-top', initialTopTS + fixedTopTS.outerHeight());
+          outerSizingTS.css('padding-top', '');
+
+          try {
+            window.Pages.onResizeHandlersExecute();
+          } catch (e) { }
+        } else {
+          outerSizingTS.css('padding-top', fixedTopTS.outerHeight() - 1);
+          innerSizingTS.css('padding-top', '');
+        }
+      } else {
+        innerSizingTS.css('padding-top', '');
+        outerSizingTS.css('padding-top', '');
+      }
+    })();
+
+    // Fixed bottom script
+    (function () {
+      if (!fixedBottomTS || fixedBottomTS.length === 0) return;
+
+      // If the widget has gone narrow, force unfix
+      if (editing || fixedBottomTS.outerHeight() > 200) {
+        fixedBottomTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedBottomTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      if (fixedBottomTS.css('position') === 'fixed') {
+        bodyContainerTS.css('padding-bottom', fixedBottomTS.outerHeight());
+      } else {
+        bodyContainerTS.css('padding-bottom', '');
+      }
+    })();
+
+    // Fixed left script
+    (function () {
+      if (!fixedLeftTS || fixedLeftTS.length === 0) return;
+
+      if (editing) {
+        fixedLeftTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedLeftTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      if (fixedLeftTS.css('position') === 'fixed') {
+        var anchorHeight = anchor.outerHeight() - 1;
+        fixedLeftTS.css('top', anchorHeight);
+        var leftBoundingTS = fixedLeftTS[0].getBoundingClientRect();
+        iterateLeftpads(function (containerTS) {
+          var containerBoundingTS = containerTS.getBoundingClientRect();
+          if (containerBoundingTS.left <= leftBoundingTS.right) {
+            $(containerTS).css('padding-left', leftBoundingTS.width + 16);
+          } else {
+            $(containerTS).css('padding-left', '');
+          }
+        });
+      } else {
+        fixedLeftTS.css('top', '');
+        iterateLeftpads(function (containerTS) {
+          $(containerTS).css('padding-left', '');
+        });
+      }
+    })();
+
+    // Fixed right script
+    (function () {
+      if (!fixedRightTS || fixedRightTS.length === 0) return;
+
+      if (editing) {
+        fixedRightTS[0].classList.add(forceUnfixClassTS);
+      } else {
+        fixedRightTS[0].classList.remove(forceUnfixClassTS);
+      }
+
+      if (fixedRightTS.css('position') === 'fixed') {
+        var anchorHeight = anchor.outerHeight() - 1;
+        fixedRightTS.css('top', anchorHeight);
+        var rightBoundingTS = fixedRightTS[0].getBoundingClientRect();
+        iterateRightpads(function (containerTS) {
+          var containerBoundingTS = containerTS.getBoundingClientRect();
+          if (containerBoundingTS.right >= rightBoundingTS.left) {
+            $(containerTS).css('padding-right', rightBoundingTS.width + 16);
+          }
+        });
+      } else {
+        fixedRightTS.css('top', '');
+        iterateRightpads(function (containerTS) {
+          $(containerTS).css('padding-right', '');
+        });
+      }
+    })();
+  }
+
+  function scrollAdjustmentTS() {
+    if (!fixedTopTS || fixedTopTS.length !== 1 || !topAttachTS || topAttachTS.length !== 1) return;
+    var topPosition = fixedTopTS.css('position');
+    if (topPosition === 'fixed' || topPosition === 'absolute') {
+      var anchorBounding = anchor[0].getBoundingClientRect();
+      var attachBounding = topAttachTS[0].getBoundingClientRect();
+      var scrollTop = $(window).scrollTop();
+
+      fixedTopTS.css('top', Math.max(anchorBounding.bottom - 1, attachBounding.bottom));
+    } else {
+      fixedTopTS.css('top', initialTopTS);
+    }
+  }
+
+  $(window).load(function () {
+    setTimeout(function () {
+      try {
+        resizeAdjustmentTS();
+      } catch (e) {
+        console.error(e);
+      }
+    }, 350);
+
+    $(window).scroll(function () {
+      try {
+        scrollAdjustmentTS();
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    var adjustTimeoutTS;
+    $(window).resize(function () {
+      clearTimeout(adjustTimeoutTS);
+      adjustTimeoutTS = setTimeout(function () {
+        try {
+          resizeAdjustmentTS();
+        } catch (e) {
+          console.error(e);
+        }
+      }, 350);
+    });
+
+    $.when(window.Pages.angularToolbarComplete).done(function () {
+      try {
+        resizeAdjustmentTS();
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  });
+</script>
+<!-- End Fixed Nav Adjustment -->
+
+<!----------Google Translate (Mobile Friendly)--------->
+
+<style>#google-translate-container {float: right;padding: 3px 5px 0px 0px;}.goog-te-combo,.goog-te-banner *,.goog-te-ftab *,.goog-te-menu *,.goog-te-menu2 *,.goog-te-balloon * {font-family: arial;font-size: 10pt;background-image: url("https://theme.zdassets.com/theme_assets/958586/bae8aa24db8d43595871692a9d259186f2db3fb4.png");background-position: 3px 4px;background-size: 22px;background-repeat: no-repeat;padding-left: 30px !important;background-color: #fff;color: #000 !important;}.goog-logo-link {display: none !important;}.goog-te-gadget {color: transparent !important;}.goog-te-gadget .goog-te-combo {margin: 2px 0 !important;border-radius: 15px !important;}.goog-te-combo{border: 1px solid !important;border-color: #bcc9d7 #96a3b1 #96a3b1 #bcc9d7 !important;border-radius: 0 !important;height:32px !important;padding: 0 0 0 30px !important;width: 145px !important;-moz-appearance: none;-webkit-appearance: none;}#launcher-wrapper {bottom: 50px !important;}</style>
+
+ 
+
+<div id="google-translate-container">
+
+<div id="google_translate_element" style="position: fixed; bottom: 0px; right: 20px; z-index: 5;"></div>
+
+</div>
+
+<script>
+
+function googleTranslateElementInit() {
+
+new google.translate.TranslateElement({ pageLanguage: "en" }, "google_translate_element");
+
+    // begin accessibility compliance
+
+    $('img.goog-te-gadget-icon').attr('alt','Google Translate');
+
+    $('div#goog-gt-tt div.logo img').attr('alt','translate');
+
+    $('div#goog-gt-tt .original-text').css('text-align','left');
+
+    $('.goog-te-gadget-simple .goog-te-menu-value span').css('color','#000000');
+
+}
+
+$(function() {
+
+$.getScript("//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit");
+
+});
+
+</script>
+
+<!--------------End Google Translate----------------->
+
+
+    <script type="text/javascript">
+        $(function () {
+            document.cookie = "responsiveGhost=0; path=/";
+        });
+        $(window).on("load", function () {
+            $('body').addClass('doneLoading').removeClass('hideContent');
+
+            if ($('#404Content').length > 0)
+                $('div#bodyWrapper').css('padding', '0px');
+        });
+    </script>
+
+    <noscript>
+        <style>
+            body.hideContent {
+                opacity: 1 !important;
+            }
+        </style>
+    </noscript>
+
+        
+<div style="display: none;">
+	<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+
+		<symbol id="iconArrow--left" viewbox="0 0 25 25">
+			<title>Arrow Left</title>
+			<polygon style="fill:currentcolor" points="18.044,25 19.498,23.545 8.409,12.454 19.408,1.455 17.954,0 5.502,12.452"></polygon>
+		</symbol>
+
+		<symbol id="iconArrow--right" viewbox="0 0 25 25">
+			<title>Arrow Right</title>
+			<polygon style="fill:currentcolor" points="6.957,0 5.502,1.455 16.591,12.546 5.592,23.545 7.047,25 19.498,12.548"></polygon>
+		</symbol>
+
+	</svg>
+</div>
+    <script type="text/javascript">loadCSS('//fonts.googleapis.com/css?family=DM+Sans:500,600,700,800,900,italic,regular|Lora:500,600,700,regular|');</script>
+    
+
+    <div class="hidden activeWidgetSkinComponentsOnPageJson">[]</div>
+        <div style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                <symbol id="iconSlideshowArrowLeft" viewbox="0 0 22.68 40">
+                    <title>Slideshow Left Arrow</title>
+                    <g>
+                        <path style="fill:currentcolor;" d="M20,40a2.67,2.67,0,0,1-1.9-.79L.79,21.9a2.68,2.68,0,0,1,0-3.79L18.1.79a2.68,2.68,0,1,1,3.79,3.79L6.47,20,21.89,35.42A2.68,2.68,0,0,1,20,40Z"></path>
+                    </g>
+                </symbol>
+                <symbol id="iconSlideshowArrowRight" viewbox="0 0 22.68 40">
+                    <title>Slideshow Right Arrow</title>
+                    <g>
+                        <path style="fill:currentcolor;" d="M2.68,0a2.67,2.67,0,0,1,1.9.79L21.89,18.1a2.68,2.68,0,0,1,0,3.79L4.58,39.21A2.68,2.68,0,0,1,.79,35.42L16.21,20,.79,4.58A2.68,2.68,0,0,1,2.68,0Z"></path>
+                    </g>
+                </symbol>
+            </svg>
+        </div>
+    
+	
+	
+
+    <div id="root-picker-outlet"></div>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a6147bba58cfe9e7',t:'MTc5NTgxNzY0MA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a6147bba58cfe9e7',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+
+

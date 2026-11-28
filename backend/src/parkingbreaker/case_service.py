@@ -1952,6 +1952,8 @@ class CaseService:
             if case.letter_state is CaseState.NEEDS_CUSTOMER
             else None,
             stop=self._case_stop(case_id, case.case_token),
+            # Upgrade candidate: memoize decoded/guarded ResearchView by (research_sha256,
+            # sources_sha256) so 5-second status polls skip repeated JSON + quote-guard passes.
             research=None if saved is None else research_view(decode_research(saved.research_json)),
             required_copies=None if saved is None else self._required_copy_state(record, saved)[0],
             draft_spans=[] if draft is None else list(_SPANS.validate_json(draft.spans_json)),

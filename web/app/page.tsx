@@ -1380,6 +1380,8 @@ function Journey() {
           setStep(6);
         } else if (status.authorization_pending || (restoredBeta && !betaAccepted)) {
           setStep(4);
+        } else if (status.state === "NEEDS_CUSTOMER") {
+          setStep(3);
         } else if (betaAccepted && !status.window_started_at) {
           setStep(3);
         } else if (status.window_started_at) {
@@ -1606,8 +1608,25 @@ function Journey() {
         return;
       }
       const preHold = await api.preHold(receipt.case_id);
-      if (preHold.kind === "stop") { setLiveStop(preHold as Stop); goTo(8); }
-      else { setLiveOffer(preHold as Offer); goTo(4); }
+      if (preHold.kind === "stop") {
+        if (preHold.reason_key === "filing_evidence_unverified") {
+          try {
+            const pendingStatus = await api.status(receipt.case_id);
+            if (pendingStatus.state === "NEEDS_CUSTOMER") {
+              setLiveStatus(pendingStatus);
+              goTo(3);
+              return;
+            }
+          } catch {
+            /* Fall back to the pre-hold stop if the status read fails. */
+          }
+        }
+        setLiveStop(preHold as Stop);
+        goTo(8);
+      } else {
+        setLiveOffer(preHold as Offer);
+        goTo(4);
+      }
     } catch (error) {
       setLiveError(plainError(error));
     } finally {
@@ -1981,7 +2000,7 @@ function Journey() {
           {step === 1 && <Step1Ticket live={LIVE} canCharge={newPaidAccess} fields={fields} setFields={setFields} plate={plate} setPlate={setPlate} plateState={plateState} setPlateState={setPlateState} backPhoto={backPhoto} setBackPhoto={setBackPhoto} onComplete={handleStep1Complete} setActionBar={setActionBar} vision={LIVE && !PREVIEW_AUTH ? step1Vision : undefined}
             scenePhotos={<CurbsidePhotos live={LIVE} samplePhoto={Boolean(photo)} onSamplePhoto={setPhoto} photos={evidencePhotos} onAdd={addEvidencePhotos} onRemove={removeEvidencePhoto} onRetry={uploadEvidencePhoto} />} />}
           {step === 2 && (<Step2YourSide story={story} setStory={setStory} owner={owner} setOwner={setOwner} photo={photo} setPhoto={setPhoto} onComplete={handleStep2Complete} setActionBar={setActionBar} onRulesClick={openRules} liveSlot={LIVE ? <LiveDetails busy={liveBusy || photoUploads > 0} submitting={liveBusy} error={liveError} onSubmit={handleLiveDetails} values={contactValues} onChange={setContactValues} ticketPhoto={photoFiles.ticket} ticketBackPhoto={photoFiles.back} evidencePhotos={evidencePhotos} ticketPhotoRef={photoRefs.ticket} ticketBackPhotoRef={photoRefs.back} onSelectPhoto={(kind,file) => {void selectPhoto(kind,file);}} onAddEvidencePhotos={addEvidencePhotos} onRemoveEvidencePhoto={removeEvidencePhoto} onMoveEvidencePhoto={moveEvidencePhoto} visionRequired={visionRequired} visionFacts={visionAdoptedFacts ? { issuedCity: visionAdoptedFacts.issued_city, issuedState: visionAdoptedFacts.issued_state, issuerKind: visionAdoptedFacts.issuer_kind } : null} /> : undefined} />)}
-          {step === 3 && LIVE && (<LiveResearch issuerName={liveOffer?.issuer.issuer_name} status={liveStatus} busy={liveBusy} onDraft={handleLiveDraft} onRetry={handleStep5Complete} caseId={liveCase?.caseId} onStatus={handleDestinationStatus} error={liveError} onAnswer={async answer => { if (!liveCase || liveBusy) return; setLiveBusy(true); setLiveError(null); try { handleDestinationStatus(await api.answer(liveCase.caseId,answer)); } catch (error) { setLiveError(plainError(error)); } finally { setLiveBusy(false); } }} setActionBar={setActionBar} />)}
+          {step === 3 && LIVE && (<LiveResearch issuerName={liveOffer?.issuer.issuer_name} status={liveStatus} busy={liveBusy} onDraft={handleLiveDraft} onRetry={handleStep5Complete} caseId={liveCase?.caseId} onStatus={handleDestinationStatus} error={liveError} onAnswer={async answer => { if (!liveCase || liveBusy) return; setLiveBusy(true); setLiveError(null); try { const next = await api.answer(liveCase.caseId,answer); handleDestinationStatus(next); if (!next.window_started_at && next.state === "INTAKE") { const decision = await api.preHold(liveCase.caseId); if (decision.kind === "stop") { setLiveStop(decision); goTo(8); } else { setLiveOffer(decision); goTo(4); } } } catch (error) { setLiveError(plainError(error)); } finally { setLiveBusy(false); } }} setActionBar={setActionBar} />)}
           {step === 3 && !LIVE && (<Step3Research onProgress={setEvidenceCount} onComplete={completeResearch} setActionBar={setActionBar} onOpenFact={(f) => { setSheetFactData(f); setSheetFact(true); }} onOpenChecklist={() => setSheetChk(true)} onGoConflict={openConflict} />)}
           {step === 4 && needsAuthorizationRecovery && <AuthorizationRecovery busy={liveBusy} onRetry={handleAuthorizationRecovery} setActionBar={setActionBar} />}
           {step === 4 && !needsAuthorizationRecovery && LIVE && liveBeta && (<Step4BetaOffer offer={liveBeta} caseId={liveCase?.caseId ?? ""} busy={liveBusy || betaBusy} blocked={betaBlocked} error={betaError} onAccept={handleBetaAccept} onRefresh={() => { void refreshBetaOffer(); }} setActionBar={setActionBar} />)}
