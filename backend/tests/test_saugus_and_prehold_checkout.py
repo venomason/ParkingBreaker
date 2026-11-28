@@ -43,6 +43,7 @@ from parkingbreaker.research.procedure import (
     ProcedureAssessment,
     assessment_data,
     procedure_sections,
+    quote_procedure_sections,
     quote_procedure_stage,
 )
 from parkingbreaker.research.questions import FactKey
@@ -444,6 +445,16 @@ def test_saugus_faq_and_form_quote_guard_and_negative_controls() -> None:
     assert form_text is not None
     assert "".join(s.text for s in procedure_sections(faq_text)) == faq_text
     assert "".join(s.text for s in procedure_sections(form_text)) == form_text
+
+    deadline_quote = "Your appeal must be received within 21 days of the ticket date."
+    repeated = quote_procedure_sections(faq_text, deadline_quote)
+    assert len(repeated) == 2
+    assert quote_procedure_stage(faq_text, deadline_quote) == "first-level review"
+    other_office = repeated[1].text.replace("298 Central Street", "299 Central Street")
+    assert (
+        quote_procedure_stage(faq_text.replace(repeated[1].text, other_office), deadline_quote)
+        is None
+    )
 
     # Payment-mixed sentence is never accepted as a contest mail route or contest address.
     mixed = (

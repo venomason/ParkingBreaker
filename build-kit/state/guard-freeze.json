@@ -5,7 +5,7 @@
   "files": {
     "backend/src/parkingbreaker/research/support.py": "09555187bd2bd6808935284e8e0c25e7d8ab5060f8ecafcb1c232fcc62db8115",
     "backend/src/parkingbreaker/research/findings.py": "7858de81208fab04efd9eb66762f444fc459e38fd68c4c76ba019bc3c2c71b24",
-    "backend/src/parkingbreaker/research/procedure.py": "b8b9ce8995ace8ee07d456470135253c7a135b996412c9cce421972d3550b7ba",
+    "backend/src/parkingbreaker/research/procedure.py": "abb1f90238c13e8aef5812901c82005cfc7b0e7671ae226e23da73a4929aca96",
     "backend/src/parkingbreaker/research/route_requirements.py": "c5a1b3a026c1f585c989b773412103d747a746ed53652c63c2302f34b74bd279"
   },
   "owner_approved_exception": {

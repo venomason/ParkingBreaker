@@ -263,14 +263,45 @@ def quote_procedure_section(text: str, quote: str) -> ProcedureSection | None:
     return matches[0] if len(matches) == 1 else None
 
 
-def quote_procedure_stage(text: str, quote: str) -> str | None:
+def _attributable_quote_sections(text: str, quote: str) -> tuple[ProcedureSection, ...]:
     matches = quote_procedure_sections(text, quote)
-    if not matches:
-        return None
-    stages = {section.stage for section in matches}
+    if len(matches) <= 1:
+        return matches
+
+    faq = _faq_sections(text)
+    stage = matches[0].stage
+    if stage is None or any(section.stage != stage or section not in faq for section in matches):
+        return ()
+    if len({normal(section.text) for section in matches}) == 1:
+        return matches
+
+    # Repeated receipt deadlines can describe one filing route in two FAQ answers.
+    # Require both answers to repeat the same first-stage mail instruction.
+    if stage != "first-level review" or not value_supported_by_quote(
+        FactKey.DEADLINE_RULE, "RECEIPT", quote
+    ):
+        return ()
+    contexts = set()
+    literal = normal(quote)
+    for section in matches:
+        before, _, after = normal(section.text).partition(literal)
+        if not before or literal in after:
+            return ()
+        sentence = re.match(r"\s+([^.!?;]+[.])", after)
+        if sentence is None:
+            return ()
+        mail_instruction = sentence[1].translate(str.maketrans("\u2013\u2014", "--"))
+        if not value_supported_by_quote(FactKey.MAIL_IN_ACCEPTED, True, mail_instruction):
+            return ()
+        contexts.add(mail_instruction.casefold())
+    return matches if len(contexts) == 1 else ()
+
+
+def quote_procedure_stage(text: str, quote: str) -> str | None:
+    matches = _attributable_quote_sections(text, quote)
     # A deadline may start at a delinquency notice, and a hearing may require a
     # completed initial review. Mentioning a different stage is not a section.
-    return matches[0].stage if len(stages) == 1 else None
+    return matches[0].stage if matches else None
 
 
 def quote_jurisdiction_matches(text: str, quote: str, jurisdiction: str) -> bool:
@@ -279,10 +310,8 @@ def quote_jurisdiction_matches(text: str, quote: str, jurisdiction: str) -> bool
     Generic stage headings inherit the preceding explicit issuer. An ambiguous
     heading ends that context; unsectioned legacy pages keep their existing checks.
     """
-    matches = quote_procedure_sections(text, quote)
-    if not matches or (len(matches) > 1 and matches[0].stage is None):
-        return False
-    if any(section.stage != matches[0].stage for section in matches):
+    matches = _attributable_quote_sections(text, quote)
+    if not matches:
         return False
     has_any_issuer = any(s.issuer_heading is not None for s in procedure_sections(text))
     return all(
