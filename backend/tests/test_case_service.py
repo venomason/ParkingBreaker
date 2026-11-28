@@ -74,6 +74,8 @@ PRIVATE["ticket"].update(issuer_hint="Synthetic Parking LLC", issuer_kind="PRIVA
 
 
 class Resolved:
+    discovered_procedure_url: str | None = None
+
     def __init__(self, agency: object, stop: object = None, code: object = None) -> None:
         self.agency, self.stop, self.code = agency, stop, code
 

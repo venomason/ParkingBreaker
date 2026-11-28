@@ -97,6 +97,8 @@ FIELDS = "d" * 64
 
 
 class _Resolved:
+    discovered_procedure_url: str | None = None
+
     def __init__(self, agency: object) -> None:
         self.agency = agency
         self.stop = None

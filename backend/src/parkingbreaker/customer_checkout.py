@@ -38,6 +38,7 @@ from parkingbreaker.research_records import (
     answers_json,
     decode_agency,
     decode_answers,
+    decode_intake_agency,
     decode_research,
     research_json,
 )
@@ -110,9 +111,11 @@ class CustomerCheckout(CaseService):
             )
             if deps is None:
                 return
-            agency = decode_agency(record.agency_json)
+            agency, lead = decode_intake_agency(record.agency_json)
             try:
-                result, reused = self._collect_research(record, agency, deps, record.created_at)
+                result, reused = self._collect_research(
+                    record, agency, deps, record.created_at, discovered_procedure_url=lead
+                )
             except PROVIDER_ERRORS:
                 self._log_research_call(case_id, deps.model_label, None, reused=False)
                 return

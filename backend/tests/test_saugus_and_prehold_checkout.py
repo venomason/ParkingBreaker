@@ -182,6 +182,8 @@ def _build_saugus_checkout(
     paid_cohort_cap: int | None = None,
     city: str = "Saugus",
     payment_rule_quote: str | None = None,
+    directory_only: bool = False,
+    form_refetch: FetchResponse | None = None,
 ) -> tuple[CustomerCheckout, FakePaymentClient, FakeLobClient]:
     now_box = clock_ref if clock_ref is not None else [NOW]
     settings = Settings(
@@ -232,6 +234,18 @@ def _build_saugus_checkout(
                     "status": "CONFIRMED",
                 }
             ]
+        if directory_only:
+            root = "https://saugus-ma.gov/"
+            town = "https://www.saugus-ma.gov/"
+            extra_responses[root] = FetchResponse(
+                root, 301, {"location": "http://www.saugus-ma.gov"}, b""
+            )
+            for path, html in (
+                ("", '<a href="/departments">Departments</a>'),
+                ("departments", '<a href="/collector">Treasurer / Collector</a>'),
+                ("collector", f'Parking violations. <a href="{SAUGUS_URL}">View all FAQs</a>'),
+            ):
+                extra_responses[town + path] = html_response(town + path, html)
         fetcher = FakeFetcher(
             {
                 SAUGUS_URL: html_response(SAUGUS_URL, faq_raw.decode()),
@@ -244,7 +258,7 @@ def _build_saugus_checkout(
                 **extra_responses,
             }
         )
-        urls = (SAUGUS_URL, SAUGUS_FORM_LINK, *extra_urls)
+        urls = () if directory_only else (SAUGUS_URL, SAUGUS_FORM_LINK, *extra_urls)
         snapshot = DotGovSnapshot(
             snapshot_date=date(2026, 11, 26),
             records=(
@@ -374,8 +388,13 @@ def _build_saugus_checkout(
         link_assessor=LlmLinkAssessor(FakeLlmClient({"links": []})),
         candidate_urls=urls,
     )
+    research_fetcher = (
+        fetcher
+        if form_refetch is None
+        else FakeFetcher({**fetcher.responses, SAUGUS_FORM_LINK: form_refetch})
+    )
     research = ResearchDeps(
-        fetcher=fetcher,
+        fetcher=research_fetcher,
         extractor=LlmExtractor(FakeLlmClient(reply)),
         searcher=search,
         wait=lambda _: None,
@@ -506,8 +525,61 @@ def test_saugus_faq_and_form_quote_guard_and_negative_controls() -> None:
     )
 
 
-async def test_saugus_customer_checkout_end_to_end_and_backup_parity(tmp_path: Path) -> None:
-    svc, payments, lob = _build_saugus_checkout(tmp_path)
+@pytest.mark.parametrize(
+    "location", [None, "http://www.saugus-ma.gov/form", "https://elsewhere.example/form"]
+)
+async def test_changed_form_refetch_stops_before_an_offer_or_hold(
+    tmp_path: Path, location: str | None
+) -> None:
+    response = (
+        FetchResponse(SAUGUS_FORM_LINK, 302, {"location": location}, b"")
+        if location
+        else FetchResponse(SAUGUS_FORM_LINK, 404, {}, b"")
+    )
+    svc, payments, _ = _build_saugus_checkout(tmp_path, directory_only=True, form_refetch=response)
+    try:
+        async with AsyncClient(
+            transport=ASGITransport(app=create_app(svc)),
+            base_url="http://saugus.test",
+            headers=ALICE,
+        ) as api:
+            ws = (await api.post("/workspaces", json={"notes": "Source changed"})).json()[
+                "workspace_id"
+            ]
+            photo = (
+                await api.post(
+                    f"/workspaces/{ws}/photos",
+                    json={"content_type": "image/png", "data_base64": PNG_B64},
+                )
+            ).json()["photo_ref"]
+            submitted = await api.post(f"/workspaces/{ws}/intake", json=_saugus_intake(photo))
+            assert submitted.status_code == 200
+            case_id = submitted.json()["case_id"]
+            decision = (await api.get(f"/cases/{case_id}/pre-hold")).json()
+            assert (decision["kind"], decision["reason_key"]) == (
+                "stop",
+                "filing_evidence_unverified",
+            )
+            denied = await api.post(
+                f"/cases/{case_id}/authorization",
+                json={"terms_accepted": True, "payment_method_id": "pm_control"},
+            )
+            assert denied.status_code == 409
+            assert not payments.authorizations
+            assert svc._deps.research is not None
+            fetched = svc._deps.research.fetcher
+            assert isinstance(fetched, FakeFetcher)
+            assert SAUGUS_FORM_LINK in fetched.calls
+            assert location not in fetched.calls
+    finally:
+        svc._store.close()
+
+
+@pytest.mark.parametrize("directory_only", [False, True], ids=["supplied-leads", "from-directory"])
+async def test_saugus_customer_checkout_end_to_end_and_backup_parity(
+    tmp_path: Path, directory_only: bool
+) -> None:
+    svc, payments, lob = _build_saugus_checkout(tmp_path, directory_only=directory_only)
     try:
         async with AsyncClient(
             transport=ASGITransport(app=create_app(svc)), base_url="http://saugus.test"

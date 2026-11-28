@@ -77,6 +77,7 @@ from parkingbreaker.research.sources import (
     EvidenceManifest,
     FetchFailure,
     SourceRecord,
+    is_allowed,
 )
 
 _VERSION = 1
@@ -919,11 +920,8 @@ def _decode(text: str, kind: str) -> object:
     except (json.JSONDecodeError, TypeError) as exc:
         raise ValueError("invalid research JSON") from exc
     data = _object(value, {"version", "kind", "payload"}, "envelope")
-    if (
-        type(data["version"]) is not int
-        or data["version"] not in ({1, 2, 3, 4, 5} if kind == "research" else {1})
-        or data["kind"] != kind
-    ):
+    versions = {"research": {1, 2, 3, 4, 5}, "agency": {1, 2}}.get(kind, {1})
+    if type(data["version"]) is not int or data["version"] not in versions or data["kind"] != kind:
         raise ValueError("unsupported research record version or kind")
     return data["payload"]
 
@@ -1194,9 +1192,9 @@ def decode_resolution(text: str) -> ResearchResolution:
     return _resolution(_decode(text, "resolution"))
 
 
-def agency_json(agency: ResolvedAgency) -> str:
+def agency_json(agency: ResolvedAgency, *, discovered_procedure_url: str | None = None) -> str:
     """The pre-hold's resolved agency, saved so research runs against the same identity."""
-    payload = {
+    payload: dict[str, JsonValue] = {
         "id": agency.id,
         "name": agency.name,
         "state": agency.state,
@@ -1209,14 +1207,29 @@ def agency_json(agency: ResolvedAgency) -> str:
             for scope in agency.delegated_scopes
         ],
     }
-    encoded = _envelope("agency", payload, 1)
+    version = 1
+    if discovered_procedure_url is not None:
+        payload = {"identity": payload, "discovered_procedure_url": discovered_procedure_url}
+        version = 2
+    encoded = _envelope("agency", payload, version)
     decode_agency(encoded)
     return encoded
 
 
 def decode_agency(text: str) -> ResolvedAgency:
+    return decode_intake_agency(text)[0]
+
+
+def decode_intake_agency(text: str) -> tuple[ResolvedAgency, str | None]:
+    """Restore issuer identity and the intake-specific URL to fetch afresh, if present."""
+    decoded = _decode(text, "agency")
+    lead = None
+    if json.loads(text)["version"] == 2:
+        envelope = _object(decoded, {"identity", "discovered_procedure_url"}, "intake agency")
+        lead = _str(envelope["discovered_procedure_url"], "intake.discovered_procedure_url")
+        decoded = envelope["identity"]
     data = _object(
-        _decode(text, "agency"),
+        decoded,
         {
             "id",
             "name",
@@ -1239,7 +1252,7 @@ def decode_agency(text: str) -> ResolvedAgency:
                 None if prefix is None else _str(prefix, "scope.path_prefix"),
             )
         )
-    return ResolvedAgency(
+    agency = ResolvedAgency(
         _str(data["id"], "agency.id"),
         _str(data["name"], "agency.name"),
         _str(data["state"], "agency.state"),
@@ -1249,3 +1262,8 @@ def decode_agency(text: str) -> ResolvedAgency:
         basis_key=_str(data["basis_key"], "agency.basis_key"),
         delegated_scopes=tuple(scopes),
     )
+    if lead is not None and not is_allowed(
+        lead, tuple(SourceScope(host) for host in agency.official_domains)
+    ):
+        raise ValueError("discovered procedure URL must be within the official issuer domains")
+    return agency, lead

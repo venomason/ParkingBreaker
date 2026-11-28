@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, replace
 from datetime import date
+from enum import Enum, auto
 from itertools import chain
 from urllib.parse import urldefrag, urlsplit
 
@@ -85,6 +86,44 @@ def _parking_navigation(page: SourceRecord, scopes: tuple[SourceScope, ...]) -> 
     return list(dict.fromkeys(contest + parking))
 
 
+class _DirectoryStep(Enum):
+    DEPARTMENTS = auto()
+    OFFICE = auto()
+    FAQ = auto()
+
+
+_DIRECTORY_LABELS = {
+    _DirectoryStep.DEPARTMENTS: {
+        "departments",
+        "department directory",
+        "city departments",
+        "town departments",
+    },
+    _DirectoryStep.OFFICE: {
+        "treasurer",
+        "collector",
+        "treasurer/collector",
+        "treasurer and collector",
+    },
+    _DirectoryStep.FAQ: {"faq", "faqs", "view all faqs", "frequently asked questions"},
+}
+_PARKING_CASE = re.compile(r"\bparking\s+(?:tickets?|citations?|violations?)\b", re.I)
+
+
+def _directory_link(
+    page: SourceRecord, scopes: tuple[SourceScope, ...], step: _DirectoryStep
+) -> str | None:
+    """Follow one unambiguous municipal directory link within the matched authority."""
+    urls = {
+        link.href
+        for link in extract_links(page.html or "", page.final_url)
+        if re.sub(r"\s*/\s*", "/", link.anchor_text.casefold()) in _DIRECTORY_LABELS[step]
+        and link.href != page.final_url
+        and is_allowed(link.href, scopes)
+    }
+    return next(iter(urls)) if len(urls) == 1 else None
+
+
 @dataclass(frozen=True)
 class IssuerResolutionAttempt:
     stage: str
@@ -106,6 +145,7 @@ class IssuerResolutionRun:
     delegations: tuple[DelegationResult, ...]
     usage: Usage
     code: VetoCode | None = None
+    discovered_procedure_url: str | None = None
 
     @property
     def stop_family(self) -> StopFamily | None:
@@ -179,6 +219,7 @@ def resolve_ticket_issuer(
     pages: list[SourceRecord] = []
     delegations: list[DelegationResult] = []
     usage = Usage()
+    discovered_procedure_url = None
 
     def finish(resolution: IssuerResolution) -> IssuerResolutionRun:
         return IssuerResolutionRun(
@@ -193,6 +234,7 @@ def resolve_ticket_issuer(
             tuple(delegations),
             usage,
             resolution.code,
+            discovered_procedure_url if resolution.agency is not None else None,
         )
 
     def unverified(reason: str, code: VetoCode) -> IssuerResolutionRun:
@@ -276,6 +318,8 @@ def resolve_ticket_issuer(
                 if url not in urls:
                     urls.append(url)
         use_navigation = outcome is MatchOutcome.SINGLE and len(urls) == 1
+        directory_steps: dict[str, _DirectoryStep] = {}
+        visited: set[str] = set()
         candidate_pages = 0
         for url in urls:
             if (
@@ -301,14 +345,47 @@ def resolve_ticket_issuer(
                     if secure_root not in urls:
                         urls.append(secure_root)
             if isinstance(fetched, SourceRecord):
-                if any(page.final_url == fetched.final_url for page in pages):
+                if fetched.final_url in visited or any(
+                    page.final_url == fetched.final_url for page in pages
+                ):
                     continue
+                visited.add(fetched.final_url)
+                step = directory_steps.get(url)
+                if step in (_DirectoryStep.DEPARTMENTS, _DirectoryStep.OFFICE):
+                    # Directory and office pages spend fetch attempts but are not filing evidence.
+                    next_step = (
+                        _DirectoryStep.OFFICE
+                        if step is _DirectoryStep.DEPARTMENTS
+                        else _DirectoryStep.FAQ
+                    )
+                    if step is _DirectoryStep.DEPARTMENTS or _PARKING_CASE.search(fetched.text):
+                        next_url = _directory_link(fetched, scopes, next_step)
+                        if next_url and next_url not in urls:
+                            directory_steps[next_url] = next_step
+                            urls.append(next_url)
+                    continue
+                if step is _DirectoryStep.FAQ:
+                    if not any(
+                        _PARKING_CASE.search(paragraph)
+                        and has_purpose_term(paragraph, LinkPurpose.CONTEST)
+                        for paragraph in fetched.text.split("\n\n")
+                    ):
+                        continue
+                    discovered_procedure_url = fetched.final_url
                 pages.append(fetched)
                 candidate_pages += 1
                 root = next(scope for scope in scopes if is_allowed(fetched.final_url, (scope,)))
                 fetched_scopes.append((fetched, root))
                 if use_navigation and candidate_pages < max_pages_per_candidate:
-                    for lead in _parking_navigation(fetched, scopes):
+                    leads = _parking_navigation(fetched, scopes)
+                    if step is _DirectoryStep.FAQ:
+                        leads = [*fetched.linked_urls, *leads]
+                    elif not leads and urlsplit(fetched.final_url).path in ("", "/"):
+                        directory = _directory_link(fetched, scopes, _DirectoryStep.DEPARTMENTS)
+                        if directory and directory not in urls:
+                            directory_steps[directory] = _DirectoryStep.DEPARTMENTS
+                            leads = [directory]
+                    for lead in leads:
                         if len(urls) >= MAX_ISSUER_FETCH_ATTEMPTS:
                             break
                         if lead not in urls:
@@ -395,5 +472,9 @@ def resolve_ticket_issuer(
                 and result.scope.host not in domains
             ):
                 domains.append(result.scope.host)
-    agency = replace(agency, official_domains=tuple(domains), delegated_scopes=tuple(delegated))
+    agency = replace(
+        agency,
+        official_domains=tuple(domains),
+        delegated_scopes=tuple(delegated),
+    )
     return finish(replace(resolution, agency=agency))

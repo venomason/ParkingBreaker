@@ -234,6 +234,7 @@ from parkingbreaker.research_records import (
     answers_json,
     decode_agency,
     decode_answers,
+    decode_intake_agency,
     decode_research,
     research_json,
 )
@@ -1269,11 +1270,15 @@ class CaseService:
                 frozenset(body.customer_position.provision_selections),
                 submitted_at,
                 agency_json=(
-                    agency_json(result.agency)
+                    agency_json(
+                        result.agency,
+                        discovered_procedure_url=result.issuer.discovered_procedure_url,
+                    )
                     if (
                         isinstance(view, s.Offer)
                         and result is not None
                         and result.agency is not None
+                        and result.issuer is not None
                     )
                     else None
                 ),
@@ -2357,9 +2362,11 @@ class CaseService:
         )
         if deps is None:
             raise ServiceConflict("research_not_configured")
-        agency = decode_agency(record.agency_json)
+        agency, lead = decode_intake_agency(record.agency_json)
         try:
-            result, reused = self._collect_research(record, agency, deps, case.authorized_at)
+            result, reused = self._collect_research(
+                record, agency, deps, case.authorized_at, discovered_procedure_url=lead
+            )
         except PROVIDER_ERRORS:
             self._apply(
                 case.case_token, Stopped(StopReason.NOT_YET_VERIFIED, hard_stop=HardStop.S1)
@@ -2375,7 +2382,13 @@ class CaseService:
         self._resolve(case_id, case.case_token, result, answers, saved.revision)
 
     def _collect_research(
-        self, record: IntakeRecord, agency: ResolvedAgency, deps: ResearchDeps, started: datetime
+        self,
+        record: IntakeRecord,
+        agency: ResolvedAgency,
+        deps: ResearchDeps,
+        started: datetime,
+        *,
+        discovered_procedure_url: str | None = None,
     ) -> tuple[ResearchResult, bool]:
         intake = s.SubmitIntake.model_validate_json(record.intake_json)
         ticket = intake.ticket
@@ -2415,7 +2428,9 @@ class CaseService:
         return run_research(
             research_ticket,
             agency,
-            known_seeds(agency, deps.known_records),
+            known_seeds(
+                agency, deps.known_records, discovered_procedure_url=discovered_procedure_url
+            ),
             deps.fetcher,
             deps.extractor,
             self._deps.clock,

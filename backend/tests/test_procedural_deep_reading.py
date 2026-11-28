@@ -110,6 +110,21 @@ def test_civicplus_granicus_collapsed_requirements_are_labelled_and_extracted(pa
     assert "[End " in extracted
 
 
+def test_generic_document_link_requires_filing_form_context_in_its_own_block() -> None:
+    html = """
+    <main>
+    <p>Use an appeal form. <a href="/one">See document link -</a></p>
+    <p><a href="/two">View document</a> for a tax payment form.</p>
+    <p>Contest a citation with a form.</p><p><a href="/three">Document</a></p>
+    <li><a href="https://other.example/doc">Document</a> is the contest form.</li>
+    </main>
+    """
+    assert harvest_artifact_links(html, CONTEST_URL) == (
+        "https://www.sfmta.com/one",
+        "https://other.example/doc",
+    )
+
+
 @pytest.mark.parametrize("container", ["main", "article", 'div id="mainContent"'])
 def test_harvesting_uses_main_content_including_hidden_tabs(container: str) -> None:
     closing = container.split()[0]

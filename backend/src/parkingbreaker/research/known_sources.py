@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 from parkingbreaker.agencies import ResolvedAgency
 from parkingbreaker.research.questions import CRITICAL_KEYS
 from parkingbreaker.research.run import SeedUrl
-from parkingbreaker.research.sources import AuthorityClass
+from parkingbreaker.research.sources import AuthorityClass, is_allowed
 
 # Historical statuses eligible to suggest a starting URL.
 USABLE_STATUSES = frozenset({"active", "paused"})
@@ -44,12 +44,22 @@ def record_urls(records: Iterable[Mapping[str, object]]) -> tuple[str, ...]:
 
 
 def known_seeds(
-    agency: ResolvedAgency, records: Iterable[Mapping[str, object]]
+    agency: ResolvedAgency,
+    records: Iterable[Mapping[str, object]],
+    *,
+    discovered_procedure_url: str | None = None,
 ) -> tuple[SeedUrl, ...]:
     """Nominate same-host leads. The fetch guard records out-of-scope path refusals."""
     hosts = _hosts(agency)
+    urls = record_urls(records)
+    if (
+        discovered_procedure_url
+        and is_allowed(discovered_procedure_url, agency.source_scopes())
+        and discovered_procedure_url not in urls
+    ):
+        urls = (*urls, discovered_procedure_url)
     return tuple(
         SeedUrl(url, AuthorityClass.OFFICIAL_PROCEDURE, CRITICAL_KEYS)
-        for url in record_urls(records)
+        for url in urls
         if any(_matches(urlsplit(url).hostname or "", host) for host in hosts)
     )

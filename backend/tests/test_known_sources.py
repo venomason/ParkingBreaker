@@ -9,6 +9,7 @@ import pytest
 
 from parkingbreaker.agencies import SourceScope
 from parkingbreaker.research.known_sources import known_seeds
+from parkingbreaker.research_records import agency_json, decode_agency, decode_intake_agency
 from samples import SAN_FRANCISCO
 
 DATA = Path(__file__).parents[1] / "data" / "cities_2x"
@@ -113,3 +114,17 @@ def test_oakland_lead_preserves_the_original_ticket_requirement() -> None:
     ]
     assert record["appeal_mail_address"]["address1"] == "270 Frank H. Ogawa Plaza"
     assert "original parking ticket" in record["special_requirements"]["required_attachments"]
+
+
+def test_case_discovery_lead_is_scoped_and_round_trips_with_legacy_records() -> None:
+    legacy = agency_json(SAN_FRANCISCO)
+    assert json.loads(legacy)["version"] == 1
+    assert agency_json(decode_agency(legacy)) == legacy
+    url = f"https://{SAN_FRANCISCO.official_domains[0]}/faqs"
+    encoded = agency_json(SAN_FRANCISCO, discovered_procedure_url=url)
+    assert json.loads(encoded)["version"] == 2
+    agency, lead = decode_intake_agency(encoded)
+    assert agency == decode_agency(legacy)
+    assert [seed.url for seed in known_seeds(agency, [], discovered_procedure_url=lead)] == [url]
+    with pytest.raises(ValueError, match="official issuer domains"):
+        decode_agency(encoded.replace(url, "https://other.gov/faq"))

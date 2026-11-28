@@ -435,6 +435,43 @@ def test_without_search_official_parking_navigation_can_find_issuer_evidence(
     assert (result.agency is not None) is verified
 
 
+@pytest.mark.parametrize(
+    ("offices", "office", "faq", "expected"),
+    [
+        ('<a href="https://other.gov/office">Treasurer</a>', "", "", ("depts",)),
+        ('<a href="/cash">Treasurer</a><a href="/tax">Collector</a>', "", "", ("depts",)),
+        (
+            '<a href="/cash">Treasurer</a>',
+            'Tax payments <a href="/faq">FAQs</a>',
+            "",
+            ("depts", "cash"),
+        ),
+        (
+            '<a href="/cash">Treasurer</a>',
+            'Parking violations <a href="/faq">FAQs</a>',
+            '<p>Pay a parking ticket</p><p>Appeal taxes using this <a href="/form">form</a></p>',
+            ("depts", "cash", "faq"),
+        ),
+    ],
+)
+def test_directory_navigation_does_not_establish_a_case_from_unrelated_pages(
+    harness: Harness, offices: str, office: str, faq: str, expected: tuple[str, ...]
+) -> None:
+    harness.searcher = None
+    harness.fetcher = FakeFetcher(
+        {
+            ROOT: html_response(ROOT, '<a href="/depts">Departments</a>'),
+            ROOT + "depts": html_response(ROOT + "depts", offices),
+            ROOT + "cash": html_response(ROOT + "cash", office),
+            ROOT + "faq": html_response(ROOT + "faq", faq),
+        }
+    )
+    result = harness.run()
+    assert harness.fetcher.calls == [ROOT, *(ROOT + path for path in expected)]
+    assert [page.final_url for page in result.pages] == [ROOT]
+    assert_unverified(result)
+
+
 @pytest.mark.parametrize("trailing_slash", ["", "/"])
 def test_directory_root_can_find_its_https_www_site_after_http_redirect(
     harness: Harness, trailing_slash: str

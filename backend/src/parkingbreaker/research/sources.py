@@ -398,14 +398,20 @@ _ARTIFACT_TERMS = re.compile(
 )
 
 
+_DOCUMENT_LABEL = re.compile(
+    r"(?:see |view |download )?(?:the )?document(?: link)?[ .\u2013\u2014-]*", re.I
+)
+_FILING_FORM_CONTEXT = re.compile(r"\b(?:appeals?|contests?|protests?)\b", re.I)
+
+
 class _ContentLinks(HTMLParser):
     """Prefer main/role=main, then article/CMS content; exclude page furniture."""
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
-        self.stack: list[tuple[str, bool, int]] = []
-        self.links: list[tuple[str, str, int]] = []
-        self.anchor: tuple[str, int, list[str]] | None = None
+        self.stack: list[tuple[str, bool, int, list[str] | None]] = []
+        self.links: list[tuple[str, str, int, list[str] | None]] = []
+        self.anchor: tuple[str, int, list[str], list[str] | None] | None = None
         self.main_rank = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
@@ -426,19 +432,27 @@ class _ContentLinks(HTMLParser):
             rank = max(rank, 1)
         if not blocked:
             self.main_rank = max(self.main_rank, rank)
+        block = self.stack[-1][3] if self.stack else None
+        if tag in {"p", "li", "td", "dd"}:
+            block = []
         if tag not in _VOID:
-            self.stack.append((tag, blocked, rank))
+            self.stack.append((tag, blocked, rank, block))
         if tag == "a" and not blocked and values.get("href"):
-            self.anchor = (values["href"] or "", rank, [])
+            self.anchor = (values["href"] or "", rank, [], block)
 
     def handle_data(self, data: str) -> None:
-        if self.anchor is not None and not (self.stack and self.stack[-1][1]):
+        if self.stack and self.stack[-1][1]:
+            return
+        block = self.stack[-1][3] if self.stack else None
+        if block is not None:
+            block.append(data)
+        if self.anchor is not None:
             self.anchor[2].append(data)
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "a" and self.anchor is not None:
-            href, rank, parts = self.anchor
-            self.links.append((href, "".join(parts), rank))
+            href, rank, parts, block = self.anchor
+            self.links.append((href, "".join(parts), rank, block))
             self.anchor = None
         for index in range(len(self.stack) - 1, -1, -1):
             if self.stack[index][0] == tag:
@@ -459,9 +473,17 @@ def harvest_artifact_links(
     parser.feed(html)
     parser.close()
     links: dict[str, None] = {}
-    for href, anchor, rank in parser.links:
-        if rank != parser.main_rank or not _ARTIFACT_TERMS.search(href + " " + anchor):
+    for href, anchor, rank, block in parser.links:
+        if rank != parser.main_rank:
             continue
+        if not _ARTIFACT_TERMS.search(href + " " + anchor):
+            if not block or not _DOCUMENT_LABEL.fullmatch(" ".join(anchor.split())):
+                continue
+            context = " ".join(block)
+            if not _FILING_FORM_CONTEXT.search(context) or not re.search(
+                r"\bforms?\b", context, re.I
+            ):
+                continue
         if href.startswith("#"):
             continue
         # Do not let urljoin strip unsafe characters/dot segments into an allowed tenant.
