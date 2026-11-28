@@ -7,6 +7,110 @@
   "github_main_readback": "5808e38ebb7a777aa6c2da819985084b82a9b4ec",
   "previous_rehearsed_revision": "7db2a277766109582d595f23d0fbc3c36fb54308",
   "local_evidence_root": "/home/ghostmonday/Vault/Ops/runs/pb-filing-20261127-lzNDp0",
+  "local_final_validation": {
+    "recorded_utc": "2026-11-28T02:01:32.673061+00:00",
+    "signed_application_revision": "261215c2df2115a3db516c59a80dc54ebf56c1b1",
+    "application_tree": "a8e9c4123995eee68c7907b358fb207f89ea0fea",
+    "application_fingerprint": "4c48fc81e85306bdff985d0bf03997030c43cd00a5085f089eba9b8d6aba6ce8",
+    "local_evidence_root": "/home/ghostmonday/Vault/Ops/runs/pb-local-final-20261127-a5758c1.JtYzPH",
+    "source_candidate_with_regression": {
+      "revision": "a5758c1b8c595f35c969ecc06528e75e99d390b3",
+      "backend_passed": 14325,
+      "backend_failed": 1,
+      "reproduced_failure": "tests/test_t21_review_regressions.py::test_repeated_quote_in_distinct_same_stage_sections_is_ambiguous"
+    },
+    "correction": "Identical wording across distinct procedure sections no longer establishes a stage. Repeated bounded FAQ passages require matching context, including the same explicit mailing instruction for repeated receipt deadlines.",
+    "qualification": "Passed locally with fictional tickets, archived official sources and fake payment and mailing providers",
+    "backend": {
+      "passed": 14326,
+      "failed": 0,
+      "skipped": 0,
+      "batches": 6,
+      "elapsed_seconds": 417.84,
+      "ruff_and_strict_mypy_passed": true
+    },
+    "focused_filing_and_checkout_tests_passed": 66,
+    "offline_research_and_vision_self_tests_passed": true,
+    "guard_freeze_doctor_passed": true,
+    "browser": {
+      "paid": 166,
+      "paid_with_ticket_reading": 17,
+      "controlled_free_beta_with_ticket_reading": 244,
+      "total": 427,
+      "physical_devices_tested": false
+    },
+    "fresh_saugus_checkout": {
+      "revision": "261215c2df2115a3db516c59a80dc54ebf56c1b1",
+      "application_fingerprint": "4c48fc81e85306bdff985d0bf03997030c43cd00a5085f089eba9b8d6aba6ce8",
+      "source_unchanged": true,
+      "services_stopped": true,
+      "fresh_browser": true,
+      "fake_provider_only": true,
+      "passed": true,
+      "ticket_photos": 2,
+      "ocr": "local Tesseract; scripted second review",
+      "intake_before_hold": "NEEDS_CUSTOMER",
+      "prehold_question": "VEHICLE_RELATIONSHIP",
+      "mock_recipient": [
+        "Town of Saugus",
+        "Parking Hearings Officer",
+        "298 Central Street",
+        "Suite 5",
+        "Saugus, MA 01906",
+        "US"
+      ],
+      "packet_pages": 3,
+      "packet_sha256": "172f12e90bd04491790115215857c1a03f550bb3a3b7ba89c9540833589b4b9d",
+      "envelope_sha256": "dacdb95aa584a7e3fc7361d29882a58630589c97c617c85b7e4f487a8574f25e",
+      "preview_approval_dispatch_hashes_match": true,
+      "final_status": {
+        "state": "IN_TRANSIT",
+        "payment_state": "CAPTURED"
+      },
+      "fake_amount_cents": 2499,
+      "authorized_attempts": 1,
+      "mail_creates": 1,
+      "capture_mutations": 1,
+      "original_tracking_record_available": true,
+      "sqlite_integrity_check": "ok",
+      "backup_record_parity": true,
+      "research": {
+        "stage": "first-level review",
+        "official_source_sha256": [
+          "aa33522df2ed4d5ee26e399f097178d538368c416d6814a5a717f013aa15c70c",
+          "c514380fb9ded25e85a2849c6a4b020176be9759dfee887139b1c64f78488279"
+        ],
+        "ticket_issue_date": "2026-11-27",
+        "official_rule": "receipt",
+        "official_deadline": "2026-12-18",
+        "latest_safe_certified_mail_date": "2026-12-07"
+      }
+    },
+    "evidence": {
+      "backend": {
+        "file": "corrected-backend.json",
+        "sha256": "ed3f448c02d3c722711ca8c17ef8bf38456468be0a065ce1ddbc2bafb8ba1733"
+      },
+      "fresh_checkout": {
+        "file": "corrected-fresh_checkout.json",
+        "sha256": "d32b19586f0e0114d9f45d613233bf8c3e9cd168aa01ee1ad336800b22c8ad8c"
+      },
+      "paid_browser": {
+        "file": "corrected-paid_browser.json",
+        "sha256": "78321da9ead2c03057fe5f12f75c9f95e9308c6b07ea854ad0c3c85f9be36387"
+      },
+      "paid_ocr_browser": {
+        "file": "corrected-paid_ocr_browser.json",
+        "sha256": "d587a89ac85c94796b6d6759e72dc4f1edfb01d04b70c36f022ad73253480e4f"
+      },
+      "controlled_free_beta_browser": {
+        "file": "corrected-controlled_free_beta_browser.json",
+        "sha256": "4520351b6244f4626b7ad7cbce5658f54c9b9a603ecddc753442615c37c174da"
+      }
+    },
+    "release_decision": "NO-GO for live paid beta",
+    "next_gate": "Owner-approved private deployed sandbox checkout on the matching signed application revision, including same-order provider interruption and recovery."
+  },
   "qualification": {
     "fresh_customer_upload_and_correction": "passed locally on three independent browser orders",
     "official_positive_filing_and_checkout": "failed locally at the filing guard",
@@ -647,11 +751,11 @@
   "remaining_and_owner": [
     {
       "owner": "Engineering",
-      "action": "Reproduce the Saugus initial mailed appeal independently of the optional form, payment instructions and later court review. Verify stage, required documents, absence claims and the official receipt clock before a new fresh positive browser checkout."
+      "action": "Prepare matching website and API image inputs pinned to the locally qualified signed revision 261215c before requesting the next private rehearsal window."
     },
     {
       "owner": "Engineering and Amir as rehearsal approver",
-      "action": "After a genuine local pass, pin both matching images and request one private, costed, expiring window. Verify private HTTPS and the complete same-order sandbox checkout, provider-accepted interruption, signed callbacks, quarantined backup, recovery and rollback before teardown."
+      "action": "Review the matching image inputs and decide on one private, costed, expiring rehearsal window. Verify private HTTPS and the complete same-order sandbox checkout, provider-accepted interruption, signed callbacks, quarantined backup, recovery and rollback before teardown."
     },
     {
       "owner": "Operations, equipment/print reviewer and outage responder",
