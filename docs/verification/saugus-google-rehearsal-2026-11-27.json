@@ -1,0 +1,301 @@
+{
+  "business_date_pacific": "2026-11-27",
+  "observed_order_utc": "2026-11-28T04:41:23.520784+00:00",
+  "scope": "One fictional Saugus first-stage appeal on the private Google qualification VM. No live customers admitted.",
+  "candidate": "261215c2df2115a3db516c59a80dc54ebf56c1b1",
+  "private_site": {
+    "origin": "https://pb-qual-1127.parkingbreaker.test",
+    "transport": "Google IAP tunnel to loopback, hostname-checked TLS and browser certificate pin",
+    "provider_mode": "test",
+    "anonymous_session_http": 401,
+    "build_id": "bd74e41a-03e5-445c-b6b1-c403b7eab22f",
+    "start_utc": "2026-11-28T04:31:12.257479121Z",
+    "finish_utc": "2026-11-28T04:38:12.813598Z",
+    "images": {
+      "backend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-backend@sha256:e614a1da418f2191a25195596c9c292ff67ec9d12e1c3198095ec7bf60bf4792",
+      "frontend": "us-west1-docker.pkg.dev/neuraldraft-parkingbreaker/parkingbreaker/qual-frontend@sha256:11730dac58521f3e72976909f8f044636ae05bdd6420f2cd671df80ad73d1b23"
+    }
+  },
+  "public_site": {
+    "origin": "https://parkingbreaker.com",
+    "health_http": 200,
+    "mode": "fake",
+    "revision": "908ac8007120e12748112fc4752809b51691358a",
+    "customer_order_run_here": false,
+    "observed_utc": "2026-11-28T04:44:13.360890+00:00"
+  },
+  "customer_path": {
+    "photos": "Two generated fictional PNGs, front and back.",
+    "photo_sha256": {
+      "front": "1ebe9e8dd11d5abc8beba3e42145c5545f0b1e3fba85350af1402d51bade7b51",
+      "back": "5cccbd0bc84e61f55cdd9bacd3dbc090dc8e34319f49323e50bd8b45c6ec89a6"
+    },
+    "operations": [
+      {
+        "operation": "extract",
+        "status": "success",
+        "started_at": "2026-11-28T04:40:48.509472+00:00",
+        "completed_at": "2026-11-28T04:40:51.054337+00:00",
+        "result_sha256": "565bea95bbff423e684f52f668a28c13383ac5599fd78dd7cfeeb2e1d599117e",
+        "model": "gemini-3.5-flash-lite",
+        "synthetic_flag": false
+      },
+      {
+        "operation": "review",
+        "status": "success",
+        "started_at": "2026-11-28T04:41:07.458074+00:00",
+        "completed_at": "2026-11-28T04:41:08.939058+00:00",
+        "result_sha256": "3ca9f5de32157bfa00d1db7f9ccb5d6e182bab95d6ea629e08807a874b4a2f1a",
+        "model": null,
+        "synthetic_flag": false
+      }
+    ],
+    "review_model_configured": "gemini-3.5-flash-lite",
+    "observed_ocr": [
+      "citation number",
+      "issuer name",
+      "issue date",
+      "violation",
+      "city",
+      "state",
+      "stage"
+    ],
+    "absent_on_ticket": [
+      "plate",
+      "plate state",
+      "notice date",
+      "absolute deadline"
+    ],
+    "customer_supplied_plate": true,
+    "customer_confirmations": 1,
+    "independent_comparison_required_resolution": [
+      "issued_city",
+      "issued_state"
+    ],
+    "comparison_resolution": "ABSENCE_ACKNOWLEDGED for both separately printed fields.",
+    "intake_http": 200,
+    "state": "STOPPED_NO_CHARGE",
+    "decision_http": 200,
+    "decision": {
+      "kind": "stop",
+      "case_id": "[redacted]",
+      "family": "NOT_YET_VERIFIED",
+      "hard_stop": "S2",
+      "reason_key": "stop.not_yet_verified.not_yet_verified.s2.no_pages",
+      "message": "We can't confirm how TOWN OF SAUGUS, MA handles mailed appeals, so we won't take your payment. Nothing was charged. Your work is saved. You can review your saved details and try again.",
+      "no_charge": true,
+      "work_preserved": true,
+      "official_quote": null
+    },
+    "persisted_original_decision_sha256": "df0a026c6cb0b7d026e6042c88b7acc776032c3c7054c99677428ed2a95e411f",
+    "case_id_sha256": "53f2de3baaff4d07c01850e263b245314ce85d764c2397fd7eca512834d53ec4",
+    "persisted_counts": {
+      "pb_workspaces": 1,
+      "pb_ticket_intake_operations": 2,
+      "pb_ticket_intake_confirmations": 1,
+      "pb_intake_records": 1,
+      "pb_intake_authorization_attempts": 0,
+      "pb_intake_drafts": 0,
+      "pb_payment_operations": 0,
+      "pb_mail_attempts": 0,
+      "pb_case_history": 0,
+      "pb_intake_research": 0
+    },
+    "model_cost_records": [
+      {
+        "worker": "INTAKE_READING",
+        "calls": 2,
+        "reserved_cents": 50,
+        "estimated_settled_cents": 2,
+        "budget_used_cents": 2
+      }
+    ]
+  },
+  "source_diagnosis": {
+    "transaction_stop": "NO_PAGES",
+    "model_issuer_assessment_reached": false,
+    "basis": "Signed resolver returns NO_PAGES before issuer assessment. The isolated ledger has extraction and review entries only.",
+    "separate_read_only_checks_from_same_container": [
+      {
+        "stage": "directory",
+        "outcome": "SINGLE",
+        "first_domains": [
+          "saugus-ma.gov"
+        ],
+        "directory_sha256": "a46c68589f391e2217026bc150add0c2f51cd4932ce1f734f0e9c085482c41f7"
+      },
+      {
+        "url": "https://saugus-ma.gov/",
+        "trace": [
+          {
+            "host": "saugus-ma.gov",
+            "http": 301,
+            "redirect_host": "www.saugus-ma.gov",
+            "bytes": 59
+          }
+        ],
+        "saved": false,
+        "failure": "not on the allowlist: http://www.saugus-ma.gov"
+      },
+      {
+        "url": "https://www.saugus-ma.gov/",
+        "trace": [
+          {
+            "host": "www.saugus-ma.gov",
+            "http": 200,
+            "redirect_host": null,
+            "bytes": 164436
+          }
+        ],
+        "saved": true,
+        "final_url": "https://www.saugus-ma.gov/"
+      },
+      {
+        "url": "https://www.saugus-ma.gov/m/faq?cat=21",
+        "trace": [
+          {
+            "host": "www.saugus-ma.gov",
+            "http": 200,
+            "redirect_host": null,
+            "bytes": 159594
+          }
+        ],
+        "saved": true,
+        "final_url": "https://www.saugus-ma.gov/m/faq?cat=21"
+      },
+      {
+        "url": "https://www.saugus-ma.gov/DocumentCenter/View/1497",
+        "trace": [
+          {
+            "host": "www.saugus-ma.gov",
+            "http": 301,
+            "redirect_host": null,
+            "bytes": 186
+          },
+          {
+            "host": "www.saugus-ma.gov",
+            "http": 200,
+            "redirect_host": null,
+            "bytes": 184721
+          }
+        ],
+        "saved": true,
+        "final_url": "https://www.saugus-ma.gov/DocumentCenter/View/1497/town_of_saugus_parking_appeal_form_0?bidId="
+      }
+    ]
+  },
+  "recovery": {
+    "verified_utc": "2026-11-28T04:43:12.852038+00:00",
+    "candidate": "261215c2df2115a3db516c59a80dc54ebf56c1b1",
+    "scope": "Private one-shot scheduled, encrypted backup from the qualification VM, independently opened on the workstation in quarantine. This case stopped before a provider operation.",
+    "systemd_trigger": "",
+    "manifest_sha256": "95ee5424e8ae2384dd2123f07650a428e0f01fe762c84eecd4d9933763659fcc",
+    "encrypted_bundle_sha256": "7df97dd3b8f3992ed91f0dc1a47915e4eb6f52e1f0042d07916cc412711ca4d1",
+    "records_match": true,
+    "artifacts_match": true,
+    "case_and_decision_match": true,
+    "photos_match": 2,
+    "restore_quarantined": true,
+    "provider_lookup_anchors": 0,
+    "local_restore_seconds": 0.085,
+    "integrity": "ok"
+  },
+  "cleanup": {
+    "observed_utc": "2026-11-28T04:43:50.048802+00:00",
+    "vm_containers_absent_and_port_closed": true,
+    "build_terminal_state": "SUCCESS",
+    "backend_tag_absent": true,
+    "frontend_tag_absent": true,
+    "created_source_generation_absent": true,
+    "url_map_unchanged": true,
+    "sha256": "e0164cd86a3c915431d05a6bb75f639b40d60550a139d171a869abc2d976f4a8",
+    "new_webhook_subscriptions": 0,
+    "public_routes_added": 0,
+    "standing_configuration_and_container_fingerprint_unchanged": true,
+    "public_checks_before_and_after_match": true,
+    "private_route_rollback": {
+      "private_listener_removed": true,
+      "backend_health_unreachable_via_removed_listener": true,
+      "same_gateway_and_api_restored": true,
+      "private_signed_health_recovered": true
+    },
+    "isolated_guest_working_directory_removed": true,
+    "labeled_networks_absent": true,
+    "final_guest_verification_utc": "2026-11-28T04:52:49.998335+00:00"
+  },
+  "limits": [
+    "No affirmative filing route, signed callbacks on this order, provider interruption, customer payment, mailing or physical-device run.",
+    "The successful restore covers the stopped order only.",
+    "This run did not test the public website through checkout or qualify Gemini for production issuer research."
+  ],
+  "local_followup": {
+    "revision": "579fdb3e88b91b8798eb28a9c1392118ed5c8264",
+    "deployed_in_this_window": false,
+    "transport_check": {
+      "utc": "2026-11-28T04:47:55.355866+00:00",
+      "candidate": "579fdb3e88b91b8798eb28a9c1392118ed5c8264",
+      "scope": "Workstation running corrected resolver against official sites, with search disabled and a zero model budget.",
+      "fetch": [
+        {
+          "url": "https://saugus-ma.gov/",
+          "error": "not on the allowlist: http://www.saugus-ma.gov"
+        },
+        {
+          "url": "https://www.saugus-ma.gov/",
+          "error": null
+        }
+      ],
+      "saved": [
+        {
+          "url": "https://www.saugus-ma.gov/",
+          "sha256": "1138098098b158b14b57823edbd31c2b3b6f20489ebf87243255816eb06f7c4a"
+        }
+      ],
+      "final_code": "BUDGET_EXHAUSTED",
+      "model_calls": 0
+    },
+    "interpretation": "The corrected workstation resolver saved the official HTTPS homepage. The zero-model, search-disabled check did not discover the FAQ or form or reach a filing decision.",
+    "validation": {
+      "backend_tests_passed": 14330,
+      "backend_tests_collected": 14330,
+      "elapsed_seconds": 403.12,
+      "focused_tests_passed": 186,
+      "new_regression_before_fix": "Positive redirect cases failed on the unmodified resolver for bare host and trailing slash.",
+      "ruff_lint_format": true,
+      "strict_mypy": true,
+      "offline_qualification_self_tests": true,
+      "frozen_research_guard_doctor": true,
+      "deployed_after_fix": false
+    }
+  },
+  "ops_evidence": "/home/ghostmonday/Vault/Ops/runs/pb-private-261215c.xwUFjK",
+  "browser_replay": {
+    "runner": "tools/qualification/saugus-browser.cjs",
+    "fixture_generator": "tools/qualification/saugus_ticket.py",
+    "scope": "One generated fictional Saugus intake through the initial pre-hold response. Supply the expected 40-character revision, test origin and a new receipt path. An IAP deployment also takes the loopback port and hostname-checked certificate. A stop or a pending question ends the replay.",
+    "qualification": "The private run exercised the Playwright steps individually. The consolidated runner was syntax-checked and refused the public fake-mode service before opening a customer session. A full second deployed run of the consolidated runner is pending.",
+    "public_preflight": [
+      {
+        "utc": "2026-11-28T04:53:27.619Z",
+        "event": "observed-health",
+        "mode": "fake",
+        "build_commit": "908ac8007120e12748112fc4752809b51691358a"
+      },
+      {
+        "utc": "2026-11-28T04:53:27.620Z",
+        "event": "incomplete",
+        "last_step": "observed-health",
+        "error_type": "AssertionError"
+      }
+    ]
+  },
+  "cost": {
+    "prior_google_billing_report": "November 26-27 account report showed $3.18 gross usage and $0.00 after savings.",
+    "new_window_ceiling_usd": 1,
+    "new_window_invoiced_total_usd": null,
+    "observed_build_seconds": 420.56,
+    "app_estimated_ocr_and_review_usd": 0.02,
+    "search_provider_allowance_usd": 0.01,
+    "search_provider_invoice_verified": false
+  }
+}
